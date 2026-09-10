@@ -1,0 +1,107 @@
+//// [tests/cases/conformance/kvs/kvsStaticNullability.ts] ////
+
+=== kvsStaticNullability.ts ===
+declare const item: string | null | undefined;
+>item : string | null | undefined
+
+declare const nullableNumber: number | null | undefined;
+>nullableNumber : number | null | undefined
+
+const widened = "ready" as?;
+>widened : "ready" | null | undefined
+>"ready" as? : "ready" | null | undefined
+>"ready" : "ready"
+
+const asserted = item as!;
+>asserted : string
+>item as! : string
+>item : string | null | undefined
+
+const untouched = item;
+>untouched : string | null | undefined
+>item : string | null | undefined
+
+const nested = [item as!];
+>nested : string[]
+>[item as!] : string[]
+>item as! : string
+>item : string | null | undefined
+
+const grouped = (item as!).length;
+>grouped : number
+>(item as!).length : number
+>(item as!) : string
+>item as! : string
+>item : string | null | undefined
+>length : number
+
+const impossible = null as!;
+>impossible : never
+>null as! : never
+
+const rejectedAddition = nullableNumber + 2;
+>rejectedAddition : number
+>nullableNumber + 2 : number
+>nullableNumber : number | null | undefined
+>2 : 2
+
+const assertedAddition = nullableNumber as! + 2;
+>assertedAddition : number
+>nullableNumber as! + 2 : number
+>nullableNumber as! : number
+>nullableNumber : number | null | undefined
+>2 : 2
+
+let request? = "ready";
+>request : string | null | undefined
+>"ready" : "ready"
+
+request = null;
+>request = null : null
+>request : string | null | undefined
+
+request = "ready";
+>request = "ready" : "ready"
+>request : string | null | undefined
+>"ready" : "ready"
+
+const required! = "ready";
+>required : "ready"
+>"ready" : "ready"
+
+let current! = "ready";
+>current : string
+>"ready" : "ready"
+
+current = "next";
+>current = "next" : "next"
+>current : string
+>"next" : "next"
+
+current = item;
+>current = item : string | null | undefined
+>current : string
+>item : string | null | undefined
+
+const rejectNullableRequired! = item;
+>rejectNullableRequired : string
+>item : string | null | undefined
+
+const rejectNullableConst? = "ready";
+>rejectNullableConst : "ready" | null | undefined
+>"ready" : "ready"
+
+let rejectTypedNullable?: string = "ready";
+>rejectTypedNullable : string
+>"ready" : "ready"
+
+const rejectSpacedNullableAssertion = "ready" as ?;
+>rejectSpacedNullableAssertion : any
+>"ready" as ? : any
+>"ready" : "ready"
+
+const rejectSpacedExtantAssertion = item as !;
+>rejectSpacedExtantAssertion : any
+>item as ! : any
+>item : string | null | undefined
+

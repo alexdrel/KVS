@@ -1548,7 +1548,7 @@ func (c *Checker) checkGrammarVariableDeclaration(node *ast.VariableDeclaration)
 		}
 	}
 
-	if node.Parent.Parent.Kind != ast.KindForInStatement && node.Parent.Parent.Kind != ast.KindForOfStatement {
+	if node.Parent.Parent.Kind != ast.KindForInStatement && node.Parent.Parent.Kind != ast.KindForOfStatement && node.Parent.Parent.Kind != ast.KindKvsCollectExpression && node.Parent.Parent.Kind != ast.KindKvsSelectExpression {
 		if nodeFlags&ast.NodeFlagsAmbient != 0 {
 			c.checkAmbientInitializer(node.AsNode())
 		} else if node.Initializer == nil {
@@ -1566,7 +1566,12 @@ func (c *Checker) checkGrammarVariableDeclaration(node *ast.VariableDeclaration)
 		}
 	}
 
-	if node.ExclamationToken != nil && (node.Parent.Parent.Kind != ast.KindVariableStatement || node.Type == nil || node.Initializer != nil || nodeFlags&ast.NodeFlagsAmbient != 0) {
+	declarationKind := node.Parent.Flags & ast.NodeFlagsBlockScoped
+	if node.Flags&ast.NodeFlagsKvsNullableBinding != 0 && (declarationKind != ast.NodeFlagsLet || node.Type != nil || node.Initializer == nil) {
+		return c.grammarErrorOnNode(node.Name(), diagnostics.Kvs_nullable_binding_requires_an_inferred_let_declaration_with_an_initializer)
+	}
+
+	if node.ExclamationToken != nil && node.Flags&ast.NodeFlagsKvsExtantBinding == 0 && (node.Parent.Parent.Kind != ast.KindVariableStatement || node.Type == nil || node.Initializer != nil || nodeFlags&ast.NodeFlagsAmbient != 0) {
 		var message *diagnostics.Message
 		switch {
 		case node.Initializer != nil:

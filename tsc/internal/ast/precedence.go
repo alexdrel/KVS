@@ -229,6 +229,8 @@ func GetOperatorPrecedence(nodeKind Kind, operatorKind Kind, flags OperatorPrece
 	// !!! By necessity, this differs from the old compiler to better align with ParenthesizerRules. consider backporting
 	case KindArrowFunction:
 		return OperatorPrecedenceAssignment
+	case KindKvsExtantAssignmentExpression:
+		return OperatorPrecedenceAssignment
 	case KindConditionalExpression:
 		return OperatorPrecedenceConditional
 	case KindBinaryExpression:
@@ -295,7 +297,9 @@ func GetOperatorPrecedence(nodeKind Kind, operatorKind Kind, flags OperatorPrece
 		return OperatorPrecedenceMember
 
 	case KindAsExpression,
-		KindSatisfiesExpression:
+		KindSatisfiesExpression,
+		KindKvsNullableAssertionExpression,
+		KindKvsExtantAssertionExpression:
 		return OperatorPrecedenceRelational
 
 	case KindThisKeyword,

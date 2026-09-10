@@ -585,6 +585,47 @@ export interface CatchClause extends NodeBase {
 export interface DebuggerStatement extends StatementBase {
     readonly kind: SyntaxKind.DebuggerStatement;
 }
+export interface KvsExtantReturnStatement extends StatementBase {
+    readonly kind: SyntaxKind.KvsExtantReturnStatement;
+    readonly expression: Expression;
+}
+export interface KvsYieldStatement extends StatementBase {
+    readonly kind: SyntaxKind.KvsYieldStatement;
+    readonly expression: Expression;
+}
+export interface KvsExtantYieldStatement extends StatementBase {
+    readonly kind: SyntaxKind.KvsExtantYieldStatement;
+    readonly expression: Expression;
+}
+export interface KvsNullableAssertionExpression extends ExpressionBase {
+    readonly kind: SyntaxKind.KvsNullableAssertionExpression;
+    readonly expression: Expression;
+    readonly questionToken: QuestionToken;
+}
+export interface KvsExtantAssertionExpression extends ExpressionBase {
+    readonly kind: SyntaxKind.KvsExtantAssertionExpression;
+    readonly expression: Expression;
+    readonly exclamationToken: ExclamationToken;
+}
+export interface KvsExtantAssignmentExpression extends ExpressionBase {
+    readonly kind: SyntaxKind.KvsExtantAssignmentExpression;
+    readonly left: Expression;
+    readonly questionToken: QuestionToken;
+    readonly equalsToken: EqualsToken;
+    readonly right: Expression;
+}
+export interface KvsCollectExpression extends ExpressionBase {
+    readonly kind: SyntaxKind.KvsCollectExpression;
+    readonly initializer: ForInitializer;
+    readonly expression: Expression;
+    readonly statement: Statement;
+}
+export interface KvsSelectExpression extends ExpressionBase {
+    readonly kind: SyntaxKind.KvsSelectExpression;
+    readonly initializer: ForInitializer;
+    readonly expression: Expression;
+    readonly statement: Statement;
+}
 export interface LabeledStatement extends StatementBase {
     readonly kind: SyntaxKind.LabeledStatement;
     readonly label: Identifier;

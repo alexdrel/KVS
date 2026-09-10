@@ -66,7 +66,7 @@ func (b *NodeBuilderImpl) pseudoTypeToNode(t *pseudochecker.PseudoType) *ast.Nod
 			return b.serializeReturnTypeForSignature(b.ch.getSignatureFromDeclaration(node), false)
 		}
 		// use symbol type from parent declaration to automatically handle expression type widening without duplicating logic
-		if ast.IsReturnStatement(node.Parent) {
+		if ast.IsReturnStatement(node.Parent) || ast.IsKvsExtantReturnStatement(node.Parent) {
 			enclosing := ast.GetContainingFunction(node)
 			if ast.IsAccessor(enclosing) {
 				return b.serializeTypeForDeclaration(enclosing, nil, nil, false)

@@ -58,6 +58,7 @@ func IsIdentifierReference(name *ast.IdentifierNode, parent *ast.Node) bool {
 		ast.KindWhileStatement,
 		ast.KindWithStatement,
 		ast.KindReturnStatement,
+		ast.KindKvsExtantReturnStatement,
 		ast.KindSwitchStatement,
 		ast.KindCaseClause,
 		ast.KindThrowStatement,

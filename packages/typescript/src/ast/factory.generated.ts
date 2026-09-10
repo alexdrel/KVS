@@ -149,6 +149,14 @@ import type {
     KeywordExpressionSyntaxKind,
     KeywordTypeNode,
     KeywordTypeSyntaxKind,
+    KvsCollectExpression,
+    KvsExtantAssertionExpression,
+    KvsExtantAssignmentExpression,
+    KvsExtantReturnStatement,
+    KvsExtantYieldStatement,
+    KvsNullableAssertionExpression,
+    KvsSelectExpression,
+    KvsYieldStatement,
     LabeledStatement,
     LeftHandSideExpression,
     LiteralTypeNode,
@@ -811,6 +819,22 @@ function cloneNodeData(node: Node): any {
             return { tryBlock: n.tryBlock, catchClause: n.catchClause, finallyBlock: n.finallyBlock };
         case SyntaxKind.CatchClause:
             return { variableDeclaration: n.variableDeclaration, block: n.block };
+        case SyntaxKind.KvsExtantReturnStatement:
+            return { expression: n.expression };
+        case SyntaxKind.KvsYieldStatement:
+            return { expression: n.expression };
+        case SyntaxKind.KvsExtantYieldStatement:
+            return { expression: n.expression };
+        case SyntaxKind.KvsNullableAssertionExpression:
+            return { expression: n.expression, questionToken: n.questionToken };
+        case SyntaxKind.KvsExtantAssertionExpression:
+            return { expression: n.expression, exclamationToken: n.exclamationToken };
+        case SyntaxKind.KvsExtantAssignmentExpression:
+            return { left: n.left, questionToken: n.questionToken, equalsToken: n.equalsToken, right: n.right };
+        case SyntaxKind.KvsCollectExpression:
+            return { initializer: n.initializer, expression: n.expression, statement: n.statement };
+        case SyntaxKind.KvsSelectExpression:
+            return { initializer: n.initializer, expression: n.expression, statement: n.statement };
         case SyntaxKind.LabeledStatement:
             return { label: n.label, statement: n.statement };
         case SyntaxKind.ExpressionStatement:
@@ -1189,6 +1213,28 @@ const forEachChildTable: Record<number, ForEachChildFunction> = {
     [SyntaxKind.CatchClause]: (data, cbNode, cbNodes) =>
         visitNode(cbNode, data.variableDeclaration) ||
         visitNode(cbNode, data.block),
+    [SyntaxKind.KvsExtantReturnStatement]: (data, cbNode, cbNodes) => visitNode(cbNode, data.expression),
+    [SyntaxKind.KvsYieldStatement]: (data, cbNode, cbNodes) => visitNode(cbNode, data.expression),
+    [SyntaxKind.KvsExtantYieldStatement]: (data, cbNode, cbNodes) => visitNode(cbNode, data.expression),
+    [SyntaxKind.KvsNullableAssertionExpression]: (data, cbNode, cbNodes) =>
+        visitNode(cbNode, data.expression) ||
+        visitNode(cbNode, data.questionToken),
+    [SyntaxKind.KvsExtantAssertionExpression]: (data, cbNode, cbNodes) =>
+        visitNode(cbNode, data.expression) ||
+        visitNode(cbNode, data.exclamationToken),
+    [SyntaxKind.KvsExtantAssignmentExpression]: (data, cbNode, cbNodes) =>
+        visitNode(cbNode, data.left) ||
+        visitNode(cbNode, data.questionToken) ||
+        visitNode(cbNode, data.equalsToken) ||
+        visitNode(cbNode, data.right),
+    [SyntaxKind.KvsCollectExpression]: (data, cbNode, cbNodes) =>
+        visitNode(cbNode, data.initializer) ||
+        visitNode(cbNode, data.expression) ||
+        visitNode(cbNode, data.statement),
+    [SyntaxKind.KvsSelectExpression]: (data, cbNode, cbNodes) =>
+        visitNode(cbNode, data.initializer) ||
+        visitNode(cbNode, data.expression) ||
+        visitNode(cbNode, data.statement),
     [SyntaxKind.LabeledStatement]: (data, cbNode, cbNodes) =>
         visitNode(cbNode, data.label) ||
         visitNode(cbNode, data.statement),
@@ -1835,6 +1881,63 @@ export function createCatchClause(variableDeclaration: VariableDeclaration | und
 
 export function createDebuggerStatement(): DebuggerStatement {
     return new NodeObject(SyntaxKind.DebuggerStatement, undefined) as unknown as DebuggerStatement;
+}
+
+export function createKvsExtantReturnStatement(expression: Expression): KvsExtantReturnStatement {
+    return new NodeObject(SyntaxKind.KvsExtantReturnStatement, {
+        expression,
+    }) as unknown as KvsExtantReturnStatement;
+}
+
+export function createKvsYieldStatement(expression: Expression): KvsYieldStatement {
+    return new NodeObject(SyntaxKind.KvsYieldStatement, {
+        expression,
+    }) as unknown as KvsYieldStatement;
+}
+
+export function createKvsExtantYieldStatement(expression: Expression): KvsExtantYieldStatement {
+    return new NodeObject(SyntaxKind.KvsExtantYieldStatement, {
+        expression,
+    }) as unknown as KvsExtantYieldStatement;
+}
+
+export function createKvsNullableAssertionExpression(expression: Expression, questionToken: QuestionToken): KvsNullableAssertionExpression {
+    return new NodeObject(SyntaxKind.KvsNullableAssertionExpression, {
+        expression,
+        questionToken,
+    }) as unknown as KvsNullableAssertionExpression;
+}
+
+export function createKvsExtantAssertionExpression(expression: Expression, exclamationToken: ExclamationToken): KvsExtantAssertionExpression {
+    return new NodeObject(SyntaxKind.KvsExtantAssertionExpression, {
+        expression,
+        exclamationToken,
+    }) as unknown as KvsExtantAssertionExpression;
+}
+
+export function createKvsExtantAssignmentExpression(left: Expression, questionToken: QuestionToken, equalsToken: EqualsToken, right: Expression): KvsExtantAssignmentExpression {
+    return new NodeObject(SyntaxKind.KvsExtantAssignmentExpression, {
+        left,
+        questionToken,
+        equalsToken,
+        right,
+    }) as unknown as KvsExtantAssignmentExpression;
+}
+
+export function createKvsCollectExpression(initializer: ForInitializer, expression: Expression, statement: Statement): KvsCollectExpression {
+    return new NodeObject(SyntaxKind.KvsCollectExpression, {
+        initializer,
+        expression,
+        statement,
+    }) as unknown as KvsCollectExpression;
+}
+
+export function createKvsSelectExpression(initializer: ForInitializer, expression: Expression, statement: Statement): KvsSelectExpression {
+    return new NodeObject(SyntaxKind.KvsSelectExpression, {
+        initializer,
+        expression,
+        statement,
+    }) as unknown as KvsSelectExpression;
 }
 
 export function createLabeledStatement(label: Identifier, statement: Statement): LabeledStatement {
@@ -3215,6 +3318,38 @@ export function updateTryStatement(node: TryStatement, tryBlock: Block, catchCla
 
 export function updateCatchClause(node: CatchClause, variableDeclaration: VariableDeclaration | undefined, block: Block): CatchClause {
     return node.variableDeclaration !== variableDeclaration || node.block !== block ? createCatchClause(variableDeclaration, block) : node;
+}
+
+export function updateKvsExtantReturnStatement(node: KvsExtantReturnStatement, expression: Expression): KvsExtantReturnStatement {
+    return node.expression !== expression ? createKvsExtantReturnStatement(expression) : node;
+}
+
+export function updateKvsYieldStatement(node: KvsYieldStatement, expression: Expression): KvsYieldStatement {
+    return node.expression !== expression ? createKvsYieldStatement(expression) : node;
+}
+
+export function updateKvsExtantYieldStatement(node: KvsExtantYieldStatement, expression: Expression): KvsExtantYieldStatement {
+    return node.expression !== expression ? createKvsExtantYieldStatement(expression) : node;
+}
+
+export function updateKvsNullableAssertionExpression(node: KvsNullableAssertionExpression, expression: Expression, questionToken: QuestionToken): KvsNullableAssertionExpression {
+    return node.expression !== expression || node.questionToken !== questionToken ? createKvsNullableAssertionExpression(expression, questionToken) : node;
+}
+
+export function updateKvsExtantAssertionExpression(node: KvsExtantAssertionExpression, expression: Expression, exclamationToken: ExclamationToken): KvsExtantAssertionExpression {
+    return node.expression !== expression || node.exclamationToken !== exclamationToken ? createKvsExtantAssertionExpression(expression, exclamationToken) : node;
+}
+
+export function updateKvsExtantAssignmentExpression(node: KvsExtantAssignmentExpression, left: Expression, questionToken: QuestionToken, equalsToken: EqualsToken, right: Expression): KvsExtantAssignmentExpression {
+    return node.left !== left || node.questionToken !== questionToken || node.equalsToken !== equalsToken || node.right !== right ? createKvsExtantAssignmentExpression(left, questionToken, equalsToken, right) : node;
+}
+
+export function updateKvsCollectExpression(node: KvsCollectExpression, initializer: ForInitializer, expression: Expression, statement: Statement): KvsCollectExpression {
+    return node.initializer !== initializer || node.expression !== expression || node.statement !== statement ? createKvsCollectExpression(initializer, expression, statement) : node;
+}
+
+export function updateKvsSelectExpression(node: KvsSelectExpression, initializer: ForInitializer, expression: Expression, statement: Statement): KvsSelectExpression {
+    return node.initializer !== initializer || node.expression !== expression || node.statement !== statement ? createKvsSelectExpression(initializer, expression, statement) : node;
 }
 
 export function updateLabeledStatement(node: LabeledStatement, label: Identifier, statement: Statement): LabeledStatement {

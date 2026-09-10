@@ -1,0 +1,43 @@
+// @strict: true
+
+interface Group {
+    value: string;
+    candidates: (number | null | undefined)[];
+}
+
+function selectFirstPresent(groups: Group[]) {
+    const result = select (const group of groups) {
+        for (const candidate of group.candidates) {
+            yield? candidate;
+        }
+    };
+    result;
+    return result;
+}
+
+function selectFirstValue(groups: Group[]) {
+    return select (const group of groups) {
+        yield group.candidates[0];
+    };
+}
+
+function selectWithTail(groups: Group[]) {
+    return select (const group of groups) {
+        yield? group.candidates[0];
+    } ?? 0;
+}
+
+function selectField(groups: Group[]) {
+    return {
+        label: "result",
+        value: select (const group of groups) {
+            yield? group.candidates[0];
+        } ?? 0,
+    };
+}
+
+function rejectNestedPosition(groups: Group[]) {
+    console.log(select (const group of groups) {
+        yield group.value;
+    });
+}

@@ -1,0 +1,117 @@
+//// [tests/cases/conformance/kvs/kvsSelect.ts] ////
+
+=== kvsSelect.ts ===
+interface Group {
+>Group : Symbol(Group, Decl(kvsSelect.ts, 0, 0))
+
+    value: string;
+>value : Symbol(Group.value, Decl(kvsSelect.ts, 0, 17))
+
+    candidates: (number | null | undefined)[];
+>candidates : Symbol(Group.candidates, Decl(kvsSelect.ts, 1, 18))
+}
+
+function selectFirstPresent(groups: Group[]) {
+>selectFirstPresent : Symbol(selectFirstPresent, Decl(kvsSelect.ts, 3, 1))
+>groups : Symbol(groups, Decl(kvsSelect.ts, 5, 28))
+>Group : Symbol(Group, Decl(kvsSelect.ts, 0, 0))
+
+    const result = select (const group of groups) {
+>result : Symbol(result, Decl(kvsSelect.ts, 6, 9))
+>group : Symbol(group, Decl(kvsSelect.ts, 6, 32))
+>groups : Symbol(groups, Decl(kvsSelect.ts, 5, 28))
+
+        for (const candidate of group.candidates) {
+>candidate : Symbol(candidate, Decl(kvsSelect.ts, 7, 18))
+>group.candidates : Symbol(Group.candidates, Decl(kvsSelect.ts, 1, 18))
+>group : Symbol(group, Decl(kvsSelect.ts, 6, 32))
+>candidates : Symbol(Group.candidates, Decl(kvsSelect.ts, 1, 18))
+
+            yield? candidate;
+>candidate : Symbol(candidate, Decl(kvsSelect.ts, 7, 18))
+        }
+    };
+    result;
+>result : Symbol(result, Decl(kvsSelect.ts, 6, 9))
+
+    return result;
+>result : Symbol(result, Decl(kvsSelect.ts, 6, 9))
+}
+
+function selectFirstValue(groups: Group[]) {
+>selectFirstValue : Symbol(selectFirstValue, Decl(kvsSelect.ts, 13, 1))
+>groups : Symbol(groups, Decl(kvsSelect.ts, 15, 26))
+>Group : Symbol(Group, Decl(kvsSelect.ts, 0, 0))
+
+    return select (const group of groups) {
+>group : Symbol(group, Decl(kvsSelect.ts, 16, 24))
+>groups : Symbol(groups, Decl(kvsSelect.ts, 15, 26))
+
+        yield group.candidates[0];
+>group.candidates : Symbol(Group.candidates, Decl(kvsSelect.ts, 1, 18))
+>group : Symbol(group, Decl(kvsSelect.ts, 16, 24))
+>candidates : Symbol(Group.candidates, Decl(kvsSelect.ts, 1, 18))
+
+    };
+}
+
+function selectWithTail(groups: Group[]) {
+>selectWithTail : Symbol(selectWithTail, Decl(kvsSelect.ts, 19, 1))
+>groups : Symbol(groups, Decl(kvsSelect.ts, 21, 24))
+>Group : Symbol(Group, Decl(kvsSelect.ts, 0, 0))
+
+    return select (const group of groups) {
+>group : Symbol(group, Decl(kvsSelect.ts, 22, 24))
+>groups : Symbol(groups, Decl(kvsSelect.ts, 21, 24))
+
+        yield? group.candidates[0];
+>group.candidates : Symbol(Group.candidates, Decl(kvsSelect.ts, 1, 18))
+>group : Symbol(group, Decl(kvsSelect.ts, 22, 24))
+>candidates : Symbol(Group.candidates, Decl(kvsSelect.ts, 1, 18))
+
+    } ?? 0;
+}
+
+function selectField(groups: Group[]) {
+>selectField : Symbol(selectField, Decl(kvsSelect.ts, 25, 1))
+>groups : Symbol(groups, Decl(kvsSelect.ts, 27, 21))
+>Group : Symbol(Group, Decl(kvsSelect.ts, 0, 0))
+
+    return {
+        label: "result",
+>label : Symbol(label, Decl(kvsSelect.ts, 28, 12))
+
+        value: select (const group of groups) {
+>value : Symbol(value, Decl(kvsSelect.ts, 29, 24))
+>group : Symbol(group, Decl(kvsSelect.ts, 30, 28))
+>groups : Symbol(groups, Decl(kvsSelect.ts, 27, 21))
+
+            yield? group.candidates[0];
+>group.candidates : Symbol(Group.candidates, Decl(kvsSelect.ts, 1, 18))
+>group : Symbol(group, Decl(kvsSelect.ts, 30, 28))
+>candidates : Symbol(Group.candidates, Decl(kvsSelect.ts, 1, 18))
+
+        } ?? 0,
+    };
+}
+
+function rejectNestedPosition(groups: Group[]) {
+>rejectNestedPosition : Symbol(rejectNestedPosition, Decl(kvsSelect.ts, 34, 1))
+>groups : Symbol(groups, Decl(kvsSelect.ts, 36, 30))
+>Group : Symbol(Group, Decl(kvsSelect.ts, 0, 0))
+
+    console.log(select (const group of groups) {
+>console.log : Symbol(Console.log, Decl(lib.dom.d.ts, --, --))
+>console : Symbol(console, Decl(lib.dom.d.ts, --, --))
+>log : Symbol(Console.log, Decl(lib.dom.d.ts, --, --))
+>group : Symbol(group, Decl(kvsSelect.ts, 37, 29))
+>groups : Symbol(groups, Decl(kvsSelect.ts, 36, 30))
+
+        yield group.value;
+>group.value : Symbol(Group.value, Decl(kvsSelect.ts, 0, 17))
+>group : Symbol(group, Decl(kvsSelect.ts, 37, 29))
+>value : Symbol(Group.value, Decl(kvsSelect.ts, 0, 17))
+
+    });
+}
+

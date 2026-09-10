@@ -45,6 +45,8 @@ const (
 	NodeFlagsPossiblyContainsDeprecatedTag NodeFlags = 1 << 26 // Set during parse if comment text contains '@deprecated'; must confirm via JSDoc lookup
 	NodeFlagsUnreachable                   NodeFlags = 1 << 27 // If node is unreachable according to the binder
 	NodeFlagsReparserTransformedLiteral    NodeFlags = 1 << 28 // If node was transformed during parsing, making its' naive text source not match the AST
+	NodeFlagsKvsNullableBinding            NodeFlags = 1 << 29 // KVS inferred nullable binding suffix
+	NodeFlagsKvsExtantBinding              NodeFlags = 1 << 30 // KVS inferred required binding suffix
 
 	NodeFlagsBlockScoped = NodeFlagsLet | NodeFlagsConst | NodeFlagsUsing
 	NodeFlagsConstant    = NodeFlagsConst | NodeFlagsUsing

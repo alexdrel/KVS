@@ -89,6 +89,30 @@ func getChildrenPropertyMask(node *ast.Node) uint8 {
 	case ast.KindCatchClause:
 		n := node.AsCatchClause()
 		return (boolToByte(n.VariableDeclaration != nil) << 0) | (boolToByte(n.Block != nil) << 1)
+	case ast.KindKvsExtantReturnStatement:
+		n := node.AsKvsExtantReturnStatement()
+		return (boolToByte(n.Expression != nil) << 0)
+	case ast.KindKvsYieldStatement:
+		n := node.AsKvsYieldStatement()
+		return (boolToByte(n.Expression != nil) << 0)
+	case ast.KindKvsExtantYieldStatement:
+		n := node.AsKvsExtantYieldStatement()
+		return (boolToByte(n.Expression != nil) << 0)
+	case ast.KindKvsNullableAssertionExpression:
+		n := node.AsKvsNullableAssertionExpression()
+		return (boolToByte(n.Expression != nil) << 0) | (boolToByte(n.QuestionToken != nil) << 1)
+	case ast.KindKvsExtantAssertionExpression:
+		n := node.AsKvsExtantAssertionExpression()
+		return (boolToByte(n.Expression != nil) << 0) | (boolToByte(n.ExclamationToken != nil) << 1)
+	case ast.KindKvsExtantAssignmentExpression:
+		n := node.AsKvsExtantAssignmentExpression()
+		return (boolToByte(n.Left != nil) << 0) | (boolToByte(n.QuestionToken != nil) << 1) | (boolToByte(n.EqualsToken != nil) << 2) | (boolToByte(n.Right != nil) << 3)
+	case ast.KindKvsCollectExpression:
+		n := node.AsKvsCollectExpression()
+		return (boolToByte(n.Initializer != nil) << 0) | (boolToByte(n.Expression != nil) << 1) | (boolToByte(n.Statement != nil) << 2)
+	case ast.KindKvsSelectExpression:
+		n := node.AsKvsSelectExpression()
+		return (boolToByte(n.Initializer != nil) << 0) | (boolToByte(n.Expression != nil) << 1) | (boolToByte(n.Statement != nil) << 2)
 	case ast.KindLabeledStatement:
 		n := node.AsLabeledStatement()
 		return (boolToByte(n.Label != nil) << 0) | (boolToByte(n.Statement != nil) << 1)

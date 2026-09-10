@@ -1,0 +1,67 @@
+//// [tests/cases/conformance/kvs/kvsExtantReturn.ts] ////
+
+=== kvsExtantReturn.ts ===
+function resolve(arg?: string): string {
+>resolve : (arg?: string) => string
+>arg : string | undefined
+
+    return? arg;
+>arg : string | undefined
+
+    arg;
+>arg : undefined
+
+    return "fallback";
+>"fallback" : "fallback"
+}
+
+function infer(arg?: string) {
+>infer : (arg?: string) => string | 1
+>arg : string | undefined
+
+    return? arg;
+>arg : string | undefined
+
+    return 1;
+>1 : 1
+}
+
+function resolveNullish(arg: string | null | undefined) {
+>resolveNullish : (arg: string | null | undefined) => string
+>arg : string | null | undefined
+
+    return? arg;
+>arg : string | null | undefined
+
+    arg;
+>arg : null | undefined
+
+    return "fallback";
+>"fallback" : "fallback"
+}
+
+function rejectWrongExtantType(arg?: number): string {
+>rejectWrongExtantType : (arg?: number) => string
+>arg : number | undefined
+
+    return? arg;
+>arg : number | undefined
+
+    return "fallback";
+>"fallback" : "fallback"
+}
+
+function rejectSpacedReturn(arg?: string): string {
+>rejectSpacedReturn : (arg?: string) => string
+>arg : string | undefined
+
+    return ? arg;
+>? arg : any
+> : any
+>arg : string | undefined
+> : any
+
+    return "fallback";
+>"fallback" : "fallback"
+}
+

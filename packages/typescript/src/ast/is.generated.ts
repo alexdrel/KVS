@@ -184,6 +184,14 @@ import type {
     KeywordExpressionSyntaxKind,
     KeywordTypeNode,
     KeywordTypeSyntaxKind,
+    KvsCollectExpression,
+    KvsExtantAssertionExpression,
+    KvsExtantAssignmentExpression,
+    KvsExtantReturnStatement,
+    KvsExtantYieldStatement,
+    KvsNullableAssertionExpression,
+    KvsSelectExpression,
+    KvsYieldStatement,
     LabeledStatement,
     LiteralExpression,
     LiteralLikeNode,
@@ -519,6 +527,78 @@ export declare namespace isDebuggerStatement {
     function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, DebuggerStatement>;
 }
 isDebuggerStatement.Handle = isDebuggerStatement as any;
+
+export function isKvsExtantReturnStatement(node: Node): node is KvsExtantReturnStatement {
+    return node.kind === SyntaxKind.KvsExtantReturnStatement;
+}
+
+export declare namespace isKvsExtantReturnStatement {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsExtantReturnStatement>;
+}
+isKvsExtantReturnStatement.Handle = isKvsExtantReturnStatement as any;
+
+export function isKvsYieldStatement(node: Node): node is KvsYieldStatement {
+    return node.kind === SyntaxKind.KvsYieldStatement;
+}
+
+export declare namespace isKvsYieldStatement {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsYieldStatement>;
+}
+isKvsYieldStatement.Handle = isKvsYieldStatement as any;
+
+export function isKvsExtantYieldStatement(node: Node): node is KvsExtantYieldStatement {
+    return node.kind === SyntaxKind.KvsExtantYieldStatement;
+}
+
+export declare namespace isKvsExtantYieldStatement {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsExtantYieldStatement>;
+}
+isKvsExtantYieldStatement.Handle = isKvsExtantYieldStatement as any;
+
+export function isKvsNullableAssertionExpression(node: Node): node is KvsNullableAssertionExpression {
+    return node.kind === SyntaxKind.KvsNullableAssertionExpression;
+}
+
+export declare namespace isKvsNullableAssertionExpression {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsNullableAssertionExpression>;
+}
+isKvsNullableAssertionExpression.Handle = isKvsNullableAssertionExpression as any;
+
+export function isKvsExtantAssertionExpression(node: Node): node is KvsExtantAssertionExpression {
+    return node.kind === SyntaxKind.KvsExtantAssertionExpression;
+}
+
+export declare namespace isKvsExtantAssertionExpression {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsExtantAssertionExpression>;
+}
+isKvsExtantAssertionExpression.Handle = isKvsExtantAssertionExpression as any;
+
+export function isKvsExtantAssignmentExpression(node: Node): node is KvsExtantAssignmentExpression {
+    return node.kind === SyntaxKind.KvsExtantAssignmentExpression;
+}
+
+export declare namespace isKvsExtantAssignmentExpression {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsExtantAssignmentExpression>;
+}
+isKvsExtantAssignmentExpression.Handle = isKvsExtantAssignmentExpression as any;
+
+export function isKvsCollectExpression(node: Node): node is KvsCollectExpression {
+    return node.kind === SyntaxKind.KvsCollectExpression;
+}
+
+export declare namespace isKvsCollectExpression {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsCollectExpression>;
+}
+isKvsCollectExpression.Handle = isKvsCollectExpression as any;
+
+export function isKvsSelectExpression(node: Node): node is KvsSelectExpression {
+    return node.kind === SyntaxKind.KvsSelectExpression;
+}
+
+export declare namespace isKvsSelectExpression {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsSelectExpression>;
+}
+isKvsSelectExpression.Handle = isKvsSelectExpression as any;
 
 export function isLabeledStatement(node: Node): node is LabeledStatement {
     return node.kind === SyntaxKind.LabeledStatement;

@@ -1,0 +1,318 @@
+//// [tests/cases/conformance/kvs/kvsCollect.ts] ////
+
+=== kvsCollect.ts ===
+interface Item {
+>Item : Symbol(Item, Decl(kvsCollect.ts, 0, 0))
+
+    value: string;
+>value : Symbol(Item.value, Decl(kvsCollect.ts, 0, 16))
+
+    included: boolean;
+>included : Symbol(Item.included, Decl(kvsCollect.ts, 1, 18))
+
+    optionalValue?: string;
+>optionalValue : Symbol(Item.optionalValue, Decl(kvsCollect.ts, 2, 22))
+}
+
+function collectValues(items: Item[]) {
+>collectValues : Symbol(collectValues, Decl(kvsCollect.ts, 4, 1))
+>items : Symbol(items, Decl(kvsCollect.ts, 6, 23))
+>Item : Symbol(Item, Decl(kvsCollect.ts, 0, 0))
+
+    const values = collect (const item of items) {
+>values : Symbol(values, Decl(kvsCollect.ts, 7, 9))
+>item : Symbol(item, Decl(kvsCollect.ts, 7, 33))
+>items : Symbol(items, Decl(kvsCollect.ts, 6, 23))
+
+        if (!item.included) continue;
+>item.included : Symbol(Item.included, Decl(kvsCollect.ts, 1, 18))
+>item : Symbol(item, Decl(kvsCollect.ts, 7, 33))
+>included : Symbol(Item.included, Decl(kvsCollect.ts, 1, 18))
+
+        yield item.value;
+>item.value : Symbol(Item.value, Decl(kvsCollect.ts, 0, 16))
+>item : Symbol(item, Decl(kvsCollect.ts, 7, 33))
+>value : Symbol(Item.value, Decl(kvsCollect.ts, 0, 16))
+
+        yield? item.optionalValue;
+>item.optionalValue : Symbol(Item.optionalValue, Decl(kvsCollect.ts, 2, 22))
+>item : Symbol(item, Decl(kvsCollect.ts, 7, 33))
+>optionalValue : Symbol(Item.optionalValue, Decl(kvsCollect.ts, 2, 22))
+
+    };
+    values;
+>values : Symbol(values, Decl(kvsCollect.ts, 7, 9))
+
+    return values;
+>values : Symbol(values, Decl(kvsCollect.ts, 7, 9))
+}
+
+function returnCollectedValues(items: Item[]) {
+>returnCollectedValues : Symbol(returnCollectedValues, Decl(kvsCollect.ts, 14, 1))
+>items : Symbol(items, Decl(kvsCollect.ts, 16, 31))
+>Item : Symbol(Item, Decl(kvsCollect.ts, 0, 0))
+
+    return collect (const item of items) {
+>item : Symbol(item, Decl(kvsCollect.ts, 17, 25))
+>items : Symbol(items, Decl(kvsCollect.ts, 16, 31))
+
+        yield item.value;
+>item.value : Symbol(Item.value, Decl(kvsCollect.ts, 0, 16))
+>item : Symbol(item, Decl(kvsCollect.ts, 17, 25))
+>value : Symbol(Item.value, Decl(kvsCollect.ts, 0, 16))
+
+    };
+}
+
+function assignCollectedValues(items: Item[]) {
+>assignCollectedValues : Symbol(assignCollectedValues, Decl(kvsCollect.ts, 20, 1))
+>items : Symbol(items, Decl(kvsCollect.ts, 22, 31))
+>Item : Symbol(Item, Decl(kvsCollect.ts, 0, 0))
+
+    let values: string[] = [];
+>values : Symbol(values, Decl(kvsCollect.ts, 23, 7))
+
+    values = collect (const item of items) {
+>values : Symbol(values, Decl(kvsCollect.ts, 23, 7))
+>item : Symbol(item, Decl(kvsCollect.ts, 24, 27))
+>items : Symbol(items, Decl(kvsCollect.ts, 22, 31))
+
+        yield item.value;
+>item.value : Symbol(Item.value, Decl(kvsCollect.ts, 0, 16))
+>item : Symbol(item, Decl(kvsCollect.ts, 24, 27))
+>value : Symbol(Item.value, Decl(kvsCollect.ts, 0, 16))
+
+    };
+    return values;
+>values : Symbol(values, Decl(kvsCollect.ts, 23, 7))
+}
+
+function assignProperty(items: Item[], target: { values: string[] }) {
+>assignProperty : Symbol(assignProperty, Decl(kvsCollect.ts, 28, 1))
+>items : Symbol(items, Decl(kvsCollect.ts, 30, 24))
+>Item : Symbol(Item, Decl(kvsCollect.ts, 0, 0))
+>target : Symbol(target, Decl(kvsCollect.ts, 30, 38))
+>values : Symbol(values, Decl(kvsCollect.ts, 30, 48))
+
+    target.values = collect (const item of items) {
+>target.values : Symbol(values, Decl(kvsCollect.ts, 30, 48))
+>target : Symbol(target, Decl(kvsCollect.ts, 30, 38))
+>values : Symbol(values, Decl(kvsCollect.ts, 30, 48))
+>item : Symbol(item, Decl(kvsCollect.ts, 31, 34))
+>items : Symbol(items, Decl(kvsCollect.ts, 30, 24))
+
+        yield item.value;
+>item.value : Symbol(Item.value, Decl(kvsCollect.ts, 0, 16))
+>item : Symbol(item, Decl(kvsCollect.ts, 31, 34))
+>value : Symbol(Item.value, Decl(kvsCollect.ts, 0, 16))
+
+    };
+}
+
+function useHeadTail(items: Item[], extra: number) {
+>useHeadTail : Symbol(useHeadTail, Decl(kvsCollect.ts, 34, 1))
+>items : Symbol(items, Decl(kvsCollect.ts, 36, 21))
+>Item : Symbol(Item, Decl(kvsCollect.ts, 0, 0))
+>extra : Symbol(extra, Decl(kvsCollect.ts, 36, 35))
+
+    const text = collect (const item of items) {
+>text : Symbol(text, Decl(kvsCollect.ts, 37, 9))
+>collect (const item of items) {        yield item.value;    }.join : Symbol(Array.join, Decl(lib.es5.d.ts, --, --))
+>item : Symbol(item, Decl(kvsCollect.ts, 37, 31))
+>items : Symbol(items, Decl(kvsCollect.ts, 36, 21))
+
+        yield item.value;
+>item.value : Symbol(Item.value, Decl(kvsCollect.ts, 0, 16))
+>item : Symbol(item, Decl(kvsCollect.ts, 37, 31))
+>value : Symbol(Item.value, Decl(kvsCollect.ts, 0, 16))
+
+    }.join(", ");
+>join : Symbol(Array.join, Decl(lib.es5.d.ts, --, --))
+
+    const count = collect (const item of items) {
+>count : Symbol(count, Decl(kvsCollect.ts, 40, 9))
+>collect (const item of items) {        yield item.value;    }.length : Symbol(Array.length, Decl(lib.es5.d.ts, --, --))
+>item : Symbol(item, Decl(kvsCollect.ts, 40, 32))
+>items : Symbol(items, Decl(kvsCollect.ts, 36, 21))
+
+        yield item.value;
+>item.value : Symbol(Item.value, Decl(kvsCollect.ts, 0, 16))
+>item : Symbol(item, Decl(kvsCollect.ts, 40, 32))
+>value : Symbol(Item.value, Decl(kvsCollect.ts, 0, 16))
+
+    }.length + extra;
+>length : Symbol(Array.length, Decl(lib.es5.d.ts, --, --))
+>extra : Symbol(extra, Decl(kvsCollect.ts, 36, 35))
+
+    return { text, count };
+>text : Symbol(text, Decl(kvsCollect.ts, 43, 12))
+>count : Symbol(count, Decl(kvsCollect.ts, 43, 18))
+}
+
+function useFieldHeads(items: Item[], getLabel: () => string) {
+>useFieldHeads : Symbol(useFieldHeads, Decl(kvsCollect.ts, 44, 1))
+>items : Symbol(items, Decl(kvsCollect.ts, 46, 23))
+>Item : Symbol(Item, Decl(kvsCollect.ts, 0, 0))
+>getLabel : Symbol(getLabel, Decl(kvsCollect.ts, 46, 37))
+
+    return {
+        label: getLabel(),
+>label : Symbol(label, Decl(kvsCollect.ts, 47, 12))
+>getLabel : Symbol(getLabel, Decl(kvsCollect.ts, 46, 37))
+
+        values: collect (const item of items) {
+>values : Symbol(values, Decl(kvsCollect.ts, 48, 26))
+>collect (const item of items) {            yield item.value;        }.filter : Symbol(Array.filter, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --))
+>item : Symbol(item, Decl(kvsCollect.ts, 49, 30))
+>items : Symbol(items, Decl(kvsCollect.ts, 46, 23))
+
+            yield item.value;
+>item.value : Symbol(Item.value, Decl(kvsCollect.ts, 0, 16))
+>item : Symbol(item, Decl(kvsCollect.ts, 49, 30))
+>value : Symbol(Item.value, Decl(kvsCollect.ts, 0, 16))
+
+        }.filter(value => value.length > 3),
+>filter : Symbol(Array.filter, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --))
+>value : Symbol(value, Decl(kvsCollect.ts, 51, 17))
+>value.length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+>value : Symbol(value, Decl(kvsCollect.ts, 51, 17))
+>length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+
+        included: collect (const item of items) {
+>included : Symbol(included, Decl(kvsCollect.ts, 51, 44))
+>collect (const item of items) {            yield item.included;        }.length : Symbol(Array.length, Decl(lib.es5.d.ts, --, --))
+>item : Symbol(item, Decl(kvsCollect.ts, 52, 32))
+>items : Symbol(items, Decl(kvsCollect.ts, 46, 23))
+
+            yield item.included;
+>item.included : Symbol(Item.included, Decl(kvsCollect.ts, 1, 18))
+>item : Symbol(item, Decl(kvsCollect.ts, 52, 32))
+>included : Symbol(Item.included, Decl(kvsCollect.ts, 1, 18))
+
+        }.length,
+>length : Symbol(Array.length, Decl(lib.es5.d.ts, --, --))
+
+    };
+}
+
+function compoundAssignmentUsesOrdinaryTyping(items: Item[]) {
+>compoundAssignmentUsesOrdinaryTyping : Symbol(compoundAssignmentUsesOrdinaryTyping, Decl(kvsCollect.ts, 56, 1))
+>items : Symbol(items, Decl(kvsCollect.ts, 58, 46))
+>Item : Symbol(Item, Decl(kvsCollect.ts, 0, 0))
+
+    let count = 0;
+>count : Symbol(count, Decl(kvsCollect.ts, 59, 7))
+
+    count += collect (const item of items) {
+>count : Symbol(count, Decl(kvsCollect.ts, 59, 7))
+>item : Symbol(item, Decl(kvsCollect.ts, 60, 27))
+>items : Symbol(items, Decl(kvsCollect.ts, 58, 46))
+
+        yield item.value;
+>item.value : Symbol(Item.value, Decl(kvsCollect.ts, 0, 16))
+>item : Symbol(item, Decl(kvsCollect.ts, 60, 27))
+>value : Symbol(Item.value, Decl(kvsCollect.ts, 0, 16))
+
+    };
+}
+
+function collectNestedValues(groups: Item[][]) {
+>collectNestedValues : Symbol(collectNestedValues, Decl(kvsCollect.ts, 63, 1))
+>groups : Symbol(groups, Decl(kvsCollect.ts, 65, 29))
+>Item : Symbol(Item, Decl(kvsCollect.ts, 0, 0))
+
+    const values = collect (const items of groups) {
+>values : Symbol(values, Decl(kvsCollect.ts, 66, 9))
+>items : Symbol(items, Decl(kvsCollect.ts, 66, 33))
+>groups : Symbol(groups, Decl(kvsCollect.ts, 65, 29))
+
+        yield collect (const item of items) {
+>item : Symbol(item, Decl(kvsCollect.ts, 67, 28))
+>items : Symbol(items, Decl(kvsCollect.ts, 66, 33))
+
+            yield item.value;
+>item.value : Symbol(Item.value, Decl(kvsCollect.ts, 0, 16))
+>item : Symbol(item, Decl(kvsCollect.ts, 67, 28))
+>value : Symbol(Item.value, Decl(kvsCollect.ts, 0, 16))
+
+        };
+    };
+    return values;
+>values : Symbol(values, Decl(kvsCollect.ts, 66, 9))
+}
+
+function consume(_values: string[]) {}
+>consume : Symbol(consume, Decl(kvsCollect.ts, 72, 1))
+>_values : Symbol(_values, Decl(kvsCollect.ts, 74, 17))
+
+function rejectNestedPlacement(items: Item[]) {
+>rejectNestedPlacement : Symbol(rejectNestedPlacement, Decl(kvsCollect.ts, 74, 38))
+>items : Symbol(items, Decl(kvsCollect.ts, 76, 31))
+>Item : Symbol(Item, Decl(kvsCollect.ts, 0, 0))
+
+    consume(collect (const item of items) {
+>consume : Symbol(consume, Decl(kvsCollect.ts, 72, 1))
+>item : Symbol(item, Decl(kvsCollect.ts, 77, 26))
+>items : Symbol(items, Decl(kvsCollect.ts, 76, 31))
+
+        yield item.value;
+>item.value : Symbol(Item.value, Decl(kvsCollect.ts, 0, 16))
+>item : Symbol(item, Decl(kvsCollect.ts, 77, 26))
+>value : Symbol(Item.value, Decl(kvsCollect.ts, 0, 16))
+
+    });
+}
+
+function rejectRightOperand(items: Item[]) {
+>rejectRightOperand : Symbol(rejectRightOperand, Decl(kvsCollect.ts, 80, 1))
+>items : Symbol(items, Decl(kvsCollect.ts, 82, 28))
+>Item : Symbol(Item, Decl(kvsCollect.ts, 0, 0))
+
+    return 1 + collect (const item of items) {
+>item : Symbol(item, Decl(kvsCollect.ts, 83, 29))
+>items : Symbol(items, Decl(kvsCollect.ts, 82, 28))
+
+        yield item.value;
+>item.value : Symbol(Item.value, Decl(kvsCollect.ts, 0, 16))
+>item : Symbol(item, Decl(kvsCollect.ts, 83, 29))
+>value : Symbol(Item.value, Decl(kvsCollect.ts, 0, 16))
+
+    };
+}
+
+function rejectConditionalBranch(items: Item[], condition: boolean) {
+>rejectConditionalBranch : Symbol(rejectConditionalBranch, Decl(kvsCollect.ts, 86, 1))
+>items : Symbol(items, Decl(kvsCollect.ts, 88, 33))
+>Item : Symbol(Item, Decl(kvsCollect.ts, 0, 0))
+>condition : Symbol(condition, Decl(kvsCollect.ts, 88, 47))
+
+    return condition ? [] : collect (const item of items) {
+>condition : Symbol(condition, Decl(kvsCollect.ts, 88, 47))
+>item : Symbol(item, Decl(kvsCollect.ts, 89, 42))
+>items : Symbol(items, Decl(kvsCollect.ts, 88, 33))
+
+        yield item.value;
+>item.value : Symbol(Item.value, Decl(kvsCollect.ts, 0, 16))
+>item : Symbol(item, Decl(kvsCollect.ts, 89, 42))
+>value : Symbol(Item.value, Decl(kvsCollect.ts, 0, 16))
+
+    };
+}
+
+function rejectSpacedYield(items: Item[]) {
+>rejectSpacedYield : Symbol(rejectSpacedYield, Decl(kvsCollect.ts, 92, 1))
+>items : Symbol(items, Decl(kvsCollect.ts, 94, 27))
+>Item : Symbol(Item, Decl(kvsCollect.ts, 0, 0))
+
+    return collect (const item of items) {
+>item : Symbol(item, Decl(kvsCollect.ts, 95, 25))
+>items : Symbol(items, Decl(kvsCollect.ts, 94, 27))
+
+        yield ? item.optionalValue;
+>item.optionalValue : Symbol(Item.optionalValue, Decl(kvsCollect.ts, 2, 22))
+>item : Symbol(item, Decl(kvsCollect.ts, 95, 25))
+>optionalValue : Symbol(Item.optionalValue, Decl(kvsCollect.ts, 2, 22))
+
+    };
+}
+

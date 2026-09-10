@@ -1,0 +1,51 @@
+kvsStaticNullability.ts(10,26): error TS18049: 'nullableNumber' is possibly 'null' or 'undefined'.
+kvsStaticNullability.ts(20,1): error TS2322: Type 'string | null | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+kvsStaticNullability.ts(22,7): error TS2322: Type 'string | null | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+kvsStaticNullability.ts(27,51): error TS1110: Type expected.
+kvsStaticNullability.ts(28,46): error TS1110: Type expected.
+
+
+==== kvsStaticNullability.ts (5 errors) ====
+    declare const item: string | null | undefined;
+    declare const nullableNumber: number | null | undefined;
+    
+    const widened = "ready" as?;
+    const asserted = item as!;
+    const untouched = item;
+    const nested = [item as!];
+    const grouped = (item as!).length;
+    const impossible = null as!;
+    const rejectedAddition = nullableNumber + 2;
+                             ~~~~~~~~~~~~~~
+!!! error TS18049: 'nullableNumber' is possibly 'null' or 'undefined'.
+    const assertedAddition = nullableNumber as! + 2;
+    
+    let request? = "ready";
+    request = null;
+    request = "ready";
+    
+    const required! = "ready";
+    let current! = "ready";
+    current = "next";
+    current = item;
+    ~~~~~~~
+!!! error TS2322: Type 'string | null | undefined' is not assignable to type 'string'.
+!!! error TS2322:   Type 'undefined' is not assignable to type 'string'.
+    
+    const rejectNullableRequired! = item;
+          ~~~~~~~~~~~~~~~~~~~~~~
+!!! error TS2322: Type 'string | null | undefined' is not assignable to type 'string'.
+!!! error TS2322:   Type 'undefined' is not assignable to type 'string'.
+    
+    const rejectNullableConst? = "ready";
+    let rejectTypedNullable?: string = "ready";
+    
+    const rejectSpacedNullableAssertion = "ready" as ?;
+                                                      ~
+!!! error TS1110: Type expected.
+    const rejectSpacedExtantAssertion = item as !;
+                                                 ~
+!!! error TS1110: Type expected.
+    

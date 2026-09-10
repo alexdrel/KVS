@@ -105,6 +105,14 @@ import type {
     JsxOpeningElement,
     JsxSelfClosingElement,
     JsxSpreadAttribute,
+    KvsCollectExpression,
+    KvsExtantAssertionExpression,
+    KvsExtantAssignmentExpression,
+    KvsExtantReturnStatement,
+    KvsExtantYieldStatement,
+    KvsNullableAssertionExpression,
+    KvsSelectExpression,
+    KvsYieldStatement,
     LabeledStatement,
     LiteralTypeNode,
     MappedTypeNode,
@@ -279,6 +287,14 @@ import {
     updateJsxOpeningElement,
     updateJsxSelfClosingElement,
     updateJsxSpreadAttribute,
+    updateKvsCollectExpression,
+    updateKvsExtantAssertionExpression,
+    updateKvsExtantAssignmentExpression,
+    updateKvsExtantReturnStatement,
+    updateKvsExtantYieldStatement,
+    updateKvsNullableAssertionExpression,
+    updateKvsSelectExpression,
+    updateKvsYieldStatement,
     updateLabeledStatement,
     updateLiteralTypeNode,
     updateMappedTypeNode,
@@ -590,6 +606,47 @@ const visitEachChildTable: Record<number, VisitEachChildFunction> = {
         const _variableDeclaration = visitNode(node.variableDeclaration, visitor, isVariableDeclaration);
         const _block = visitNode(node.block, visitor, isBlock);
         return updateCatchClause(node, _variableDeclaration, _block);
+    },
+    [SyntaxKind.KvsExtantReturnStatement]: (node: KvsExtantReturnStatement, visitor: Visitor): KvsExtantReturnStatement => {
+        const _expression = visitNode(node.expression, visitor, isExpression);
+        return updateKvsExtantReturnStatement(node, _expression);
+    },
+    [SyntaxKind.KvsYieldStatement]: (node: KvsYieldStatement, visitor: Visitor): KvsYieldStatement => {
+        const _expression = visitNode(node.expression, visitor, isExpression);
+        return updateKvsYieldStatement(node, _expression);
+    },
+    [SyntaxKind.KvsExtantYieldStatement]: (node: KvsExtantYieldStatement, visitor: Visitor): KvsExtantYieldStatement => {
+        const _expression = visitNode(node.expression, visitor, isExpression);
+        return updateKvsExtantYieldStatement(node, _expression);
+    },
+    [SyntaxKind.KvsNullableAssertionExpression]: (node: KvsNullableAssertionExpression, visitor: Visitor): KvsNullableAssertionExpression => {
+        const _expression = visitNode(node.expression, visitor, isExpression);
+        const _questionToken = visitNode(node.questionToken, visitor, isQuestionToken);
+        return updateKvsNullableAssertionExpression(node, _expression, _questionToken);
+    },
+    [SyntaxKind.KvsExtantAssertionExpression]: (node: KvsExtantAssertionExpression, visitor: Visitor): KvsExtantAssertionExpression => {
+        const _expression = visitNode(node.expression, visitor, isExpression);
+        const _exclamationToken = visitNode(node.exclamationToken, visitor, isExclamationToken);
+        return updateKvsExtantAssertionExpression(node, _expression, _exclamationToken);
+    },
+    [SyntaxKind.KvsExtantAssignmentExpression]: (node: KvsExtantAssignmentExpression, visitor: Visitor): KvsExtantAssignmentExpression => {
+        const _left = visitNode(node.left, visitor, isExpression);
+        const _questionToken = visitNode(node.questionToken, visitor, isQuestionToken);
+        const _equalsToken = visitNode(node.equalsToken, visitor, isEqualsToken);
+        const _right = visitNode(node.right, visitor, isExpression);
+        return updateKvsExtantAssignmentExpression(node, _left, _questionToken, _equalsToken, _right);
+    },
+    [SyntaxKind.KvsCollectExpression]: (node: KvsCollectExpression, visitor: Visitor): KvsCollectExpression => {
+        const _initializer = visitNode(node.initializer, visitor, isForInitializer);
+        const _expression = visitNode(node.expression, visitor, isExpression);
+        const _statement = visitNode(node.statement, visitor, isStatement);
+        return updateKvsCollectExpression(node, _initializer, _expression, _statement);
+    },
+    [SyntaxKind.KvsSelectExpression]: (node: KvsSelectExpression, visitor: Visitor): KvsSelectExpression => {
+        const _initializer = visitNode(node.initializer, visitor, isForInitializer);
+        const _expression = visitNode(node.expression, visitor, isExpression);
+        const _statement = visitNode(node.statement, visitor, isStatement);
+        return updateKvsSelectExpression(node, _initializer, _expression, _statement);
     },
     [SyntaxKind.LabeledStatement]: (node: LabeledStatement, visitor: Visitor): LabeledStatement => {
         const _label = visitNode(node.label, visitor, isIdentifier);

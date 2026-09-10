@@ -1,0 +1,44 @@
+kvsExtantReturn.ts(19,5): error TS2322: Type 'number' is not assignable to type 'string'.
+kvsExtantReturn.ts(24,12): error TS1109: Expression expected.
+kvsExtantReturn.ts(24,14): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+kvsExtantReturn.ts(24,17): error TS1005: ':' expected.
+
+
+==== kvsExtantReturn.ts (4 errors) ====
+    function resolve(arg?: string): string {
+        return? arg;
+        arg;
+        return "fallback";
+    }
+    
+    function infer(arg?: string) {
+        return? arg;
+        return 1;
+    }
+    
+    function resolveNullish(arg: string | null | undefined) {
+        return? arg;
+        arg;
+        return "fallback";
+    }
+    
+    function rejectWrongExtantType(arg?: number): string {
+        return? arg;
+        ~~~~~~~~~~~~
+!!! error TS2322: Type 'number' is not assignable to type 'string'.
+        return "fallback";
+    }
+    
+    function rejectSpacedReturn(arg?: string): string {
+        return ? arg;
+               ~
+!!! error TS1109: Expression expected.
+                 ~~~
+!!! error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+!!! error TS2322:   Type 'undefined' is not assignable to type 'string'.
+                    ~
+!!! error TS1005: ':' expected.
+        return "fallback";
+    }
+    

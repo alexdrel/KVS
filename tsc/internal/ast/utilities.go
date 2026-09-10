@@ -185,6 +185,11 @@ func GetAssignmentTarget(node *Node) *Node {
 	for {
 		parent := node.Parent
 		switch parent.Kind {
+		case KindKvsExtantAssignmentExpression:
+			if parent.AsKvsExtantAssignmentExpression().Left == node {
+				return parent
+			}
+			return nil
 		case KindBinaryExpression:
 			if IsAssignmentOperator(parent.AsBinaryExpression().OperatorToken.Kind) && parent.AsBinaryExpression().Left == node {
 				return parent
@@ -465,6 +470,8 @@ func IsIterationStatement(node *Node, lookInLabeledStatements bool) bool {
 	case KindForStatement,
 		KindForInStatement,
 		KindForOfStatement,
+		KindKvsCollectExpression,
+		KindKvsSelectExpression,
 		KindDoStatement,
 		KindWhileStatement:
 		return true
@@ -668,6 +675,7 @@ func isStatementKindButNotDeclarationKind(kind Kind) bool {
 		KindIfStatement,
 		KindLabeledStatement,
 		KindReturnStatement,
+		KindKvsExtantReturnStatement,
 		KindSwitchStatement,
 		KindThrowStatement,
 		KindTryStatement,
@@ -1158,7 +1166,7 @@ func ForEachReturnStatement(body *Node, visitor func(stmt *Node) bool) bool {
 	var traverse func(*Node) bool
 	traverse = func(node *Node) bool {
 		switch node.Kind {
-		case KindReturnStatement:
+		case KindReturnStatement, KindKvsExtantReturnStatement:
 			return visitor(node)
 		case KindCaseBlock, KindBlock, KindIfStatement, KindDoStatement, KindWhileStatement, KindForStatement, KindForInStatement,
 			KindForOfStatement, KindWithStatement, KindSwitchStatement, KindCaseClause, KindDefaultClause, KindLabeledStatement,
@@ -2003,7 +2011,7 @@ func IsExpressionNode(node *Node) bool {
 		KindClassExpression, KindArrowFunction, KindVoidExpression, KindDeleteExpression, KindTypeOfExpression,
 		KindPrefixUnaryExpression, KindPostfixUnaryExpression, KindBinaryExpression, KindConditionalExpression,
 		KindSpreadElement, KindTemplateExpression, KindOmittedExpression, KindJsxElement, KindJsxSelfClosingElement,
-		KindJsxFragment, KindYieldExpression, KindAwaitExpression:
+		KindJsxFragment, KindYieldExpression, KindKvsNullableAssertionExpression, KindKvsExtantAssertionExpression, KindKvsExtantAssignmentExpression, KindKvsCollectExpression, KindKvsSelectExpression, KindAwaitExpression:
 		return true
 	case KindMetaProperty:
 		// `import.defer` in `import.defer(...)` is not an expression
@@ -2029,19 +2037,72 @@ func IsExpressionNode(node *Node) bool {
 	}
 }
 
+func IsKvsProducerHeadPosition(node *Node) bool {
+	current := node
+	for current.Parent != nil {
+		parent := current.Parent
+		switch parent.Kind {
+		case KindVariableDeclaration:
+			return parent.Initializer() == current && parent.Parent.Kind == KindVariableDeclarationList && len(parent.Parent.AsVariableDeclarationList().Declarations.Nodes) == 1 && parent.Parent.Parent.Kind == KindVariableStatement
+		case KindReturnStatement, KindKvsExtantReturnStatement, KindKvsYieldStatement, KindKvsExtantYieldStatement:
+			return parent.Expression() == current
+		case KindPropertyAssignment:
+			return parent.Initializer() == current
+		case KindBinaryExpression:
+			binary := parent.AsBinaryExpression()
+			if IsAssignmentOperator(binary.OperatorToken.Kind) && binary.Right == current {
+				return true
+			}
+			if binary.Left != current {
+				return false
+			}
+		case KindParenthesizedExpression, KindAsExpression, KindSatisfiesExpression, KindNonNullExpression,
+			KindTypeAssertionExpression, KindAwaitExpression, KindVoidExpression, KindTypeOfExpression, KindDeleteExpression,
+			KindPropertyAccessExpression, KindElementAccessExpression, KindCallExpression, KindNewExpression:
+			if parent.Expression() != current {
+				return false
+			}
+		case KindConditionalExpression:
+			if parent.AsConditionalExpression().Condition != current {
+				return false
+			}
+		case KindPrefixUnaryExpression:
+			if parent.AsPrefixUnaryExpression().Operand != current {
+				return false
+			}
+		case KindPostfixUnaryExpression:
+			if parent.AsPostfixUnaryExpression().Operand != current {
+				return false
+			}
+		default:
+			return false
+		}
+		current = parent
+	}
+	return false
+}
+
 func IsInExpressionContext(node *Node) bool {
 	parent := node.Parent
 	switch parent.Kind {
 	case KindVariableDeclaration, KindParameter, KindPropertyDeclaration, KindPropertySignature, KindEnumMember, KindPropertyAssignment, KindBindingElement:
 		return parent.Initializer() == node
-	case KindExpressionStatement, KindIfStatement, KindDoStatement, KindWhileStatement, KindReturnStatement, KindWithStatement, KindSwitchStatement,
+	case KindExpressionStatement, KindIfStatement, KindDoStatement, KindWhileStatement, KindReturnStatement, KindKvsExtantReturnStatement, KindKvsYieldStatement, KindKvsExtantYieldStatement, KindWithStatement, KindSwitchStatement,
 		KindCaseClause, KindDefaultClause, KindThrowStatement, KindTypeAssertionExpression, KindAsExpression, KindTemplateSpan, KindComputedPropertyName,
 		KindSatisfiesExpression:
 		return parent.Expression() == node
 	case KindForStatement:
 		s := parent.AsForStatement()
 		return s.Initializer == node && s.Initializer.Kind != KindVariableDeclarationList || s.Condition == node || s.Incrementor == node
-	case KindForInStatement, KindForOfStatement:
+	case KindForInStatement, KindForOfStatement, KindKvsCollectExpression, KindKvsSelectExpression:
+		if parent.Kind == KindKvsCollectExpression {
+			s := parent.AsKvsCollectExpression()
+			return s.Initializer == node && s.Initializer.Kind != KindVariableDeclarationList || s.Expression == node
+		}
+		if parent.Kind == KindKvsSelectExpression {
+			s := parent.AsKvsSelectExpression()
+			return s.Initializer == node && s.Initializer.Kind != KindVariableDeclarationList || s.Expression == node
+		}
 		s := parent.AsForInOrOfStatement()
 		return s.Initializer == node && s.Initializer.Kind != KindVariableDeclarationList || s.Expression == node
 	case KindDecorator, KindJsxExpression, KindJsxSpreadAttribute, KindSpreadAssignment:

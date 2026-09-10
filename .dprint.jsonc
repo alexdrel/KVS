@@ -46,6 +46,7 @@
         "**/node_modules",
         "**/*-lock.json",
         "**/testdata",
+        "kvs/examples/**/*.ts",
         "packages/vscode-typescript/l10n/**",
         "tsc/internal/bundled/libs/**",
         "tsc/internal/lsp/lsproto/_generate/*.json",

@@ -2111,7 +2111,7 @@ func (c *Checker) isUsedInFunctionOrInstanceProperty(usage *ast.Node, declaratio
 
 func isImmediatelyUsedInInitializerOfBlockScopedVariable(declaration *ast.Node, usage *ast.Node, declContainer *ast.Node) bool {
 	switch declaration.Parent.Parent.Kind {
-	case ast.KindVariableStatement, ast.KindForStatement, ast.KindForOfStatement:
+	case ast.KindVariableStatement, ast.KindForStatement, ast.KindForOfStatement, ast.KindKvsCollectExpression, ast.KindKvsSelectExpression:
 		// variable statement/for/for-of statement case,
 		// use site should not be inside variable declaration (initializer of declaration or binding element)
 		if isSameScopeDescendentOf(usage, declaration, declContainer) {
@@ -2120,7 +2120,7 @@ func isImmediatelyUsedInInitializerOfBlockScopedVariable(declaration *ast.Node, 
 	}
 	// ForIn/ForOf case - use site should not be used in expression part
 	grandparent := declaration.Parent.Parent
-	return ast.IsForInOrOfStatement(grandparent) && isSameScopeDescendentOf(usage, grandparent.Expression(), declContainer)
+	return (ast.IsForInOrOfStatement(grandparent) || grandparent.Kind == ast.KindKvsCollectExpression || grandparent.Kind == ast.KindKvsSelectExpression) && isSameScopeDescendentOf(usage, grandparent.Expression(), declContainer)
 }
 
 // Starting from 'initial' node walk up the parent chain until 'stopAt' node is reached.
@@ -2384,6 +2384,10 @@ func (c *Checker) checkSourceElementWorker(node *ast.Node) {
 		c.checkBreakOrContinueStatement(node)
 	case ast.KindReturnStatement:
 		c.checkReturnStatement(node)
+	case ast.KindKvsExtantReturnStatement:
+		c.checkKvsExtantReturnStatement(node)
+	case ast.KindKvsYieldStatement, ast.KindKvsExtantYieldStatement:
+		c.checkExpression(node.Expression())
 	case ast.KindWithStatement:
 		c.checkWithStatement(node)
 	case ast.KindSwitchStatement:
@@ -4149,6 +4153,40 @@ func (c *Checker) checkReturnStatement(node *ast.Node) {
 	}
 }
 
+func (c *Checker) checkKvsExtantReturnStatement(node *ast.Node) {
+	expr := node.Expression()
+	exprType := c.GetNonNullableType(c.checkExpressionCached(expr))
+	if c.checkGrammarStatementInAmbientContext(node) {
+		return
+	}
+	container := getContainingFunctionOrClassStaticBlock(node)
+	if container != nil && ast.IsClassStaticBlockDeclaration(container) {
+		c.grammarErrorOnFirstToken(node, diagnostics.A_return_statement_cannot_be_used_inside_a_class_static_block)
+		return
+	}
+	if container == nil {
+		c.grammarErrorOnFirstToken(node, diagnostics.A_return_statement_can_only_be_used_within_a_function_body)
+		return
+	}
+	if ast.IsSetAccessorDeclaration(container) {
+		c.error(node, diagnostics.Setters_cannot_return_a_value)
+		return
+	}
+	signature := c.getSignatureFromDeclaration(container)
+	returnType := c.getReturnTypeOfSignature(signature)
+	if ast.IsConstructorDeclaration(container) {
+		if !c.checkTypeAssignableToAndOptionallyElaborate(exprType, returnType, node, expr, nil, nil) {
+			c.error(node, diagnostics.Return_type_of_constructor_signature_must_be_assignable_to_the_instance_type_of_the_class)
+		}
+		return
+	}
+	if c.getReturnTypeFromAnnotation(container) != nil {
+		functionFlags := ast.GetFunctionFlags(container)
+		unwrappedReturnType := core.OrElse(c.unwrapReturnType(returnType, functionFlags), returnType)
+		c.checkReturnExpression(container, unwrappedReturnType, node, expr, exprType, false)
+	}
+}
+
 // When checking an arrow expression such as `(x) => exp`, then `node` is the expression `exp`.
 // Otherwise, `node` is a return statement.
 func (c *Checker) checkReturnExpression(container *ast.Node, unwrappedReturnType *Type, node *ast.Node, expr *ast.Node, exprType *Type, inConditionalExpression bool) {
@@ -4164,7 +4202,7 @@ func (c *Checker) checkReturnExpression(container *ast.Node, unwrappedReturnType
 			return
 		}
 	}
-	inReturnStatement := node.Kind == ast.KindReturnStatement
+	inReturnStatement := node.Kind == ast.KindReturnStatement || node.Kind == ast.KindKvsExtantReturnStatement
 	if functionFlags&ast.FunctionFlagsAsync != 0 {
 		unwrappedExprType = c.checkAwaitedType(exprType, false /*withAlias*/, node, diagnostics.The_return_type_of_an_async_function_must_either_be_a_valid_promise_or_must_not_contain_a_callable_then_member)
 	}
@@ -7402,7 +7440,7 @@ func (c *Checker) isUnreferencedVariableDeclaration(node *ast.Node) bool {
 		}
 	}
 	if (ast.IsParameterDeclaration(node) ||
-		ast.IsVariableDeclaration(node) && (ast.IsForInOrOfStatement(node.Parent.Parent) || c.getCombinedNodeFlagsCached(node)&ast.NodeFlagsUsing != 0) ||
+		ast.IsVariableDeclaration(node) && (ast.IsForInOrOfStatement(node.Parent.Parent) || node.Parent.Parent.Kind == ast.KindKvsCollectExpression || node.Parent.Parent.Kind == ast.KindKvsSelectExpression || c.getCombinedNodeFlagsCached(node)&ast.NodeFlagsUsing != 0) ||
 		ast.IsBindingElement(node) && !(ast.IsObjectBindingPattern(node.Parent) && node.PropertyName() == nil)) &&
 		isIdentifierThatStartsWithUnderscore(name) {
 		return false
@@ -7981,6 +8019,16 @@ func (c *Checker) checkExpressionWorker(node *ast.Node, checkMode CheckMode) *Ty
 		return c.undefinedWideningType
 	case ast.KindYieldExpression:
 		return c.checkYieldExpression(node)
+	case ast.KindKvsNullableAssertionExpression:
+		return c.getNullableType(c.checkExpressionEx(node.Expression(), checkMode), TypeFlagsNullable)
+	case ast.KindKvsExtantAssertionExpression:
+		return c.GetNonNullableType(c.checkExpressionEx(node.Expression(), checkMode))
+	case ast.KindKvsExtantAssignmentExpression:
+		return c.checkKvsExtantAssignmentExpression(node, checkMode)
+	case ast.KindKvsCollectExpression:
+		return c.checkKvsCollectExpression(node)
+	case ast.KindKvsSelectExpression:
+		return c.checkKvsSelectExpression(node)
 	case ast.KindSyntheticExpression:
 		return c.checkSyntheticExpression(node)
 	case ast.KindJsxExpression:
@@ -11326,7 +11374,7 @@ func (c *Checker) checkIdentifier(node *ast.Node, checkMode CheckMode) *Type {
 	// We only look for uninitialized variables in strict null checking mode, and only when we can analyze
 	// the entire control flow graph from the variable's declaration (i.e. when the flow container and
 	// declaration container are the same).
-	isNeverInitialized := immediateDeclaration != nil && ast.IsVariableDeclaration(immediateDeclaration) && !ast.IsForInOrOfStatement(immediateDeclaration.Parent.Parent) &&
+	isNeverInitialized := immediateDeclaration != nil && ast.IsVariableDeclaration(immediateDeclaration) && !ast.IsForInOrOfStatement(immediateDeclaration.Parent.Parent) && immediateDeclaration.Parent.Parent.Kind != ast.KindKvsCollectExpression && immediateDeclaration.Parent.Parent.Kind != ast.KindKvsSelectExpression &&
 		immediateDeclaration.Initializer() == nil && immediateDeclaration.AsVariableDeclaration().ExclamationToken == nil &&
 		c.isMutableLocalVariableDeclaration(immediateDeclaration) && !c.isSymbolAssignedDefinitely(symbol)
 	assumeInitialized := isParameter ||
@@ -12517,6 +12565,19 @@ func (c *Checker) checkBinaryExpression(node *ast.Node, checkMode CheckMode) *Ty
 	return c.checkBinaryLikeExpression(binary.Left, binary.OperatorToken, binary.Right, checkMode, node)
 }
 
+func (c *Checker) checkKvsExtantAssignmentExpression(node *ast.Node, checkMode CheckMode) *Type {
+	expression := node.AsKvsExtantAssignmentExpression()
+	rightType := c.checkExpressionEx(expression.Right, checkMode)
+	assignedType := c.GetNonNullableType(rightType)
+	if expression.Left.Kind == ast.KindObjectLiteralExpression || expression.Left.Kind == ast.KindArrayLiteralExpression {
+		c.checkDestructuringAssignment(expression.Left, assignedType, checkMode, expression.Right.Kind == ast.KindThisKeyword)
+	} else {
+		leftType := c.checkExpressionEx(expression.Left, checkMode)
+		c.checkAssignmentOperator(expression.Left, ast.KindEqualsToken, expression.Right, leftType, assignedType)
+	}
+	return rightType
+}
+
 func (c *Checker) checkBinaryLikeExpression(left *ast.Node, operatorToken *ast.Node, right *ast.Node, checkMode CheckMode, errorNode *ast.Node) *Type {
 	operator := operatorToken.Kind
 	if operator == ast.KindEqualsToken && (left.Kind == ast.KindObjectLiteralExpression || left.Kind == ast.KindArrayLiteralExpression) {
@@ -13145,6 +13206,8 @@ func (c *Checker) getSyntacticNullishnessSemantics(node *ast.Node) PredicateSema
 		ast.KindNewExpression,
 		ast.KindPropertyAccessExpression,
 		ast.KindYieldExpression,
+		ast.KindKvsCollectExpression,
+		ast.KindKvsSelectExpression,
 		ast.KindThisKeyword:
 		return PredicateSemanticsSometimes
 	case ast.KindBinaryExpression:
@@ -16961,7 +17024,7 @@ func (c *Checker) getTypeForVariableLikeDeclaration(declaration *ast.Node, inclu
 				return c.getExtractStringType(indexType)
 			}
 			return c.stringType
-		case ast.KindForOfStatement:
+		case ast.KindForOfStatement, ast.KindKvsCollectExpression, ast.KindKvsSelectExpression:
 			// checkRightHandSideOfForOf will return undefined if the for-of expression type was
 			// missing properties/signatures required to get its iteratedType (like
 			// [Symbol.iterator] or next). This may be because we accessed properties from anyType,
@@ -17047,6 +17110,12 @@ func (c *Checker) getTypeForVariableLikeDeclaration(declaration *ast.Node, inclu
 	// not a parameter of a contextually typed function
 	if declaration.Initializer() != nil {
 		t := c.widenTypeInferredFromInitializer(declaration, c.checkDeclarationInitializer(declaration, checkMode, nil /*contextualType*/))
+		if declaration.Flags&ast.NodeFlagsKvsNullableBinding != 0 {
+			return c.getNullableType(c.GetNonNullableType(t), TypeFlagsNullable)
+		}
+		if declaration.Flags&ast.NodeFlagsKvsExtantBinding != 0 {
+			return c.GetNonNullableType(t)
+		}
 		return c.addOptionalityEx(t, isProperty, isOptional)
 	}
 	if c.noImplicitAny && ast.IsPropertyDeclaration(declaration) {
@@ -17992,8 +18061,62 @@ func (c *Checker) isNullOrUndefined(node *ast.Node) bool {
 }
 
 func (c *Checker) checkRightHandSideOfForOf(statement *ast.Node) *Type {
-	use := core.IfElse(statement.AsForInOrOfStatement().AwaitModifier != nil, IterationUseForAwaitOf, IterationUseForOf)
+	use := IterationUseForOf
+	if statement.Kind == ast.KindForOfStatement && statement.AsForInOrOfStatement().AwaitModifier != nil {
+		use = IterationUseForAwaitOf
+	}
 	return c.checkIteratedTypeOrElementType(use, c.checkNonNullExpression(statement.Expression()), c.undefinedType, statement.Expression())
+}
+
+func (c *Checker) checkKvsCollectExpression(node *ast.Node) *Type {
+	data := node.AsKvsCollectExpression()
+	return c.checkKvsProducerExpression(node, data.Initializer, data.Expression, data.Statement, false)
+}
+
+func (c *Checker) checkKvsSelectExpression(node *ast.Node) *Type {
+	data := node.AsKvsSelectExpression()
+	return c.checkKvsProducerExpression(node, data.Initializer, data.Expression, data.Statement, true)
+}
+
+func (c *Checker) checkKvsProducerExpression(node *ast.Node, initializer *ast.ForInitializer, expression *ast.Expression, statement *ast.Statement, selectProducer bool) *Type {
+	if !ast.IsKvsProducerHeadPosition(node) {
+		message := diagnostics.Kvs_collect_is_only_supported_in_a_terminal_value_position
+		if selectProducer {
+			message = diagnostics.Kvs_select_is_only_supported_in_a_terminal_value_position
+		}
+		c.error(node, message)
+	}
+	c.checkVariableDeclarationList(initializer)
+	c.checkSourceElement(statement)
+	var yieldTypes []*Type
+	var visit func(*ast.Node) bool
+	visit = func(current *ast.Node) bool {
+		if current != node && (ast.IsFunctionLike(current) || current.Kind == ast.KindKvsCollectExpression || current.Kind == ast.KindKvsSelectExpression) {
+			return false
+		}
+		if current.Kind == ast.KindKvsYieldStatement || current.Kind == ast.KindKvsExtantYieldStatement {
+			t := c.checkExpressionCached(current.Expression())
+			if current.Kind == ast.KindKvsExtantYieldStatement {
+				t = c.GetNonNullableType(t)
+			}
+			yieldTypes = append(yieldTypes, c.getWidenedType(t))
+			return false
+		}
+		current.ForEachChild(visit)
+		return false
+	}
+	statement.ForEachChild(visit)
+	elementType := c.neverType
+	if len(yieldTypes) != 0 {
+		elementType = c.getUnionType(yieldTypes)
+	}
+	if node.Locals() != nil {
+		c.registerForUnusedIdentifiersCheck(node)
+	}
+	if selectProducer {
+		return c.getUnionType([]*Type{elementType, c.nullType})
+	}
+	return c.createArrayType(elementType)
 }
 
 // Return the inferred type for a binding element
@@ -20599,6 +20722,9 @@ func (c *Checker) checkAndAggregateReturnExpressionTypes(fn *ast.Node, checkMode
 			return false
 		}
 		t := c.checkExpressionCachedEx(expr, checkMode & ^CheckModeSkipGenericFunctions)
+		if returnStatement.Kind == ast.KindKvsExtantReturnStatement {
+			t = c.GetNonNullableType(t)
+		}
 		if functionFlags&ast.FunctionFlagsAsync != 0 {
 			// From within an async function you can return either a non-promise value or a promise. Any
 			// Promise/A+ compatible implementation will always assimilate any foreign promise, so the
@@ -29705,7 +29831,7 @@ func (c *Checker) getContextualType(node *ast.Node, contextFlags ContextFlags) *
 	switch parent.Kind {
 	case ast.KindVariableDeclaration, ast.KindParameter, ast.KindPropertyDeclaration, ast.KindPropertySignature, ast.KindBindingElement:
 		return c.getContextualTypeForInitializerExpression(node, contextFlags)
-	case ast.KindArrowFunction, ast.KindReturnStatement:
+	case ast.KindArrowFunction, ast.KindReturnStatement, ast.KindKvsExtantReturnStatement:
 		return c.getContextualTypeForReturnExpression(node, contextFlags)
 	case ast.KindYieldExpression:
 		return c.getContextualTypeForYieldOperand(parent, contextFlags)

@@ -81,6 +81,9 @@ type Parser struct {
 	contextFlags                ast.NodeFlags
 	parsingContexts             ParsingContexts
 	statementHasAwaitIdentifier bool
+	functionDepth               int
+	kvsProducerActive           bool
+	kvsProducerFunctionDepth    int
 	hasDeprecatedTag            bool
 	hasParseError               bool
 
@@ -1061,6 +1064,9 @@ func (p *Parser) parseOptionalTokenJSDoc(kind ast.Kind) *ast.Node {
 }
 
 func (p *Parser) parseStatement() *ast.Statement {
+	if p.token == ast.KindYieldKeyword && p.kvsProducerActive && p.kvsProducerFunctionDepth == p.functionDepth {
+		return p.parseKvsYieldStatement()
+	}
 	switch p.token {
 	case ast.KindSemicolonToken:
 		return p.parseEmptyStatement()
@@ -1119,6 +1125,22 @@ func (p *Parser) parseStatement() *ast.Statement {
 		}
 	}
 	return p.parseExpressionOrLabeledStatement()
+}
+
+func (p *Parser) parseKvsYieldStatement() *ast.Statement {
+	pos := p.nodePos()
+	yieldEnd := p.scanner.TokenEnd()
+	p.nextToken()
+	extant := p.token == ast.KindQuestionToken && p.scanner.TokenStart() == yieldEnd
+	if extant {
+		p.nextToken()
+	}
+	expression := p.parseExpressionAllowIn()
+	p.parseSemicolon()
+	if extant {
+		return p.finishNode(p.factory.NewKvsExtantYieldStatement(expression), pos)
+	}
+	return p.finishNode(p.factory.NewKvsYieldStatement(expression), pos)
 }
 
 func (p *Parser) parseDeclaration() *ast.Statement {
@@ -1367,7 +1389,16 @@ func (p *Parser) parseIdentifierUnlessAtSemicolon() *ast.Node {
 func (p *Parser) parseReturnStatement() *ast.Node {
 	pos := p.nodePos()
 	jsdoc := p.jsdocScannerInfo()
+	returnEnd := p.scanner.TokenEnd()
 	p.parseExpected(ast.KindReturnKeyword)
+	if p.token == ast.KindQuestionToken && p.scanner.TokenStart() == returnEnd {
+		p.nextToken()
+		expression := p.parseExpressionAllowIn()
+		p.parseSemicolon()
+		result := p.finishNode(p.factory.NewKvsExtantReturnStatement(expression), pos)
+		p.withJSDoc(result, jsdoc)
+		return result
+	}
 	var expression *ast.Expression
 	if !p.canParseSemicolon() {
 		expression = p.parseExpressionAllowIn()
@@ -1615,10 +1646,19 @@ func (p *Parser) parseVariableDeclarationAllowExclamation() *ast.Node {
 func (p *Parser) parseVariableDeclarationWorker(allowExclamation bool) *ast.Node {
 	pos := p.nodePos()
 	jsdoc := p.jsdocScannerInfo()
+	nameEnd := p.scanner.TokenEnd()
 	name := p.parseIdentifierOrPatternWithDiagnostic(diagnostics.Private_identifiers_are_not_allowed_in_variable_declarations)
+	var kvsBindingFlags ast.NodeFlags
 	var exclamationToken *ast.Node
 	if allowExclamation && name.Kind == ast.KindIdentifier && p.token == ast.KindExclamationToken && !p.hasPrecedingLineBreak() {
+		adjacent := p.scanner.TokenStart() == nameEnd
 		exclamationToken = p.parseTokenNode()
+		if adjacent {
+			kvsBindingFlags = ast.NodeFlagsKvsExtantBinding
+		}
+	} else if allowExclamation && name.Kind == ast.KindIdentifier && p.token == ast.KindQuestionToken && p.scanner.TokenStart() == nameEnd {
+		p.nextToken()
+		kvsBindingFlags = ast.NodeFlagsKvsNullableBinding
 	}
 	typeNode := p.parseTypeAnnotation()
 	var initializer *ast.Expression
@@ -1626,6 +1666,10 @@ func (p *Parser) parseVariableDeclarationWorker(allowExclamation bool) *ast.Node
 		initializer = p.parseInitializer()
 	}
 	result := p.finishNode(p.factory.NewVariableDeclaration(name, exclamationToken, typeNode, initializer), pos)
+	if kvsBindingFlags == ast.NodeFlagsKvsExtantBinding && (typeNode != nil || initializer == nil) {
+		kvsBindingFlags = ast.NodeFlagsNone
+	}
+	result.Flags |= kvsBindingFlags
 	p.withJSDoc(result, jsdoc)
 	p.checkJSSyntax(result)
 	return result
@@ -3548,6 +3592,8 @@ func (p *Parser) parseFunctionBlockOrSemicolon(flags ParseFlags, diagnosticMessa
 func (p *Parser) parseFunctionBlock(flags ParseFlags, diagnosticMessage *diagnostics.Message) *ast.Node {
 	saveContextFlags := p.contextFlags
 	saveHasAwaitIdentifier := p.statementHasAwaitIdentifier
+	p.functionDepth++
+	defer func() { p.functionDepth-- }()
 	p.setContextFlags(ast.NodeFlagsYieldContext, flags&ParseFlagsYield != 0)
 	p.setContextFlags(ast.NodeFlagsAwaitContext, flags&ParseFlagsAwait != 0)
 	// We may be in a [Decorator] context when parsing a function expression or
@@ -4187,6 +4233,12 @@ func (p *Parser) parseAssignmentExpressionOrHigherWorker(allowReturnTypeInArrowF
 	if expr.Kind == ast.KindIdentifier && p.token == ast.KindEqualsGreaterThanToken {
 		return p.parseSimpleArrowFunctionExpression(pos, expr, allowReturnTypeInArrowFunction, jsdoc, nil /*asyncModifier*/)
 	}
+	if ast.IsLeftHandSideExpression(expr) && p.isKvsExtantAssignment() {
+		questionToken := p.parseTokenNode()
+		equalsToken := p.parseTokenNode()
+		right := p.parseAssignmentExpressionOrHigherWorker(allowReturnTypeInArrowFunction)
+		return p.finishNode(p.factory.NewKvsExtantAssignmentExpression(expr, questionToken, equalsToken, right), pos)
+	}
 	// Now see if we might be in cases '2' or '3'.
 	// If the expression was a LHS expression, and we have an assignment operator, then
 	// we're in '2' or '3'. Consume the assignment and return.
@@ -4198,6 +4250,16 @@ func (p *Parser) parseAssignmentExpressionOrHigherWorker(allowReturnTypeInArrowF
 	}
 	// It wasn't an assignment or a lambda.  This is a conditional expression:
 	return p.parseConditionalExpressionRest(expr, pos, allowReturnTypeInArrowFunction)
+}
+
+func (p *Parser) isKvsExtantAssignment() bool {
+	if p.token != ast.KindQuestionToken {
+		return false
+	}
+	questionEnd := p.scanner.TokenEnd()
+	return p.lookAhead(func(p *Parser) bool {
+		return p.nextToken() == ast.KindEqualsToken && p.scanner.TokenStart() == questionEnd
+	})
 }
 
 func (p *Parser) isYieldExpression() bool {
@@ -4682,7 +4744,17 @@ func (p *Parser) parseBinaryExpressionRest(precedence ast.OperatorPrecedence, le
 			if p.hasPrecedingLineBreak() {
 				break
 			} else {
+				operatorEnd := p.scanner.TokenEnd()
 				p.nextToken()
+				if operator == ast.KindAsKeyword && p.scanner.TokenStart() == operatorEnd && (p.token == ast.KindQuestionToken || p.token == ast.KindExclamationToken) {
+					assertionToken := p.parseTokenNode()
+					if assertionToken.Kind == ast.KindQuestionToken {
+						leftOperand = p.finishNode(p.factory.NewKvsNullableAssertionExpression(leftOperand, assertionToken), leftOperand.Pos())
+					} else {
+						leftOperand = p.finishNode(p.factory.NewKvsExtantAssertionExpression(leftOperand, assertionToken), leftOperand.Pos())
+					}
+					continue
+				}
 				// When we have 'a ## b as SomeType $$ c' or 'a ## b satisfies SomeType $$ c', where ## and $$
 				// are binary operators, we want to stop parsing when $$ would bind before ## after erasing the
 				// assertion. See https://github.com/microsoft/TypeScript/issues/63527.
@@ -5604,6 +5676,9 @@ func (p *Parser) parseTemplateSpan(isTaggedTemplate bool) *ast.Node {
 }
 
 func (p *Parser) parsePrimaryExpression() *ast.Expression {
+	if p.token == ast.KindIdentifier && (p.scanner.TokenValue() == "collect" || p.scanner.TokenValue() == "select") && p.lookAhead((*Parser).nextTokenIsOpenParenThenConstKeyword) {
+		return p.parseKvsProducerExpression()
+	}
 	switch p.token {
 	case ast.KindNoSubstitutionTemplateLiteral:
 		if p.scanner.TokenFlags()&ast.TokenFlagsIsInvalid != 0 {
@@ -5646,6 +5721,32 @@ func (p *Parser) parsePrimaryExpression() *ast.Expression {
 		return p.parsePrivateIdentifier()
 	}
 	return p.parseIdentifierWithDiagnostic(diagnostics.Expression_expected, nil)
+}
+
+func (p *Parser) nextTokenIsOpenParenThenConstKeyword() bool {
+	return p.nextToken() == ast.KindOpenParenToken && p.nextToken() == ast.KindConstKeyword
+}
+
+func (p *Parser) parseKvsProducerExpression() *ast.Expression {
+	pos := p.nodePos()
+	kind := p.scanner.TokenValue()
+	p.nextToken()
+	p.parseExpected(ast.KindOpenParenToken)
+	initializer := p.parseVariableDeclarationList(true)
+	p.parseExpected(ast.KindOfKeyword)
+	expression := doInContext(p, ast.NodeFlagsDisallowInContext, false, (*Parser).parseAssignmentExpressionOrHigher)
+	p.parseExpected(ast.KindCloseParenToken)
+	saveActive := p.kvsProducerActive
+	saveFunctionDepth := p.kvsProducerFunctionDepth
+	p.kvsProducerActive = true
+	p.kvsProducerFunctionDepth = p.functionDepth
+	statement := p.parseStatement()
+	p.kvsProducerActive = saveActive
+	p.kvsProducerFunctionDepth = saveFunctionDepth
+	if kind == "select" {
+		return p.finishNode(p.factory.NewKvsSelectExpression(initializer, expression, statement), pos)
+	}
+	return p.finishNode(p.factory.NewKvsCollectExpression(initializer, expression, statement), pos)
 }
 
 func (p *Parser) parseParenthesizedExpression() *ast.Expression {

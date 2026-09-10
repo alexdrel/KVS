@@ -1,0 +1,134 @@
+kvsCollect.ts(61,5): error TS2365: Operator '+=' cannot be applied to types 'number' and 'string[]'.
+kvsCollect.ts(78,13): error TS100069: KVS 'collect' must be at the head of a supported value expression.
+kvsCollect.ts(84,12): error TS2365: Operator '+' cannot be applied to types 'number' and 'string[]'.
+kvsCollect.ts(84,16): error TS100069: KVS 'collect' must be at the head of a supported value expression.
+kvsCollect.ts(90,29): error TS100069: KVS 'collect' must be at the head of a supported value expression.
+kvsCollect.ts(97,15): error TS1109: Expression expected.
+kvsCollect.ts(97,35): error TS1005: ':' expected.
+
+
+==== kvsCollect.ts (7 errors) ====
+    interface Item {
+        value: string;
+        included: boolean;
+        optionalValue?: string;
+    }
+    
+    function collectValues(items: Item[]) {
+        const values = collect (const item of items) {
+            if (!item.included) continue;
+            yield item.value;
+            yield? item.optionalValue;
+        };
+        values;
+        return values;
+    }
+    
+    function returnCollectedValues(items: Item[]) {
+        return collect (const item of items) {
+            yield item.value;
+        };
+    }
+    
+    function assignCollectedValues(items: Item[]) {
+        let values: string[] = [];
+        values = collect (const item of items) {
+            yield item.value;
+        };
+        return values;
+    }
+    
+    function assignProperty(items: Item[], target: { values: string[] }) {
+        target.values = collect (const item of items) {
+            yield item.value;
+        };
+    }
+    
+    function useHeadTail(items: Item[], extra: number) {
+        const text = collect (const item of items) {
+            yield item.value;
+        }.join(", ");
+        const count = collect (const item of items) {
+            yield item.value;
+        }.length + extra;
+        return { text, count };
+    }
+    
+    function useFieldHeads(items: Item[], getLabel: () => string) {
+        return {
+            label: getLabel(),
+            values: collect (const item of items) {
+                yield item.value;
+            }.filter(value => value.length > 3),
+            included: collect (const item of items) {
+                yield item.included;
+            }.length,
+        };
+    }
+    
+    function compoundAssignmentUsesOrdinaryTyping(items: Item[]) {
+        let count = 0;
+        count += collect (const item of items) {
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            yield item.value;
+    ~~~~~~~~~~~~~~~~~~~~~~~~~
+        };
+    ~~~~~
+!!! error TS2365: Operator '+=' cannot be applied to types 'number' and 'string[]'.
+    }
+    
+    function collectNestedValues(groups: Item[][]) {
+        const values = collect (const items of groups) {
+            yield collect (const item of items) {
+                yield item.value;
+            };
+        };
+        return values;
+    }
+    
+    function consume(_values: string[]) {}
+    
+    function rejectNestedPlacement(items: Item[]) {
+        consume(collect (const item of items) {
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            yield item.value;
+    ~~~~~~~~~~~~~~~~~~~~~~~~~
+        });
+    ~~~~~
+!!! error TS100069: KVS 'collect' must be at the head of a supported value expression.
+    }
+    
+    function rejectRightOperand(items: Item[]) {
+        return 1 + collect (const item of items) {
+               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            yield item.value;
+    ~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~~~~~~~~
+        };
+    ~~~~~
+!!! error TS2365: Operator '+' cannot be applied to types 'number' and 'string[]'.
+    ~~~~~
+!!! error TS100069: KVS 'collect' must be at the head of a supported value expression.
+    }
+    
+    function rejectConditionalBranch(items: Item[], condition: boolean) {
+        return condition ? [] : collect (const item of items) {
+                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            yield item.value;
+    ~~~~~~~~~~~~~~~~~~~~~~~~~
+        };
+    ~~~~~
+!!! error TS100069: KVS 'collect' must be at the head of a supported value expression.
+    }
+    
+    function rejectSpacedYield(items: Item[]) {
+        return collect (const item of items) {
+            yield ? item.optionalValue;
+                  ~
+!!! error TS1109: Expression expected.
+                                      ~
+!!! error TS1005: ':' expected.
+        };
+    }
+    

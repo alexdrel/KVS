@@ -1,0 +1,97 @@
+//// [tests/cases/conformance/kvs/kvsExtantAssignment.ts] ////
+
+=== kvsExtantAssignment.ts ===
+function assignPresent(candidate: string | null | undefined) {
+>assignPresent : Symbol(assignPresent, Decl(kvsExtantAssignment.ts, 0, 0))
+>candidate : Symbol(candidate, Decl(kvsExtantAssignment.ts, 0, 23))
+
+    let target = "old";
+>target : Symbol(target, Decl(kvsExtantAssignment.ts, 1, 7))
+
+    const result = target ?= candidate;
+>result : Symbol(result, Decl(kvsExtantAssignment.ts, 2, 9))
+>target : Symbol(target, Decl(kvsExtantAssignment.ts, 1, 7))
+>candidate : Symbol(candidate, Decl(kvsExtantAssignment.ts, 0, 23))
+
+    target;
+>target : Symbol(target, Decl(kvsExtantAssignment.ts, 1, 7))
+
+    result;
+>result : Symbol(result, Decl(kvsExtantAssignment.ts, 2, 9))
+
+    return { target, result };
+>target : Symbol(target, Decl(kvsExtantAssignment.ts, 5, 12))
+>result : Symbol(result, Decl(kvsExtantAssignment.ts, 5, 20))
+}
+
+function assignFalsy(candidate: false | 0 | "" | null | undefined) {
+>assignFalsy : Symbol(assignFalsy, Decl(kvsExtantAssignment.ts, 6, 1))
+>candidate : Symbol(candidate, Decl(kvsExtantAssignment.ts, 8, 21))
+
+    let target: false | 0 | "" = "";
+>target : Symbol(target, Decl(kvsExtantAssignment.ts, 9, 7))
+
+    return target ?= candidate;
+>target : Symbol(target, Decl(kvsExtantAssignment.ts, 9, 7))
+>candidate : Symbol(candidate, Decl(kvsExtantAssignment.ts, 8, 21))
+}
+
+function assignProperty(target: { value: string }, candidate?: string) {
+>assignProperty : Symbol(assignProperty, Decl(kvsExtantAssignment.ts, 11, 1))
+>target : Symbol(target, Decl(kvsExtantAssignment.ts, 13, 24))
+>value : Symbol(value, Decl(kvsExtantAssignment.ts, 13, 33))
+>candidate : Symbol(candidate, Decl(kvsExtantAssignment.ts, 13, 50))
+
+    return target.value ?= candidate;
+>target.value : Symbol(value, Decl(kvsExtantAssignment.ts, 13, 33))
+>target : Symbol(target, Decl(kvsExtantAssignment.ts, 13, 24))
+>value : Symbol(value, Decl(kvsExtantAssignment.ts, 13, 33))
+>candidate : Symbol(candidate, Decl(kvsExtantAssignment.ts, 13, 50))
+}
+
+function showPrototypeEvaluationOrder(
+>showPrototypeEvaluationOrder : Symbol(showPrototypeEvaluationOrder, Decl(kvsExtantAssignment.ts, 15, 1))
+
+    getTarget: () => { values: string[] },
+>getTarget : Symbol(getTarget, Decl(kvsExtantAssignment.ts, 17, 38))
+>values : Symbol(values, Decl(kvsExtantAssignment.ts, 18, 22))
+
+    getKey: () => number,
+>getKey : Symbol(getKey, Decl(kvsExtantAssignment.ts, 18, 42))
+
+    getCandidate: () => string | undefined,
+>getCandidate : Symbol(getCandidate, Decl(kvsExtantAssignment.ts, 19, 25))
+
+) {
+    return getTarget().values[getKey()] ?= getCandidate();
+>getTarget().values : Symbol(values, Decl(kvsExtantAssignment.ts, 18, 22))
+>getTarget : Symbol(getTarget, Decl(kvsExtantAssignment.ts, 17, 38))
+>values : Symbol(values, Decl(kvsExtantAssignment.ts, 18, 22))
+>getKey : Symbol(getKey, Decl(kvsExtantAssignment.ts, 18, 42))
+>getCandidate : Symbol(getCandidate, Decl(kvsExtantAssignment.ts, 19, 25))
+}
+
+function rejectWrongPresentType(candidate: number | null) {
+>rejectWrongPresentType : Symbol(rejectWrongPresentType, Decl(kvsExtantAssignment.ts, 23, 1))
+>candidate : Symbol(candidate, Decl(kvsExtantAssignment.ts, 25, 32))
+
+    let target = "old";
+>target : Symbol(target, Decl(kvsExtantAssignment.ts, 26, 7))
+
+    target ?= candidate;
+>target : Symbol(target, Decl(kvsExtantAssignment.ts, 26, 7))
+>candidate : Symbol(candidate, Decl(kvsExtantAssignment.ts, 25, 32))
+}
+
+function rejectWhitespace(candidate?: string) {
+>rejectWhitespace : Symbol(rejectWhitespace, Decl(kvsExtantAssignment.ts, 28, 1))
+>candidate : Symbol(candidate, Decl(kvsExtantAssignment.ts, 30, 26))
+
+    let target = "old";
+>target : Symbol(target, Decl(kvsExtantAssignment.ts, 31, 7))
+
+    target ? = candidate;
+>target : Symbol(target, Decl(kvsExtantAssignment.ts, 31, 7))
+>candidate : Symbol(candidate, Decl(kvsExtantAssignment.ts, 30, 26))
+}
+

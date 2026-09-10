@@ -15,6 +15,7 @@ import (
 	"github.com/microsoft/TypeScript/tsc/internal/transformers/estransforms"
 	"github.com/microsoft/TypeScript/tsc/internal/transformers/inliners"
 	"github.com/microsoft/TypeScript/tsc/internal/transformers/jsxtransforms"
+	"github.com/microsoft/TypeScript/tsc/internal/transformers/kvs"
 	"github.com/microsoft/TypeScript/tsc/internal/transformers/moduletransforms"
 	"github.com/microsoft/TypeScript/tsc/internal/transformers/tstransforms"
 	"github.com/microsoft/TypeScript/tsc/internal/tsoptions"
@@ -136,6 +137,9 @@ func getScriptTransformers(emitContext *printer.EmitContext, host printer.EmitHo
 
 	// transform TypeScript syntax
 	{
+		// lower KVS syntax before the ordinary TypeScript and ECMAScript transforms
+		tx = append(tx, kvs.NewTransformer(&opts))
+
 		// use type nodes to add metadata decorators
 		if options.EmitDecoratorMetadata.IsTrue() {
 			tx = append(tx, tstransforms.NewMetadataTransformer(&opts))

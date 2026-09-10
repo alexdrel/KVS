@@ -556,7 +556,7 @@ func findNearestDeclaration(node *ast.Node) *ast.Node {
 	if ast.IsExportAssignment(result) {
 		return result
 	}
-	if ast.IsReturnStatement(result) {
+	if ast.IsReturnStatement(result) || ast.IsKvsExtantReturnStatement(result) {
 		return ast.FindAncestor(result, isFunctionLikeAndNotConstructor)
 	}
 	if ast.IsStatement(result) {

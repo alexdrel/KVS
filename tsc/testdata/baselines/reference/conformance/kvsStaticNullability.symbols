@@ -1,0 +1,82 @@
+//// [tests/cases/conformance/kvs/kvsStaticNullability.ts] ////
+
+=== kvsStaticNullability.ts ===
+declare const item: string | null | undefined;
+>item : Symbol(item, Decl(kvsStaticNullability.ts, 0, 13))
+
+declare const nullableNumber: number | null | undefined;
+>nullableNumber : Symbol(nullableNumber, Decl(kvsStaticNullability.ts, 1, 13))
+
+const widened = "ready" as?;
+>widened : Symbol(widened, Decl(kvsStaticNullability.ts, 3, 5))
+
+const asserted = item as!;
+>asserted : Symbol(asserted, Decl(kvsStaticNullability.ts, 4, 5))
+>item : Symbol(item, Decl(kvsStaticNullability.ts, 0, 13))
+
+const untouched = item;
+>untouched : Symbol(untouched, Decl(kvsStaticNullability.ts, 5, 5))
+>item : Symbol(item, Decl(kvsStaticNullability.ts, 0, 13))
+
+const nested = [item as!];
+>nested : Symbol(nested, Decl(kvsStaticNullability.ts, 6, 5))
+>item : Symbol(item, Decl(kvsStaticNullability.ts, 0, 13))
+
+const grouped = (item as!).length;
+>grouped : Symbol(grouped, Decl(kvsStaticNullability.ts, 7, 5))
+>(item as!).length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+>item : Symbol(item, Decl(kvsStaticNullability.ts, 0, 13))
+>length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+
+const impossible = null as!;
+>impossible : Symbol(impossible, Decl(kvsStaticNullability.ts, 8, 5))
+
+const rejectedAddition = nullableNumber + 2;
+>rejectedAddition : Symbol(rejectedAddition, Decl(kvsStaticNullability.ts, 9, 5))
+>nullableNumber : Symbol(nullableNumber, Decl(kvsStaticNullability.ts, 1, 13))
+
+const assertedAddition = nullableNumber as! + 2;
+>assertedAddition : Symbol(assertedAddition, Decl(kvsStaticNullability.ts, 10, 5))
+>nullableNumber : Symbol(nullableNumber, Decl(kvsStaticNullability.ts, 1, 13))
+
+let request? = "ready";
+>request : Symbol(request, Decl(kvsStaticNullability.ts, 12, 3))
+
+request = null;
+>request : Symbol(request, Decl(kvsStaticNullability.ts, 12, 3))
+
+request = "ready";
+>request : Symbol(request, Decl(kvsStaticNullability.ts, 12, 3))
+
+const required! = "ready";
+>required : Symbol(required, Decl(kvsStaticNullability.ts, 16, 5))
+
+let current! = "ready";
+>current : Symbol(current, Decl(kvsStaticNullability.ts, 17, 3))
+
+current = "next";
+>current : Symbol(current, Decl(kvsStaticNullability.ts, 17, 3))
+
+current = item;
+>current : Symbol(current, Decl(kvsStaticNullability.ts, 17, 3))
+>item : Symbol(item, Decl(kvsStaticNullability.ts, 0, 13))
+
+const rejectNullableRequired! = item;
+>rejectNullableRequired : Symbol(rejectNullableRequired, Decl(kvsStaticNullability.ts, 21, 5))
+>item : Symbol(item, Decl(kvsStaticNullability.ts, 0, 13))
+
+const rejectNullableConst? = "ready";
+>rejectNullableConst : Symbol(rejectNullableConst, Decl(kvsStaticNullability.ts, 23, 5))
+
+let rejectTypedNullable?: string = "ready";
+>rejectTypedNullable : Symbol(rejectTypedNullable, Decl(kvsStaticNullability.ts, 24, 3))
+
+const rejectSpacedNullableAssertion = "ready" as ?;
+>rejectSpacedNullableAssertion : Symbol(rejectSpacedNullableAssertion, Decl(kvsStaticNullability.ts, 26, 5))
+> : Symbol(unknown)
+
+const rejectSpacedExtantAssertion = item as !;
+>rejectSpacedExtantAssertion : Symbol(rejectSpacedExtantAssertion, Decl(kvsStaticNullability.ts, 27, 5))
+>item : Symbol(item, Decl(kvsStaticNullability.ts, 0, 13))
+> : Symbol(unknown)
+

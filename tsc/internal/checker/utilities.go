@@ -92,6 +92,8 @@ func getAssignmentTargetKind(node *ast.Node) AssignmentKind {
 		return AssignmentKindNone
 	}
 	switch target.Kind {
+	case ast.KindKvsExtantAssignmentExpression:
+		return AssignmentKindDefinite
 	case ast.KindBinaryExpression:
 		binaryOperator := target.AsBinaryExpression().OperatorToken.Kind
 		if binaryOperator == ast.KindEqualsToken || ast.IsLogicalOrCoalescingAssignmentOperator(binaryOperator) {

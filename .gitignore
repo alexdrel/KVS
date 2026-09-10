@@ -78,6 +78,12 @@ __debug_bin*
 .DS_Store
 .idea
 
+# Local KVS collaboration notes
+/AGENTS.md
+/.codex/
+/kvs/examples/*.js
+/kvs/examples/**/*.js
+
 # Local compiler baselines and test output
 tsc/testdata/baselines/local
 tsc/testdata/baselines/tmp

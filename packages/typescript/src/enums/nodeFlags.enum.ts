@@ -31,6 +31,8 @@ export enum NodeFlags {
     PossiblyContainsDeprecatedTag = 1 << 26,
     Unreachable = 1 << 27,
     ReparserTransformedLiteral = 1 << 28,
+    KvsNullableBinding = 1 << 29,
+    KvsExtantBinding = 1 << 30,
     BlockScoped = Let | Const | Using,
     Constant = Const | Using,
     AwaitUsing = Const | Using,

@@ -1,0 +1,59 @@
+//// [tests/cases/conformance/kvs/kvsExtantReturn.ts] ////
+
+=== kvsExtantReturn.ts ===
+function resolve(arg?: string): string {
+>resolve : Symbol(resolve, Decl(kvsExtantReturn.ts, 0, 0))
+>arg : Symbol(arg, Decl(kvsExtantReturn.ts, 0, 17))
+
+    return? arg;
+>arg : Symbol(arg, Decl(kvsExtantReturn.ts, 0, 17))
+
+    arg;
+>arg : Symbol(arg, Decl(kvsExtantReturn.ts, 0, 17))
+
+    return "fallback";
+}
+
+function infer(arg?: string) {
+>infer : Symbol(infer, Decl(kvsExtantReturn.ts, 4, 1))
+>arg : Symbol(arg, Decl(kvsExtantReturn.ts, 6, 15))
+
+    return? arg;
+>arg : Symbol(arg, Decl(kvsExtantReturn.ts, 6, 15))
+
+    return 1;
+}
+
+function resolveNullish(arg: string | null | undefined) {
+>resolveNullish : Symbol(resolveNullish, Decl(kvsExtantReturn.ts, 9, 1))
+>arg : Symbol(arg, Decl(kvsExtantReturn.ts, 11, 24))
+
+    return? arg;
+>arg : Symbol(arg, Decl(kvsExtantReturn.ts, 11, 24))
+
+    arg;
+>arg : Symbol(arg, Decl(kvsExtantReturn.ts, 11, 24))
+
+    return "fallback";
+}
+
+function rejectWrongExtantType(arg?: number): string {
+>rejectWrongExtantType : Symbol(rejectWrongExtantType, Decl(kvsExtantReturn.ts, 15, 1))
+>arg : Symbol(arg, Decl(kvsExtantReturn.ts, 17, 31))
+
+    return? arg;
+>arg : Symbol(arg, Decl(kvsExtantReturn.ts, 17, 31))
+
+    return "fallback";
+}
+
+function rejectSpacedReturn(arg?: string): string {
+>rejectSpacedReturn : Symbol(rejectSpacedReturn, Decl(kvsExtantReturn.ts, 20, 1))
+>arg : Symbol(arg, Decl(kvsExtantReturn.ts, 22, 28))
+
+    return ? arg;
+>arg : Symbol(arg, Decl(kvsExtantReturn.ts, 22, 28))
+
+    return "fallback";
+}
+

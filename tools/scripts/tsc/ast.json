@@ -284,6 +284,11 @@
             "ConditionalExpression",
             "TemplateExpression",
             "YieldExpression",
+            "KvsNullableAssertionExpression",
+            "KvsExtantAssertionExpression",
+            "KvsExtantAssignmentExpression",
+            "KvsCollectExpression",
+            "KvsSelectExpression",
             "SpreadElement",
             "ClassExpression",
             "OmittedExpression",
@@ -320,6 +325,9 @@
             "ThrowStatement",
             "TryStatement",
             "DebuggerStatement",
+            "KvsExtantReturnStatement",
+            "KvsYieldStatement",
+            "KvsExtantYieldStatement",
             "VariableDeclaration",
             "VariableDeclarationList",
             "FunctionDeclaration",
@@ -542,7 +550,7 @@
             },
             {
                 "name": "LastStatement",
-                "value": "DebuggerStatement"
+                "value": "KvsExtantYieldStatement"
             },
             {
                 "name": "FirstNode",
@@ -1598,6 +1606,150 @@
                 "extends": [
                     "StatementBase"
                 ]
+            },
+            "KvsExtantReturnStatement": {
+                "extends": [
+                    "StatementBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "Expression",
+                        "type": "Expression"
+                    }
+                ],
+                "arena": true
+            },
+            "KvsYieldStatement": {
+                "extends": [
+                    "StatementBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "Expression",
+                        "type": "Expression"
+                    }
+                ],
+                "arena": true
+            },
+            "KvsExtantYieldStatement": {
+                "extends": [
+                    "StatementBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "Expression",
+                        "type": "Expression"
+                    }
+                ],
+                "arena": true
+            },
+            "KvsNullableAssertionExpression": {
+                "extends": [
+                    "ExpressionBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "Expression",
+                        "type": "Expression"
+                    },
+                    {
+                        "name": "QuestionToken",
+                        "type": "QuestionToken"
+                    }
+                ],
+                "arena": true
+            },
+            "KvsExtantAssertionExpression": {
+                "extends": [
+                    "ExpressionBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "Expression",
+                        "type": "Expression"
+                    },
+                    {
+                        "name": "ExclamationToken",
+                        "type": "ExclamationToken"
+                    }
+                ],
+                "arena": true
+            },
+            "KvsExtantAssignmentExpression": {
+                "extends": [
+                    "ExpressionBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "Left",
+                        "type": "Expression"
+                    },
+                    {
+                        "name": "QuestionToken",
+                        "type": "QuestionToken"
+                    },
+                    {
+                        "name": "EqualsToken",
+                        "type": "EqualsToken"
+                    },
+                    {
+                        "name": "Right",
+                        "type": "Expression"
+                    }
+                ],
+                "arena": true
+            },
+            "KvsCollectExpression": {
+                "extends": [
+                    "ExpressionBase",
+                    "LocalsContainerBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "Initializer",
+                        "type": "ForInitializer"
+                    },
+                    {
+                        "name": "Expression",
+                        "type": "Expression"
+                    },
+                    {
+                        "name": "Statement",
+                        "type": "Statement",
+                        "visit": "iterationBody"
+                    }
+                ],
+                "arena": true
+            },
+            "KvsSelectExpression": {
+                "extends": [
+                    "ExpressionBase",
+                    "LocalsContainerBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "Initializer",
+                        "type": "ForInitializer"
+                    },
+                    {
+                        "name": "Expression",
+                        "type": "Expression"
+                    },
+                    {
+                        "name": "Statement",
+                        "type": "Statement",
+                        "visit": "iterationBody"
+                    }
+                ],
+                "arena": true
             },
             "LabeledStatement": {
                 "generateSubtreeFacts": true,

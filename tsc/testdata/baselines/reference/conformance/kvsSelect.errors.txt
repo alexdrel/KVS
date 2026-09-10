@@ -1,0 +1,50 @@
+kvsSelect.ts(38,17): error TS100070: KVS 'select' must be at the head of a supported value expression.
+
+
+==== kvsSelect.ts (1 errors) ====
+    interface Group {
+        value: string;
+        candidates: (number | null | undefined)[];
+    }
+    
+    function selectFirstPresent(groups: Group[]) {
+        const result = select (const group of groups) {
+            for (const candidate of group.candidates) {
+                yield? candidate;
+            }
+        };
+        result;
+        return result;
+    }
+    
+    function selectFirstValue(groups: Group[]) {
+        return select (const group of groups) {
+            yield group.candidates[0];
+        };
+    }
+    
+    function selectWithTail(groups: Group[]) {
+        return select (const group of groups) {
+            yield? group.candidates[0];
+        } ?? 0;
+    }
+    
+    function selectField(groups: Group[]) {
+        return {
+            label: "result",
+            value: select (const group of groups) {
+                yield? group.candidates[0];
+            } ?? 0,
+        };
+    }
+    
+    function rejectNestedPosition(groups: Group[]) {
+        console.log(select (const group of groups) {
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            yield group.value;
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+        });
+    ~~~~~
+!!! error TS100070: KVS 'select' must be at the head of a supported value expression.
+    }
+    

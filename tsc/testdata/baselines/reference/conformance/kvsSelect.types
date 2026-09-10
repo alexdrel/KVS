@@ -1,0 +1,130 @@
+//// [tests/cases/conformance/kvs/kvsSelect.ts] ////
+
+=== kvsSelect.ts ===
+interface Group {
+    value: string;
+>value : string
+
+    candidates: (number | null | undefined)[];
+>candidates : (number | null | undefined)[]
+}
+
+function selectFirstPresent(groups: Group[]) {
+>selectFirstPresent : (groups: Group[]) => number | null
+>groups : Group[]
+
+    const result = select (const group of groups) {
+>result : number | null
+>select (const group of groups) {        for (const candidate of group.candidates) {            yield? candidate;        }    } : number | null
+>group : Group
+>groups : Group[]
+
+        for (const candidate of group.candidates) {
+>candidate : number | null | undefined
+>group.candidates : (number | null | undefined)[]
+>group : Group
+>candidates : (number | null | undefined)[]
+
+            yield? candidate;
+>candidate : number | null | undefined
+        }
+    };
+    result;
+>result : number | null
+
+    return result;
+>result : number | null
+}
+
+function selectFirstValue(groups: Group[]) {
+>selectFirstValue : (groups: Group[]) => number | null | undefined
+>groups : Group[]
+
+    return select (const group of groups) {
+>select (const group of groups) {        yield group.candidates[0];    } : number | null | undefined
+>group : Group
+>groups : Group[]
+
+        yield group.candidates[0];
+>group.candidates[0] : number | null | undefined
+>group.candidates : (number | null | undefined)[]
+>group : Group
+>candidates : (number | null | undefined)[]
+>0 : 0
+
+    };
+}
+
+function selectWithTail(groups: Group[]) {
+>selectWithTail : (groups: Group[]) => number
+>groups : Group[]
+
+    return select (const group of groups) {
+>select (const group of groups) {        yield? group.candidates[0];    } ?? 0 : number
+>select (const group of groups) {        yield? group.candidates[0];    } : number | null
+>group : Group
+>groups : Group[]
+
+        yield? group.candidates[0];
+>group.candidates[0] : number | null | undefined
+>group.candidates : (number | null | undefined)[]
+>group : Group
+>candidates : (number | null | undefined)[]
+>0 : 0
+
+    } ?? 0;
+>0 : 0
+}
+
+function selectField(groups: Group[]) {
+>selectField : (groups: Group[]) => { label: string; value: number; }
+>groups : Group[]
+
+    return {
+>{        label: "result",        value: select (const group of groups) {            yield? group.candidates[0];        } ?? 0,    } : { label: string; value: number; }
+
+        label: "result",
+>label : string
+>"result" : "result"
+
+        value: select (const group of groups) {
+>value : number
+>select (const group of groups) {            yield? group.candidates[0];        } ?? 0 : number
+>select (const group of groups) {            yield? group.candidates[0];        } : number | null
+>group : Group
+>groups : Group[]
+
+            yield? group.candidates[0];
+>group.candidates[0] : number | null | undefined
+>group.candidates : (number | null | undefined)[]
+>group : Group
+>candidates : (number | null | undefined)[]
+>0 : 0
+
+        } ?? 0,
+>0 : 0
+
+    };
+}
+
+function rejectNestedPosition(groups: Group[]) {
+>rejectNestedPosition : (groups: Group[]) => void
+>groups : Group[]
+
+    console.log(select (const group of groups) {
+>console.log(select (const group of groups) {        yield group.value;    }) : void
+>console.log : (...data: any[]) => void
+>console : Console
+>log : (...data: any[]) => void
+>select (const group of groups) {        yield group.value;    } : string | null
+>group : Group
+>groups : Group[]
+
+        yield group.value;
+>group.value : string
+>group : Group
+>value : string
+
+    });
+}
+

@@ -348,6 +348,14 @@ func (n *Node) Expression() *Node {
 		return n.AsAwaitExpression().Expression
 	case KindYieldExpression:
 		return n.AsYieldExpression().Expression
+	case KindKvsCollectExpression:
+		return n.AsKvsCollectExpression().Expression
+	case KindKvsNullableAssertionExpression:
+		return n.AsKvsNullableAssertionExpression().Expression
+	case KindKvsExtantAssertionExpression:
+		return n.AsKvsExtantAssertionExpression().Expression
+	case KindKvsSelectExpression:
+		return n.AsKvsSelectExpression().Expression
 	case KindPartiallyEmittedExpression:
 		return n.AsPartiallyEmittedExpression().Expression
 	case KindIfStatement:
@@ -368,6 +376,12 @@ func (n *Node) Expression() *Node {
 		return n.AsExpressionStatement().Expression
 	case KindReturnStatement:
 		return n.AsReturnStatement().Expression
+	case KindKvsExtantReturnStatement:
+		return n.AsKvsExtantReturnStatement().Expression
+	case KindKvsYieldStatement:
+		return n.AsKvsYieldStatement().Expression
+	case KindKvsExtantYieldStatement:
+		return n.AsKvsExtantYieldStatement().Expression
 	case KindThrowStatement:
 		return n.AsThrowStatement().Expression
 	case KindExternalModuleReference:
@@ -437,6 +451,14 @@ func (m *MutableNode) SetExpression(expr *Node) {
 		n.AsAwaitExpression().Expression = expr
 	case KindYieldExpression:
 		n.AsYieldExpression().Expression = expr
+	case KindKvsNullableAssertionExpression:
+		n.AsKvsNullableAssertionExpression().Expression = expr
+	case KindKvsExtantAssertionExpression:
+		n.AsKvsExtantAssertionExpression().Expression = expr
+	case KindKvsCollectExpression:
+		n.AsKvsCollectExpression().Expression = expr
+	case KindKvsSelectExpression:
+		n.AsKvsSelectExpression().Expression = expr
 	case KindPartiallyEmittedExpression:
 		n.AsPartiallyEmittedExpression().Expression = expr
 	case KindIfStatement:
@@ -457,6 +479,12 @@ func (m *MutableNode) SetExpression(expr *Node) {
 		n.AsExpressionStatement().Expression = expr
 	case KindReturnStatement:
 		n.AsReturnStatement().Expression = expr
+	case KindKvsExtantReturnStatement:
+		n.AsKvsExtantReturnStatement().Expression = expr
+	case KindKvsYieldStatement:
+		n.AsKvsYieldStatement().Expression = expr
+	case KindKvsExtantYieldStatement:
+		n.AsKvsExtantYieldStatement().Expression = expr
 	case KindThrowStatement:
 		n.AsThrowStatement().Expression = expr
 	case KindExternalModuleReference:
@@ -768,6 +796,10 @@ func (n *Node) Initializer() *Node {
 		return n.AsForStatement().Initializer
 	case KindForInStatement, KindForOfStatement:
 		return n.AsForInOrOfStatement().Initializer
+	case KindKvsCollectExpression:
+		return n.AsKvsCollectExpression().Initializer
+	case KindKvsSelectExpression:
+		return n.AsKvsSelectExpression().Initializer
 	case KindJsxAttribute:
 		return n.AsJsxAttribute().Initializer
 	}
@@ -795,6 +827,10 @@ func (m *MutableNode) SetInitializer(initializer *Node) {
 		n.AsForStatement().Initializer = initializer
 	case KindForInStatement, KindForOfStatement:
 		n.AsForInOrOfStatement().Initializer = initializer
+	case KindKvsCollectExpression:
+		n.AsKvsCollectExpression().Initializer = initializer
+	case KindKvsSelectExpression:
+		n.AsKvsSelectExpression().Initializer = initializer
 	case KindJsxAttribute:
 		n.AsJsxAttribute().Initializer = initializer
 	default:
@@ -1017,6 +1053,10 @@ func (n *Node) Statement() *Statement {
 		return n.AsForStatement().Statement
 	case KindForInStatement, KindForOfStatement:
 		return n.AsForInOrOfStatement().Statement
+	case KindKvsCollectExpression:
+		return n.AsKvsCollectExpression().Statement
+	case KindKvsSelectExpression:
+		return n.AsKvsSelectExpression().Statement
 	case KindWithStatement:
 		return n.AsWithStatement().Statement
 	case KindLabeledStatement:
@@ -2099,6 +2139,22 @@ func (node *AsExpression) computeSubtreeFacts() SubtreeFacts {
 }
 
 func (node *AsExpression) propagateSubtreeFacts() SubtreeFacts {
+	return node.SubtreeFacts() & ^SubtreeExclusionsOuterExpression
+}
+
+func (node *KvsNullableAssertionExpression) computeSubtreeFacts() SubtreeFacts {
+	return propagateSubtreeFacts(node.Expression) | SubtreeContainsTypeScript
+}
+
+func (node *KvsNullableAssertionExpression) propagateSubtreeFacts() SubtreeFacts {
+	return node.SubtreeFacts() & ^SubtreeExclusionsOuterExpression
+}
+
+func (node *KvsExtantAssertionExpression) computeSubtreeFacts() SubtreeFacts {
+	return propagateSubtreeFacts(node.Expression) | SubtreeContainsTypeScript
+}
+
+func (node *KvsExtantAssertionExpression) propagateSubtreeFacts() SubtreeFacts {
 	return node.SubtreeFacts() & ^SubtreeExclusionsOuterExpression
 }
 

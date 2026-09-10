@@ -135,7 +135,8 @@ function f3() {
 >x : number
 }
 
-// Definite assignment assertion requires type annotation and no initializer
+// TypeScript definite assignment assertion requires a type annotation and no initializer.
+// KVS uses the previously invalid inferred form `let value! = initializer`.
 
 function f4() {
 >f4 : () => void

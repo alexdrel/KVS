@@ -229,7 +229,7 @@ func (ch *PseudoChecker) typeFromSingleReturnExpression(fn *ast.Node) *PseudoTyp
 					return true
 				}
 				if candidateExpr == nil {
-					candidateExpr = stmt.AsReturnStatement().Expression
+					candidateExpr = stmt.Expression()
 				} else {
 					candidateExpr = nil
 					return true

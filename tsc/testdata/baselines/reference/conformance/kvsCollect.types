@@ -1,0 +1,344 @@
+//// [tests/cases/conformance/kvs/kvsCollect.ts] ////
+
+=== kvsCollect.ts ===
+interface Item {
+    value: string;
+>value : string
+
+    included: boolean;
+>included : boolean
+
+    optionalValue?: string;
+>optionalValue : string | undefined
+}
+
+function collectValues(items: Item[]) {
+>collectValues : (items: Item[]) => string[]
+>items : Item[]
+
+    const values = collect (const item of items) {
+>values : string[]
+>collect (const item of items) {        if (!item.included) continue;        yield item.value;        yield? item.optionalValue;    } : string[]
+>item : Item
+>items : Item[]
+
+        if (!item.included) continue;
+>!item.included : boolean
+>item.included : boolean
+>item : Item
+>included : boolean
+
+        yield item.value;
+>item.value : string
+>item : Item
+>value : string
+
+        yield? item.optionalValue;
+>item.optionalValue : string | undefined
+>item : Item
+>optionalValue : string | undefined
+
+    };
+    values;
+>values : string[]
+
+    return values;
+>values : string[]
+}
+
+function returnCollectedValues(items: Item[]) {
+>returnCollectedValues : (items: Item[]) => string[]
+>items : Item[]
+
+    return collect (const item of items) {
+>collect (const item of items) {        yield item.value;    } : string[]
+>item : Item
+>items : Item[]
+
+        yield item.value;
+>item.value : string
+>item : Item
+>value : string
+
+    };
+}
+
+function assignCollectedValues(items: Item[]) {
+>assignCollectedValues : (items: Item[]) => string[]
+>items : Item[]
+
+    let values: string[] = [];
+>values : string[]
+>[] : never[]
+
+    values = collect (const item of items) {
+>values = collect (const item of items) {        yield item.value;    } : string[]
+>values : string[]
+>collect (const item of items) {        yield item.value;    } : string[]
+>item : Item
+>items : Item[]
+
+        yield item.value;
+>item.value : string
+>item : Item
+>value : string
+
+    };
+    return values;
+>values : string[]
+}
+
+function assignProperty(items: Item[], target: { values: string[] }) {
+>assignProperty : (items: Item[], target: { values: string[]; }) => void
+>items : Item[]
+>target : { values: string[]; }
+>values : string[]
+
+    target.values = collect (const item of items) {
+>target.values = collect (const item of items) {        yield item.value;    } : string[]
+>target.values : string[]
+>target : { values: string[]; }
+>values : string[]
+>collect (const item of items) {        yield item.value;    } : string[]
+>item : Item
+>items : Item[]
+
+        yield item.value;
+>item.value : string
+>item : Item
+>value : string
+
+    };
+}
+
+function useHeadTail(items: Item[], extra: number) {
+>useHeadTail : (items: Item[], extra: number) => { text: string; count: number; }
+>items : Item[]
+>extra : number
+
+    const text = collect (const item of items) {
+>text : string
+>collect (const item of items) {        yield item.value;    }.join(", ") : string
+>collect (const item of items) {        yield item.value;    }.join : (separator?: string) => string
+>collect (const item of items) {        yield item.value;    } : string[]
+>item : Item
+>items : Item[]
+
+        yield item.value;
+>item.value : string
+>item : Item
+>value : string
+
+    }.join(", ");
+>join : (separator?: string) => string
+>", " : ", "
+
+    const count = collect (const item of items) {
+>count : number
+>collect (const item of items) {        yield item.value;    }.length + extra : number
+>collect (const item of items) {        yield item.value;    }.length : number
+>collect (const item of items) {        yield item.value;    } : string[]
+>item : Item
+>items : Item[]
+
+        yield item.value;
+>item.value : string
+>item : Item
+>value : string
+
+    }.length + extra;
+>length : number
+>extra : number
+
+    return { text, count };
+>{ text, count } : { text: string; count: number; }
+>text : string
+>count : number
+}
+
+function useFieldHeads(items: Item[], getLabel: () => string) {
+>useFieldHeads : (items: Item[], getLabel: () => string) => { label: string; values: string[]; included: number; }
+>items : Item[]
+>getLabel : () => string
+
+    return {
+>{        label: getLabel(),        values: collect (const item of items) {            yield item.value;        }.filter(value => value.length > 3),        included: collect (const item of items) {            yield item.included;        }.length,    } : { label: string; values: string[]; included: number; }
+
+        label: getLabel(),
+>label : string
+>getLabel() : string
+>getLabel : () => string
+
+        values: collect (const item of items) {
+>values : string[]
+>collect (const item of items) {            yield item.value;        }.filter(value => value.length > 3) : string[]
+>collect (const item of items) {            yield item.value;        }.filter : { <S extends string>(predicate: (value: string, index: number, array: string[]) => value is S, thisArg?: any): S[]; (predicate: (value: string, index: number, array: string[]) => unknown, thisArg?: any): string[]; }
+>collect (const item of items) {            yield item.value;        } : string[]
+>item : Item
+>items : Item[]
+
+            yield item.value;
+>item.value : string
+>item : Item
+>value : string
+
+        }.filter(value => value.length > 3),
+>filter : { <S extends string>(predicate: (value: string, index: number, array: string[]) => value is S, thisArg?: any): S[]; (predicate: (value: string, index: number, array: string[]) => unknown, thisArg?: any): string[]; }
+>value => value.length > 3 : (value: string) => boolean
+>value : string
+>value.length > 3 : boolean
+>value.length : number
+>value : string
+>length : number
+>3 : 3
+
+        included: collect (const item of items) {
+>included : number
+>collect (const item of items) {            yield item.included;        }.length : number
+>collect (const item of items) {            yield item.included;        } : boolean[]
+>item : Item
+>items : Item[]
+
+            yield item.included;
+>item.included : boolean
+>item : Item
+>included : boolean
+
+        }.length,
+>length : number
+
+    };
+}
+
+function compoundAssignmentUsesOrdinaryTyping(items: Item[]) {
+>compoundAssignmentUsesOrdinaryTyping : (items: Item[]) => void
+>items : Item[]
+
+    let count = 0;
+>count : number
+>0 : 0
+
+    count += collect (const item of items) {
+>count += collect (const item of items) {        yield item.value;    } : any
+>count : number
+>collect (const item of items) {        yield item.value;    } : string[]
+>item : Item
+>items : Item[]
+
+        yield item.value;
+>item.value : string
+>item : Item
+>value : string
+
+    };
+}
+
+function collectNestedValues(groups: Item[][]) {
+>collectNestedValues : (groups: Item[][]) => string[][]
+>groups : Item[][]
+
+    const values = collect (const items of groups) {
+>values : string[][]
+>collect (const items of groups) {        yield collect (const item of items) {            yield item.value;        };    } : string[][]
+>items : Item[]
+>groups : Item[][]
+
+        yield collect (const item of items) {
+>collect (const item of items) {            yield item.value;        } : string[]
+>item : Item
+>items : Item[]
+
+            yield item.value;
+>item.value : string
+>item : Item
+>value : string
+
+        };
+    };
+    return values;
+>values : string[][]
+}
+
+function consume(_values: string[]) {}
+>consume : (_values: string[]) => void
+>_values : string[]
+
+function rejectNestedPlacement(items: Item[]) {
+>rejectNestedPlacement : (items: Item[]) => void
+>items : Item[]
+
+    consume(collect (const item of items) {
+>consume(collect (const item of items) {        yield item.value;    }) : void
+>consume : (_values: string[]) => void
+>collect (const item of items) {        yield item.value;    } : string[]
+>item : Item
+>items : Item[]
+
+        yield item.value;
+>item.value : string
+>item : Item
+>value : string
+
+    });
+}
+
+function rejectRightOperand(items: Item[]) {
+>rejectRightOperand : (items: Item[]) => any
+>items : Item[]
+
+    return 1 + collect (const item of items) {
+>1 + collect (const item of items) {        yield item.value;    } : any
+>1 : 1
+>collect (const item of items) {        yield item.value;    } : string[]
+>item : Item
+>items : Item[]
+
+        yield item.value;
+>item.value : string
+>item : Item
+>value : string
+
+    };
+}
+
+function rejectConditionalBranch(items: Item[], condition: boolean) {
+>rejectConditionalBranch : (items: Item[], condition: boolean) => string[]
+>items : Item[]
+>condition : boolean
+
+    return condition ? [] : collect (const item of items) {
+>condition ? [] : collect (const item of items) {        yield item.value;    } : string[]
+>condition : boolean
+>[] : never[]
+>collect (const item of items) {        yield item.value;    } : string[]
+>item : Item
+>items : Item[]
+
+        yield item.value;
+>item.value : string
+>item : Item
+>value : string
+
+    };
+}
+
+function rejectSpacedYield(items: Item[]) {
+>rejectSpacedYield : (items: Item[]) => any[]
+>items : Item[]
+
+    return collect (const item of items) {
+>collect (const item of items) {        yield ? item.optionalValue;    } : any[]
+>item : Item
+>items : Item[]
+
+        yield ? item.optionalValue;
+>? item.optionalValue : any
+> : any
+>item.optionalValue : string | undefined
+>item : Item
+>optionalValue : string | undefined
+> : any
+
+    };
+}
+

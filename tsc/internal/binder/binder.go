@@ -50,6 +50,7 @@ type ExpandoAssignmentInfo struct {
 
 type Binder struct {
 	file            *ast.SourceFile
+	flowFactory     *ast.NodeFactory
 	bindFunc        func(*ast.Node) bool
 	unreachableFlow *ast.FlowNode
 
@@ -61,6 +62,7 @@ type Binder struct {
 	currentBreakTarget      *ast.FlowLabel
 	currentContinueTarget   *ast.FlowLabel
 	currentReturnTarget     *ast.FlowLabel
+	currentKvsSelectTarget  *ast.FlowLabel
 	currentTrueTarget       *ast.FlowLabel
 	currentFalseTarget      *ast.FlowLabel
 	currentExceptionTarget  *ast.FlowLabel
@@ -122,6 +124,7 @@ func bindSourceFile(file *ast.SourceFile) {
 		b := getBinder()
 		defer putBinder(b)
 		b.file = file
+		b.flowFactory = ast.NewNodeFactory(ast.NodeFactoryHooks{})
 		b.unreachableFlow = b.newFlowNode(ast.FlowFlagsUnreachable)
 		b.bind(file.AsNode())
 		b.bindDeferredExpandoAssignments()
@@ -1520,6 +1523,7 @@ func (b *Binder) bindContainer(node *ast.Node, containerFlags ContainerFlags) {
 		saveBreakTarget := b.currentBreakTarget
 		saveContinueTarget := b.currentContinueTarget
 		saveReturnTarget := b.currentReturnTarget
+		saveKvsSelectTarget := b.currentKvsSelectTarget
 		saveExceptionTarget := b.currentExceptionTarget
 		saveActiveLabelList := b.activeLabelList
 		saveHasExplicitReturn := b.hasExplicitReturn
@@ -1543,6 +1547,7 @@ func (b *Binder) bindContainer(node *ast.Node, containerFlags ContainerFlags) {
 			b.currentReturnTarget = b.newFlowNode(ast.FlowFlagsBranchLabel)
 		} else {
 			b.currentReturnTarget = nil
+			b.currentKvsSelectTarget = nil
 		}
 		b.currentExceptionTarget = nil
 		b.currentBreakTarget = nil
@@ -1582,6 +1587,7 @@ func (b *Binder) bindContainer(node *ast.Node, containerFlags ContainerFlags) {
 		b.currentBreakTarget = saveBreakTarget
 		b.currentContinueTarget = saveContinueTarget
 		b.currentReturnTarget = saveReturnTarget
+		b.currentKvsSelectTarget = saveKvsSelectTarget
 		b.currentExceptionTarget = saveExceptionTarget
 		b.activeLabelList = saveActiveLabelList
 		b.hasExplicitReturn = saveHasExplicitReturn
@@ -1676,10 +1682,18 @@ func (b *Binder) bindChildren(node *ast.Node) {
 		b.bindForStatement(node)
 	case ast.KindForInStatement, ast.KindForOfStatement:
 		b.bindForInOrForOfStatement(node)
+	case ast.KindKvsCollectExpression:
+		b.bindKvsCollectExpression(node)
+	case ast.KindKvsSelectExpression:
+		b.bindKvsSelectExpression(node)
 	case ast.KindIfStatement:
 		b.bindIfStatement(node)
 	case ast.KindReturnStatement:
 		b.bindReturnStatement(node)
+	case ast.KindKvsExtantReturnStatement:
+		b.bindKvsExtantReturnStatement(node)
+	case ast.KindKvsYieldStatement, ast.KindKvsExtantYieldStatement:
+		b.bindKvsYieldStatement(node)
 	case ast.KindThrowStatement:
 		b.bindThrowStatement(node)
 	case ast.KindBreakStatement:
@@ -1711,6 +1725,8 @@ func (b *Binder) bindChildren(node *ast.Node) {
 			return
 		}
 		b.bindBinaryExpressionFlow(node)
+	case ast.KindKvsExtantAssignmentExpression:
+		b.bindKvsExtantAssignmentExpression(node)
 	case ast.KindDeleteExpression:
 		b.bindDeleteExpressionFlow(node)
 	case ast.KindConditionalExpression:
@@ -1740,6 +1756,24 @@ func (b *Binder) bindChildren(node *ast.Node) {
 		b.bindEachChild(node)
 	}
 	b.inAssignmentPattern = saveInAssignmentPattern
+}
+
+func (b *Binder) bindKvsExtantAssignmentExpression(node *ast.Node) {
+	expression := node.AsKvsExtantAssignmentExpression()
+	b.bind(expression.QuestionToken)
+	b.bind(expression.EqualsToken)
+	b.bind(expression.Right)
+	condition := b.createKvsExtantCondition(node, expression.Right)
+	presentFlow := b.createFlowCondition(ast.FlowFlagsTrueCondition, b.currentFlow, condition)
+	absentFlow := b.createFlowCondition(ast.FlowFlagsFalseCondition, b.currentFlow, condition)
+	b.currentFlow = presentFlow
+	b.bind(expression.Left)
+	b.bindAssignmentTargetFlow(expression.Left)
+	postExpressionLabel := b.createBranchLabel()
+	b.addAntecedent(postExpressionLabel, b.currentFlow)
+	b.addAntecedent(postExpressionLabel, absentFlow)
+	b.currentFlow = b.finishFlowLabel(postExpressionLabel)
+	b.hasFlowEffects = true
 }
 
 func (b *Binder) bindEachChild(node *ast.Node) {
@@ -1943,6 +1977,59 @@ func (b *Binder) bindForInOrForOfStatement(node *ast.Node) {
 	b.currentFlow = b.finishFlowLabel(postLoopLabel)
 }
 
+func (b *Binder) bindKvsCollectExpression(node *ast.Node) {
+	expr := node.AsKvsCollectExpression()
+	b.bindKvsProducerExpression(node, expr.Initializer, expr.Expression, expr.Statement, false)
+}
+
+func (b *Binder) bindKvsSelectExpression(node *ast.Node) {
+	expr := node.AsKvsSelectExpression()
+	b.bindKvsProducerExpression(node, expr.Initializer, expr.Expression, expr.Statement, true)
+}
+
+func (b *Binder) bindKvsProducerExpression(node *ast.Node, initializer *ast.ForInitializer, expression *ast.Expression, statement *ast.Statement, selectProducer bool) {
+	b.bind(expression)
+	if b.currentFlow == b.unreachableFlow {
+		b.bind(initializer)
+		b.bind(statement)
+		return
+	}
+	preLoopLabel := b.setContinueTarget(node, b.createLoopLabel())
+	postLoopLabel := b.createBranchLabel()
+	b.addAntecedent(preLoopLabel, b.currentFlow)
+	b.currentFlow = preLoopLabel
+	b.addAntecedent(postLoopLabel, b.currentFlow)
+	b.bind(initializer)
+	savedSelectTarget := b.currentKvsSelectTarget
+	if selectProducer {
+		b.currentKvsSelectTarget = postLoopLabel
+	} else {
+		b.currentKvsSelectTarget = nil
+	}
+	b.bindIterativeStatement(statement, postLoopLabel, preLoopLabel)
+	b.currentKvsSelectTarget = savedSelectTarget
+	b.addAntecedent(preLoopLabel, b.currentFlow)
+	b.currentFlow = b.finishFlowLabel(postLoopLabel)
+}
+
+func (b *Binder) bindKvsYieldStatement(node *ast.Node) {
+	expression := node.Expression()
+	b.bind(expression)
+	if b.currentKvsSelectTarget == nil {
+		return
+	}
+	if node.Kind == ast.KindKvsExtantYieldStatement {
+		condition := b.createKvsExtantCondition(node, expression)
+		b.addAntecedent(b.currentKvsSelectTarget, b.createFlowCondition(ast.FlowFlagsTrueCondition, b.currentFlow, condition))
+		b.currentFlow = b.createFlowCondition(ast.FlowFlagsFalseCondition, b.currentFlow, condition)
+		b.hasFlowEffects = true
+		return
+	}
+	b.addAntecedent(b.currentKvsSelectTarget, b.currentFlow)
+	b.currentFlow = b.unreachableFlow
+	b.hasFlowEffects = true
+}
+
 func (b *Binder) bindIfStatement(node *ast.Node) {
 	stmt := node.AsIfStatement()
 	thenLabel := b.createBranchLabel()
@@ -1966,6 +2053,33 @@ func (b *Binder) bindReturnStatement(node *ast.Node) {
 	b.currentFlow = b.unreachableFlow
 	b.hasExplicitReturn = true
 	b.hasFlowEffects = true
+}
+
+func (b *Binder) bindKvsExtantReturnStatement(node *ast.Node) {
+	expression := node.Expression()
+	b.bind(expression)
+	condition := b.createKvsExtantCondition(node, expression)
+	if b.currentReturnTarget != nil {
+		b.addAntecedent(b.currentReturnTarget, b.createFlowCondition(ast.FlowFlagsTrueCondition, b.currentFlow, condition))
+	}
+	b.currentFlow = b.createFlowCondition(ast.FlowFlagsFalseCondition, b.currentFlow, condition)
+	b.hasExplicitReturn = true
+	b.hasFlowEffects = true
+}
+
+// createKvsExtantCondition maps KVS presence semantics onto TypeScript's
+// existing loose-null equality narrowing. The returned expression exists only
+// in the flow graph and is never emitted.
+func (b *Binder) createKvsExtantCondition(parent *ast.Node, expression *ast.Expression) *ast.Expression {
+	condition := b.flowFactory.NewBinaryExpression(
+		nil,
+		expression,
+		nil,
+		b.flowFactory.NewToken(ast.KindExclamationEqualsToken),
+		b.flowFactory.NewKeywordExpression(ast.KindNullKeyword),
+	)
+	condition.Parent = parent
+	return condition
 }
 
 func (b *Binder) bindThrowStatement(node *ast.Node) {
@@ -2335,7 +2449,7 @@ func (b *Binder) bindConditionalExpressionFlow(node *ast.Node) {
 
 func (b *Binder) bindVariableDeclarationFlow(node *ast.Node) {
 	b.bindEachChild(node)
-	if node.Initializer() != nil || ast.IsForInOrOfStatement(node.Parent.Parent) {
+	if node.Initializer() != nil || ast.IsForInOrOfStatement(node.Parent.Parent) || node.Parent.Parent.Kind == ast.KindKvsCollectExpression || node.Parent.Parent.Kind == ast.KindKvsSelectExpression {
 		b.bindInitializedVariableFlow(node)
 	}
 }
@@ -2609,7 +2723,7 @@ func GetContainerFlags(node *ast.Node) ContainerFlags {
 		} else {
 			return ContainerFlagsNone
 		}
-	case ast.KindCatchClause, ast.KindForStatement, ast.KindForInStatement, ast.KindForOfStatement, ast.KindCaseBlock:
+	case ast.KindCatchClause, ast.KindForStatement, ast.KindForInStatement, ast.KindForOfStatement, ast.KindKvsCollectExpression, ast.KindKvsSelectExpression, ast.KindCaseBlock:
 		return ContainerFlagsIsBlockScopedContainer | ContainerFlagsHasLocals
 	case ast.KindBlock:
 		if ast.IsFunctionLike(node.Parent) || ast.IsClassStaticBlockDeclaration(node.Parent) {

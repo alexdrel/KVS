@@ -291,6 +291,41 @@ func (d *astDecoder) createChildrenNode(kind ast.Kind, data uint32, childIndices
 		return d.factory.NewCatchClause(variableDeclaration, block), nil
 	case ast.KindDebuggerStatement:
 		return d.factory.NewDebuggerStatement(), nil
+	case ast.KindKvsExtantReturnStatement:
+		return d.factory.NewKvsExtantReturnStatement(d.singleChild(childIndices)), nil
+	case ast.KindKvsYieldStatement:
+		return d.factory.NewKvsYieldStatement(d.singleChild(childIndices)), nil
+	case ast.KindKvsExtantYieldStatement:
+		return d.factory.NewKvsExtantYieldStatement(d.singleChild(childIndices)), nil
+	case ast.KindKvsNullableAssertionExpression:
+		it := newChildIter(childIndices)
+		expression := d.nodeAt(it.nextIf(mask, 0))
+		questionToken := d.nodeAt(it.nextIf(mask, 1))
+		return d.factory.NewKvsNullableAssertionExpression(expression, questionToken), nil
+	case ast.KindKvsExtantAssertionExpression:
+		it := newChildIter(childIndices)
+		expression := d.nodeAt(it.nextIf(mask, 0))
+		exclamationToken := d.nodeAt(it.nextIf(mask, 1))
+		return d.factory.NewKvsExtantAssertionExpression(expression, exclamationToken), nil
+	case ast.KindKvsExtantAssignmentExpression:
+		it := newChildIter(childIndices)
+		left := d.nodeAt(it.nextIf(mask, 0))
+		questionToken := d.nodeAt(it.nextIf(mask, 1))
+		equalsToken := d.nodeAt(it.nextIf(mask, 2))
+		right := d.nodeAt(it.nextIf(mask, 3))
+		return d.factory.NewKvsExtantAssignmentExpression(left, questionToken, equalsToken, right), nil
+	case ast.KindKvsCollectExpression:
+		it := newChildIter(childIndices)
+		initializer := d.nodeAt(it.nextIf(mask, 0))
+		expression := d.nodeAt(it.nextIf(mask, 1))
+		statement := d.nodeAt(it.nextIf(mask, 2))
+		return d.factory.NewKvsCollectExpression(initializer, expression, statement), nil
+	case ast.KindKvsSelectExpression:
+		it := newChildIter(childIndices)
+		initializer := d.nodeAt(it.nextIf(mask, 0))
+		expression := d.nodeAt(it.nextIf(mask, 1))
+		statement := d.nodeAt(it.nextIf(mask, 2))
+		return d.factory.NewKvsSelectExpression(initializer, expression, statement), nil
 	case ast.KindLabeledStatement:
 		it := newChildIter(childIndices)
 		label := d.nodeAt(it.nextIf(mask, 0))

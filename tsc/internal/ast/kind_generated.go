@@ -255,6 +255,11 @@ const (
 	KindConditionalExpression
 	KindTemplateExpression
 	KindYieldExpression
+	KindKvsNullableAssertionExpression
+	KindKvsExtantAssertionExpression
+	KindKvsExtantAssignmentExpression
+	KindKvsCollectExpression
+	KindKvsSelectExpression
 	KindSpreadElement
 	KindClassExpression
 	KindOmittedExpression
@@ -287,6 +292,9 @@ const (
 	KindThrowStatement
 	KindTryStatement
 	KindDebuggerStatement
+	KindKvsExtantReturnStatement
+	KindKvsYieldStatement
+	KindKvsExtantYieldStatement
 	KindVariableDeclaration
 	KindVariableDeclarationList
 	KindFunctionDeclaration
@@ -412,7 +420,7 @@ const (
 	KindFirstBinaryOperator     = KindLessThanToken
 	KindLastBinaryOperator      = KindCaretEqualsToken
 	KindFirstStatement          = KindVariableStatement
-	KindLastStatement           = KindDebuggerStatement
+	KindLastStatement           = KindKvsExtantYieldStatement
 	KindFirstNode               = KindQualifiedName
 	KindFirstJSDocNode          = KindJSDocTypeExpression
 	KindLastJSDocNode           = KindJSDocImportTag
