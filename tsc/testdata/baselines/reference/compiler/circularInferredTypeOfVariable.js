@@ -15,10 +15,11 @@
     let a1: string[] | undefined = [];
 
     while (true) {
-        let a2 = foo(a1!);
+        let a2 = foo(a1 as!);
         a1 = await bar(a2);
     }
 });
+
 
 //// [circularInferredTypeOfVariable.js]
 "use strict";

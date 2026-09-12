@@ -109,9 +109,9 @@ class A {
 			<meta content="helloworld"></meta>,
 >content : Symbol(content, Decl(test.tsx, 11, 8))
 
-			<meta content={c.a!.b}></meta>
+			<meta content={(c.a as!).b}></meta>
 >content : Symbol(content, Decl(test.tsx, 12, 8))
->c.a!.b : Symbol(b, Decl(test.tsx, 3, 6))
+>(c.a as!).b : Symbol(b, Decl(test.tsx, 3, 6))
 >c.a : Symbol(a, Decl(test.tsx, 2, 8))
 >c : Symbol(c, Decl(test.tsx, 2, 3))
 >a : Symbol(a, Decl(test.tsx, 2, 8))

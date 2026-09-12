@@ -210,7 +210,7 @@ func GetAssignmentTarget(node *Node) *Node {
 				return parent
 			}
 			return nil
-		case KindParenthesizedExpression, KindArrayLiteralExpression, KindSpreadElement, KindNonNullExpression:
+		case KindParenthesizedExpression, KindArrayLiteralExpression, KindSpreadElement, KindNonNullExpression, KindKvsExtantAssertionExpression:
 			node = parent
 		case KindSpreadAssignment:
 			node = parent.Parent
@@ -438,7 +438,7 @@ func IsUnaryExpression(node *Node) bool {
 
 func isExpressionKind(kind Kind) bool {
 	switch kind {
-	case KindConditionalExpression,
+	case KindConditionalExpression, KindKvsNullingExpression,
 		KindYieldExpression,
 		KindArrowFunction,
 		KindBinaryExpression,
@@ -673,6 +673,7 @@ func isStatementKindButNotDeclarationKind(kind Kind) bool {
 		KindForOfStatement,
 		KindForStatement,
 		KindIfStatement,
+		KindKvsIfBindingStatement,
 		KindLabeledStatement,
 		KindReturnStatement,
 		KindKvsExtantReturnStatement,
@@ -806,7 +807,7 @@ func IsOuterExpression(node *Expression, kinds OuterExpressionKinds) bool {
 		return kinds&(OEKExpressionsWithTypeArguments|OEKSatisfies) != 0
 	case KindExpressionWithTypeArguments:
 		return kinds&OEKExpressionsWithTypeArguments != 0
-	case KindNonNullExpression:
+	case KindNonNullExpression, KindKvsExtantAssertionExpression:
 		return kinds&OEKNonNullAssertions != 0
 	case KindPartiallyEmittedExpression:
 		return kinds&OEKPartiallyEmittedExpressions != 0
@@ -2009,7 +2010,7 @@ func IsExpressionNode(node *Node) bool {
 		KindCallExpression, KindNewExpression, KindTaggedTemplateExpression, KindAsExpression, KindTypeAssertionExpression,
 		KindSatisfiesExpression, KindNonNullExpression, KindParenthesizedExpression, KindFunctionExpression,
 		KindClassExpression, KindArrowFunction, KindVoidExpression, KindDeleteExpression, KindTypeOfExpression,
-		KindPrefixUnaryExpression, KindPostfixUnaryExpression, KindBinaryExpression, KindConditionalExpression,
+		KindPrefixUnaryExpression, KindPostfixUnaryExpression, KindBinaryExpression, KindConditionalExpression, KindKvsExtantTestExpression, KindKvsDefaultExpression, KindKvsNullingExpression,
 		KindSpreadElement, KindTemplateExpression, KindOmittedExpression, KindJsxElement, KindJsxSelfClosingElement,
 		KindJsxFragment, KindYieldExpression, KindKvsNullableAssertionExpression, KindKvsExtantAssertionExpression, KindKvsExtantAssignmentExpression, KindKvsCollectExpression, KindKvsSelectExpression, KindAwaitExpression:
 		return true
@@ -2064,6 +2065,10 @@ func IsKvsProducerHeadPosition(node *Node) bool {
 			}
 		case KindConditionalExpression:
 			if parent.AsConditionalExpression().Condition != current {
+				return false
+			}
+		case KindKvsNullingExpression:
+			if parent.AsKvsNullingExpression().Condition != current {
 				return false
 			}
 		case KindPrefixUnaryExpression:
@@ -2286,7 +2291,7 @@ func GetEnclosingBlockScopeContainer(node *Node) *Node {
 
 func IsBlockScope(node *Node, parentNode *Node) bool {
 	switch node.Kind {
-	case KindSourceFile, KindCaseBlock, KindCatchClause, KindModuleDeclaration, KindForStatement, KindForInStatement, KindForOfStatement,
+	case KindSourceFile, KindCaseBlock, KindCatchClause, KindKvsIfBindingClause, KindModuleDeclaration, KindForStatement, KindForInStatement, KindForOfStatement,
 		KindConstructor, KindMethodDeclaration, KindGetAccessor, KindSetAccessor, KindFunctionDeclaration, KindFunctionExpression,
 		KindArrowFunction, KindPropertyDeclaration, KindClassStaticBlockDeclaration:
 		return true
@@ -3169,7 +3174,7 @@ func GetTypeAnnotationNode(node *Node) *TypeNode {
 	case KindVariableDeclaration, KindParameter, KindPropertySignature, KindPropertyDeclaration,
 		KindTypePredicate, KindParenthesizedType, KindTypeOperator, KindMappedType, KindTypeAssertionExpression,
 		KindAsExpression, KindSatisfiesExpression, KindTypeAliasDeclaration, KindJSTypeAliasDeclaration,
-		KindNamedTupleMember, KindOptionalType, KindRestType, KindTemplateLiteralTypeSpan, KindJSDocTypeExpression,
+		KindNamedTupleMember, KindOptionalType, KindKvsNullableType, KindKvsExtantType, KindRestType, KindTemplateLiteralTypeSpan, KindJSDocTypeExpression,
 		KindJSDocPropertyTag, KindJSDocNullableType, KindJSDocNonNullableType, KindJSDocOptionalType:
 		return node.Type()
 	default:

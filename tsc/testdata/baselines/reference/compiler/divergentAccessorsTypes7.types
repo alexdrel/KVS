@@ -14,13 +14,13 @@ class Test<S> {
     get value(): string {
 >value : string
 
-        return null!;
->null! : never
+        return null as!;
+>null as! : never
     }
 
     // -- Replacing the getter such that the getter/setter types match, removes the error:
     // get value(): string | ((item: S) => string) {
-    //     return null!;
+    //     return null as!;
     // }
 
     // -- Or, replacing the setter such that a concrete type is used, removes the error:

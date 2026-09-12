@@ -18,7 +18,7 @@ type G<T = string> = {
   set divergentProperty(p: number | T);
 };
 
-export const x = (() => null! as ExpandRecursively<G>)();
+export const x = (() => null as! as ExpandRecursively<G>)();
 
 
 function makeV() {
@@ -33,7 +33,7 @@ function makeV() {
     get divergentProperty(): string | T;
     set divergentProperty(p: number | T);
    }
-  return null! as X<number>
+  return null as! as X<number>
 }
 
 export const v = makeV();

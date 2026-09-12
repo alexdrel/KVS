@@ -92,7 +92,8 @@ checks inline result-array allocation, ordinary `for...of`, unconditional
 `push`, and the `!= null` guarded extant `push`. Head-path cases prove member,
 call, and binary tails plus multiple named object fields. The same file rejects
 spaced `yield ?`, a call argument, a binary right operand, and a conditional
-branch.
+branch. Its nullable-source case checks a nullable result type, once-only source
+capture, `null` for absence, and `[]` initialization only on the present path.
 
 Run it with:
 
@@ -111,13 +112,41 @@ includes the no-production `null`. Plain `yield` preserves a produced
 Its JavaScript baseline checks the eager `null` result initialization, an
 ordinary break for direct production, and the labelled break used only when a
 production must cross a nested loop to exit the whole producer. It also checks
-a nullish-coalescing tail and a named object field. The same file rejects
+a nullish-coalescing tail and a named object field. A nullable-source case
+checks once-only capture and a guarded loop. The same file rejects
 `select` in a call-argument position.
 
 Run it with:
 
 ```sh
 go -C ./tsc test -run='TestLocal/kvsSelect' ./internal/testrunner
+```
+
+## Nullable ordinary-iteration slice
+
+`kvsNullableIteration.ts` checks that synchronous `for...of` derives its loop
+binding from the present iterable type and lowers a nullable source to
+`source ?? []`, preserving once-only evaluation. Async iteration is not part
+of this slice.
+
+Run it with:
+
+```sh
+go -C ./tsc test -run='TestLocal/kvsNullableIteration' ./internal/testrunner
+```
+
+## Implicit-subject slice
+
+`kvsImplicitSubject.ts` checks iterable-only `for`, `collect`, and `select`
+headers; inferred `_` types; an explicit nested loop retaining its outer
+subject; and nearest-subject shadowing. Its JavaScript baseline verifies direct
+explicit-loop lowering and source capture only for a nested header that uses
+the outer `_`.
+
+Run it with:
+
+```sh
+go -C ./tsc test -run='TestLocal/kvsImplicitSubject' ./internal/testrunner
 ```
 
 ## Extant-assignment slice
@@ -146,4 +175,85 @@ Run it with:
 
 ```sh
 go -C ./tsc test -run='TestLocal/kvsStaticNullability' ./internal/testrunner
+```
+
+## Nulling-operator slice
+
+`kvsNulling.ts` checks the `condition ?: expression` result union, narrowing
+inside the successful expression, ordinary conditional precedence, right
+associativity, and contextual typing of an arrow-function operand. Its
+JavaScript baseline verifies direct `condition ? expression : null` lowering,
+which also demonstrates lazy RHS evaluation structurally. A producer-headed
+condition verifies that its loop lowers before the remaining nulling expression.
+One final parse case rejects whitespace inside `?:`.
+
+Run it with:
+
+```sh
+go -C ./tsc test -run='TestLocal/kvsNulling' ./internal/testrunner
+```
+
+## Extant-test slice
+
+`kvsExtantTest.ts` checks true- and false-path presence narrowing, the boolean
+result outside control flow, whitespace before postfix `?`, a parenthesized
+operand, and preservation of an ordinary ternary. Its JavaScript baseline
+verifies direct `value != null` lowering.
+
+Run it with:
+
+```sh
+go -C ./tsc test -run='TestLocal/kvsExtantTest' ./internal/testrunner
+```
+
+## Conditional-binding slice
+
+`kvsIfBinding.ts` checks successful-branch truthy narrowing and verifies that
+the binding is unresolved in `else` and after the statement. Its JavaScript
+baseline records the once-only temporary and the source-named declaration
+inside the successful block. A minimal final case rejects an absent initializer.
+
+Run it with:
+
+```sh
+go -C ./tsc test -run='TestLocal/kvsIfBinding' ./internal/testrunner
+```
+
+## Nullability-type slice
+
+`kvsNullabilityTypes.ts` checks that `T?` adds both `null` and `undefined` and
+that `T!` removes both. It covers idempotence, all four `?`/`!` compositions,
+unions, arrays, ordinary nullish narrowing, and direct rejection where a
+present type is required. Minimal final parse cases reject whitespace before
+each postfix operator.
+
+Its declaration baseline verifies postfix source printing, while the
+JavaScript baseline verifies ordinary type erasure. The same file combines
+`number?` with the nulling operator in the quadratic `realSqrt` example and
+uses an extant type directly in arithmetic.
+
+The inherited compiler cases `parseNullableTypes.ts` and
+`parseExtantTypes.ts` now define the compatibility boundary that their former
+`parseInvalid*` versions rejected wholesale: postfix KVS forms are accepted,
+while prefix JSDoc-style `?T` and `!T` remain invalid in TypeScript source.
+
+Run it with:
+
+```sh
+go -C ./tsc test -run='TestLocal/kvsNullabilityTypes' ./internal/testrunner
+```
+
+## Terminal-default slice
+
+`kvsDefault.ts` checks string, number, boolean, bigint, mutable and readonly
+array defaults, preservation of the present result type, primitive literal
+unions, and rejection of mixed primitive families, tuples, and structural
+objects. It separately rejects `null!` and `undefined!` because an absence-only
+type has no present type from which to determine a default. Its JavaScript
+baseline verifies the type-directed `??` fallback and fresh array literals.
+
+Run it with:
+
+```sh
+go -C ./tsc test -run='TestLocal/kvsDefault' ./internal/testrunner
 ```

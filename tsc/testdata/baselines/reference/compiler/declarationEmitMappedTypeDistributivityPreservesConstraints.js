@@ -8,7 +8,7 @@ type Map<T extends Fns> = { [K in keyof T]: T[K]; };
 type AllArg<T extends Fns> = { [K in keyof T]: Parameters<T[K]> };
 
 function fn<T extends { x: Map<T['x']> }>(sliceIndex: T): AllArg<T['x']> {
-    return null!;
+    return null as!;
 }
 
 export default { fn };

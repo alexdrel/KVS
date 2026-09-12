@@ -16,6 +16,6 @@ declare let optionalUndefined: { k1?: undefined };
 let dict: { [key: string]: string } = optionalUndefined; // error
 
 function f<T>() {
-	let optional: { k1?: T } = undefined!;
+	let optional: { k1?: T } = undefined as!;
 	let dict: { [key: string]: T | number } = optional; // ok
 }

@@ -277,10 +277,11 @@ function f6() {
     let x: string | undefined | null;
 >x : string | null | undefined
 
-    x!.slice();
->x!.slice() : string
->x!.slice : (start?: number, end?: number) => string
->x! : string
+    (x as!).slice();
+>(x as!).slice() : string
+>(x as!).slice : (start?: number, end?: number) => string
+>(x as!) : string
+>x as! : string
 >x : string | null | undefined
 >slice : (start?: number, end?: number) => string
 
@@ -289,10 +290,11 @@ function f6() {
 >x : string | null | undefined
 >"" : ""
 
-    x!.slice();
->x!.slice() : string
->x!.slice : (start?: number, end?: number) => string
->x! : string
+    (x as!).slice();
+>(x as!).slice() : string
+>(x as!).slice : (start?: number, end?: number) => string
+>(x as!) : string
+>x as! : string
 >x : string
 >slice : (start?: number, end?: number) => string
 
@@ -301,22 +303,26 @@ function f6() {
 >x : string | null | undefined
 >undefined : undefined
 
-    x!.slice();
->x!.slice() : string
->x!.slice : (start?: number, end?: number) => string
->x! : string
->x : string | null | undefined
+    (x as unknown as string).slice();
+>(x as unknown as string).slice() : string
+>(x as unknown as string).slice : (start?: number, end?: number) => string
+>(x as unknown as string) : string
+>x as unknown as string : string
+>x as unknown : unknown
+>x : undefined
 >slice : (start?: number, end?: number) => string
 
     x = null;
 >x = null : null
 >x : string | null | undefined
 
-    x!.slice();
->x!.slice() : string
->x!.slice : (start?: number, end?: number) => string
->x! : string
->x : string | null | undefined
+    (x as unknown as string).slice();
+>(x as unknown as string).slice() : string
+>(x as unknown as string).slice : (start?: number, end?: number) => string
+>(x as unknown as string) : string
+>x as unknown as string : string
+>x as unknown : unknown
+>x : null
 >slice : (start?: number, end?: number) => string
 
     x = <undefined | null>undefined;
@@ -325,11 +331,13 @@ function f6() {
 ><undefined | null>undefined : null | undefined
 >undefined : undefined
 
-    x!.slice();
->x!.slice() : string
->x!.slice : (start?: number, end?: number) => string
->x! : string
->x : string | null | undefined
+    (x as unknown as string).slice();
+>(x as unknown as string).slice() : string
+>(x as unknown as string).slice : (start?: number, end?: number) => string
+>(x as unknown as string) : string
+>x as unknown as string : string
+>x as unknown : unknown
+>x : null | undefined
 >slice : (start?: number, end?: number) => string
 
     x = <string | undefined>"";
@@ -338,10 +346,11 @@ function f6() {
 ><string | undefined>"" : string | undefined
 >"" : ""
 
-    x!.slice();
->x!.slice() : string
->x!.slice : (start?: number, end?: number) => string
->x! : string
+    (x as!).slice();
+>(x as!).slice() : string
+>(x as!).slice : (start?: number, end?: number) => string
+>(x as!) : string
+>x as! : string
 >x : string | undefined
 >slice : (start?: number, end?: number) => string
 
@@ -351,10 +360,11 @@ function f6() {
 ><string | null>"" : string | null
 >"" : ""
 
-    x!.slice();
->x!.slice() : string
->x!.slice : (start?: number, end?: number) => string
->x! : string
+    (x as!).slice();
+>(x as!).slice() : string
+>(x as!).slice : (start?: number, end?: number) => string
+>(x as!) : string
+>x as! : string
 >x : string | null
 >slice : (start?: number, end?: number) => string
 }
@@ -365,10 +375,11 @@ function f7() {
     let x: string;
 >x : string
 
-    x!.slice();
->x!.slice() : string
->x!.slice : (start?: number, end?: number) => string
->x! : string
+    (x as!).slice();
+>(x as!).slice() : string
+>(x as!).slice : (start?: number, end?: number) => string
+>(x as!) : string
+>x as! : string
 >x : string
 >slice : (start?: number, end?: number) => string
 }

@@ -41,7 +41,7 @@ optionalPropertyAssignableToStringIndexSignature.ts(13,5): error TS2322: Type '{
 !!! error TS2322:     Type 'undefined' is not assignable to type 'string'.
     
     function f<T>() {
-    	let optional: { k1?: T } = undefined!;
+    	let optional: { k1?: T } = undefined as!;
     	let dict: { [key: string]: T | number } = optional; // ok
     }
     

@@ -83,7 +83,7 @@ xx = ([1, 2, x++], xx);
 >x : Symbol(x, Decl(commaOperatorLeftSideUnused.ts, 15, 3))
 >xx : Symbol(xx, Decl(commaOperatorLeftSideUnused.ts, 0, 3))
 
-xx = (xx!, xx);
+xx = (xx as!, xx);
 >xx : Symbol(xx, Decl(commaOperatorLeftSideUnused.ts, 0, 3))
 >xx : Symbol(xx, Decl(commaOperatorLeftSideUnused.ts, 0, 3))
 >xx : Symbol(xx, Decl(commaOperatorLeftSideUnused.ts, 0, 3))

@@ -107,24 +107,24 @@ function f5(x: string | number) {
 
 function f6() {
     let x: string | undefined | null;
-    x!.slice();
+    (x as!).slice();
     x = "";
-    x!.slice();
+    (x as!).slice();
     x = undefined;
-    x!.slice();
+    (x as unknown as string).slice();
     x = null;
-    x!.slice();
+    (x as unknown as string).slice();
     x = <undefined | null>undefined;
-    x!.slice();
+    (x as unknown as string).slice();
     x = <string | undefined>"";
-    x!.slice();
+    (x as!).slice();
     x = <string | null>"";
-    x!.slice();
+    (x as!).slice();
 }
 
 function f7() {
     let x: string;
-    x!.slice();
+    (x as!).slice();
 }
 
 
@@ -216,9 +216,9 @@ function f5(x) {
 }
 function f6() {
     let x;
-    x.slice();
+    (x).slice();
     x = "";
-    x.slice();
+    (x).slice();
     x = undefined;
     x.slice();
     x = null;
@@ -226,11 +226,11 @@ function f6() {
     x = undefined;
     x.slice();
     x = "";
-    x.slice();
+    (x).slice();
     x = "";
-    x.slice();
+    (x).slice();
 }
 function f7() {
     let x;
-    x.slice();
+    (x).slice();
 }

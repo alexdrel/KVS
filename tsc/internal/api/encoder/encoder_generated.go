@@ -98,6 +98,12 @@ func getChildrenPropertyMask(node *ast.Node) uint8 {
 	case ast.KindKvsExtantYieldStatement:
 		n := node.AsKvsExtantYieldStatement()
 		return (boolToByte(n.Expression != nil) << 0)
+	case ast.KindKvsIfBindingStatement:
+		n := node.AsKvsIfBindingStatement()
+		return (boolToByte(n.Clause != nil) << 0) | (boolToByte(n.ElseStatement != nil) << 1)
+	case ast.KindKvsIfBindingClause:
+		n := node.AsKvsIfBindingClause()
+		return (boolToByte(n.DeclarationList != nil) << 0) | (boolToByte(n.Statement != nil) << 1)
 	case ast.KindKvsNullableAssertionExpression:
 		n := node.AsKvsNullableAssertionExpression()
 		return (boolToByte(n.Expression != nil) << 0) | (boolToByte(n.QuestionToken != nil) << 1)
@@ -107,6 +113,15 @@ func getChildrenPropertyMask(node *ast.Node) uint8 {
 	case ast.KindKvsExtantAssignmentExpression:
 		n := node.AsKvsExtantAssignmentExpression()
 		return (boolToByte(n.Left != nil) << 0) | (boolToByte(n.QuestionToken != nil) << 1) | (boolToByte(n.EqualsToken != nil) << 2) | (boolToByte(n.Right != nil) << 3)
+	case ast.KindKvsExtantTestExpression:
+		n := node.AsKvsExtantTestExpression()
+		return (boolToByte(n.Expression != nil) << 0) | (boolToByte(n.QuestionToken != nil) << 1)
+	case ast.KindKvsDefaultExpression:
+		n := node.AsKvsDefaultExpression()
+		return (boolToByte(n.Expression != nil) << 0)
+	case ast.KindKvsNullingExpression:
+		n := node.AsKvsNullingExpression()
+		return (boolToByte(n.Condition != nil) << 0) | (boolToByte(n.QuestionToken != nil) << 1) | (boolToByte(n.ColonToken != nil) << 2) | (boolToByte(n.WhenTrue != nil) << 3)
 	case ast.KindKvsCollectExpression:
 		n := node.AsKvsCollectExpression()
 		return (boolToByte(n.Initializer != nil) << 0) | (boolToByte(n.Expression != nil) << 1) | (boolToByte(n.Statement != nil) << 2)
@@ -377,6 +392,12 @@ func getChildrenPropertyMask(node *ast.Node) uint8 {
 	case ast.KindOptionalType:
 		n := node.AsOptionalTypeNode()
 		return (boolToByte(n.Type != nil) << 0)
+	case ast.KindKvsNullableType:
+		n := node.AsKvsNullableType()
+		return (boolToByte(n.Type != nil) << 0) | (boolToByte(n.QuestionToken != nil) << 1)
+	case ast.KindKvsExtantType:
+		n := node.AsKvsExtantType()
+		return (boolToByte(n.Type != nil) << 0) | (boolToByte(n.ExclamationToken != nil) << 1)
 	case ast.KindRestType:
 		n := node.AsRestTypeNode()
 		return (boolToByte(n.Type != nil) << 0)

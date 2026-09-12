@@ -48,3 +48,4 @@ overloadingStaticFunctionsInFunctions.ts(4,25): error TS1005: ';' expected.
                             ~
 !!! error TS1005: ';' expected.
     }
+    

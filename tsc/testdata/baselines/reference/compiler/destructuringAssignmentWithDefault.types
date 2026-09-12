@@ -64,30 +64,30 @@ function f1(options?: { color?: string, width?: number }) {
 
 function f2(options?: [string?, number?]) {
 >f2 : (options?: [string?, number?]) => void
->options : [(string | undefined)?, (number | undefined)?] | undefined
+>options : [(string | null | undefined)?, (number | null | undefined)?] | undefined
 
     let [str, num] = options || [];
->str : string | undefined
->num : number | undefined
->options || [] : [(string | undefined)?, (number | undefined)?]
->options : [(string | undefined)?, (number | undefined)?] | undefined
+>str : string | null | undefined
+>num : number | null | undefined
+>options || [] : [(string | null | undefined)?, (number | null | undefined)?]
+>options : [(string | null | undefined)?, (number | null | undefined)?] | undefined
 >[] : []
 
     [str, num] = options || [];
->[str, num] = options || [] : [(string | undefined)?, (number | undefined)?]
->[str, num] : [string | undefined, number | undefined]
->str : string | undefined
->num : number | undefined
->options || [] : [(string | undefined)?, (number | undefined)?]
->options : [(string | undefined)?, (number | undefined)?] | undefined
+>[str, num] = options || [] : [(string | null | undefined)?, (number | null | undefined)?]
+>[str, num] : [string | null | undefined, number | null | undefined]
+>str : string | null | undefined
+>num : number | null | undefined
+>options || [] : [(string | null | undefined)?, (number | null | undefined)?]
+>options : [(string | null | undefined)?, (number | null | undefined)?] | undefined
 >[] : []
 
     let x1 = (options || {})[0];
->x1 : string | undefined
->(options || {})[0] : string | undefined
->(options || {}) : {} | [(string | undefined)?, (number | undefined)?]
->options || {} : {} | [(string | undefined)?, (number | undefined)?]
->options : [(string | undefined)?, (number | undefined)?] | undefined
+>x1 : string | null | undefined
+>(options || {})[0] : string | null | undefined
+>(options || {}) : {} | [(string | null | undefined)?, (number | null | undefined)?]
+>options || {} : {} | [(string | null | undefined)?, (number | null | undefined)?]
+>options : [(string | null | undefined)?, (number | null | undefined)?] | undefined
 >{} : {}
 >0 : 0
 }

@@ -29,8 +29,8 @@ class Test {
 >arg2 : number
 
     ): Observable<string> {
-        return null!;
->null! : never
+        return null as!;
+>null as! : never
     }
 }
 

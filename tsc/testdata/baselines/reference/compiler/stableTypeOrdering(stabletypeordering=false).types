@@ -11,11 +11,11 @@ function takeMessageOrArray(message: Message | Message[]) { return message; }
 >message : Message[] | Message
 >message : Message[] | Message
 
-const result1 = takeMessageOrArray(null!);
+const result1 = takeMessageOrArray(null as!);
 >result1 : Message[] | Message
->takeMessageOrArray(null!) : Message[] | Message
+>takeMessageOrArray(null as!) : Message[] | Message
 >takeMessageOrArray : (message: Message | Message[]) => Message[] | Message
->null! : never
+>null as! : never
 
 function checkType(x: string | number | boolean) {
 >checkType : (x: string | number | boolean) => "bigint" | "boolean" | "function" | "number" | "object" | "string" | "symbol" | "undefined"

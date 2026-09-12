@@ -11,4 +11,4 @@ export class WithData {
     }
 }
 
-export const a = (new WithData())["ahahahaahah"]!();
+export const a = ((new WithData())["ahahahaahah"] as!)();

@@ -1,0 +1,58 @@
+parseNullableTypes.ts(3,30): error TS2677: A type predicate's type must be assignable to its parameter's type.
+  Type 'string | null' is not assignable to type 'string'.
+    Type 'null' is not assignable to type 'string'.
+parseNullableTypes.ts(3,30): error TS17020: '?' at the start of a type is not valid TypeScript syntax. Did you mean to write 'string | null | undefined'?
+parseNullableTypes.ts(10,16): error TS17020: '?' at the start of a type is not valid TypeScript syntax. Did you mean to write 'string | null | undefined'?
+parseNullableTypes.ts(11,16): error TS17020: '?' at the start of a type is not valid TypeScript syntax. Did you mean to write 'number | null | undefined'?
+parseNullableTypes.ts(13,25): error TS17020: '?' at the start of a type is not valid TypeScript syntax. Did you mean to write 'string | null | undefined'?
+parseNullableTypes.ts(14,5): error TS2322: Type 'boolean' is not assignable to type 'string'.
+parseNullableTypes.ts(20,16): error TS17020: '?' at the start of a type is not valid TypeScript syntax. Did you mean to write 'any'?
+parseNullableTypes.ts(21,10): error TS17020: '?' at the start of a type is not valid TypeScript syntax. Did you mean to write 'number | null | undefined'?
+
+
+==== parseNullableTypes.ts (8 errors) ====
+    // KVS accepts postfix nullable types; prefix JSDoc-style types remain invalid.
+    
+    function f1(a: string): a is ?string {
+                                 ~~~~~~~
+!!! error TS2677: A type predicate's type must be assignable to its parameter's type.
+!!! error TS2677:   Type 'string | null' is not assignable to type 'string'.
+!!! error TS2677:     Type 'null' is not assignable to type 'string'.
+                                 ~~~~~~~
+!!! error TS17020: '?' at the start of a type is not valid TypeScript syntax. Did you mean to write 'string | null | undefined'?
+        return true;
+    }
+    
+    function f2(a: string?) {}
+    function f3(a: number?) {}
+    
+    function f4(a: ?string) {}
+                   ~~~~~~~
+!!! error TS17020: '?' at the start of a type is not valid TypeScript syntax. Did you mean to write 'string | null | undefined'?
+    function f5(a: ?number) {}
+                   ~~~~~~~
+!!! error TS17020: '?' at the start of a type is not valid TypeScript syntax. Did you mean to write 'number | null | undefined'?
+    
+    function f6(a: string): ?string {
+                            ~~~~~~~
+!!! error TS17020: '?' at the start of a type is not valid TypeScript syntax. Did you mean to write 'string | null | undefined'?
+        return true;
+        ~~~~~~
+!!! error TS2322: Type 'boolean' is not assignable to type 'string'.
+    }
+    
+    const a = 1 as any?;
+    const b: number? = 1;
+    
+    const c = 1 as ?any;
+                   ~~~~
+!!! error TS17020: '?' at the start of a type is not valid TypeScript syntax. Did you mean to write 'any'?
+    const d: ?number = 1;
+             ~~~~~~~
+!!! error TS17020: '?' at the start of a type is not valid TypeScript syntax. Did you mean to write 'number | null | undefined'?
+    
+    let e: unknown?;
+    let f: never?;
+    let g: void?;
+    let h: undefined?;
+    

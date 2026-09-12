@@ -10,7 +10,7 @@ export const nNotImported = "nNotImported"
 const nPrivate = "private"
 >nPrivate : Symbol(nPrivate, Decl(a.ts, 2, 5))
 
-export const o = (p1: typeof nImported, p2: typeof nNotImported, p3: typeof nPrivate) => null! as { foo: typeof nImported, bar: typeof nPrivate, baz: typeof nNotImported }
+export const o = (p1: typeof nImported, p2: typeof nNotImported, p3: typeof nPrivate) => null as! as { foo: typeof nImported, bar: typeof nPrivate, baz: typeof nNotImported }
 >o : Symbol(o, Decl(a.ts, 3, 12))
 >p1 : Symbol(p1, Decl(a.ts, 3, 18))
 >nImported : Symbol(nImported, Decl(a.ts, 0, 12))
@@ -18,11 +18,11 @@ export const o = (p1: typeof nImported, p2: typeof nNotImported, p3: typeof nPri
 >nNotImported : Symbol(nNotImported, Decl(a.ts, 1, 12))
 >p3 : Symbol(p3, Decl(a.ts, 3, 64))
 >nPrivate : Symbol(nPrivate, Decl(a.ts, 2, 5))
->foo : Symbol(foo, Decl(a.ts, 3, 99))
+>foo : Symbol(foo, Decl(a.ts, 3, 102))
 >nImported : Symbol(nImported, Decl(a.ts, 0, 12))
->bar : Symbol(bar, Decl(a.ts, 3, 122))
+>bar : Symbol(bar, Decl(a.ts, 3, 125))
 >nPrivate : Symbol(nPrivate, Decl(a.ts, 2, 5))
->baz : Symbol(baz, Decl(a.ts, 3, 144))
+>baz : Symbol(baz, Decl(a.ts, 3, 147))
 >nNotImported : Symbol(nNotImported, Decl(a.ts, 1, 12))
 
 === b.ts ===

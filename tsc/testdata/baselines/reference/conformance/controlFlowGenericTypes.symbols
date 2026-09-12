@@ -499,15 +499,15 @@ class TableBaseEnum<
     m() {
 >m : Symbol(TableBaseEnum.m, Decl(controlFlowGenericTypes.ts, 163, 82))
 
-        let iSpec = null! as InternalSpec;
+        let iSpec = null as! as InternalSpec;
 >iSpec : Symbol(iSpec, Decl(controlFlowGenericTypes.ts, 165, 11))
 >InternalSpec : Symbol(InternalSpec, Decl(controlFlowGenericTypes.ts, 162, 55))
 
-        iSpec[null! as keyof InternalSpec];  // Error, object possibly undefined
+        iSpec[null as! as keyof InternalSpec];  // Error, object possibly undefined
 >iSpec : Symbol(iSpec, Decl(controlFlowGenericTypes.ts, 165, 11))
 >InternalSpec : Symbol(InternalSpec, Decl(controlFlowGenericTypes.ts, 162, 55))
 
-        iSpec[null! as keyof PublicSpec];    // Error, object possibly undefined
+        iSpec[null as! as keyof PublicSpec];    // Error, object possibly undefined
 >iSpec : Symbol(iSpec, Decl(controlFlowGenericTypes.ts, 165, 11))
 >PublicSpec : Symbol(PublicSpec, Decl(controlFlowGenericTypes.ts, 161, 20))
 
@@ -517,11 +517,11 @@ class TableBaseEnum<
 
             return;
         }
-        iSpec[null! as keyof InternalSpec];
+        iSpec[null as! as keyof InternalSpec];
 >iSpec : Symbol(iSpec, Decl(controlFlowGenericTypes.ts, 165, 11))
 >InternalSpec : Symbol(InternalSpec, Decl(controlFlowGenericTypes.ts, 162, 55))
 
-        iSpec[null! as keyof PublicSpec];
+        iSpec[null as! as keyof PublicSpec];
 >iSpec : Symbol(iSpec, Decl(controlFlowGenericTypes.ts, 165, 11))
 >PublicSpec : Symbol(PublicSpec, Decl(controlFlowGenericTypes.ts, 161, 20))
     }

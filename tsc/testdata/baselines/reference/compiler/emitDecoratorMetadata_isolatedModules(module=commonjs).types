@@ -80,10 +80,10 @@ class HelloWorld {
 >EventListener : any
 >'3' : "3"
 
-  handleEvent3(event: C3): T1 { return undefined! } // Ok, Error
+  handleEvent3(event: C3): T1 { return undefined as! } // Ok, Error
 >handleEvent3 : (event: C3) => T1
 >event : C3
->undefined! : never
+>undefined as! : never
 >undefined : undefined
 }
 

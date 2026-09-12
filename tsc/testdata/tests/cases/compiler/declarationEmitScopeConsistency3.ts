@@ -5,7 +5,7 @@
 
 // @filename: a.ts
 export const g = (v: "outer") => {
-    const f = (v: "inner") => () => null! as typeof v;
-    const r = f(null!)
+    const f = (v: "inner") => () => null as! as typeof v;
+    const r = f(null as!)
     return r;
 }

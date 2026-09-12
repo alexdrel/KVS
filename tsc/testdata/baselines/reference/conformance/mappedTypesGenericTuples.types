@@ -38,19 +38,19 @@ type D = { d: string };
 >d : string
 
 type V0<T extends unknown[]> = [A, B?, ...T, ...C[]]
->V0 : [A, (B | undefined)?, ...T, ...C[]]
+>V0 : [A, B | null | undefined, ...T, ...C[]]
 
 type V1<T extends unknown[]> = [A, ...T, B, ...C[], D]
 >V1 : [A, ...T, B, ...C[], D]
 
 type K0<T extends unknown[]> = K<V0<T>>;  // ["0", "1"?, ...K<T>, ...number[]]
->K0 : ["0", ("1" | undefined)?, ...K<T>, ...number[]]
+>K0 : ["0", "1", ...K<T>, ...number[]]
 
 type K1<T extends unknown[]> = K<V1<T>>;  // ["0", ...K<T>, number, ...number[], number]
 >K1 : ["0", ...K<T>, number, ...number[], number]
 
 type M0<T extends unknown[]> = M<V0<T>>;  // [A, B?, ...M<T>, ...C[]]
->M0 : [A, (B | undefined)?, ...M<T>, ...C[]]
+>M0 : [A, B | null | undefined, ...M<T>, ...C[]]
 
 type M1<T extends unknown[]> = M<V1<T>>;  // [A, ...M<T>, B, ...C[], D]
 >M1 : [A, ...M<T>, B, ...C[], D]

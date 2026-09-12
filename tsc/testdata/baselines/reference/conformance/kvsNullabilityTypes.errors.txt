@@ -1,0 +1,69 @@
+kvsNullabilityTypes.ts(24,7): error TS2322: Type 'number | null | undefined' is not assignable to type 'number'.
+  Type 'undefined' is not assignable to type 'number'.
+kvsNullabilityTypes.ts(25,7): error TS2322: Type 'number | null | undefined' is not assignable to type 'number'.
+  Type 'undefined' is not assignable to type 'number'.
+kvsNullabilityTypes.ts(29,7): error TS2322: Type 'number | null | undefined' is not assignable to type 'number'.
+  Type 'undefined' is not assignable to type 'number'.
+kvsNullabilityTypes.ts(40,36): error TS1005: ';' expected.
+kvsNullabilityTypes.ts(41,42): error TS1005: ';' expected.
+kvsNullabilityTypes.ts(41,43): error TS1109: Expression expected.
+
+
+==== kvsNullabilityTypes.ts (6 errors) ====
+    type NullableNumber = number?;
+    type ExtantNumber = NullableNumber!;
+    
+    type NullableAgain = (number?)?;
+    type ExtantAgain = (NullableNumber!)!;
+    type ExtantAfterNullable = (number?)!;
+    type NullableAfterExtant = (number!)?;
+    
+    type NullableUnion = (string | number)?;
+    type ExtantUnion = (string | number | null | undefined)!;
+    
+    type ArrayOfNullable = number?[];
+    type NullableArray = number[]?;
+    type ArrayOfExtant = NullableNumber![];
+    type ExtantArray = (number[]?)!;
+    type ParenthesizedArrayOfNullable = (number?[]);
+    
+    declare const nullableValue: NullableNumber;
+    declare const extantValue: ExtantNumber;
+    
+    const acceptNumber: NullableNumber = 1;
+    const acceptNull: NullableNumber = null;
+    const acceptUndefined: NullableNumber = undefined;
+    const rejectNullable: number = nullableValue;
+          ~~~~~~~~~~~~~~
+!!! error TS2322: Type 'number | null | undefined' is not assignable to type 'number'.
+!!! error TS2322:   Type 'undefined' is not assignable to type 'number'.
+    const rejectNullableAsExtant: ExtantNumber = nullableValue;
+          ~~~~~~~~~~~~~~~~~~~~~~
+!!! error TS2322: Type 'number | null | undefined' is not assignable to type 'number'.
+!!! error TS2322:   Type 'undefined' is not assignable to type 'number'.
+    const calculation = extantValue + 1;
+    
+    declare const values: ArrayOfNullable;
+    const rejectNullableElement: number = values[0];
+          ~~~~~~~~~~~~~~~~~~~~~
+!!! error TS2322: Type 'number | null | undefined' is not assignable to type 'number'.
+!!! error TS2322:   Type 'undefined' is not assignable to type 'number'.
+    
+    function incrementPresent(candidate: number?): number {
+        if (candidate != null) return candidate + 1;
+        return 0;
+    }
+    
+    function realSqrt(x: number): number? {
+        return x >= 0 ?: Math.sqrt(x);
+    }
+    
+    type RejectSpacedNullable = number ?;
+                                       ~
+!!! error TS1005: ';' expected.
+    type RejectSpacedExtant = NullableNumber !;
+                                             ~
+!!! error TS1005: ';' expected.
+                                              ~
+!!! error TS1109: Expression expected.
+    

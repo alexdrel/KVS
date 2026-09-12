@@ -10,7 +10,7 @@ class Table<S extends Schema>  {
 
     // Removing this line, removes the error 
     getRows<C extends keyof S>(): Array<UnrollOnHover<Pick<S, C>>> {
-        return null!
+        return null as!
     }
 }
 

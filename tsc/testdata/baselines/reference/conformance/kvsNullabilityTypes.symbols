@@ -1,0 +1,117 @@
+//// [tests/cases/conformance/kvs/kvsNullabilityTypes.ts] ////
+
+=== kvsNullabilityTypes.ts ===
+type NullableNumber = number?;
+>NullableNumber : Symbol(NullableNumber, Decl(kvsNullabilityTypes.ts, 0, 0))
+
+type ExtantNumber = NullableNumber!;
+>ExtantNumber : Symbol(ExtantNumber, Decl(kvsNullabilityTypes.ts, 0, 30))
+>NullableNumber : Symbol(NullableNumber, Decl(kvsNullabilityTypes.ts, 0, 0))
+
+type NullableAgain = (number?)?;
+>NullableAgain : Symbol(NullableAgain, Decl(kvsNullabilityTypes.ts, 1, 36))
+
+type ExtantAgain = (NullableNumber!)!;
+>ExtantAgain : Symbol(ExtantAgain, Decl(kvsNullabilityTypes.ts, 3, 32))
+>NullableNumber : Symbol(NullableNumber, Decl(kvsNullabilityTypes.ts, 0, 0))
+
+type ExtantAfterNullable = (number?)!;
+>ExtantAfterNullable : Symbol(ExtantAfterNullable, Decl(kvsNullabilityTypes.ts, 4, 38))
+
+type NullableAfterExtant = (number!)?;
+>NullableAfterExtant : Symbol(NullableAfterExtant, Decl(kvsNullabilityTypes.ts, 5, 38))
+
+type NullableUnion = (string | number)?;
+>NullableUnion : Symbol(NullableUnion, Decl(kvsNullabilityTypes.ts, 6, 38))
+
+type ExtantUnion = (string | number | null | undefined)!;
+>ExtantUnion : Symbol(ExtantUnion, Decl(kvsNullabilityTypes.ts, 8, 40))
+
+type ArrayOfNullable = number?[];
+>ArrayOfNullable : Symbol(ArrayOfNullable, Decl(kvsNullabilityTypes.ts, 9, 57))
+
+type NullableArray = number[]?;
+>NullableArray : Symbol(NullableArray, Decl(kvsNullabilityTypes.ts, 11, 33))
+
+type ArrayOfExtant = NullableNumber![];
+>ArrayOfExtant : Symbol(ArrayOfExtant, Decl(kvsNullabilityTypes.ts, 12, 31))
+>NullableNumber : Symbol(NullableNumber, Decl(kvsNullabilityTypes.ts, 0, 0))
+
+type ExtantArray = (number[]?)!;
+>ExtantArray : Symbol(ExtantArray, Decl(kvsNullabilityTypes.ts, 13, 39))
+
+type ParenthesizedArrayOfNullable = (number?[]);
+>ParenthesizedArrayOfNullable : Symbol(ParenthesizedArrayOfNullable, Decl(kvsNullabilityTypes.ts, 14, 32))
+
+declare const nullableValue: NullableNumber;
+>nullableValue : Symbol(nullableValue, Decl(kvsNullabilityTypes.ts, 17, 13))
+>NullableNumber : Symbol(NullableNumber, Decl(kvsNullabilityTypes.ts, 0, 0))
+
+declare const extantValue: ExtantNumber;
+>extantValue : Symbol(extantValue, Decl(kvsNullabilityTypes.ts, 18, 13))
+>ExtantNumber : Symbol(ExtantNumber, Decl(kvsNullabilityTypes.ts, 0, 30))
+
+const acceptNumber: NullableNumber = 1;
+>acceptNumber : Symbol(acceptNumber, Decl(kvsNullabilityTypes.ts, 20, 5))
+>NullableNumber : Symbol(NullableNumber, Decl(kvsNullabilityTypes.ts, 0, 0))
+
+const acceptNull: NullableNumber = null;
+>acceptNull : Symbol(acceptNull, Decl(kvsNullabilityTypes.ts, 21, 5))
+>NullableNumber : Symbol(NullableNumber, Decl(kvsNullabilityTypes.ts, 0, 0))
+
+const acceptUndefined: NullableNumber = undefined;
+>acceptUndefined : Symbol(acceptUndefined, Decl(kvsNullabilityTypes.ts, 22, 5))
+>NullableNumber : Symbol(NullableNumber, Decl(kvsNullabilityTypes.ts, 0, 0))
+>undefined : Symbol(undefined)
+
+const rejectNullable: number = nullableValue;
+>rejectNullable : Symbol(rejectNullable, Decl(kvsNullabilityTypes.ts, 23, 5))
+>nullableValue : Symbol(nullableValue, Decl(kvsNullabilityTypes.ts, 17, 13))
+
+const rejectNullableAsExtant: ExtantNumber = nullableValue;
+>rejectNullableAsExtant : Symbol(rejectNullableAsExtant, Decl(kvsNullabilityTypes.ts, 24, 5))
+>ExtantNumber : Symbol(ExtantNumber, Decl(kvsNullabilityTypes.ts, 0, 30))
+>nullableValue : Symbol(nullableValue, Decl(kvsNullabilityTypes.ts, 17, 13))
+
+const calculation = extantValue + 1;
+>calculation : Symbol(calculation, Decl(kvsNullabilityTypes.ts, 25, 5))
+>extantValue : Symbol(extantValue, Decl(kvsNullabilityTypes.ts, 18, 13))
+
+declare const values: ArrayOfNullable;
+>values : Symbol(values, Decl(kvsNullabilityTypes.ts, 27, 13))
+>ArrayOfNullable : Symbol(ArrayOfNullable, Decl(kvsNullabilityTypes.ts, 9, 57))
+
+const rejectNullableElement: number = values[0];
+>rejectNullableElement : Symbol(rejectNullableElement, Decl(kvsNullabilityTypes.ts, 28, 5))
+>values : Symbol(values, Decl(kvsNullabilityTypes.ts, 27, 13))
+
+function incrementPresent(candidate: number?): number {
+>incrementPresent : Symbol(incrementPresent, Decl(kvsNullabilityTypes.ts, 28, 48))
+>candidate : Symbol(candidate, Decl(kvsNullabilityTypes.ts, 30, 26))
+
+    if (candidate != null) return candidate + 1;
+>candidate : Symbol(candidate, Decl(kvsNullabilityTypes.ts, 30, 26))
+>candidate : Symbol(candidate, Decl(kvsNullabilityTypes.ts, 30, 26))
+
+    return 0;
+}
+
+function realSqrt(x: number): number? {
+>realSqrt : Symbol(realSqrt, Decl(kvsNullabilityTypes.ts, 33, 1))
+>x : Symbol(x, Decl(kvsNullabilityTypes.ts, 35, 18))
+
+    return x >= 0 ?: Math.sqrt(x);
+>x : Symbol(x, Decl(kvsNullabilityTypes.ts, 35, 18))
+>Math.sqrt : Symbol(Math.sqrt, Decl(lib.es5.d.ts, --, --))
+>Math : Symbol(Math, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --), Decl(lib.es2015.core.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --), Decl(lib.es2025.float16.d.ts, --, --))
+>sqrt : Symbol(Math.sqrt, Decl(lib.es5.d.ts, --, --))
+>x : Symbol(x, Decl(kvsNullabilityTypes.ts, 35, 18))
+}
+
+type RejectSpacedNullable = number ?;
+>RejectSpacedNullable : Symbol(RejectSpacedNullable, Decl(kvsNullabilityTypes.ts, 37, 1))
+
+type RejectSpacedExtant = NullableNumber !;
+>RejectSpacedExtant : Symbol(RejectSpacedExtant, Decl(kvsNullabilityTypes.ts, 39, 37))
+>NullableNumber : Symbol(NullableNumber, Decl(kvsNullabilityTypes.ts, 0, 0))
+

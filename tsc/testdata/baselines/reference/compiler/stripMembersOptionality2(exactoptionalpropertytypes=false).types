@@ -14,10 +14,10 @@ const obj1: WithObject1 = { a: undefined };
 >undefined : undefined
 
 type WithArray1 = Required<[(string | undefined)?]>;
->WithArray1 : [string]
+>WithArray1 : [string | null]
 
 const tup1: WithArray1 = [undefined];
->tup1 : [string]
+>tup1 : [string | null]
 >[undefined] : [undefined]
 >undefined : undefined
 

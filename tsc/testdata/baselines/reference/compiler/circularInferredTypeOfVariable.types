@@ -4,8 +4,8 @@
 // Repro from #14428
 
 (async () => {
->(async () => {    function foo(p: string[]): string[] {        return [];    }    function bar(p: string[]): string[] {        return [];    }    let a1: string[] | undefined = [];    while (true) {        let a2 = foo(a1!);        a1 = await bar(a2);    }}) : () => Promise<never>
->async () => {    function foo(p: string[]): string[] {        return [];    }    function bar(p: string[]): string[] {        return [];    }    let a1: string[] | undefined = [];    while (true) {        let a2 = foo(a1!);        a1 = await bar(a2);    }} : () => Promise<never>
+>(async () => {    function foo(p: string[]): string[] {        return [];    }    function bar(p: string[]): string[] {        return [];    }    let a1: string[] | undefined = [];    while (true) {        let a2 = foo(a1 as!);        a1 = await bar(a2);    }}) : () => Promise<never>
+>async () => {    function foo(p: string[]): string[] {        return [];    }    function bar(p: string[]): string[] {        return [];    }    let a1: string[] | undefined = [];    while (true) {        let a2 = foo(a1 as!);        a1 = await bar(a2);    }} : () => Promise<never>
 
     function foo(p: string[]): string[] {
 >foo : (p: string[]) => string[]
@@ -30,11 +30,11 @@
     while (true) {
 >true : true
 
-        let a2 = foo(a1!);
+        let a2 = foo(a1 as!);
 >a2 : string[]
->foo(a1!) : string[]
+>foo(a1 as!) : string[]
 >foo : (p: string[]) => string[]
->a1! : string[]
+>a1 as! : string[]
 >a1 : string[]
 
         a1 = await bar(a2);
@@ -46,3 +46,4 @@
 >a2 : string[]
     }
 });
+

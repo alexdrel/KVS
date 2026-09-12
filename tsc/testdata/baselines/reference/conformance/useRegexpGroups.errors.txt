@@ -46,6 +46,6 @@ useRegexpGroups.ts(15,11): error TS2532: Object is possibly 'undefined'.
                ~~~~~~
 !!! error TS18047: 'result' is possibly 'null'.
     
-    let foo = "foo".match(/(?<bar>foo)/)!.groups.foo;
-              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    let foo = ("foo".match(/(?<bar>foo)/) as!).groups.foo;
+              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !!! error TS2532: Object is possibly 'undefined'.

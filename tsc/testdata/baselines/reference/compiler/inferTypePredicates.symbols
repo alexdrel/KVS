@@ -287,7 +287,7 @@ function isBarNonNull(x: Foo | Bar | null) {
 >Foo : Symbol(Foo, Decl(inferTypePredicates.ts, 65, 4))
 >Bar : Symbol(Bar, Decl(inferTypePredicates.ts, 70, 1))
 
-  return ('bar' in x!);
+  return ('bar' in x as!);
 >x : Symbol(x, Decl(inferTypePredicates.ts, 78, 22))
 }
 const fooOrBar = list[0];

@@ -88,8 +88,8 @@ function referencedInSignartureKeyword({ function: alias }: { function: string }
 >function : string
 >alias : string
 
-    return null!;
->null! : null
+    return null as!;
+>null as! : null
 }
 
 function referencedInInferredType({ name: alias }: Named) {
@@ -102,9 +102,9 @@ function referencedInInferredType({ name: alias }: Named) {
 >name : string
 >alias : string
 
-    return null! as Named2
->null! as Named2 : { name: typeof alias; }
->null! : null
+    return null as! as Named2
+>null as! as Named2 : { name: typeof alias; }
+>null as! : null
 }
 
 function referencedInNestedFunction({ name: alias }: Named) {
@@ -248,8 +248,8 @@ class ReferencedInSignartureClass {
 >alias : string
 >alias : string
 
-        return null!
->null! : null
+        return null as!
+>null as! : null
     }
 	mRerturnTypeNested({ name: alias }: Named): NonNullable<typeof alias> {
 >mRerturnTypeNested : ({ name: alias }: Named) => NonNullable<typeof alias>
@@ -257,8 +257,8 @@ class ReferencedInSignartureClass {
 >alias : string
 >alias : string
 
-        return null!
->null! : null
+        return null as!
+>null as! : null
     }
     mParameter({ name: alias }: Named, p: typeof alias) {
 >mParameter : ({ name: alias }: Named, p: typeof alias) => any
@@ -267,8 +267,8 @@ class ReferencedInSignartureClass {
 >p : string
 >alias : string
 
-        return null!
->null! : null
+        return null as!
+>null as! : null
     }
 }
 

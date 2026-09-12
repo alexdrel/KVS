@@ -1,12 +1,11 @@
 //// [tests/cases/conformance/types/spread/objectSpreadNegativeParse.ts] ////
 
 === objectSpreadNegativeParse.ts ===
-let o7 = { ...o? };
+let o7 = { ...o ?? };
 >o7 : any
->{ ...o? } : any
->o? : any
+>{ ...o ?? } : any
+>o ?? : any
 >o : any
-> : any
 > : any
 
 let o8 = { ...*o };

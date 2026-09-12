@@ -247,7 +247,7 @@ function f35431(a: A) {
     case "abc":
     case "def": return;
     default:
-      a!.kind; // Error expected
+      (a as!).kind; // Error expected
   }
 }
 
@@ -471,7 +471,7 @@ function f35431(a) {
         case "abc":
         case "def": return;
         default:
-            a.kind; // Error expected
+            (a).kind; // Error expected
     }
 }
 

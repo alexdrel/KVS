@@ -53,10 +53,10 @@ let t1 = a?.m?.({x: 12});
 >m : Symbol(m, Decl(callChain.3.ts, 1, 18))
 >x : Symbol(x, Decl(callChain.3.ts, 8, 17))
 
-t1 = a!.m!({x: 12});
+t1 = ((a as!).m as!)({x: 12});
 >t1 : Symbol(t1, Decl(callChain.3.ts, 8, 3))
->a!.m : Symbol(m, Decl(callChain.3.ts, 1, 18))
+>(a as!).m : Symbol(m, Decl(callChain.3.ts, 1, 18))
 >a : Symbol(a, Decl(callChain.3.ts, 1, 13))
 >m : Symbol(m, Decl(callChain.3.ts, 1, 18))
->x : Symbol(x, Decl(callChain.3.ts, 9, 12))
+>x : Symbol(x, Decl(callChain.3.ts, 9, 22))
 

@@ -68,6 +68,16 @@ if (value?) {
 }
 ```
 
+It is an expression operator, not a compound keyword, so whitespace before
+`?` is insignificant. Parenthesized and spaced forms are ordinary:
+
+```kvs
+if ((left ?? right) ?) use(left ?? right);
+```
+
+When `?` is followed by a true expression and `:`, it remains the ordinary
+ternary operator rather than an extant test.
+
 It is a total boolean test:
 
 ```text
@@ -194,6 +204,14 @@ use(item); // still nullable
 
 `as!` is the local escape hatch when flow analysis cannot preserve a narrowing, such as inside an ordinary callback. It inserts no check or default, so an incorrect assertion leaves the actual runtime value unchanged. Neither form changes nested types; the corresponding type operations are [`T?` and `T!`](nullability.md).
 
+An `as!` assertion preserves an underlying writable target. Parenthesized forms
+can therefore be assigned to or used with increment and decrement operators:
+
+```kvs
+(counts[key] as!)++;
+(current as!) = replacement;
+```
+
 ## Destructuring
 
 Destructuring derives nullability from the source and the selected field or element, just like the corresponding member or indexed access:
@@ -244,6 +262,10 @@ The operation is rejected when the type has no default value. Arbitrary fallback
 ```kvs
 const user = possibleUser ?? guest;
 ```
+
+An absence-only expression has no result type from which to obtain a default,
+so `null!` and `undefined!` are errors. Use `null as!` or `undefined as!` when
+an unchecked impossible-value placeholder is needed.
 
 Writing `!` chooses the type's default value in one place. Use `??` to select another fallback, or `~~` when absence should raise an error. Once the choice is made, the language supplies its mechanics.
 

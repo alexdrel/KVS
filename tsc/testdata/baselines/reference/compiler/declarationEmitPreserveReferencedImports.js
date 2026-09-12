@@ -6,13 +6,13 @@ export interface Evt { }
 
 //// [decl.ts]
 import {Evt} from './utils'
-export const o = <T>(o: T) => () : T => null!
+export const o = <T>(o: T) => () : T => null as!
 
 //// [main.ts]
 import { o }  from './decl'
 import { Evt }  from './utils'
 
-export const f = { o: o({ v: null! as Evt}) };
+export const f = { o: o({ v: null as! as Evt}) };
 
 //// [utils.js]
 "use strict";

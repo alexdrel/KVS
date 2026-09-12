@@ -833,7 +833,7 @@ function f<T extends { x: {} }>(): Partial<T> {
 >Partial : Symbol(Partial, Decl(lib.es5.d.ts, --, --))
 >T : Symbol(T, Decl(mappedTypeRelationships.ts, 188, 11))
 
-    return undefined! as T;
+    return undefined as! as T;
 >undefined : Symbol(undefined)
 >T : Symbol(T, Decl(mappedTypeRelationships.ts, 188, 11))
 }

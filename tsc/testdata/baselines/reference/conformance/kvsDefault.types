@@ -1,0 +1,110 @@
+//// [tests/cases/conformance/kvs/kvsDefault.ts] ////
+
+=== kvsDefault.ts ===
+declare const maybeString: string | null | undefined;
+>maybeString : string | null | undefined
+
+declare const maybeNumber: number | null;
+>maybeNumber : number | null
+
+declare const maybeBoolean: boolean | undefined;
+>maybeBoolean : boolean | undefined
+
+declare const maybeBigInt: bigint | null;
+>maybeBigInt : bigint | null
+
+declare const maybeStrings: string[] | null;
+>maybeStrings : string[] | null
+
+declare const maybeReadonlyNumbers: readonly number[] | undefined;
+>maybeReadonlyNumbers : readonly number[] | undefined
+
+declare const maybeArrayFamily: string[] | readonly number[] | null;
+>maybeArrayFamily : string[] | readonly number[] | null
+
+const stringValue = maybeString!;
+>stringValue : string
+>maybeString! : string
+>maybeString : string | null | undefined
+
+const numberValue = maybeNumber!;
+>numberValue : number
+>maybeNumber! : number
+>maybeNumber : number | null
+
+const booleanValue = maybeBoolean!;
+>booleanValue : boolean
+>maybeBoolean! : boolean
+>maybeBoolean : boolean | undefined
+
+const bigintValue = maybeBigInt!;
+>bigintValue : bigint
+>maybeBigInt! : bigint
+>maybeBigInt : bigint | null
+
+const strings = maybeStrings!;
+>strings : string[]
+>maybeStrings! : string[]
+>maybeStrings : string[] | null
+
+const readonlyNumbers = maybeReadonlyNumbers!;
+>readonlyNumbers : readonly number[]
+>maybeReadonlyNumbers! : readonly number[]
+>maybeReadonlyNumbers : readonly number[] | undefined
+
+const arrayFamily = maybeArrayFamily!;
+>arrayFamily : string[] | readonly number[]
+>maybeArrayFamily! : string[] | readonly number[]
+>maybeArrayFamily : string[] | readonly number[] | null
+
+const stringLength = maybeString!.length;
+>stringLength : number
+>maybeString!.length : number
+>maybeString! : string
+>maybeString : string | null | undefined
+>length : number
+
+const incremented = maybeNumber! + 1;
+>incremented : number
+>maybeNumber! + 1 : number
+>maybeNumber! : number
+>maybeNumber : number | null
+>1 : 1
+
+declare const stringLiteral: "left" | "right" | null;
+>stringLiteral : "left" | "right" | null
+
+const literalValue = stringLiteral!;
+>literalValue : "left" | "right"
+>stringLiteral! : "left" | "right"
+>stringLiteral : "left" | "right" | null
+
+declare const mixed: string | number | null;
+>mixed : string | number | null
+
+mixed!;
+>mixed! : string | number
+>mixed : string | number | null
+
+declare const tuple: [string, number] | null;
+>tuple : [string, number] | null
+
+tuple!;
+>tuple! : [string, number]
+>tuple : [string, number] | null
+
+declare const object: { value: string } | null;
+>object : { value: string; } | null
+>value : string
+
+object!;
+>object! : { value: string; }
+>object : { value: string; } | null
+
+null!;
+>null! : never
+
+undefined!;
+>undefined! : never
+>undefined : undefined
+

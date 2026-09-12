@@ -1,0 +1,36 @@
+kvsIfBinding.ts(12,5): error TS2304: Cannot find name 'scopedValue'.
+kvsIfBinding.ts(15,1): error TS2304: Cannot find name 'scopedValue'.
+kvsIfBinding.ts(18,11): error TS1155: 'const' declarations must be initialized.
+kvsIfBinding.ts(18,11): error TS2454: Variable 'missing' is used before being assigned.
+
+
+==== kvsIfBinding.ts (4 errors) ====
+    declare function findValue(): string | number | undefined;
+    
+    if (const value = findValue()) {
+        const narrowed = value;
+        const displayed = typeof value === "string" ? value.toUpperCase() : value.toFixed(2);
+    }
+    
+    // Rejected: the binding exists only in the successful branch.
+    if (const scopedValue = findValue()) {
+        scopedValue;
+    } else {
+        scopedValue;
+        ~~~~~~~~~~~
+!!! error TS2304: Cannot find name 'scopedValue'.
+    }
+    
+    scopedValue;
+    ~~~~~~~~~~~
+!!! error TS2304: Cannot find name 'scopedValue'.
+    
+    // Rejected: an if binding requires a complete const initializer.
+    if (const missing: string) {
+              ~~~~~~~
+!!! error TS1155: 'const' declarations must be initialized.
+              ~~~~~~~
+!!! error TS2454: Variable 'missing' is used before being assigned.
+        missing;
+    }
+    

@@ -223,12 +223,12 @@ export type MyInfo = NeededInfo<ToB<{ initialize: any }>>;
 >ToB : Symbol(ToB, Decl(varianceProblingAndZeroOrderIndexSignatureRelationsAlign2.ts, 49, 37))
 >initialize : Symbol(initialize, Decl(varianceProblingAndZeroOrderIndexSignatureRelationsAlign2.ts, 58, 37))
 
-const tmp1: MyInfo = null!;
+const tmp1: MyInfo = null as!;
 >tmp1 : Symbol(tmp1, Decl(varianceProblingAndZeroOrderIndexSignatureRelationsAlign2.ts, 60, 5))
 >MyInfo : Symbol(MyInfo, Decl(varianceProblingAndZeroOrderIndexSignatureRelationsAlign2.ts, 56, 2))
 
 function tmp2<N extends NeededInfo>(n: N) {}
->tmp2 : Symbol(tmp2, Decl(varianceProblingAndZeroOrderIndexSignatureRelationsAlign2.ts, 60, 27))
+>tmp2 : Symbol(tmp2, Decl(varianceProblingAndZeroOrderIndexSignatureRelationsAlign2.ts, 60, 30))
 >N : Symbol(N, Decl(varianceProblingAndZeroOrderIndexSignatureRelationsAlign2.ts, 61, 14))
 >NeededInfo : Symbol(NeededInfo, Decl(varianceProblingAndZeroOrderIndexSignatureRelationsAlign2.ts, 52, 45))
 >n : Symbol(n, Decl(varianceProblingAndZeroOrderIndexSignatureRelationsAlign2.ts, 61, 36))

@@ -16,8 +16,8 @@ foo.ts(12,8): error TS18033: Type 'string' is not assignable to type 'number' as
       E1 = (`${BAR}`) as string, // We could recognize these,
            ~~~~~~~~~~~~~~~~~~~~
 !!! error TS18033: Type 'string' is not assignable to type 'number' as required for computed enum member values.
-      E2 = `${BAR}`!,             // but Babel doesn't
-           ~~~~~~~~~
+      E2 = `${BAR}` as!,             // but Babel doesn't
+           ~~~~~~~~~~~~
 !!! error TS18033: Type 'string' is not assignable to type 'number' as required for computed enum member values.
     
       F = BAR,

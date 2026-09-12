@@ -44,11 +44,18 @@ type NodeFactory struct {
 	keywordExpressionArena              core.Arena[KeywordExpression]
 	keywordTypeNodeArena                core.Arena[KeywordTypeNode]
 	kvsCollectExpressionArena           core.Arena[KvsCollectExpression]
+	kvsDefaultExpressionArena           core.Arena[KvsDefaultExpression]
 	kvsExtantAssertionExpressionArena   core.Arena[KvsExtantAssertionExpression]
 	kvsExtantAssignmentExpressionArena  core.Arena[KvsExtantAssignmentExpression]
 	kvsExtantReturnStatementArena       core.Arena[KvsExtantReturnStatement]
+	kvsExtantTestExpressionArena        core.Arena[KvsExtantTestExpression]
+	kvsExtantTypeArena                  core.Arena[KvsExtantType]
 	kvsExtantYieldStatementArena        core.Arena[KvsExtantYieldStatement]
+	kvsIfBindingClauseArena             core.Arena[KvsIfBindingClause]
+	kvsIfBindingStatementArena          core.Arena[KvsIfBindingStatement]
 	kvsNullableAssertionExpressionArena core.Arena[KvsNullableAssertionExpression]
+	kvsNullableTypeArena                core.Arena[KvsNullableType]
+	kvsNullingExpressionArena           core.Arena[KvsNullingExpression]
 	kvsSelectExpressionArena            core.Arena[KvsSelectExpression]
 	kvsYieldStatementArena              core.Arena[KvsYieldStatement]
 	literalTypeNodeArena                core.Arena[LiteralTypeNode]
@@ -283,9 +290,14 @@ type (
 	KvsExtantReturnStatementNode       = Node
 	KvsYieldStatementNode              = Node
 	KvsExtantYieldStatementNode        = Node
+	KvsIfBindingStatementNode          = Node
+	KvsIfBindingClauseNode             = Node
 	KvsNullableAssertionExpressionNode = Node
 	KvsExtantAssertionExpressionNode   = Node
 	KvsExtantAssignmentExpressionNode  = Node
+	KvsExtantTestExpressionNode        = Node
+	KvsDefaultExpressionNode           = Node
+	KvsNullingExpressionNode           = Node
 	KvsCollectExpressionNode           = Node
 	KvsSelectExpressionNode            = Node
 	LabeledStatementNode               = Node
@@ -388,6 +400,8 @@ type (
 	TupleTypeNodeNode                  = Node
 	NamedTupleMemberNode               = Node
 	OptionalTypeNodeNode               = Node
+	KvsNullableTypeNode                = Node
+	KvsExtantTypeNode                  = Node
 	RestTypeNodeNode                   = Node
 	ParenthesizedTypeNodeNode          = Node
 	FunctionTypeNodeNode               = Node
@@ -1651,6 +1665,90 @@ func IsKvsExtantYieldStatement(node *Node) bool {
 }
 
 // ──────────────────────────────────────────────────────────────────────
+// KvsIfBindingStatement
+// ──────────────────────────────────────────────────────────────────────
+
+type KvsIfBindingStatement struct {
+	StatementBase
+	CompositeBase
+	Clause        *KvsIfBindingClauseNode
+	ElseStatement *Statement // Optional
+}
+
+func (f *NodeFactory) NewKvsIfBindingStatement(clause *KvsIfBindingClauseNode, elseStatement *Statement) *Node {
+	data := f.kvsIfBindingStatementArena.New()
+	data.Clause = clause
+	data.ElseStatement = elseStatement
+	return f.newNode(KindKvsIfBindingStatement, data)
+}
+
+func (f *NodeFactory) UpdateKvsIfBindingStatement(node *KvsIfBindingStatement, clause *KvsIfBindingClauseNode, elseStatement *Statement) *Node {
+	if clause != node.Clause || elseStatement != node.ElseStatement {
+		return updateNode(f.NewKvsIfBindingStatement(clause, elseStatement), node.AsNode(), f.hooks)
+	}
+	return node.AsNode()
+}
+
+func (node *KvsIfBindingStatement) ForEachChild(v Visitor) bool {
+	return visit(v, node.Clause) || visit(v, node.ElseStatement)
+}
+
+func (node *KvsIfBindingStatement) VisitEachChild(v *NodeVisitor) *Node {
+	return v.Factory.UpdateKvsIfBindingStatement(node, v.visitNode(node.Clause), v.visitNode(node.ElseStatement))
+}
+
+func (node *KvsIfBindingStatement) Clone(f NodeFactoryCoercible) *Node {
+	return cloneNode(f.AsNodeFactory().NewKvsIfBindingStatement(node.Clause, node.ElseStatement), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func IsKvsIfBindingStatement(node *Node) bool {
+	return node.Kind == KindKvsIfBindingStatement
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// KvsIfBindingClause
+// ──────────────────────────────────────────────────────────────────────
+
+type KvsIfBindingClause struct {
+	NodeBase
+	LocalsContainerBase
+	CompositeBase
+	DeclarationList *VariableDeclarationListNode
+	Condition       *Node
+	Statement       *Statement
+}
+
+func (f *NodeFactory) NewKvsIfBindingClause(declarationList *VariableDeclarationListNode, statement *Statement) *Node {
+	data := f.kvsIfBindingClauseArena.New()
+	data.DeclarationList = declarationList
+	data.Statement = statement
+	return f.newNode(KindKvsIfBindingClause, data)
+}
+
+func (f *NodeFactory) UpdateKvsIfBindingClause(node *KvsIfBindingClause, declarationList *VariableDeclarationListNode, statement *Statement) *Node {
+	if declarationList != node.DeclarationList || statement != node.Statement {
+		return updateNode(f.NewKvsIfBindingClause(declarationList, statement), node.AsNode(), f.hooks)
+	}
+	return node.AsNode()
+}
+
+func (node *KvsIfBindingClause) ForEachChild(v Visitor) bool {
+	return visit(v, node.DeclarationList) || visit(v, node.Statement)
+}
+
+func (node *KvsIfBindingClause) VisitEachChild(v *NodeVisitor) *Node {
+	return v.Factory.UpdateKvsIfBindingClause(node, v.visitNode(node.DeclarationList), v.visitNode(node.Statement))
+}
+
+func (node *KvsIfBindingClause) Clone(f NodeFactoryCoercible) *Node {
+	return cloneNode(f.AsNodeFactory().NewKvsIfBindingClause(node.DeclarationList, node.Statement), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func IsKvsIfBindingClause(node *Node) bool {
+	return node.Kind == KindKvsIfBindingClause
+}
+
+// ──────────────────────────────────────────────────────────────────────
 // KvsNullableAssertionExpression
 // ──────────────────────────────────────────────────────────────────────
 
@@ -1778,6 +1876,134 @@ func (node *KvsExtantAssignmentExpression) Clone(f NodeFactoryCoercible) *Node {
 
 func IsKvsExtantAssignmentExpression(node *Node) bool {
 	return node.Kind == KindKvsExtantAssignmentExpression
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// KvsExtantTestExpression
+// ──────────────────────────────────────────────────────────────────────
+
+type KvsExtantTestExpression struct {
+	ExpressionBase
+	CompositeBase
+	Expression    *Expression
+	QuestionToken *QuestionToken
+}
+
+func (f *NodeFactory) NewKvsExtantTestExpression(expression *Expression, questionToken *QuestionToken) *Node {
+	data := f.kvsExtantTestExpressionArena.New()
+	data.Expression = expression
+	data.QuestionToken = questionToken
+	return f.newNode(KindKvsExtantTestExpression, data)
+}
+
+func (f *NodeFactory) UpdateKvsExtantTestExpression(node *KvsExtantTestExpression, expression *Expression, questionToken *QuestionToken) *Node {
+	if expression != node.Expression || questionToken != node.QuestionToken {
+		return updateNode(f.NewKvsExtantTestExpression(expression, questionToken), node.AsNode(), f.hooks)
+	}
+	return node.AsNode()
+}
+
+func (node *KvsExtantTestExpression) ForEachChild(v Visitor) bool {
+	return visit(v, node.Expression) || visit(v, node.QuestionToken)
+}
+
+func (node *KvsExtantTestExpression) VisitEachChild(v *NodeVisitor) *Node {
+	return v.Factory.UpdateKvsExtantTestExpression(node, v.visitNode(node.Expression), v.visitNode(node.QuestionToken))
+}
+
+func (node *KvsExtantTestExpression) Clone(f NodeFactoryCoercible) *Node {
+	return cloneNode(f.AsNodeFactory().NewKvsExtantTestExpression(node.Expression, node.QuestionToken), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func IsKvsExtantTestExpression(node *Node) bool {
+	return node.Kind == KindKvsExtantTestExpression
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// KvsDefaultExpression
+// ──────────────────────────────────────────────────────────────────────
+
+type KvsDefaultExpression struct {
+	ExpressionBase
+	CompositeBase
+	Expression *Expression
+}
+
+func (f *NodeFactory) NewKvsDefaultExpression(expression *Expression) *Node {
+	data := f.kvsDefaultExpressionArena.New()
+	data.Expression = expression
+	return f.newNode(KindKvsDefaultExpression, data)
+}
+
+func (f *NodeFactory) UpdateKvsDefaultExpression(node *KvsDefaultExpression, expression *Expression) *Node {
+	if expression != node.Expression {
+		return updateNode(f.NewKvsDefaultExpression(expression), node.AsNode(), f.hooks)
+	}
+	return node.AsNode()
+}
+
+func (node *KvsDefaultExpression) ForEachChild(v Visitor) bool {
+	return visit(v, node.Expression)
+}
+
+func (node *KvsDefaultExpression) VisitEachChild(v *NodeVisitor) *Node {
+	return v.Factory.UpdateKvsDefaultExpression(node, v.visitNode(node.Expression))
+}
+
+func (node *KvsDefaultExpression) Clone(f NodeFactoryCoercible) *Node {
+	return cloneNode(f.AsNodeFactory().NewKvsDefaultExpression(node.Expression), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func IsKvsDefaultExpression(node *Node) bool {
+	return node.Kind == KindKvsDefaultExpression
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// KvsNullingExpression
+// ──────────────────────────────────────────────────────────────────────
+
+type KvsNullingExpression struct {
+	ExpressionBase
+	CompositeBase
+	Condition     *Expression
+	QuestionToken *QuestionToken
+	ColonToken    *ColonToken
+	WhenTrue      *Expression
+}
+
+func (f *NodeFactory) NewKvsNullingExpression(condition *Expression, questionToken *QuestionToken, colonToken *ColonToken, whenTrue *Expression) *Node {
+	data := f.kvsNullingExpressionArena.New()
+	data.Condition = condition
+	data.QuestionToken = questionToken
+	data.ColonToken = colonToken
+	data.WhenTrue = whenTrue
+	return f.newNode(KindKvsNullingExpression, data)
+}
+
+func (f *NodeFactory) UpdateKvsNullingExpression(node *KvsNullingExpression, condition *Expression, questionToken *QuestionToken, colonToken *ColonToken, whenTrue *Expression) *Node {
+	if condition != node.Condition || questionToken != node.QuestionToken || colonToken != node.ColonToken || whenTrue != node.WhenTrue {
+		return updateNode(f.NewKvsNullingExpression(condition, questionToken, colonToken, whenTrue), node.AsNode(), f.hooks)
+	}
+	return node.AsNode()
+}
+
+func (node *KvsNullingExpression) ForEachChild(v Visitor) bool {
+	return visit(v, node.Condition) ||
+		visit(v, node.QuestionToken) ||
+		visit(v, node.ColonToken) ||
+		visit(v, node.WhenTrue)
+}
+
+func (node *KvsNullingExpression) VisitEachChild(v *NodeVisitor) *Node {
+	return v.Factory.UpdateKvsNullingExpression(node, v.visitNode(node.Condition), v.visitNode(node.QuestionToken), v.visitNode(node.ColonToken), v.visitNode(node.WhenTrue))
+}
+
+func (node *KvsNullingExpression) Clone(f NodeFactoryCoercible) *Node {
+	return cloneNode(f.AsNodeFactory().NewKvsNullingExpression(node.Condition, node.QuestionToken, node.ColonToken, node.WhenTrue), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func IsKvsNullingExpression(node *Node) bool {
+	return node.Kind == KindKvsNullingExpression
 }
 
 // ──────────────────────────────────────────────────────────────────────
@@ -6292,6 +6518,88 @@ func IsOptionalTypeNode(node *Node) bool {
 }
 
 // ──────────────────────────────────────────────────────────────────────
+// KvsNullableType
+// ──────────────────────────────────────────────────────────────────────
+
+type KvsNullableType struct {
+	TypeNodeBase
+	CompositeBase
+	Type          *TypeNode
+	QuestionToken *QuestionToken
+}
+
+func (f *NodeFactory) NewKvsNullableType(typeNode *TypeNode, questionToken *QuestionToken) *Node {
+	data := f.kvsNullableTypeArena.New()
+	data.Type = typeNode
+	data.QuestionToken = questionToken
+	return f.newNode(KindKvsNullableType, data)
+}
+
+func (f *NodeFactory) UpdateKvsNullableType(node *KvsNullableType, typeNode *TypeNode, questionToken *QuestionToken) *Node {
+	if typeNode != node.Type || questionToken != node.QuestionToken {
+		return updateNode(f.NewKvsNullableType(typeNode, questionToken), node.AsNode(), f.hooks)
+	}
+	return node.AsNode()
+}
+
+func (node *KvsNullableType) ForEachChild(v Visitor) bool {
+	return visit(v, node.Type) || visit(v, node.QuestionToken)
+}
+
+func (node *KvsNullableType) VisitEachChild(v *NodeVisitor) *Node {
+	return v.Factory.UpdateKvsNullableType(node, v.visitNode(node.Type), v.visitNode(node.QuestionToken))
+}
+
+func (node *KvsNullableType) Clone(f NodeFactoryCoercible) *Node {
+	return cloneNode(f.AsNodeFactory().NewKvsNullableType(node.Type, node.QuestionToken), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func IsKvsNullableType(node *Node) bool {
+	return node.Kind == KindKvsNullableType
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// KvsExtantType
+// ──────────────────────────────────────────────────────────────────────
+
+type KvsExtantType struct {
+	TypeNodeBase
+	CompositeBase
+	Type             *TypeNode
+	ExclamationToken *ExclamationToken
+}
+
+func (f *NodeFactory) NewKvsExtantType(typeNode *TypeNode, exclamationToken *ExclamationToken) *Node {
+	data := f.kvsExtantTypeArena.New()
+	data.Type = typeNode
+	data.ExclamationToken = exclamationToken
+	return f.newNode(KindKvsExtantType, data)
+}
+
+func (f *NodeFactory) UpdateKvsExtantType(node *KvsExtantType, typeNode *TypeNode, exclamationToken *ExclamationToken) *Node {
+	if typeNode != node.Type || exclamationToken != node.ExclamationToken {
+		return updateNode(f.NewKvsExtantType(typeNode, exclamationToken), node.AsNode(), f.hooks)
+	}
+	return node.AsNode()
+}
+
+func (node *KvsExtantType) ForEachChild(v Visitor) bool {
+	return visit(v, node.Type) || visit(v, node.ExclamationToken)
+}
+
+func (node *KvsExtantType) VisitEachChild(v *NodeVisitor) *Node {
+	return v.Factory.UpdateKvsExtantType(node, v.visitNode(node.Type), v.visitNode(node.ExclamationToken))
+}
+
+func (node *KvsExtantType) Clone(f NodeFactoryCoercible) *Node {
+	return cloneNode(f.AsNodeFactory().NewKvsExtantType(node.Type, node.ExclamationToken), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func IsKvsExtantType(node *Node) bool {
+	return node.Kind == KindKvsExtantType
+}
+
+// ──────────────────────────────────────────────────────────────────────
 // RestTypeNode
 // ──────────────────────────────────────────────────────────────────────
 
@@ -9083,12 +9391,22 @@ func (n *Node) ForEachChild(v Visitor) bool {
 		return n.data.(*KvsYieldStatement).ForEachChild(v)
 	case KindKvsExtantYieldStatement:
 		return n.data.(*KvsExtantYieldStatement).ForEachChild(v)
+	case KindKvsIfBindingStatement:
+		return n.data.(*KvsIfBindingStatement).ForEachChild(v)
+	case KindKvsIfBindingClause:
+		return n.data.(*KvsIfBindingClause).ForEachChild(v)
 	case KindKvsNullableAssertionExpression:
 		return n.data.(*KvsNullableAssertionExpression).ForEachChild(v)
 	case KindKvsExtantAssertionExpression:
 		return n.data.(*KvsExtantAssertionExpression).ForEachChild(v)
 	case KindKvsExtantAssignmentExpression:
 		return n.data.(*KvsExtantAssignmentExpression).ForEachChild(v)
+	case KindKvsExtantTestExpression:
+		return n.data.(*KvsExtantTestExpression).ForEachChild(v)
+	case KindKvsDefaultExpression:
+		return n.data.(*KvsDefaultExpression).ForEachChild(v)
+	case KindKvsNullingExpression:
+		return n.data.(*KvsNullingExpression).ForEachChild(v)
 	case KindKvsCollectExpression:
 		return n.data.(*KvsCollectExpression).ForEachChild(v)
 	case KindKvsSelectExpression:
@@ -9269,6 +9587,10 @@ func (n *Node) ForEachChild(v Visitor) bool {
 		return n.data.(*NamedTupleMember).ForEachChild(v)
 	case KindOptionalType:
 		return n.data.(*OptionalTypeNode).ForEachChild(v)
+	case KindKvsNullableType:
+		return n.data.(*KvsNullableType).ForEachChild(v)
+	case KindKvsExtantType:
+		return n.data.(*KvsExtantType).ForEachChild(v)
 	case KindRestType:
 		return n.data.(*RestTypeNode).ForEachChild(v)
 	case KindParenthesizedType:
@@ -9504,6 +9826,14 @@ func (n *Node) AsKvsExtantYieldStatement() *KvsExtantYieldStatement {
 	return n.data.(*KvsExtantYieldStatement)
 }
 
+func (n *Node) AsKvsIfBindingStatement() *KvsIfBindingStatement {
+	return n.data.(*KvsIfBindingStatement)
+}
+
+func (n *Node) AsKvsIfBindingClause() *KvsIfBindingClause {
+	return n.data.(*KvsIfBindingClause)
+}
+
 func (n *Node) AsKvsNullableAssertionExpression() *KvsNullableAssertionExpression {
 	return n.data.(*KvsNullableAssertionExpression)
 }
@@ -9514,6 +9844,18 @@ func (n *Node) AsKvsExtantAssertionExpression() *KvsExtantAssertionExpression {
 
 func (n *Node) AsKvsExtantAssignmentExpression() *KvsExtantAssignmentExpression {
 	return n.data.(*KvsExtantAssignmentExpression)
+}
+
+func (n *Node) AsKvsExtantTestExpression() *KvsExtantTestExpression {
+	return n.data.(*KvsExtantTestExpression)
+}
+
+func (n *Node) AsKvsDefaultExpression() *KvsDefaultExpression {
+	return n.data.(*KvsDefaultExpression)
+}
+
+func (n *Node) AsKvsNullingExpression() *KvsNullingExpression {
+	return n.data.(*KvsNullingExpression)
 }
 
 func (n *Node) AsKvsCollectExpression() *KvsCollectExpression {
@@ -9922,6 +10264,14 @@ func (n *Node) AsNamedTupleMember() *NamedTupleMember {
 
 func (n *Node) AsOptionalTypeNode() *OptionalTypeNode {
 	return n.data.(*OptionalTypeNode)
+}
+
+func (n *Node) AsKvsNullableType() *KvsNullableType {
+	return n.data.(*KvsNullableType)
+}
+
+func (n *Node) AsKvsExtantType() *KvsExtantType {
+	return n.data.(*KvsExtantType)
 }
 
 func (n *Node) AsRestTypeNode() *RestTypeNode {

@@ -31,12 +31,16 @@ else {
 >foo : Symbol(foo, Decl(incrementOnNullAssertion.ts, 4, 3))
 >x : Symbol(x, Decl(incrementOnNullAssertion.ts, 3, 5))
 
-    let n = foo[x]
+    let n = foo[x];
 >n : Symbol(n, Decl(incrementOnNullAssertion.ts, 10, 7))
 >foo : Symbol(foo, Decl(incrementOnNullAssertion.ts, 4, 3))
 >x : Symbol(x, Decl(incrementOnNullAssertion.ts, 3, 5))
 
-    foo[x]!++
+    (foo[x] as!)++
+>foo : Symbol(foo, Decl(incrementOnNullAssertion.ts, 4, 3))
+>x : Symbol(x, Decl(incrementOnNullAssertion.ts, 3, 5))
+
+    foo[x] as! = 2
 >foo : Symbol(foo, Decl(incrementOnNullAssertion.ts, 4, 3))
 >x : Symbol(x, Decl(incrementOnNullAssertion.ts, 3, 5))
 }

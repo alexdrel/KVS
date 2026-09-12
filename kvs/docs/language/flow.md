@@ -416,13 +416,14 @@ if (const user = users.find(%.id == requestedId)) {
 
 The initializer is evaluated once, and its value is tested using ordinary KVS truthiness. **The successful condition narrows the binding's type:** although the lookup can produce absence, `user` has type `User` inside the body, so it can be passed directly to a function requiring a non-nullable `User`.
 
-The binding is scoped to the `if` statement, including its branches, and is unavailable afterward. The non-nullable narrowing applies in the successful branch.
+The binding exists only in the successful branch, where it is narrowed to its truthy type. It is not in scope in `else` or after the `if` statement.
 
 This keeps the lookup, test, and use together. As with a loop-header binding, the surrounding scope does not need a variable whose only purpose is to support this operation. The declaration does not change the condition into a presence-only test: false, zero, and empty values still fail an ordinary truthiness condition.
 
-### Compact ternary
+### Nulling operator `?:`
 
-Infix `?:` is a compact ternary whose missing branch is null:
+The nulling operator evaluates its right-hand expression when the condition
+succeeds; otherwise it produces `null`:
 
 ```kvs
 const footer = showFooter ?: renderFooter(data);

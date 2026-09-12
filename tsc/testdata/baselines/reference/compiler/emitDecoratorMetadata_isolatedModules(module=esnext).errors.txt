@@ -43,7 +43,7 @@ index.ts(24,28): error TS1272: A type referenced in a decorated signature must b
       p2!: T2; // Ok
     
       @EventListener('3')
-      handleEvent3(event: C3): T1 { return undefined! } // Ok, Error
+      handleEvent3(event: C3): T1 { return undefined as! } // Ok, Error
                                ~~
 !!! error TS1272: A type referenced in a decorated signature must be imported with 'import type' or a namespace import when 'isolatedModules' and 'emitDecoratorMetadata' are enabled.
 !!! related TS1376 index.ts:1:10: 'T1' was imported here.

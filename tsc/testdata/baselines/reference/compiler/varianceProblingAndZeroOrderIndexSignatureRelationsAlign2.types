@@ -144,9 +144,9 @@ export type MyInfo = NeededInfo<ToB<{ initialize: any }>>;
 >MyInfo : MyInfo
 >initialize : any
 
-const tmp1: MyInfo = null!;
+const tmp1: MyInfo = null as!;
 >tmp1 : MyInfo
->null! : never
+>null as! : never
 
 function tmp2<N extends NeededInfo>(n: N) {}
 >tmp2 : <N extends NeededInfo>(n: N) => void

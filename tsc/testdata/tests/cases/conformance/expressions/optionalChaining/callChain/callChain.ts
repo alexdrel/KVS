@@ -39,6 +39,5 @@ const v: number | undefined = o4?.(incr);
 declare const o5: <T>() => undefined | (() => void);
 o5<number>()?.();
 
-// GH#36031
-o2?.b()!.toString;
-o2?.b()!.toString!;
+// GH#36031 covered TypeScript `!` inside an optional chain; KVS keeps only the terminal assertion.
+o2?.b().toString as!;

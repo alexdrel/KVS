@@ -60,7 +60,7 @@ function generic1<T extends { [s: string]: boolean }>(arg: T): boolean {
 }
 function generic2<T extends { [s: string]: boolean }>(arg: T): boolean {
     // Should OK
-    return arg["blah"]!;
+    return arg["blah"] as!;
 }
 function generic3<T extends string>(arg: T): boolean {
     // Should error

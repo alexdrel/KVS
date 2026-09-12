@@ -1,6 +1,8 @@
-//// [tests/cases/compiler/parseInvalidNullableTypes.ts] ////
+//// [tests/cases/compiler/parseNullableTypes.ts] ////
 
-=== parseInvalidNullableTypes.ts ===
+=== parseNullableTypes.ts ===
+// KVS accepts postfix nullable types; prefix JSDoc-style types remain invalid.
+
 function f1(a: string): a is ?string {
 >f1 : (a: string) => a is string | null
 >a : string
@@ -10,12 +12,12 @@ function f1(a: string): a is ?string {
 }
 
 function f2(a: string?) {}
->f2 : (a: string | null) => void
->a : string | null
+>f2 : (a: string?) => void
+>a : string | null | undefined
 
 function f3(a: number?) {}
->f3 : (a: number | null) => void
->a : number | null
+>f3 : (a: number?) => void
+>a : number | null | undefined
 
 function f4(a: ?string) {}
 >f4 : (a: string | null) => void
@@ -39,7 +41,7 @@ const a = 1 as any?;
 >1 : 1
 
 const b: number? = 1;
->b : number | null
+>b : number | null | undefined
 >1 : 1
 
 const c = 1 as ?any;
@@ -55,10 +57,10 @@ let e: unknown?;
 >e : unknown
 
 let f: never?;
->f : null
+>f : null | undefined
 
 let g: void?;
->g : void | null
+>g : void | null | undefined
 
 let h: undefined?;
 >h : null | undefined

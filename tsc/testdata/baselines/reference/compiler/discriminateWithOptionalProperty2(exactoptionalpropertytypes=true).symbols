@@ -173,7 +173,7 @@ function mapAsyncIterable<T, U, R = undefined>(
 >Symbol : Symbol(Symbol, Decl(lib.es5.d.ts, --, --), Decl(lib.es2015.symbol.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --), Decl(lib.es2019.symbol.d.ts, --, --))
 >asyncDispose : Symbol(SymbolConstructor.asyncDispose, Decl(lib.esnext.disposable.d.ts, --, --))
 
-      await this.return(undefined!);
+      await this.return(undefined as!);
 >this.return : Symbol(AsyncGenerator.return, Decl(lib.es2018.asyncgenerator.d.ts, --, --))
 >this : Symbol(AsyncGenerator, Decl(lib.es2018.asyncgenerator.d.ts, --, --))
 >return : Symbol(AsyncGenerator.return, Decl(lib.es2018.asyncgenerator.d.ts, --, --))

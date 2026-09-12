@@ -553,7 +553,7 @@ func typeNodeCouldReferToUndefined(node *ast.Node) bool {
 	}
 	switch node.Kind {
 	// these types require symbolic/type resolution to know if they definitely do or do not refer to `undefined`, so might (or definitely do)
-	case ast.KindTypeReference, ast.KindIndexedAccessType, ast.KindTypeQuery, ast.KindOptionalType, ast.KindRestType, ast.KindImportType:
+	case ast.KindTypeReference, ast.KindIndexedAccessType, ast.KindTypeQuery, ast.KindOptionalType, ast.KindKvsNullableType, ast.KindKvsExtantType, ast.KindRestType, ast.KindImportType:
 		return true
 	case ast.KindIntersectionType:
 		// TODO: why is this not `core.Every`? strada treated unions and intersections the same, but logically every intersection member needs to contain a possible `undefined`

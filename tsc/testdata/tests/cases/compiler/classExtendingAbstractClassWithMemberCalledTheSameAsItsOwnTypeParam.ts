@@ -17,7 +17,7 @@ export interface IReader {
 }
 
 export abstract class ConvenientObservable<T, TChange> implements IObservable<T, TChange> {
-	get TChange(): TChange { return null!; }
+	get TChange(): TChange { return null as!; }
 	public abstract get(): T;
 }
 

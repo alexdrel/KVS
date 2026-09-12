@@ -674,9 +674,9 @@ function f<T extends { x: {} }>(): Partial<T> {
 >f : <T extends { x: {}; }>() => Partial<T>
 >x : {}
 
-    return undefined! as T;
->undefined! as T : T
->undefined! : never
+    return undefined as! as T;
+>undefined as! as T : T
+>undefined as! : never
 >undefined : undefined
 }
 

@@ -1,0 +1,46 @@
+optionalTupleElementsAndUndefined.ts(13,5): error TS2403: Subsequent variable declarations must have the same type.  Variable 'v' must be of type '[1, (2 | null | undefined)?]', but here has type '[a: 1, b?: 2 | undefined]'.
+optionalTupleElementsAndUndefined.ts(14,5): error TS2403: Subsequent variable declarations must have the same type.  Variable 'v' must be of type '[1, (2 | null | undefined)?]', but here has type '[a: 1, b?: 2 | undefined]'.
+optionalTupleElementsAndUndefined.ts(15,5): error TS2403: Subsequent variable declarations must have the same type.  Variable 'v' must be of type '[1, (2 | null | undefined)?]', but here has type '[1, (2 | undefined)?]'.
+optionalTupleElementsAndUndefined.ts(16,5): error TS2403: Subsequent variable declarations must have the same type.  Variable 'v' must be of type '[1, (2 | null | undefined)?]', but here has type '[1, (2 | undefined)?]'.
+optionalTupleElementsAndUndefined.ts(17,5): error TS2403: Subsequent variable declarations must have the same type.  Variable 'v' must be of type '[1, (2 | null | undefined)?]', but here has type '[a: 1, b?: 2 | undefined]'.
+optionalTupleElementsAndUndefined.ts(18,5): error TS2403: Subsequent variable declarations must have the same type.  Variable 'v' must be of type '[1, (2 | null | undefined)?]', but here has type '[a: 1, b?: 2 | undefined]'.
+
+
+==== optionalTupleElementsAndUndefined.ts (6 errors) ====
+    // Repro from #50753
+    
+    type UnNullify<T> = { [K in keyof T]: NonNullable<T[K]> };
+    
+    type Foo = UnNullify<[a: 1, b?: 2 | undefined]>;
+    
+    type Test = [a: 1, b?: 2] extends Foo ? true : false;  // true
+    
+    // Types in the following declarations should be identical
+    
+    var v: [1, 2?];
+    var v: [1, (2 | undefined)?];
+    var v: [a: 1, b?: 2];
+        ~
+!!! error TS2403: Subsequent variable declarations must have the same type.  Variable 'v' must be of type '[1, (2 | null | undefined)?]', but here has type '[a: 1, b?: 2 | undefined]'.
+!!! related TS6203 optionalTupleElementsAndUndefined.ts:11:5: 'v' was also declared here.
+    var v: [a: 1, b?: 2 | undefined];
+        ~
+!!! error TS2403: Subsequent variable declarations must have the same type.  Variable 'v' must be of type '[1, (2 | null | undefined)?]', but here has type '[a: 1, b?: 2 | undefined]'.
+!!! related TS6203 optionalTupleElementsAndUndefined.ts:11:5: 'v' was also declared here.
+    var v: UnNullify<[1, 2?]>;
+        ~
+!!! error TS2403: Subsequent variable declarations must have the same type.  Variable 'v' must be of type '[1, (2 | null | undefined)?]', but here has type '[1, (2 | undefined)?]'.
+!!! related TS6203 optionalTupleElementsAndUndefined.ts:11:5: 'v' was also declared here.
+    var v: UnNullify<[1, (2 | undefined)?]>;
+        ~
+!!! error TS2403: Subsequent variable declarations must have the same type.  Variable 'v' must be of type '[1, (2 | null | undefined)?]', but here has type '[1, (2 | undefined)?]'.
+!!! related TS6203 optionalTupleElementsAndUndefined.ts:11:5: 'v' was also declared here.
+    var v: UnNullify<[a: 1, b?: 2]>;
+        ~
+!!! error TS2403: Subsequent variable declarations must have the same type.  Variable 'v' must be of type '[1, (2 | null | undefined)?]', but here has type '[a: 1, b?: 2 | undefined]'.
+!!! related TS6203 optionalTupleElementsAndUndefined.ts:11:5: 'v' was also declared here.
+    var v: UnNullify<[a: 1, b?: 2 | undefined]>;
+        ~
+!!! error TS2403: Subsequent variable declarations must have the same type.  Variable 'v' must be of type '[1, (2 | null | undefined)?]', but here has type '[a: 1, b?: 2 | undefined]'.
+!!! related TS6203 optionalTupleElementsAndUndefined.ts:11:5: 'v' was also declared here.
+    

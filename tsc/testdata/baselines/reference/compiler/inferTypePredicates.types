@@ -384,11 +384,11 @@ function isBarNonNull(x: Foo | Bar | null) {
 >isBarNonNull : (x: Foo | Bar | null) => x is Bar
 >x : Foo | Bar | null
 
-  return ('bar' in x!);
->('bar' in x!) : boolean
->'bar' in x! : boolean
+  return ('bar' in x as!);
+>('bar' in x as!) : boolean
+>'bar' in x as! : boolean
+>'bar' in x : boolean
 >'bar' : "bar"
->x! : Foo | Bar
 >x : Foo | Bar | null
 }
 const fooOrBar = list[0];

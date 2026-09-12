@@ -34,17 +34,25 @@ else {
 >foo : Dictionary<number>
 >x : "bar"
 
-    let n = foo[x]
+    let n = foo[x];
 >n : number
 >foo[x] : number
 >foo : Dictionary<number>
 >x : "bar"
 
-    foo[x]!++
->foo[x]!++ : number
->foo[x]! : number
+    (foo[x] as!)++
+>(foo[x] as!)++ : number
+>(foo[x] as!) : number
+>foo[x] as! : number
 >foo[x] : number
 >foo : Dictionary<number>
 >x : "bar"
+
+    foo[x] as! = 2
+>foo[x] as! : number
+>foo[x] : number
+>foo : Dictionary<number>
+>x : "bar"
+>2 : 2
 }
 

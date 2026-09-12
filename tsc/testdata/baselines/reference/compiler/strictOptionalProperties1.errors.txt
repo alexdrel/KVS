@@ -4,27 +4,14 @@ strictOptionalProperties1.ts(12,5): error TS2412: Type 'string | undefined' is n
 strictOptionalProperties1.ts(20,9): error TS2412: Type 'undefined' is not assignable to type 'string' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the type of the target.
 strictOptionalProperties1.ts(28,9): error TS2412: Type 'undefined' is not assignable to type 'string' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the type of the target.
 strictOptionalProperties1.ts(53,5): error TS2412: Type 'undefined' is not assignable to type 'string' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the type of the target.
-strictOptionalProperties1.ts(60,5): error TS2322: Type 'undefined' is not assignable to type 'string'.
-strictOptionalProperties1.ts(64,5): error TS2322: Type '[number, string?, string?]' is not assignable to type '[number, string?]'.
+strictOptionalProperties1.ts(64,5): error TS2322: Type '[number, (string | null | undefined)?, (string | null | undefined)?]' is not assignable to type '[number, (string | null | undefined)?]'.
   Target allows only 2 element(s) but source may have more.
-strictOptionalProperties1.ts(73,5): error TS2322: Type '[number, never?, never?, never?]' is not assignable to type '[number, string?, boolean?]'.
+strictOptionalProperties1.ts(73,5): error TS2322: Type '[number, never?, never?, never?]' is not assignable to type '[number, (string | null | undefined)?, (boolean | null | undefined)?]'.
   Target allows only 3 element(s) but source may have more.
-strictOptionalProperties1.ts(74,5): error TS2322: Type '[never?, never?, true?]' is not assignable to type '[number, string?, boolean?]'.
+strictOptionalProperties1.ts(74,5): error TS2322: Type '[never?, never?, true?]' is not assignable to type '[number, (string | null | undefined)?, (boolean | null | undefined)?]'.
   Source provides no match for required element at position 0 in target.
-strictOptionalProperties1.ts(75,5): error TS2322: Type '[number, undefined, true]' is not assignable to type '[number, string?, boolean?]'.
-  Type at position 1 in source is not compatible with type at position 1 in target.
-    Type 'undefined' is not assignable to type 'string'.
 strictOptionalProperties1.ts(99,7): error TS2375: Type '{ foo: undefined; bar: string; }' is not assignable to type 'InputProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
   Types of property 'foo' are incompatible.
-    Type 'undefined' is not assignable to type 'string'.
-strictOptionalProperties1.ts(105,7): error TS2322: Type '[number, undefined]' is not assignable to type '[number, string?, boolean?]'.
-  Type at position 1 in source is not compatible with type at position 1 in target.
-    Type 'undefined' is not assignable to type 'string'.
-strictOptionalProperties1.ts(106,7): error TS2322: Type '[number, string, undefined]' is not assignable to type '[number, string?, boolean?]'.
-  Type at position 2 in source is not compatible with type at position 2 in target.
-    Type 'undefined' is not assignable to type 'boolean'.
-strictOptionalProperties1.ts(107,7): error TS2322: Type '[number, undefined, undefined]' is not assignable to type '[number, string?, boolean?]'.
-  Type at position 1 in source is not compatible with type at position 1 in target.
     Type 'undefined' is not assignable to type 'string'.
 strictOptionalProperties1.ts(111,7): error TS2375: Type '{ foo: undefined; }' is not assignable to type '{ foo?: number; }' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
   Types of property 'foo' are incompatible.
@@ -47,7 +34,7 @@ strictOptionalProperties1.ts(211,1): error TS2322: Type 'string | boolean | unde
   Type 'undefined' is not assignable to type '{ [x: string]: string | number; }'.
 
 
-==== strictOptionalProperties1.ts (23 errors) ====
+==== strictOptionalProperties1.ts (18 errors) ====
     function f1(obj: { a?: string, b?: string | undefined }) {
         let a = obj.a;  // string | undefined
         let b = obj.b;  // string | undefined
@@ -119,14 +106,12 @@ strictOptionalProperties1.ts(211,1): error TS2322: Type 'string | boolean | unde
         let x = t[0];  // string | undefined
         t[0] = 'hello';
         t[0] = undefined;  // Error
-        ~~~~
-!!! error TS2322: Type 'undefined' is not assignable to type 'string'.
     }
     
     function f4a(t1: [number, string?], t2: [number, string?, string?]) {
         t1 = t2;  // Wasn't an error, but should be
         ~~
-!!! error TS2322: Type '[number, string?, string?]' is not assignable to type '[number, string?]'.
+!!! error TS2322: Type '[number, (string | null | undefined)?, (string | null | undefined)?]' is not assignable to type '[number, (string | null | undefined)?]'.
 !!! error TS2322:   Target allows only 2 element(s) but source may have more.
     }
     
@@ -138,17 +123,13 @@ strictOptionalProperties1.ts(211,1): error TS2322: Type 'string | boolean | unde
         t = [42, , ,];
         t = [42, , , ,];  // Error
         ~
-!!! error TS2322: Type '[number, never?, never?, never?]' is not assignable to type '[number, string?, boolean?]'.
+!!! error TS2322: Type '[number, never?, never?, never?]' is not assignable to type '[number, (string | null | undefined)?, (boolean | null | undefined)?]'.
 !!! error TS2322:   Target allows only 3 element(s) but source may have more.
         t = [, , true];  // Error
         ~
-!!! error TS2322: Type '[never?, never?, true?]' is not assignable to type '[number, string?, boolean?]'.
+!!! error TS2322: Type '[never?, never?, true?]' is not assignable to type '[number, (string | null | undefined)?, (boolean | null | undefined)?]'.
 !!! error TS2322:   Source provides no match for required element at position 0 in target.
         t = [42, undefined, true];  // Error
-        ~
-!!! error TS2322: Type '[number, undefined, true]' is not assignable to type '[number, string?, boolean?]'.
-!!! error TS2322:   Type at position 1 in source is not compatible with type at position 1 in target.
-!!! error TS2322:     Type 'undefined' is not assignable to type 'string'.
     }
     
     function f6() {
@@ -183,20 +164,8 @@ strictOptionalProperties1.ts(211,1): error TS2322: Type 'string | boolean | unde
     
     const t1: [number, string?, boolean?] = [1];
     const t2: [number, string?, boolean?] = [1, undefined];
-          ~~
-!!! error TS2322: Type '[number, undefined]' is not assignable to type '[number, string?, boolean?]'.
-!!! error TS2322:   Type at position 1 in source is not compatible with type at position 1 in target.
-!!! error TS2322:     Type 'undefined' is not assignable to type 'string'.
     const t3: [number, string?, boolean?] = [1, "string", undefined];
-          ~~
-!!! error TS2322: Type '[number, string, undefined]' is not assignable to type '[number, string?, boolean?]'.
-!!! error TS2322:   Type at position 2 in source is not compatible with type at position 2 in target.
-!!! error TS2322:     Type 'undefined' is not assignable to type 'boolean'.
     const t4: [number, string?, boolean?] = [1, undefined, undefined];
-          ~~
-!!! error TS2322: Type '[number, undefined, undefined]' is not assignable to type '[number, string?, boolean?]'.
-!!! error TS2322:   Type at position 1 in source is not compatible with type at position 1 in target.
-!!! error TS2322:     Type 'undefined' is not assignable to type 'string'.
     
     // Example from #13195
     

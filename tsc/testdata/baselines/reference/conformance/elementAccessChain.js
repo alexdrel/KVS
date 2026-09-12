@@ -26,11 +26,10 @@ o5["b"]?.()["c"].d?.["e"];
 declare const o6: <T>() => undefined | ({ x: number });
 o6<number>()?.["x"];
 
-// GH#36031
-o2?.["b"]!.c;
-o2?.["b"]!["c"];
-o2?.["b"]!.c!;
-o2?.["b"]!["c"]!;
+// GH#36031 covered TypeScript `!` inside an optional chain; KVS keeps only terminal assertions.
+o2?.["b"].c as!;
+o2?.["b"]["c"] as!;
+
 
 //// [elementAccessChain.js]
 "use strict";
@@ -47,8 +46,6 @@ o2 === null || o2 === void 0 ? void 0 : o2.b["c"];
 (_m = (_l = o5["b"]) === null || _l === void 0 ? void 0 : _l.call(o5)["c"].d) === null || _m === void 0 ? void 0 : _m.e;
 (_p = (_o = o5["b"]) === null || _o === void 0 ? void 0 : _o.call(o5)["c"].d) === null || _p === void 0 ? void 0 : _p["e"];
 (_q = o6()) === null || _q === void 0 ? void 0 : _q["x"];
-// GH#36031
-o2 === null || o2 === void 0 ? void 0 : o2["b"].c;
-o2 === null || o2 === void 0 ? void 0 : o2["b"]["c"];
+// GH#36031 covered TypeScript `!` inside an optional chain; KVS keeps only terminal assertions.
 o2 === null || o2 === void 0 ? void 0 : o2["b"].c;
 o2 === null || o2 === void 0 ? void 0 : o2["b"]["c"];

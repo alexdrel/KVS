@@ -1,0 +1,60 @@
+//// [tests/cases/compiler/parseNullableTypes.ts] ////
+
+=== parseNullableTypes.ts ===
+// KVS accepts postfix nullable types; prefix JSDoc-style types remain invalid.
+
+function f1(a: string): a is ?string {
+>f1 : Symbol(f1, Decl(parseNullableTypes.ts, 0, 0))
+>a : Symbol(a, Decl(parseNullableTypes.ts, 2, 12))
+>a : Symbol(a, Decl(parseNullableTypes.ts, 2, 12))
+
+    return true;
+}
+
+function f2(a: string?) {}
+>f2 : Symbol(f2, Decl(parseNullableTypes.ts, 4, 1))
+>a : Symbol(a, Decl(parseNullableTypes.ts, 6, 12))
+
+function f3(a: number?) {}
+>f3 : Symbol(f3, Decl(parseNullableTypes.ts, 6, 26))
+>a : Symbol(a, Decl(parseNullableTypes.ts, 7, 12))
+
+function f4(a: ?string) {}
+>f4 : Symbol(f4, Decl(parseNullableTypes.ts, 7, 26))
+>a : Symbol(a, Decl(parseNullableTypes.ts, 9, 12))
+
+function f5(a: ?number) {}
+>f5 : Symbol(f5, Decl(parseNullableTypes.ts, 9, 26))
+>a : Symbol(a, Decl(parseNullableTypes.ts, 10, 12))
+
+function f6(a: string): ?string {
+>f6 : Symbol(f6, Decl(parseNullableTypes.ts, 10, 26))
+>a : Symbol(a, Decl(parseNullableTypes.ts, 12, 12))
+
+    return true;
+}
+
+const a = 1 as any?;
+>a : Symbol(a, Decl(parseNullableTypes.ts, 16, 5))
+
+const b: number? = 1;
+>b : Symbol(b, Decl(parseNullableTypes.ts, 17, 5))
+
+const c = 1 as ?any;
+>c : Symbol(c, Decl(parseNullableTypes.ts, 19, 5))
+
+const d: ?number = 1;
+>d : Symbol(d, Decl(parseNullableTypes.ts, 20, 5))
+
+let e: unknown?;
+>e : Symbol(e, Decl(parseNullableTypes.ts, 22, 3))
+
+let f: never?;
+>f : Symbol(f, Decl(parseNullableTypes.ts, 23, 3))
+
+let g: void?;
+>g : Symbol(g, Decl(parseNullableTypes.ts, 24, 3))
+
+let h: undefined?;
+>h : Symbol(h, Decl(parseNullableTypes.ts, 25, 3))
+

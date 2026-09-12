@@ -266,20 +266,10 @@ o5<number>()?.();
 >o5<number>() : (() => void) | undefined
 >o5 : <T>() => undefined | (() => void)
 
-// GH#36031
-o2?.b()!.toString;
->o2?.b()!.toString : ((radix?: number) => string) | undefined
->o2?.b()! : number | undefined
->o2?.b() : number | undefined
->o2?.b : ((...args: any[]) => number) | undefined
->o2 : { b: (...args: any[]) => number; } | undefined
->b : ((...args: any[]) => number) | undefined
->toString : ((radix?: number) => string) | undefined
-
-o2?.b()!.toString!;
->o2?.b()!.toString! : (radix?: number) => string
->o2?.b()!.toString : ((radix?: number) => string) | undefined
->o2?.b()! : number | undefined
+// GH#36031 covered TypeScript `!` inside an optional chain; KVS keeps only the terminal assertion.
+o2?.b().toString as!;
+>o2?.b().toString as! : (radix?: number) => string
+>o2?.b().toString : ((radix?: number) => string) | undefined
 >o2?.b() : number | undefined
 >o2?.b : ((...args: any[]) => number) | undefined
 >o2 : { b: (...args: any[]) => number; } | undefined

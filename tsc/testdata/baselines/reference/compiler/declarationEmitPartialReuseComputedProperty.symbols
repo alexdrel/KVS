@@ -10,14 +10,14 @@ export const poz = 1;
 export const neg = -1;
 >neg : Symbol(neg, Decl(a.ts, 2, 12))
 
-export const o = () => null! as { [n]: string, foo: string, [poz]: number, [neg]: number }
+export const o = () => null as! as { [n]: string, foo: string, [poz]: number, [neg]: number }
 >o : Symbol(o, Decl(a.ts, 3, 12))
->[n] : Symbol([n], Decl(a.ts, 3, 33))
+>[n] : Symbol([n], Decl(a.ts, 3, 36))
 >n : Symbol(n, Decl(a.ts, 0, 12))
->foo : Symbol(foo, Decl(a.ts, 3, 46))
->[poz] : Symbol([poz], Decl(a.ts, 3, 59))
+>foo : Symbol(foo, Decl(a.ts, 3, 49))
+>[poz] : Symbol([poz], Decl(a.ts, 3, 62))
 >poz : Symbol(poz, Decl(a.ts, 1, 12))
->[neg] : Symbol([neg], Decl(a.ts, 3, 74))
+>[neg] : Symbol([neg], Decl(a.ts, 3, 77))
 >neg : Symbol(neg, Decl(a.ts, 2, 12))
 
 === b.ts ===

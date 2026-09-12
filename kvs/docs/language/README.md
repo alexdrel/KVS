@@ -14,6 +14,14 @@ Application code should make its actual computation easy to see. Too often it do
 
 KVS treats that as a language problem rather than an unavoidable cost of writing robust application code. The compiler can perform the necessary presence checks while the source code expresses the computation directly, instead of forcing the developer to spell out those checks at every intermediate step. A recurring principle is to let absence and ordinary outcomes propagate naturally, while requiring explicit syntax where the program has a genuine policy decision to make. A call may depend on its inputs being present; a missing value may be replaced or materialized; a selected failure may become absence rather than escape as an exception. The aim is for ordinary robust code to get reasonable behavior by default, while making the decisions that actually matter explicit and local.
 
+## Compound syntax is adjacent
+
+KVS compound operators and keyword forms are indivisible spellings, not two
+operations fused by context. Their characters must be adjacent: whitespace or
+comments may not appear inside `return?`, `yield?`, `as?`, `as!`, `?=`, `?:`,
+`collect*`, `?(`, `?[`, or `?{`. The same rule applies to every compound form
+introduced by KVS.
+
 
 ## Functional ideas in procedural code
 
@@ -187,6 +195,7 @@ Alongside the chapters:
 
 - [Whole Programs](examples.md) — examples combining the themes, with a TypeScript comparison.
 - [Lowering, Evaluation, and JavaScript Interop](implementation.md) — implementation reference outside the introductory reading path.
+- [Postponed Changes](postponed.md) — accepted directions deliberately deferred because their compatibility or implementation cost is outside the current slice.
 
 ## Scope
 

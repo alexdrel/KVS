@@ -1,13 +1,15 @@
 kvsStaticNullability.ts(10,26): error TS18049: 'nullableNumber' is possibly 'null' or 'undefined'.
-kvsStaticNullability.ts(20,1): error TS2322: Type 'string | null | undefined' is not assignable to type 'string'.
+kvsStaticNullability.ts(21,7): error TS2322: Type '[]' is not assignable to type '[boolean | null | undefined, string]'.
+  Source has 0 element(s) but target requires 2.
+kvsStaticNullability.ts(30,1): error TS2322: Type 'string | null | undefined' is not assignable to type 'string'.
   Type 'undefined' is not assignable to type 'string'.
-kvsStaticNullability.ts(22,7): error TS2322: Type 'string | null | undefined' is not assignable to type 'string'.
+kvsStaticNullability.ts(32,7): error TS2322: Type 'string | null | undefined' is not assignable to type 'string'.
   Type 'undefined' is not assignable to type 'string'.
-kvsStaticNullability.ts(27,51): error TS1110: Type expected.
-kvsStaticNullability.ts(28,46): error TS1110: Type expected.
+kvsStaticNullability.ts(37,51): error TS1110: Type expected.
+kvsStaticNullability.ts(38,46): error TS1110: Type expected.
 
 
-==== kvsStaticNullability.ts (5 errors) ====
+==== kvsStaticNullability.ts (6 errors) ====
     declare const item: string | null | undefined;
     declare const nullableNumber: number | null | undefined;
     
@@ -21,6 +23,19 @@ kvsStaticNullability.ts(28,46): error TS1110: Type expected.
                              ~~~~~~~~~~~~~~
 !!! error TS18049: 'nullableNumber' is possibly 'null' or 'undefined'.
     const assertedAddition = nullableNumber as! + 2;
+    
+    const omittedTrailingTuple: [string, boolean?] = ["pending"];
+    const omittedParenthesizedTrailingTuple: [string, (boolean?)] = ["pending"];
+    const presentTrailingTuple: [string, boolean?] = ["visible", true];
+    const nullTrailingTuple: [string, boolean?] = ["unknown", null];
+    const undefinedTrailingTuple: [string, boolean?] = ["unknown", undefined];
+    declare const nullableTuple: [string, boolean?];
+    const nullableTupleElement: boolean? = nullableTuple[1];
+    const presentNonTrailingTuple: [boolean?, string] = [null, "ready"];
+    const rejectOmittedNonTrailingTuple: [boolean?, string] = [];
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+!!! error TS2322: Type '[]' is not assignable to type '[boolean | null | undefined, string]'.
+!!! error TS2322:   Source has 0 element(s) but target requires 2.
     
     let request? = "ready";
     request = null;

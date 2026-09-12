@@ -239,6 +239,8 @@
             "ArrayType",
             "TupleType",
             "OptionalType",
+            "KvsNullableType",
+            "KvsExtantType",
             "RestType",
             "UnionType",
             "IntersectionType",
@@ -287,6 +289,9 @@
             "KvsNullableAssertionExpression",
             "KvsExtantAssertionExpression",
             "KvsExtantAssignmentExpression",
+            "KvsExtantTestExpression",
+            "KvsDefaultExpression",
+            "KvsNullingExpression",
             "KvsCollectExpression",
             "KvsSelectExpression",
             "SpreadElement",
@@ -328,6 +333,8 @@
             "KvsExtantReturnStatement",
             "KvsYieldStatement",
             "KvsExtantYieldStatement",
+            "KvsIfBindingStatement",
+            "KvsIfBindingClause",
             "VariableDeclaration",
             "VariableDeclarationList",
             "FunctionDeclaration",
@@ -550,7 +557,7 @@
             },
             {
                 "name": "LastStatement",
-                "value": "KvsExtantYieldStatement"
+                "value": "KvsIfBindingStatement"
             },
             {
                 "name": "FirstNode",
@@ -1646,6 +1653,47 @@
                 ],
                 "arena": true
             },
+            "KvsIfBindingStatement": {
+                "extends": [
+                    "StatementBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "Clause",
+                        "type": "KvsIfBindingClause"
+                    },
+                    {
+                        "name": "ElseStatement",
+                        "type": "Statement",
+                        "optional": true
+                    }
+                ],
+                "arena": true
+            },
+            "KvsIfBindingClause": {
+                "extends": [
+                    "NodeBase",
+                    "LocalsContainerBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "DeclarationList",
+                        "type": "VariableDeclarationList"
+                    },
+                    {
+                        "name": "Condition",
+                        "type": "*Node",
+                        "goOnly": true
+                    },
+                    {
+                        "name": "Statement",
+                        "type": "Statement"
+                    }
+                ],
+                "arena": true
+            },
             "KvsNullableAssertionExpression": {
                 "extends": [
                     "ExpressionBase",
@@ -1700,6 +1748,61 @@
                     },
                     {
                         "name": "Right",
+                        "type": "Expression"
+                    }
+                ],
+                "arena": true
+            },
+            "KvsExtantTestExpression": {
+                "extends": [
+                    "ExpressionBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "Expression",
+                        "type": "Expression"
+                    },
+                    {
+                        "name": "QuestionToken",
+                        "type": "QuestionToken"
+                    }
+                ],
+                "arena": true
+            },
+            "KvsDefaultExpression": {
+                "extends": [
+                    "ExpressionBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "Expression",
+                        "type": "Expression"
+                    }
+                ],
+                "arena": true
+            },
+            "KvsNullingExpression": {
+                "extends": [
+                    "ExpressionBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "Condition",
+                        "type": "Expression"
+                    },
+                    {
+                        "name": "QuestionToken",
+                        "type": "QuestionToken"
+                    },
+                    {
+                        "name": "ColonToken",
+                        "type": "ColonToken"
+                    },
+                    {
+                        "name": "WhenTrue",
                         "type": "Expression"
                     }
                 ],
@@ -4003,6 +4106,40 @@
                         "type": "TypeNode"
                     }
                 ]
+            },
+            "KvsNullableType": {
+                "extends": [
+                    "TypeNodeBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "Type",
+                        "type": "TypeNode"
+                    },
+                    {
+                        "name": "QuestionToken",
+                        "type": "QuestionToken"
+                    }
+                ],
+                "arena": true
+            },
+            "KvsExtantType": {
+                "extends": [
+                    "TypeNodeBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "Type",
+                        "type": "TypeNode"
+                    },
+                    {
+                        "name": "ExclamationToken",
+                        "type": "ExclamationToken"
+                    }
+                ],
+                "arena": true
             },
             "RestTypeNode": {
                 "kind": "RestType",

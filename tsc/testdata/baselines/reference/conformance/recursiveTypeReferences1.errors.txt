@@ -130,7 +130,7 @@ recursiveTypeReferences1.ts(127,3): error TS2304: Cannot find name 'assert'.
         return html('li', [
                ~~~~
 !!! error TS2304: Cannot find name 'html'.
-          html('a', { href: `#${el.id}`, rel: 'noopener', 'data-index': idx.join('.') }, el.textContent!),
+          html('a', { href: `#${el.id}`, rel: 'noopener', 'data-index': idx.join('.') }, el.textContent as!),
           ~~~~
 !!! error TS2304: Cannot find name 'html'.
           children.length > 0 ? parse(children, idx) : frag()
@@ -143,7 +143,7 @@ recursiveTypeReferences1.ts(127,3): error TS2304: Cannot find name 'assert'.
     function cons(hs: HTMLHeadingElement[]): Tree {
       return hs
         .reduce<HTMLHeadingElement[][]>((hss, h) => {
-          const hs = hss.pop()!;
+          const hs = hss.pop() as!;
           return hs.length === 0 || level(h) > level(hs[0])
             ? concat(hss, [concat(hs, [h])])
               ~~~~~~
@@ -157,7 +157,7 @@ recursiveTypeReferences1.ts(127,3): error TS2304: Cannot find name 'assert'.
         .reduce<Tree>((node, hs) =>
           hs.length === 0
             ? node
-            : concat<Tree[number]>(node, [[hs.shift()!, cons(hs)]])
+            : concat<Tree[number]>(node, [[hs.shift() as!, cons(hs)]])
               ~~~~~~
 !!! error TS2304: Cannot find name 'concat'.
         , []);

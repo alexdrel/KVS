@@ -42,8 +42,8 @@ function watchMain() {
         readDirectory: ts.sys.readDirectory,
         realpath: ts.sys.realpath,
 
-        watchFile: ts.sys.watchFile!,
-        watchDirectory: ts.sys.watchDirectory!,
+        watchFile: ts.sys.watchFile as!,
+        watchDirectory: ts.sys.watchDirectory as!,
         createProgram: ts.createAbstractBuilder
     };
 
@@ -58,7 +58,7 @@ function watchMain() {
 
     host.afterProgramCreate = program => {
         console.log("** We finished making the program! **");
-        origPostProgramCreate!(program);
+        (origPostProgramCreate as!)(program);
     };
 
     // `createWatchProgram` creates an initial program, watches files, and updates the program over time.

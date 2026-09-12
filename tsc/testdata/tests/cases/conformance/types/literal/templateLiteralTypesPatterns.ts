@@ -198,7 +198,7 @@ export class AA {}
 export abstract class BB {
     abstract get(id: Id<AA>): void;
     update(id: Id<AA>): void {
-        this.get(id!);
+        this.get(id as!);
     }
 }
 

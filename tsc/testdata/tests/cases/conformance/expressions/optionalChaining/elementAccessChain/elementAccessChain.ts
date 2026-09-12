@@ -26,8 +26,6 @@ o5["b"]?.()["c"].d?.["e"];
 declare const o6: <T>() => undefined | ({ x: number });
 o6<number>()?.["x"];
 
-// GH#36031
-o2?.["b"]!.c;
-o2?.["b"]!["c"];
-o2?.["b"]!.c!;
-o2?.["b"]!["c"]!;
+// GH#36031 covered TypeScript `!` inside an optional chain; KVS keeps only terminal assertions.
+o2?.["b"].c as!;
+o2?.["b"]["c"] as!;

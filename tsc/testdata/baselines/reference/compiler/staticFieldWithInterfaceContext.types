@@ -117,7 +117,7 @@ let [ c7 ]: I[] = [class { static x = { a: "a" } }];
 >"a" : "a"
 
 let [ c8 = class { static x = { a: "a" } } ]: [I?] = [];
->c8 : I
+>c8 : I | null
 >class { static x = { a: "a" } } : typeof c8
 >x : { a: "a"; }
 >{ a: "a" } : { a: "a"; }
@@ -135,7 +135,7 @@ let [ c9 = class { static x = { a: "a" } } ]: I[] = [];
 >[] : never[]
 
 let [ c10 = class { static x = { a: "a" } } ]: [I?] = [class { static x = { a: "a" } }];
->c10 : I
+>c10 : I | null
 >class { static x = { a: "a" } } : typeof c10
 >x : { a: "a"; }
 >{ a: "a" } : { a: "a"; }

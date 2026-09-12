@@ -7,7 +7,8 @@ function foo<T>(x: T): T { return x }
 
 class Bar<T> { constructor(public x: T) { } }
 
-// Errors expected on all of the following
+// JSDoc-only prefix forms remain errors. KVS postfix nullable type arguments
+// such as `string?` are valid and include both null and undefined.
 
 const WhatFoo = foo<?>;
 const HuhFoo = foo<string?>;
@@ -39,7 +40,8 @@ class Bar {
         this.x = x;
     }
 }
-// Errors expected on all of the following
+// JSDoc-only prefix forms remain errors. KVS postfix nullable type arguments
+// such as `string?` are valid and include both null and undefined.
 const WhatFoo = foo;
 const HuhFoo = foo;
 const NopeFoo = foo;

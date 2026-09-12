@@ -479,7 +479,7 @@ sourceFile:test.tsx
 5 >Emitted(9, 58) Source(12, 30) + SourceIndex(0)
 6 >Emitted(9, 61) Source(12, 38) + SourceIndex(0)
 ---
->>>            createElement("meta", { content: c.a.b })
+>>>            createElement("meta", { content: (c.a).b })
 1 >^^^^^^^^^^^^
 2 >            ^^^^^^^^^^^^^^^^^^^^^^^^
 3 >                                    ^^^^^^^
@@ -489,28 +489,34 @@ sourceFile:test.tsx
 7 >                                               ^
 8 >                                                ^
 9 >                                                 ^
-10>                                                  ^^^
+10>                                                  ^
+11>                                                   ^
+12>                                                    ^^^
 1 >,
   >			
 2 >            <meta 
 3 >                                    content
 4 >                                           ={
-5 >                                             c
-6 >                                              .
-7 >                                               a!
-8 >                                                .
-9 >                                                 b
-10>                                                  }></meta>
+5 >                                             (
+6 >                                              c
+7 >                                               .
+8 >                                                a
+9 >                                                  as!)
+10>                                                  .
+11>                                                   b
+12>                                                    }></meta>
 1 >Emitted(10, 13) Source(13, 4) + SourceIndex(0)
 2 >Emitted(10, 37) Source(13, 10) + SourceIndex(0)
 3 >Emitted(10, 44) Source(13, 17) + SourceIndex(0)
 4 >Emitted(10, 46) Source(13, 19) + SourceIndex(0)
 5 >Emitted(10, 47) Source(13, 20) + SourceIndex(0)
 6 >Emitted(10, 48) Source(13, 21) + SourceIndex(0)
-7 >Emitted(10, 49) Source(13, 23) + SourceIndex(0)
-8 >Emitted(10, 50) Source(13, 24) + SourceIndex(0)
-9 >Emitted(10, 51) Source(13, 25) + SourceIndex(0)
-10>Emitted(10, 54) Source(13, 34) + SourceIndex(0)
+7 >Emitted(10, 49) Source(13, 22) + SourceIndex(0)
+8 >Emitted(10, 50) Source(13, 23) + SourceIndex(0)
+9 >Emitted(10, 51) Source(13, 28) + SourceIndex(0)
+10>Emitted(10, 52) Source(13, 29) + SourceIndex(0)
+11>Emitted(10, 53) Source(13, 30) + SourceIndex(0)
+12>Emitted(10, 56) Source(13, 39) + SourceIndex(0)
 ---
 >>>        ];
 1 >^^^^^^^^^

@@ -35,7 +35,7 @@ function getV(): Foo | Bar {
 >Foo : Symbol(Foo, Decl(narrowByParenthesizedSwitchExpression.ts, 2, 1))
 >Bar : Symbol(Bar, Decl(narrowByParenthesizedSwitchExpression.ts, 7, 1))
 
-  return null!;
+  return null as!;
 }
 
 const v = getV();

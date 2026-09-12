@@ -20,3 +20,17 @@ var Kvs_nullable_binding_requires_an_inferred_let_declaration_with_an_initialize
 	key:      "Kvs_nullable_binding_requires_an_inferred_let_declaration_with_an_initializer_100071",
 	text:     "A KVS nullable binding requires an inferred 'let' declaration with an initializer.",
 }
+
+var Kvs_terminal_default_requires_a_single_supported_primitive_or_array_family = &Message{
+	code:     100072,
+	category: CategoryError,
+	key:      "Kvs_terminal_default_requires_a_single_supported_primitive_or_array_family_100072",
+	text:     "KVS terminal '!' requires string, number, boolean, bigint, or a non-tuple array.",
+}
+
+var Kvs_terminal_default_cannot_determine_a_default_for_an_absence_only_type = &Message{
+	code:     100073,
+	category: CategoryError,
+	key:      "Kvs_terminal_default_cannot_determine_a_default_for_an_absence_only_type_100073",
+	text:     "KVS terminal '!' cannot determine a default value from an absence-only type.",
+}

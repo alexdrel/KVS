@@ -15,7 +15,7 @@ let month2 = result[2];
 let day1 = result.groups.day;
 let day2 = result[3];
 
-let foo = "foo".match(/(?<bar>foo)/)!.groups.foo;
+let foo = ("foo".match(/(?<bar>foo)/) as!).groups.foo;
 
 //// [useRegexpGroups.js]
 "use strict";
@@ -28,4 +28,4 @@ let month1 = result.groups.month;
 let month2 = result[2];
 let day1 = result.groups.day;
 let day2 = result[3];
-let foo = "foo".match(/(?<bar>foo)/).groups.foo;
+let foo = ("foo".match(/(?<bar>foo)/)).groups.foo;

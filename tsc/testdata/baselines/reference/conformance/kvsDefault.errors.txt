@@ -1,0 +1,51 @@
+kvsDefault.ts(23,1): error TS100072: KVS terminal '!' requires string, number, boolean, bigint, or a non-tuple array.
+kvsDefault.ts(26,1): error TS100072: KVS terminal '!' requires string, number, boolean, bigint, or a non-tuple array.
+kvsDefault.ts(29,1): error TS100072: KVS terminal '!' requires string, number, boolean, bigint, or a non-tuple array.
+kvsDefault.ts(31,1): error TS100073: KVS terminal '!' cannot determine a default value from an absence-only type.
+kvsDefault.ts(32,1): error TS100073: KVS terminal '!' cannot determine a default value from an absence-only type.
+
+
+==== kvsDefault.ts (5 errors) ====
+    declare const maybeString: string | null | undefined;
+    declare const maybeNumber: number | null;
+    declare const maybeBoolean: boolean | undefined;
+    declare const maybeBigInt: bigint | null;
+    declare const maybeStrings: string[] | null;
+    declare const maybeReadonlyNumbers: readonly number[] | undefined;
+    declare const maybeArrayFamily: string[] | readonly number[] | null;
+    
+    const stringValue = maybeString!;
+    const numberValue = maybeNumber!;
+    const booleanValue = maybeBoolean!;
+    const bigintValue = maybeBigInt!;
+    const strings = maybeStrings!;
+    const readonlyNumbers = maybeReadonlyNumbers!;
+    const arrayFamily = maybeArrayFamily!;
+    const stringLength = maybeString!.length;
+    const incremented = maybeNumber! + 1;
+    
+    declare const stringLiteral: "left" | "right" | null;
+    const literalValue = stringLiteral!;
+    
+    declare const mixed: string | number | null;
+    mixed!;
+    ~~~~~~
+!!! error TS100072: KVS terminal '!' requires string, number, boolean, bigint, or a non-tuple array.
+    
+    declare const tuple: [string, number] | null;
+    tuple!;
+    ~~~~~~
+!!! error TS100072: KVS terminal '!' requires string, number, boolean, bigint, or a non-tuple array.
+    
+    declare const object: { value: string } | null;
+    object!;
+    ~~~~~~~
+!!! error TS100072: KVS terminal '!' requires string, number, boolean, bigint, or a non-tuple array.
+    
+    null!;
+    ~~~~~
+!!! error TS100073: KVS terminal '!' cannot determine a default value from an absence-only type.
+    undefined!;
+    ~~~~~~~~~~
+!!! error TS100073: KVS terminal '!' cannot determine a default value from an absence-only type.
+    

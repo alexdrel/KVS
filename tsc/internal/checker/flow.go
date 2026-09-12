@@ -400,8 +400,10 @@ func (c *Checker) narrowType(f *FlowState, t *Type, expr *ast.Node, assumeTrue b
 		return c.narrowTypeByTruthiness(f, t, expr, assumeTrue)
 	case ast.KindCallExpression:
 		return c.narrowTypeByCallExpression(f, t, expr, assumeTrue)
-	case ast.KindParenthesizedExpression, ast.KindNonNullExpression, ast.KindSatisfiesExpression:
+	case ast.KindParenthesizedExpression, ast.KindNonNullExpression, ast.KindKvsExtantAssertionExpression, ast.KindSatisfiesExpression:
 		return c.narrowType(f, t, expr.Expression(), assumeTrue)
+	case ast.KindKvsExtantTestExpression:
+		return c.narrowTypeByOptionality(f, t, expr.Expression(), assumeTrue)
 	case ast.KindBinaryExpression:
 		return c.narrowTypeByBinaryExpression(f, t, expr.AsBinaryExpression(), assumeTrue)
 	case ast.KindPrefixUnaryExpression:
@@ -1596,7 +1598,7 @@ func (c *Checker) reportFlowControlError(node *ast.Node) {
 
 func (c *Checker) isMatchingReference(source *ast.Node, target *ast.Node) bool {
 	switch target.Kind {
-	case ast.KindParenthesizedExpression, ast.KindNonNullExpression:
+	case ast.KindParenthesizedExpression, ast.KindNonNullExpression, ast.KindKvsExtantAssertionExpression:
 		return c.isMatchingReference(source, target.Expression())
 	case ast.KindBinaryExpression:
 		return ast.IsAssignmentExpression(target, false) && c.isMatchingReference(source, target.AsBinaryExpression().Left) ||
@@ -1616,7 +1618,7 @@ func (c *Checker) isMatchingReference(source *ast.Node, target *ast.Node) bool {
 		return target.Kind == ast.KindThisKeyword
 	case ast.KindSuperKeyword:
 		return target.Kind == ast.KindSuperKeyword
-	case ast.KindNonNullExpression, ast.KindParenthesizedExpression, ast.KindSatisfiesExpression:
+	case ast.KindNonNullExpression, ast.KindKvsExtantAssertionExpression, ast.KindParenthesizedExpression, ast.KindSatisfiesExpression:
 		return c.isMatchingReference(source.Expression(), target)
 	case ast.KindPropertyAccessExpression, ast.KindElementAccessExpression:
 		if sourcePropertyName, ok := c.getAccessedPropertyName(source); ok {
@@ -1685,7 +1687,7 @@ func (c *Checker) writeFlowCacheKey(b *keyBuilder, node *ast.Node, declaredType 
 			b.writeNode(flowContainer)
 		}
 		return true
-	case ast.KindNonNullExpression, ast.KindParenthesizedExpression:
+	case ast.KindNonNullExpression, ast.KindKvsExtantAssertionExpression, ast.KindParenthesizedExpression:
 		return c.writeFlowCacheKey(b, node.Expression(), declaredType, initialType, flowContainer)
 	case ast.KindQualifiedName:
 		if !c.writeFlowCacheKey(b, node.AsQualifiedName().Left, declaredType, initialType, flowContainer) {

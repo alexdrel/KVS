@@ -82,12 +82,13 @@ var most: !string = 'definite';
 >most : string
 >'definite' : "definite"
 
+// Postfix forms are KVS types rather than JSDoc syntax.
 var postfixdef: number! = 101;
 >postfixdef : number
 >101 : 101
 
 var postfixopt: number? = undefined;
->postfixopt : number | null
+>postfixopt : number | null | undefined
 >undefined : undefined
 
 var nns: Array<?number>;
@@ -98,5 +99,4 @@ var dns: Array<!number>;
 
 var anys: Array<*>;
 >anys : any[]
-
 

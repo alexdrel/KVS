@@ -10,7 +10,7 @@ coAndContraVariantInferences5.ts(9,9): error TS2322: Type '(status: Thing | null
         options: SelectOptions<Thing>,
         onChange: (status: Thing | null) => void,
     ): void {
-        select({
+        selectValue({
             options,
             onChange,
             ~~~~~~~~
@@ -21,7 +21,7 @@ coAndContraVariantInferences5.ts(9,9): error TS2322: Type '(status: Thing | null
         });
     }
     
-    declare function select<KeyT extends string>(props: SelectProps<KeyT>): void;
+    declare function selectValue<KeyT extends string>(props: SelectProps<KeyT>): void;
     
     type SelectProps<KeyT extends string> = {
         options?: SelectOptions<KeyT>;

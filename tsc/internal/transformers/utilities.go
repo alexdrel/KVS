@@ -35,6 +35,7 @@ func IsIdentifierReference(name *ast.IdentifierNode, parent *ast.Node) bool {
 		ast.KindSatisfiesExpression,
 		ast.KindElementAccessExpression,
 		ast.KindNonNullExpression,
+		ast.KindKvsDefaultExpression,
 		ast.KindSpreadElement,
 		ast.KindSpreadAssignment,
 		ast.KindParenthesizedExpression,
@@ -96,6 +97,11 @@ func IsIdentifierReference(name *ast.IdentifierNode, parent *ast.Node) bool {
 		return parent.AsConditionalExpression().Condition == name ||
 			parent.AsConditionalExpression().WhenTrue == name ||
 			parent.AsConditionalExpression().WhenFalse == name
+	case ast.KindKvsNullingExpression:
+		return parent.AsKvsNullingExpression().Condition == name ||
+			parent.AsKvsNullingExpression().WhenTrue == name
+	case ast.KindKvsExtantTestExpression:
+		return parent.AsKvsExtantTestExpression().Expression == name
 	case ast.KindCallExpression, ast.KindNewExpression:
 		return parent.Expression() == name ||
 			slices.Contains(parent.Arguments(), name)

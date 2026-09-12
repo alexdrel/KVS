@@ -14,7 +14,7 @@ enum Foo {
   D = C + 'BAR',
 
   E1 = (`${BAR}`) as string, // We could recognize these,
-  E2 = `${BAR}`!,             // but Babel doesn't
+  E2 = `${BAR}` as!,             // but Babel doesn't
 
   F = BAR,
   G = 2 + BAR,

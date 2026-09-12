@@ -12,12 +12,12 @@ function takeMessageOrArray(message: Message | Message[]) { return message; }
 >Message : Symbol(Message, Decl(stableTypeOrdering.ts, 0, 0))
 >message : Symbol(message, Decl(stableTypeOrdering.ts, 2, 28))
 
-const result1 = takeMessageOrArray(null!);
+const result1 = takeMessageOrArray(null as!);
 >result1 : Symbol(result1, Decl(stableTypeOrdering.ts, 3, 5))
 >takeMessageOrArray : Symbol(takeMessageOrArray, Decl(stableTypeOrdering.ts, 0, 37))
 
 function checkType(x: string | number | boolean) {
->checkType : Symbol(checkType, Decl(stableTypeOrdering.ts, 3, 42))
+>checkType : Symbol(checkType, Decl(stableTypeOrdering.ts, 3, 45))
 >x : Symbol(x, Decl(stableTypeOrdering.ts, 5, 19))
 
     const t = typeof x;

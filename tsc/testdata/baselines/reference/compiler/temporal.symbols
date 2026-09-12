@@ -1263,7 +1263,7 @@
 >month : Symbol(month, Decl(temporal.ts, 372, 74))
 
     // Shuffle to improve poem as determined empirically
-    strings.unshift(strings.pop()!);
+    strings.unshift(strings.pop() as!);
 >strings.unshift : Symbol(Array.unshift, Decl(lib.es5.d.ts, --, --))
 >strings : Symbol(strings, Decl(temporal.ts, 372, 9))
 >unshift : Symbol(Array.unshift, Decl(lib.es5.d.ts, --, --))
@@ -1872,9 +1872,9 @@
 >now : Symbol(now, Decl(temporal.ts, 546, 9))
 >getTimeZoneTransition : Symbol(Temporal.ZonedDateTime.getTimeZoneTransition, Decl(lib.esnext.temporal.d.ts, --, --), Decl(lib.esnext.temporal.d.ts, --, --))
 
-    duration = nextTransition!.since(now);
+    duration = (nextTransition as!).since(now);
 >duration : Symbol(duration, Decl(temporal.ts, 543, 7))
->nextTransition!.since : Symbol(Temporal.ZonedDateTime.since, Decl(lib.esnext.temporal.d.ts, --, --))
+>(nextTransition as!).since : Symbol(Temporal.ZonedDateTime.since, Decl(lib.esnext.temporal.d.ts, --, --))
 >nextTransition : Symbol(nextTransition, Decl(temporal.ts, 547, 9))
 >since : Symbol(Temporal.ZonedDateTime.since, Decl(lib.esnext.temporal.d.ts, --, --))
 >now : Symbol(now, Decl(temporal.ts, 546, 9))
@@ -1891,7 +1891,7 @@
 >now : Symbol(now, Decl(temporal.ts, 546, 9))
 >getTimeZoneTransition : Symbol(Temporal.ZonedDateTime.getTimeZoneTransition, Decl(lib.esnext.temporal.d.ts, --, --), Decl(lib.esnext.temporal.d.ts, --, --))
 
-    duration = now.since(previousTransition!);
+    duration = now.since(previousTransition as!);
 >duration : Symbol(duration, Decl(temporal.ts, 543, 7))
 >now.since : Symbol(Temporal.ZonedDateTime.since, Decl(lib.esnext.temporal.d.ts, --, --))
 >now : Symbol(now, Decl(temporal.ts, 546, 9))
@@ -2547,7 +2547,7 @@
 >month : Symbol(month, Decl(temporal.ts, 707, 76))
 
     // Shuffle to improve poem as determined empirically
-    strings.unshift(strings.pop()!);
+    strings.unshift(strings.pop() as!);
 >strings.unshift : Symbol(Array.unshift, Decl(lib.es5.d.ts, --, --))
 >strings : Symbol(strings, Decl(temporal.ts, 707, 9))
 >unshift : Symbol(Array.unshift, Decl(lib.es5.d.ts, --, --))
@@ -4253,7 +4253,7 @@
 >month : Symbol(month, Decl(temporal.ts, 1130, 72))
 
     // Shuffle to improve poem as determined empirically
-    strings.unshift(strings.pop()!);
+    strings.unshift(strings.pop() as!);
 >strings.unshift : Symbol(Array.unshift, Decl(lib.es5.d.ts, --, --))
 >strings : Symbol(strings, Decl(temporal.ts, 1130, 9))
 >unshift : Symbol(Array.unshift, Decl(lib.es5.d.ts, --, --))
@@ -5139,7 +5139,7 @@
 >calendar : Symbol(calendar, Decl(temporal.ts, 1359, 87))
 
     // Shuffle to improve poem as determined empirically
-    strings.unshift(strings.pop()!);
+    strings.unshift(strings.pop() as!);
 >strings.unshift : Symbol(Array.unshift, Decl(lib.es5.d.ts, --, --))
 >strings : Symbol(strings, Decl(temporal.ts, 1359, 9))
 >unshift : Symbol(Array.unshift, Decl(lib.es5.d.ts, --, --))

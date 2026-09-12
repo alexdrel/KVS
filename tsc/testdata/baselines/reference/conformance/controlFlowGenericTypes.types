@@ -461,22 +461,22 @@ class TableBaseEnum<
     m() {
 >m : () => void
 
-        let iSpec = null! as InternalSpec;
+        let iSpec = null as! as InternalSpec;
 >iSpec : InternalSpec
->null! as InternalSpec : InternalSpec
->null! : never
+>null as! as InternalSpec : InternalSpec
+>null as! : never
 
-        iSpec[null! as keyof InternalSpec];  // Error, object possibly undefined
->iSpec[null! as keyof InternalSpec] : Record<keyof PublicSpec, any>[keyof InternalSpec]
+        iSpec[null as! as keyof InternalSpec];  // Error, object possibly undefined
+>iSpec[null as! as keyof InternalSpec] : Record<keyof PublicSpec, any>[keyof InternalSpec]
 >iSpec : Record<keyof PublicSpec, any> | undefined
->null! as keyof InternalSpec : keyof InternalSpec
->null! : never
+>null as! as keyof InternalSpec : keyof InternalSpec
+>null as! : never
 
-        iSpec[null! as keyof PublicSpec];    // Error, object possibly undefined
->iSpec[null! as keyof PublicSpec] : Record<keyof PublicSpec, any>[keyof PublicSpec]
+        iSpec[null as! as keyof PublicSpec];    // Error, object possibly undefined
+>iSpec[null as! as keyof PublicSpec] : Record<keyof PublicSpec, any>[keyof PublicSpec]
 >iSpec : Record<keyof PublicSpec, any> | undefined
->null! as keyof PublicSpec : keyof PublicSpec
->null! : never
+>null as! as keyof PublicSpec : keyof PublicSpec
+>null as! : never
 
         if (iSpec === undefined) {
 >iSpec === undefined : boolean
@@ -485,17 +485,17 @@ class TableBaseEnum<
 
             return;
         }
-        iSpec[null! as keyof InternalSpec];
->iSpec[null! as keyof InternalSpec] : Record<keyof PublicSpec, any>[keyof InternalSpec]
+        iSpec[null as! as keyof InternalSpec];
+>iSpec[null as! as keyof InternalSpec] : Record<keyof PublicSpec, any>[keyof InternalSpec]
 >iSpec : Record<keyof PublicSpec, any>
->null! as keyof InternalSpec : keyof InternalSpec
->null! : never
+>null as! as keyof InternalSpec : keyof InternalSpec
+>null as! : never
 
-        iSpec[null! as keyof PublicSpec];
->iSpec[null! as keyof PublicSpec] : Record<keyof PublicSpec, any>[keyof PublicSpec]
+        iSpec[null as! as keyof PublicSpec];
+>iSpec[null as! as keyof PublicSpec] : Record<keyof PublicSpec, any>[keyof PublicSpec]
 >iSpec : Record<keyof PublicSpec, any>
->null! as keyof PublicSpec : keyof PublicSpec
->null! : never
+>null as! as keyof PublicSpec : keyof PublicSpec
+>null as! : never
     }
 }
 

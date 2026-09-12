@@ -13,7 +13,7 @@ export namespace N {
     export type SpecialString = string;
 >SpecialString : Symbol(SpecialString, Decl(a.ts, 3, 20))
 }
-export const o = (p1: SpecialString, p2: PrivateSpecialString, p3: N.SpecialString) => null! as { foo: SpecialString, bar: PrivateSpecialString, baz: N.SpecialString };
+export const o = (p1: SpecialString, p2: PrivateSpecialString, p3: N.SpecialString) => null as! as { foo: SpecialString, bar: PrivateSpecialString, baz: N.SpecialString };
 >o : Symbol(o, Decl(a.ts, 6, 12))
 >p1 : Symbol(p1, Decl(a.ts, 6, 18))
 >SpecialString : Symbol(SpecialString, Decl(a.ts, 0, 0))
@@ -22,11 +22,11 @@ export const o = (p1: SpecialString, p2: PrivateSpecialString, p3: N.SpecialStri
 >p3 : Symbol(p3, Decl(a.ts, 6, 62))
 >N : Symbol(N, Decl(a.ts, 1, 35))
 >SpecialString : Symbol(N.SpecialString, Decl(a.ts, 3, 20))
->foo : Symbol(foo, Decl(a.ts, 6, 97))
+>foo : Symbol(foo, Decl(a.ts, 6, 100))
 >SpecialString : Symbol(SpecialString, Decl(a.ts, 0, 0))
->bar : Symbol(bar, Decl(a.ts, 6, 117))
+>bar : Symbol(bar, Decl(a.ts, 6, 120))
 >PrivateSpecialString : Symbol(PrivateSpecialString, Decl(a.ts, 0, 35))
->baz : Symbol(baz, Decl(a.ts, 6, 144))
+>baz : Symbol(baz, Decl(a.ts, 6, 147))
 >N : Symbol(N, Decl(a.ts, 1, 35))
 >SpecialString : Symbol(N.SpecialString, Decl(a.ts, 3, 20))
 

@@ -3,24 +3,25 @@
 === a.ts ===
 export const g = (v: "outer") => {
 >g : (v: "outer") => () => "inner"
->(v: "outer") => {    const f = (v: "inner") => () => null! as typeof v;    const r = f(null!)    return r;} : (v: "outer") => () => "inner"
+>(v: "outer") => {    const f = (v: "inner") => () => null as! as typeof v;    const r = f(null as!)    return r;} : (v: "outer") => () => "inner"
 >v : "outer"
 
-    const f = (v: "inner") => () => null! as typeof v;
+    const f = (v: "inner") => () => null as! as typeof v;
 >f : (v: "inner") => () => typeof v
->(v: "inner") => () => null! as typeof v : (v: "inner") => () => typeof v
+>(v: "inner") => () => null as! as typeof v : (v: "inner") => () => typeof v
 >v : "inner"
->() => null! as typeof v : () => typeof v
->null! as typeof v : "inner"
->null! : never
+>() => null as! as typeof v : () => typeof v
+>null as! as typeof v : "inner"
+>null as! : never
 >v : "inner"
 
-    const r = f(null!)
+    const r = f(null as!)
 >r : () => "inner"
->f(null!) : () => "inner"
+>f(null as!) : () => "inner"
 >f : (v: "inner") => () => typeof v
->null! : never
+>null as! : never
 
     return r;
 >r : () => "inner"
 }
+

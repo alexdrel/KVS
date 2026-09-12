@@ -10,7 +10,7 @@ const n4: number | undefined = a?.m?.({x: absorb()}); // likewise
 
 // Also a test showing `!` vs `?` for good measure
 let t1 = a?.m?.({x: 12});
-t1 = a!.m!({x: 12});
+t1 = ((a as!).m as!)({x: 12});
 
 //// [callChain.3.js]
 "use strict";
@@ -21,4 +21,4 @@ const n3 = (_c = a === null || a === void 0 ? void 0 : a.m) === null || _c === v
 const n4 = (_d = a === null || a === void 0 ? void 0 : a.m) === null || _d === void 0 ? void 0 : _d.call(a, { x: absorb() }); // likewise
 // Also a test showing `!` vs `?` for good measure
 let t1 = (_e = a === null || a === void 0 ? void 0 : a.m) === null || _e === void 0 ? void 0 : _e.call(a, { x: 12 });
-t1 = a.m({ x: 12 });
+t1 = ((a).m)({ x: 12 });

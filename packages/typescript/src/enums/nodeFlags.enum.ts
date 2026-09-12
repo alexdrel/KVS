@@ -33,6 +33,7 @@ export enum NodeFlags {
     ReparserTransformedLiteral = 1 << 28,
     KvsNullableBinding = 1 << 29,
     KvsExtantBinding = 1 << 30,
+    KvsImplicitSubject = 1 << 31,
     BlockScoped = Let | Const | Using,
     Constant = Const | Using,
     AwaitUsing = Const | Using,

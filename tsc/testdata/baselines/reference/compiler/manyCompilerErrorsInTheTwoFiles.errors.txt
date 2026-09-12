@@ -30,7 +30,7 @@
 
 [96ma.ts[0m:[93m3[0m:[93m1[0m - [91merror[0m[90m TS2304: [0mCannot find name 'OK'.
 
-[7m3[0m OK!
+[7m3[0m OK as!
 [7m [0m [91m~~[0m
 
 [96ma.ts[0m:[93m4[0m:[93m1[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
@@ -104,7 +104,7 @@
 !!! error TS18026: '#!' can only be used at the start of a file.
                       ~~
 !!! error TS18026: '#!' can only be used at the start of a file.
-    OK!
+    OK as!
     ~~
 !!! error TS2304: Cannot find name 'OK'.
     HERE's A shouty thing

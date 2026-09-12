@@ -61,14 +61,14 @@ type G<T = string> = {
 
 };
 
-export const x = (() => null! as ExpandRecursively<G>)();
+export const x = (() => null as! as ExpandRecursively<G>)();
 >x : Symbol(x, Decl(declarationEmitGenericTypeParamerSerialization2.ts, 16, 12))
 >ExpandRecursively : Symbol(ExpandRecursively, Decl(declarationEmitGenericTypeParamerSerialization2.ts, 0, 0))
 >G : Symbol(G, Decl(declarationEmitGenericTypeParamerSerialization2.ts, 2, 1))
 
 
 function makeV() {
->makeV : Symbol(makeV, Decl(declarationEmitGenericTypeParamerSerialization2.ts, 16, 57))
+>makeV : Symbol(makeV, Decl(declarationEmitGenericTypeParamerSerialization2.ts, 16, 60))
 
   type X<T> = {
 >X : Symbol(X, Decl(declarationEmitGenericTypeParamerSerialization2.ts, 19, 18))
@@ -117,11 +117,11 @@ function makeV() {
 >p : Symbol(p, Decl(declarationEmitGenericTypeParamerSerialization2.ts, 29, 26))
 >T : Symbol(T, Decl(declarationEmitGenericTypeParamerSerialization2.ts, 20, 9))
    }
-  return null! as X<number>
+  return null as! as X<number>
 >X : Symbol(X, Decl(declarationEmitGenericTypeParamerSerialization2.ts, 19, 18))
 }
 
 export const v = makeV();
 >v : Symbol(v, Decl(declarationEmitGenericTypeParamerSerialization2.ts, 34, 12))
->makeV : Symbol(makeV, Decl(declarationEmitGenericTypeParamerSerialization2.ts, 16, 57))
+>makeV : Symbol(makeV, Decl(declarationEmitGenericTypeParamerSerialization2.ts, 16, 60))
 

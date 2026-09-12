@@ -5,7 +5,7 @@
 class Message { value: string = ""; }
 
 function takeMessageOrArray(message: Message | Message[]) { return message; }
-const result1 = takeMessageOrArray(null!);
+const result1 = takeMessageOrArray(null as!);
 
 function checkType(x: string | number | boolean) {
     const t = typeof x;

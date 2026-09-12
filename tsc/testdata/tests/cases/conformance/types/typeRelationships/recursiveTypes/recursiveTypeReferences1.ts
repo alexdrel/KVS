@@ -106,7 +106,7 @@ function parse(node: Tree, index: number[] = []): HTMLUListElement {
   return html('ul', node.map(([el, children], i) => {
     const idx = [...index, i + 1];
     return html('li', [
-      html('a', { href: `#${el.id}`, rel: 'noopener', 'data-index': idx.join('.') }, el.textContent!),
+      html('a', { href: `#${el.id}`, rel: 'noopener', 'data-index': idx.join('.') }, el.textContent as!),
       children.length > 0 ? parse(children, idx) : frag()
     ]);
   }));
@@ -115,7 +115,7 @@ function parse(node: Tree, index: number[] = []): HTMLUListElement {
 function cons(hs: HTMLHeadingElement[]): Tree {
   return hs
     .reduce<HTMLHeadingElement[][]>((hss, h) => {
-      const hs = hss.pop()!;
+      const hs = hss.pop() as!;
       return hs.length === 0 || level(h) > level(hs[0])
         ? concat(hss, [concat(hs, [h])])
         : concat(hss, [hs, [h]]);
@@ -123,7 +123,7 @@ function cons(hs: HTMLHeadingElement[]): Tree {
     .reduce<Tree>((node, hs) =>
       hs.length === 0
         ? node
-        : concat<Tree[number]>(node, [[hs.shift()!, cons(hs)]])
+        : concat<Tree[number]>(node, [[hs.shift() as!, cons(hs)]])
     , []);
 }
 

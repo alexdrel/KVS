@@ -1,0 +1,83 @@
+//// [tests/cases/conformance/kvs/kvsNulling.ts] ////
+
+=== kvsNulling.ts ===
+declare const condition: boolean;
+>condition : boolean
+
+const value = condition ?: "ready";
+>value : "ready" | null
+>condition ?: "ready" : "ready" | null
+>condition : boolean
+>"ready" : "ready"
+
+value;
+>value : "ready" | null
+
+function useNarrowing(candidate: { length: number } | null) {
+>useNarrowing : (candidate: { length: number; } | null) => number | null
+>candidate : { length: number; } | null
+>length : number
+
+    return candidate ?: candidate.length;
+>candidate ?: candidate.length : number | null
+>candidate : { length: number; } | null
+>candidate.length : number
+>candidate : { length: number; }
+>length : number
+}
+
+const calculation = condition ?: 1 + 2;
+>calculation : number | null
+>condition ?: 1 + 2 : number | null
+>condition : boolean
+>1 + 2 : number
+>1 : 1
+>2 : 2
+
+const nested = condition ?: false ?: "ready";
+>nested : "ready" | null
+>condition ?: false ?: "ready" : "ready" | null
+>condition : boolean
+>false ?: "ready" : "ready" | null
+>false : false
+>"ready" : "ready"
+
+const mapper: ((value: string) => number) | null = condition ?: value => value.length;
+>mapper : ((value: string) => number) | null
+>value : string
+>condition ?: value => value.length : ((value: string) => number) | null
+>condition : boolean
+>value => value.length : (value: string) => number
+>value : string
+>value.length : number
+>value : string
+>length : number
+
+function describeCollected(items: string[]) {
+>describeCollected : (items: string[]) => "Items collected" | null
+>items : string[]
+
+    return collect (const item of items) {
+>collect (const item of items) {        yield item;    }.length > 0 ?: "Items collected" : "Items collected" | null
+>collect (const item of items) {        yield item;    }.length > 0 : boolean
+>collect (const item of items) {        yield item;    }.length : number
+>collect (const item of items) {        yield item;    } : string[]
+>item : string
+>items : string[]
+
+        yield item;
+>item : string
+
+    }.length > 0 ?: "Items collected";
+>length : number
+>0 : 0
+>"Items collected" : "Items collected"
+}
+
+const rejectSpaced = condition ? : "ready";
+>rejectSpaced : any
+>condition ? : "ready" : any
+>condition : boolean
+> : any
+>"ready" : "ready"
+

@@ -592,7 +592,7 @@ const Component = registerComponent('test-component', {
 >f : Symbol(f, Decl(neverReturningFunctions1.ts, 226, 10))
 
 		// Reference to system because both were registered with the same name.
-		return f * this.data.num * this.system!.data.counter;
+		return f * this.data.num * (this.system as!).data.counter;
 >f : Symbol(f, Decl(neverReturningFunctions1.ts, 226, 10))
 >this.data : Symbol(Component.data, Decl(neverReturningFunctions1.ts, 166, 19))
 >data : Symbol(Component.data, Decl(neverReturningFunctions1.ts, 166, 19))

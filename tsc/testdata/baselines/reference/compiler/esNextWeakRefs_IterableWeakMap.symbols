@@ -207,7 +207,7 @@ export class IterableWeakMap<K extends object, V> implements WeakMap<K, V> {
             return defaultValue;
 >defaultValue : Symbol(defaultValue, Decl(esNextWeakRefs_IterableWeakMap.ts, 49, 23))
         }
-        return this.get(key)!;
+        return this.get(key) as!;
 >this.get : Symbol(IterableWeakMap.get, Decl(esNextWeakRefs_IterableWeakMap.ts, 43, 5))
 >this : Symbol(IterableWeakMap, Decl(esNextWeakRefs_IterableWeakMap.ts, 6, 2))
 >get : Symbol(IterableWeakMap.get, Decl(esNextWeakRefs_IterableWeakMap.ts, 43, 5))
@@ -245,7 +245,7 @@ export class IterableWeakMap<K extends object, V> implements WeakMap<K, V> {
             return value;
 >value : Symbol(value, Decl(esNextWeakRefs_IterableWeakMap.ts, 59, 17))
         }
-        return this.get(key)!;
+        return this.get(key) as!;
 >this.get : Symbol(IterableWeakMap.get, Decl(esNextWeakRefs_IterableWeakMap.ts, 43, 5))
 >this : Symbol(IterableWeakMap, Decl(esNextWeakRefs_IterableWeakMap.ts, 6, 2))
 >get : Symbol(IterableWeakMap.get, Decl(esNextWeakRefs_IterableWeakMap.ts, 43, 5))
@@ -327,7 +327,7 @@ export class IterableWeakMap<K extends object, V> implements WeakMap<K, V> {
 >key : Symbol(key, Decl(esNextWeakRefs_IterableWeakMap.ts, 82, 17))
 >undefined : Symbol(undefined)
 
-            const { value } = this.#weakMap.get(key)!;
+            const { value } = this.#weakMap.get(key) as!;
 >value : Symbol(value, Decl(esNextWeakRefs_IterableWeakMap.ts, 84, 19))
 >this.#weakMap.get : Symbol(WeakMap.get, Decl(lib.es2015.collection.d.ts, --, --))
 >this.#weakMap : Symbol(IterableWeakMap.#weakMap, Decl(esNextWeakRefs_IterableWeakMap.ts, 10, 61))
@@ -389,9 +389,9 @@ Object.defineProperties(IterableWeakMap.prototype, {
         writable: true,
 >writable : Symbol(writable, Decl(esNextWeakRefs_IterableWeakMap.ts, 105, 26))
 
-        value: Object.getOwnPropertyDescriptor(
+        value: (Object.getOwnPropertyDescriptor(
 >value : Symbol(value, Decl(esNextWeakRefs_IterableWeakMap.ts, 106, 23))
->Object.getOwnPropertyDescriptor(            IterableWeakMap.prototype,            "entries",        )!.value : Symbol(PropertyDescriptor.value, Decl(lib.es5.d.ts, --, --))
+>(Object.getOwnPropertyDescriptor(            IterableWeakMap.prototype,            "entries",        ) as!).value : Symbol(PropertyDescriptor.value, Decl(lib.es5.d.ts, --, --))
 >Object.getOwnPropertyDescriptor : Symbol(ObjectConstructor.getOwnPropertyDescriptor, Decl(lib.es5.d.ts, --, --))
 >Object : Symbol(Object, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --))
 >getOwnPropertyDescriptor : Symbol(ObjectConstructor.getOwnPropertyDescriptor, Decl(lib.es5.d.ts, --, --))
@@ -402,7 +402,7 @@ Object.defineProperties(IterableWeakMap.prototype, {
 >prototype : Symbol(IterableWeakMap.prototype)
 
             "entries",
-        )!.value,
+        ) as!).value,
 >value : Symbol(PropertyDescriptor.value, Decl(lib.es5.d.ts, --, --))
 
     },

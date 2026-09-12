@@ -27,5 +27,5 @@ async function* f(): AsyncGenerator<"NOT_FOUND_AUTHOR" | "NOT_FOUND_BOOK", BookW
     const x1 = yield* g();
     const x2: number = yield* g();
 
-    return null! as BookWithAuthor;
+    return null as! as BookWithAuthor;
 }

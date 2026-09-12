@@ -185,11 +185,18 @@ import type {
     KeywordTypeNode,
     KeywordTypeSyntaxKind,
     KvsCollectExpression,
+    KvsDefaultExpression,
     KvsExtantAssertionExpression,
     KvsExtantAssignmentExpression,
     KvsExtantReturnStatement,
+    KvsExtantTestExpression,
+    KvsExtantType,
     KvsExtantYieldStatement,
+    KvsIfBindingClause,
+    KvsIfBindingStatement,
     KvsNullableAssertionExpression,
+    KvsNullableType,
+    KvsNullingExpression,
     KvsSelectExpression,
     KvsYieldStatement,
     LabeledStatement,
@@ -555,6 +562,24 @@ export declare namespace isKvsExtantYieldStatement {
 }
 isKvsExtantYieldStatement.Handle = isKvsExtantYieldStatement as any;
 
+export function isKvsIfBindingStatement(node: Node): node is KvsIfBindingStatement {
+    return node.kind === SyntaxKind.KvsIfBindingStatement;
+}
+
+export declare namespace isKvsIfBindingStatement {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsIfBindingStatement>;
+}
+isKvsIfBindingStatement.Handle = isKvsIfBindingStatement as any;
+
+export function isKvsIfBindingClause(node: Node): node is KvsIfBindingClause {
+    return node.kind === SyntaxKind.KvsIfBindingClause;
+}
+
+export declare namespace isKvsIfBindingClause {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsIfBindingClause>;
+}
+isKvsIfBindingClause.Handle = isKvsIfBindingClause as any;
+
 export function isKvsNullableAssertionExpression(node: Node): node is KvsNullableAssertionExpression {
     return node.kind === SyntaxKind.KvsNullableAssertionExpression;
 }
@@ -581,6 +606,33 @@ export declare namespace isKvsExtantAssignmentExpression {
     function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsExtantAssignmentExpression>;
 }
 isKvsExtantAssignmentExpression.Handle = isKvsExtantAssignmentExpression as any;
+
+export function isKvsExtantTestExpression(node: Node): node is KvsExtantTestExpression {
+    return node.kind === SyntaxKind.KvsExtantTestExpression;
+}
+
+export declare namespace isKvsExtantTestExpression {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsExtantTestExpression>;
+}
+isKvsExtantTestExpression.Handle = isKvsExtantTestExpression as any;
+
+export function isKvsDefaultExpression(node: Node): node is KvsDefaultExpression {
+    return node.kind === SyntaxKind.KvsDefaultExpression;
+}
+
+export declare namespace isKvsDefaultExpression {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsDefaultExpression>;
+}
+isKvsDefaultExpression.Handle = isKvsDefaultExpression as any;
+
+export function isKvsNullingExpression(node: Node): node is KvsNullingExpression {
+    return node.kind === SyntaxKind.KvsNullingExpression;
+}
+
+export declare namespace isKvsNullingExpression {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsNullingExpression>;
+}
+isKvsNullingExpression.Handle = isKvsNullingExpression as any;
 
 export function isKvsCollectExpression(node: Node): node is KvsCollectExpression {
     return node.kind === SyntaxKind.KvsCollectExpression;
@@ -1502,6 +1554,24 @@ export declare namespace isOptionalTypeNode {
     function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, OptionalTypeNode>;
 }
 isOptionalTypeNode.Handle = isOptionalTypeNode as any;
+
+export function isKvsNullableType(node: Node): node is KvsNullableType {
+    return node.kind === SyntaxKind.KvsNullableType;
+}
+
+export declare namespace isKvsNullableType {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsNullableType>;
+}
+isKvsNullableType.Handle = isKvsNullableType as any;
+
+export function isKvsExtantType(node: Node): node is KvsExtantType {
+    return node.kind === SyntaxKind.KvsExtantType;
+}
+
+export declare namespace isKvsExtantType {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsExtantType>;
+}
+isKvsExtantType.Handle = isKvsExtantType as any;
 
 export function isRestTypeNode(node: Node): node is RestTypeNode {
     return node.kind === SyntaxKind.RestType;

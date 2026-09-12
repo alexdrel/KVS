@@ -241,76 +241,102 @@ function collectNestedValues(groups: Item[][]) {
 >values : Symbol(values, Decl(kvsCollect.ts, 66, 9))
 }
 
-function consume(_values: string[]) {}
->consume : Symbol(consume, Decl(kvsCollect.ts, 72, 1))
->_values : Symbol(_values, Decl(kvsCollect.ts, 74, 17))
-
-function rejectNestedPlacement(items: Item[]) {
->rejectNestedPlacement : Symbol(rejectNestedPlacement, Decl(kvsCollect.ts, 74, 38))
->items : Symbol(items, Decl(kvsCollect.ts, 76, 31))
+declare function getOptionalItems(): Item[] | null | undefined;
+>getOptionalItems : Symbol(getOptionalItems, Decl(kvsCollect.ts, 72, 1))
 >Item : Symbol(Item, Decl(kvsCollect.ts, 0, 0))
 
-    consume(collect (const item of items) {
->consume : Symbol(consume, Decl(kvsCollect.ts, 72, 1))
->item : Symbol(item, Decl(kvsCollect.ts, 77, 26))
->items : Symbol(items, Decl(kvsCollect.ts, 76, 31))
+function collectOptionalItems() {
+>collectOptionalItems : Symbol(collectOptionalItems, Decl(kvsCollect.ts, 74, 63))
+
+    const values = collect (const item of getOptionalItems()) {
+>values : Symbol(values, Decl(kvsCollect.ts, 77, 9))
+>item : Symbol(item, Decl(kvsCollect.ts, 77, 33))
+>getOptionalItems : Symbol(getOptionalItems, Decl(kvsCollect.ts, 72, 1))
 
         yield item.value;
 >item.value : Symbol(Item.value, Decl(kvsCollect.ts, 0, 16))
->item : Symbol(item, Decl(kvsCollect.ts, 77, 26))
+>item : Symbol(item, Decl(kvsCollect.ts, 77, 33))
+>value : Symbol(Item.value, Decl(kvsCollect.ts, 0, 16))
+
+    };
+    const expected: string[] | null = values;
+>expected : Symbol(expected, Decl(kvsCollect.ts, 80, 9))
+>values : Symbol(values, Decl(kvsCollect.ts, 77, 9))
+
+    return expected;
+>expected : Symbol(expected, Decl(kvsCollect.ts, 80, 9))
+}
+
+function consume(_values: string[]) {}
+>consume : Symbol(consume, Decl(kvsCollect.ts, 82, 1))
+>_values : Symbol(_values, Decl(kvsCollect.ts, 84, 17))
+
+function rejectNestedPlacement(items: Item[]) {
+>rejectNestedPlacement : Symbol(rejectNestedPlacement, Decl(kvsCollect.ts, 84, 38))
+>items : Symbol(items, Decl(kvsCollect.ts, 86, 31))
+>Item : Symbol(Item, Decl(kvsCollect.ts, 0, 0))
+
+    consume(collect (const item of items) {
+>consume : Symbol(consume, Decl(kvsCollect.ts, 82, 1))
+>item : Symbol(item, Decl(kvsCollect.ts, 87, 26))
+>items : Symbol(items, Decl(kvsCollect.ts, 86, 31))
+
+        yield item.value;
+>item.value : Symbol(Item.value, Decl(kvsCollect.ts, 0, 16))
+>item : Symbol(item, Decl(kvsCollect.ts, 87, 26))
 >value : Symbol(Item.value, Decl(kvsCollect.ts, 0, 16))
 
     });
 }
 
 function rejectRightOperand(items: Item[]) {
->rejectRightOperand : Symbol(rejectRightOperand, Decl(kvsCollect.ts, 80, 1))
->items : Symbol(items, Decl(kvsCollect.ts, 82, 28))
+>rejectRightOperand : Symbol(rejectRightOperand, Decl(kvsCollect.ts, 90, 1))
+>items : Symbol(items, Decl(kvsCollect.ts, 92, 28))
 >Item : Symbol(Item, Decl(kvsCollect.ts, 0, 0))
 
     return 1 + collect (const item of items) {
->item : Symbol(item, Decl(kvsCollect.ts, 83, 29))
->items : Symbol(items, Decl(kvsCollect.ts, 82, 28))
+>item : Symbol(item, Decl(kvsCollect.ts, 93, 29))
+>items : Symbol(items, Decl(kvsCollect.ts, 92, 28))
 
         yield item.value;
 >item.value : Symbol(Item.value, Decl(kvsCollect.ts, 0, 16))
->item : Symbol(item, Decl(kvsCollect.ts, 83, 29))
+>item : Symbol(item, Decl(kvsCollect.ts, 93, 29))
 >value : Symbol(Item.value, Decl(kvsCollect.ts, 0, 16))
 
     };
 }
 
 function rejectConditionalBranch(items: Item[], condition: boolean) {
->rejectConditionalBranch : Symbol(rejectConditionalBranch, Decl(kvsCollect.ts, 86, 1))
->items : Symbol(items, Decl(kvsCollect.ts, 88, 33))
+>rejectConditionalBranch : Symbol(rejectConditionalBranch, Decl(kvsCollect.ts, 96, 1))
+>items : Symbol(items, Decl(kvsCollect.ts, 98, 33))
 >Item : Symbol(Item, Decl(kvsCollect.ts, 0, 0))
->condition : Symbol(condition, Decl(kvsCollect.ts, 88, 47))
+>condition : Symbol(condition, Decl(kvsCollect.ts, 98, 47))
 
     return condition ? [] : collect (const item of items) {
->condition : Symbol(condition, Decl(kvsCollect.ts, 88, 47))
->item : Symbol(item, Decl(kvsCollect.ts, 89, 42))
->items : Symbol(items, Decl(kvsCollect.ts, 88, 33))
+>condition : Symbol(condition, Decl(kvsCollect.ts, 98, 47))
+>item : Symbol(item, Decl(kvsCollect.ts, 99, 42))
+>items : Symbol(items, Decl(kvsCollect.ts, 98, 33))
 
         yield item.value;
 >item.value : Symbol(Item.value, Decl(kvsCollect.ts, 0, 16))
->item : Symbol(item, Decl(kvsCollect.ts, 89, 42))
+>item : Symbol(item, Decl(kvsCollect.ts, 99, 42))
 >value : Symbol(Item.value, Decl(kvsCollect.ts, 0, 16))
 
     };
 }
 
 function rejectSpacedYield(items: Item[]) {
->rejectSpacedYield : Symbol(rejectSpacedYield, Decl(kvsCollect.ts, 92, 1))
->items : Symbol(items, Decl(kvsCollect.ts, 94, 27))
+>rejectSpacedYield : Symbol(rejectSpacedYield, Decl(kvsCollect.ts, 102, 1))
+>items : Symbol(items, Decl(kvsCollect.ts, 104, 27))
 >Item : Symbol(Item, Decl(kvsCollect.ts, 0, 0))
 
     return collect (const item of items) {
->item : Symbol(item, Decl(kvsCollect.ts, 95, 25))
->items : Symbol(items, Decl(kvsCollect.ts, 94, 27))
+>item : Symbol(item, Decl(kvsCollect.ts, 105, 25))
+>items : Symbol(items, Decl(kvsCollect.ts, 104, 27))
 
         yield ? item.optionalValue;
 >item.optionalValue : Symbol(Item.optionalValue, Decl(kvsCollect.ts, 2, 22))
->item : Symbol(item, Decl(kvsCollect.ts, 95, 25))
+>item : Symbol(item, Decl(kvsCollect.ts, 105, 25))
 >optionalValue : Symbol(Item.optionalValue, Decl(kvsCollect.ts, 2, 22))
 
     };

@@ -23,6 +23,5 @@ o6<number>()?.x;
 // GH#34109
 o1?.b ? 1 : 0;
 
-// GH#36031
-o2?.b!.c;
-o2?.b!.c!;
+// GH#36031 covered TypeScript `!` inside an optional chain; KVS keeps only the terminal assertion.
+o2?.b.c as!;

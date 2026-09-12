@@ -20,7 +20,7 @@ export class WithData {
     }
 }
 
-export const a = (new WithData())["ahahahaahah"]!();
+export const a = ((new WithData())["ahahahaahah"] as!)();
 >a : Symbol(a, Decl(declarationEmitComputedNameWithQuestionToken.ts, 9, 12))
 >WithData : Symbol(WithData, Decl(declarationEmitComputedNameWithQuestionToken.ts, 1, 58))
 

@@ -18,11 +18,11 @@ function f(
 >Thing : Symbol(Thing, Decl(coAndContraVariantInferences5.ts, 0, 0))
 
 ): void {
-    select({
->select : Symbol(select, Decl(coAndContraVariantInferences5.ts, 10, 1))
+    selectValue({
+>selectValue : Symbol(selectValue, Decl(coAndContraVariantInferences5.ts, 10, 1))
 
         options,
->options : Symbol(options, Decl(coAndContraVariantInferences5.ts, 6, 12))
+>options : Symbol(options, Decl(coAndContraVariantInferences5.ts, 6, 17))
 
         onChange,
 >onChange : Symbol(onChange, Decl(coAndContraVariantInferences5.ts, 7, 16))
@@ -30,15 +30,15 @@ function f(
     });
 }
 
-declare function select<KeyT extends string>(props: SelectProps<KeyT>): void;
->select : Symbol(select, Decl(coAndContraVariantInferences5.ts, 10, 1))
->KeyT : Symbol(KeyT, Decl(coAndContraVariantInferences5.ts, 12, 24))
->props : Symbol(props, Decl(coAndContraVariantInferences5.ts, 12, 45))
->SelectProps : Symbol(SelectProps, Decl(coAndContraVariantInferences5.ts, 12, 77))
->KeyT : Symbol(KeyT, Decl(coAndContraVariantInferences5.ts, 12, 24))
+declare function selectValue<KeyT extends string>(props: SelectProps<KeyT>): void;
+>selectValue : Symbol(selectValue, Decl(coAndContraVariantInferences5.ts, 10, 1))
+>KeyT : Symbol(KeyT, Decl(coAndContraVariantInferences5.ts, 12, 29))
+>props : Symbol(props, Decl(coAndContraVariantInferences5.ts, 12, 50))
+>SelectProps : Symbol(SelectProps, Decl(coAndContraVariantInferences5.ts, 12, 82))
+>KeyT : Symbol(KeyT, Decl(coAndContraVariantInferences5.ts, 12, 29))
 
 type SelectProps<KeyT extends string> = {
->SelectProps : Symbol(SelectProps, Decl(coAndContraVariantInferences5.ts, 12, 77))
+>SelectProps : Symbol(SelectProps, Decl(coAndContraVariantInferences5.ts, 12, 82))
 >KeyT : Symbol(KeyT, Decl(coAndContraVariantInferences5.ts, 14, 17))
 
     options?: SelectOptions<KeyT>;

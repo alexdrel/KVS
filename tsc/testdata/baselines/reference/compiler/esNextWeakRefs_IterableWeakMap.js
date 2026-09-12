@@ -55,7 +55,7 @@ export class IterableWeakMap<K extends object, V> implements WeakMap<K, V> {
             this.set(key, defaultValue);
             return defaultValue;
         }
-        return this.get(key)!;
+        return this.get(key) as!;
     }
 
     getOrInsertComputed(key: K, callback: (key: K) => V): V {
@@ -64,7 +64,7 @@ export class IterableWeakMap<K extends object, V> implements WeakMap<K, V> {
             this.set(key, value);
             return value;
         }
-        return this.get(key)!;
+        return this.get(key) as!;
     }
 
     delete(key: K): boolean {
@@ -85,7 +85,7 @@ export class IterableWeakMap<K extends object, V> implements WeakMap<K, V> {
         for (const ref of this.#refSet) {
             const key = ref.deref();
             if (key === undefined) continue;
-            const { value } = this.#weakMap.get(key)!;
+            const { value } = this.#weakMap.get(key) as!;
             yield [key, value];
         }
     }
@@ -108,10 +108,10 @@ Object.defineProperties(IterableWeakMap.prototype, {
         configurable: true,
         enumerable: false,
         writable: true,
-        value: Object.getOwnPropertyDescriptor(
+        value: (Object.getOwnPropertyDescriptor(
             IterableWeakMap.prototype,
             "entries",
-        )!.value,
+        ) as!).value,
     },
     [Symbol.toStringTag]: {
         configurable: true,
@@ -212,7 +212,7 @@ Object.defineProperties(IterableWeakMap.prototype, {
         configurable: true,
         enumerable: false,
         writable: true,
-        value: Object.getOwnPropertyDescriptor(IterableWeakMap.prototype, "entries").value,
+        value: (Object.getOwnPropertyDescriptor(IterableWeakMap.prototype, "entries")).value,
     },
     [Symbol.toStringTag]: {
         configurable: true,

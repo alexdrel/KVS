@@ -34,7 +34,7 @@ function f3(x: unknown) {
 >f3 : Symbol(f3, Decl(nonNullableTypes1.ts, 10, 1))
 >x : Symbol(x, Decl(nonNullableTypes1.ts, 12, 12))
 
-    let y = x!;  // {}
+    let y = x as!;  // {}
 >y : Symbol(y, Decl(nonNullableTypes1.ts, 13, 7))
 >x : Symbol(x, Decl(nonNullableTypes1.ts, 12, 12))
 }

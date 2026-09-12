@@ -33,6 +33,7 @@ export var NodeFlags: any;
     NodeFlags[NodeFlags["ReparserTransformedLiteral"] = 268435456] = "ReparserTransformedLiteral";
     NodeFlags[NodeFlags["KvsNullableBinding"] = 536870912] = "KvsNullableBinding";
     NodeFlags[NodeFlags["KvsExtantBinding"] = 1073741824] = "KvsExtantBinding";
+    NodeFlags[NodeFlags["KvsImplicitSubject"] = -2147483648] = "KvsImplicitSubject";
     NodeFlags[NodeFlags["BlockScoped"] = 7] = "BlockScoped";
     NodeFlags[NodeFlags["Constant"] = 6] = "Constant";
     NodeFlags[NodeFlags["AwaitUsing"] = 6] = "AwaitUsing";

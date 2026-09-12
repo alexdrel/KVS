@@ -625,12 +625,12 @@ export abstract class BB {
 >update : (id: Id<AA>) => void
 >id : `${string}-${string}`
 
-        this.get(id!);
->this.get(id!) : void
+        this.get(id as!);
+>this.get(id as!) : void
 >this.get : (id: Id<AA>) => void
 >this : this
 >get : (id: Id<AA>) => void
->id! : `${string}-${string}`
+>id as! : `${string}-${string}`
 >id : `${string}-${string}`
     }
 }

@@ -1,4 +1,4 @@
-kvsSelect.ts(38,17): error TS100070: KVS 'select' must be at the head of a supported value expression.
+kvsSelect.ts(46,17): error TS100070: KVS 'select' must be at the head of a supported value expression.
 
 
 ==== kvsSelect.ts (1 errors) ====
@@ -35,6 +35,14 @@ kvsSelect.ts(38,17): error TS100070: KVS 'select' must be at the head of a suppo
             value: select (const group of groups) {
                 yield? group.candidates[0];
             } ?? 0,
+        };
+    }
+    
+    declare function getOptionalGroups(): Group[] | null | undefined;
+    
+    function selectFromOptionalGroups() {
+        return select (const group of getOptionalGroups()) {
+            yield? group.candidates[0];
         };
     }
     

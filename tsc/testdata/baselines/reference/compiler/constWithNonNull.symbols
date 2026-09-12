@@ -6,6 +6,6 @@
 declare const x: number | undefined;
 >x : Symbol(x, Decl(constWithNonNull.ts, 2, 13))
 
-x!++;
+(x as!)++;
 >x : Symbol(x, Decl(constWithNonNull.ts, 2, 13))
 

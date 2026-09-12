@@ -5,7 +5,7 @@
 import * as React from "react";
 
 function MyComp2(props: { className?: string, htmlFor?: string }) {
-    return null!;
+    return (null as!);
 }
 class MyComp extends React.Component<{ className?: string, htmlFor?: string }> { }
 <a class="" />;
@@ -22,7 +22,7 @@ class MyComp extends React.Component<{ className?: string, htmlFor?: string }> {
 /// <reference path="/.lib/react16.d.ts" />
 import * as React from "react";
 function MyComp2(props) {
-    return null;
+    return (null);
 }
 class MyComp extends React.Component {
 }

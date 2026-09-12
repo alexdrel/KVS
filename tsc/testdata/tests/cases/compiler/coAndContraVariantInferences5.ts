@@ -8,13 +8,13 @@ function f(
     options: SelectOptions<Thing>,
     onChange: (status: Thing | null) => void,
 ): void {
-    select({
+    selectValue({
         options,
         onChange,
     });
 }
 
-declare function select<KeyT extends string>(props: SelectProps<KeyT>): void;
+declare function selectValue<KeyT extends string>(props: SelectProps<KeyT>): void;
 
 type SelectProps<KeyT extends string> = {
     options?: SelectOptions<KeyT>;

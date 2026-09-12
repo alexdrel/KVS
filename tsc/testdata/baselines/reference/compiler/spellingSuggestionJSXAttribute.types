@@ -11,8 +11,9 @@ function MyComp2(props: { className?: string, htmlFor?: string }) {
 >className : string | undefined
 >htmlFor : string | undefined
 
-    return null!;
->null! : never
+    return (null as!);
+>(null as!) : never
+>null as! : never
 }
 class MyComp extends React.Component<{ className?: string, htmlFor?: string }> { }
 >MyComp : MyComp

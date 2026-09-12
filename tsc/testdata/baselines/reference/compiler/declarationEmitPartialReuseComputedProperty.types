@@ -14,11 +14,11 @@ export const neg = -1;
 >-1 : -1
 >1 : 1
 
-export const o = () => null! as { [n]: string, foo: string, [poz]: number, [neg]: number }
+export const o = () => null as! as { [n]: string, foo: string, [poz]: number, [neg]: number }
 >o : () => { [n]: string; foo: string; [poz]: number; [neg]: number; }
->() => null! as { [n]: string, foo: string, [poz]: number, [neg]: number } : () => { [n]: string; foo: string; [poz]: number; [neg]: number; }
->null! as { [n]: string, foo: string, [poz]: number, [neg]: number } : { A: string; foo: string; 1: number; [-1]: number; }
->null! : never
+>() => null as! as { [n]: string, foo: string, [poz]: number, [neg]: number } : () => { [n]: string; foo: string; [poz]: number; [neg]: number; }
+>null as! as { [n]: string, foo: string, [poz]: number, [neg]: number } : { A: string; foo: string; 1: number; [-1]: number; }
+>null as! : never
 >[n] : string
 >n : "A"
 >foo : string

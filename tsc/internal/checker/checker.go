@@ -2340,7 +2340,7 @@ func (c *Checker) checkSourceElementWorker(node *ast.Node) {
 		c.checkTupleType(node)
 	case ast.KindUnionType, ast.KindIntersectionType:
 		c.checkUnionOrIntersectionType(node)
-	case ast.KindParenthesizedType, ast.KindOptionalType, ast.KindRestType:
+	case ast.KindParenthesizedType, ast.KindOptionalType, ast.KindKvsNullableType, ast.KindKvsExtantType, ast.KindRestType:
 		node.ForEachChild(c.checkSourceElement)
 	case ast.KindThisType:
 		c.checkThisType(node)
@@ -2370,6 +2370,8 @@ func (c *Checker) checkSourceElementWorker(node *ast.Node) {
 		c.checkExpressionStatement(node)
 	case ast.KindIfStatement:
 		c.checkIfStatement(node)
+	case ast.KindKvsIfBindingStatement:
+		c.checkKvsIfBindingStatement(node)
 	case ast.KindDoStatement:
 		c.checkDoStatement(node)
 	case ast.KindWhileStatement:
@@ -3836,6 +3838,24 @@ func (c *Checker) checkIfStatement(node *ast.Node) {
 		c.error(data.ThenStatement, diagnostics.The_body_of_an_if_statement_cannot_be_the_empty_statement)
 	}
 	c.checkSourceElement(data.ElseStatement)
+}
+
+func (c *Checker) checkKvsIfBindingStatement(node *ast.Node) {
+	c.checkGrammarStatementInAmbientContext(node)
+	data := node.AsKvsIfBindingStatement()
+	clause := data.Clause.AsKvsIfBindingClause()
+	c.checkGrammarVariableDeclarationList(clause.DeclarationList.AsVariableDeclarationList())
+	c.checkVariableDeclarationList(clause.DeclarationList)
+	t := c.checkTruthinessExpression(clause.Condition, CheckModeNormal)
+	c.checkTestingKnownTruthyCallableOrAwaitableOrEnumMemberType(clause.Condition, t, clause.Statement)
+	c.checkSourceElement(clause.Statement)
+	if ast.IsEmptyStatement(clause.Statement) {
+		c.error(clause.Statement, diagnostics.The_body_of_an_if_statement_cannot_be_the_empty_statement)
+	}
+	c.checkSourceElement(data.ElseStatement)
+	if len(clause.AsNode().Locals()) != 0 {
+		c.registerForUnusedIdentifiersCheck(clause.AsNode())
+	}
 }
 
 func (c *Checker) checkTestingKnownTruthyCallableOrAwaitableOrEnumMemberType(condExpr *ast.Node, condType *Type, body *ast.Node) {
@@ -6076,7 +6096,12 @@ func (c *Checker) checkVariableLikeDeclaration(node *ast.Node) {
 			// check the binding pattern with empty elements
 			if needCheckWidenedType {
 				if ast.IsArrayBindingPattern(name) {
-					c.checkIteratedTypeOrElementType(IterationUseDestructuring, widenedType, c.undefinedType, node)
+					parent := node.Parent.Parent
+					absenceOnlyForOf := ast.IsForOfStatement(parent) && parent.AsForInOrOfStatement().AwaitModifier == nil &&
+						c.isKvsAbsenceOnlyType(c.checkExpression(parent.Expression()))
+					if !absenceOnlyForOf {
+						c.checkIteratedTypeOrElementType(IterationUseDestructuring, widenedType, c.undefinedType, node)
+					}
 				} else if c.strictNullChecks {
 					c.checkNonNullNonVoidType(widenedType, node)
 				}
@@ -7252,8 +7277,8 @@ func (c *Checker) checkUnusedIdentifiers(potentiallyUnusedIdentifiers []*ast.Nod
 		case ast.KindClassDeclaration, ast.KindClassExpression:
 			c.checkUnusedClassMembers(node)
 			c.checkUnusedTypeParameters(node)
-		case ast.KindSourceFile, ast.KindModuleDeclaration, ast.KindBlock, ast.KindCaseBlock, ast.KindForStatement, ast.KindForInStatement,
-			ast.KindForOfStatement:
+		case ast.KindSourceFile, ast.KindModuleDeclaration, ast.KindBlock, ast.KindCaseBlock, ast.KindKvsIfBindingClause, ast.KindForStatement, ast.KindForInStatement,
+			ast.KindForOfStatement, ast.KindKvsCollectExpression, ast.KindKvsSelectExpression:
 			c.checkUnusedLocalsAndParameters(node)
 		case ast.KindConstructor, ast.KindFunctionExpression, ast.KindFunctionDeclaration, ast.KindArrowFunction, ast.KindMethodDeclaration,
 			ast.KindGetAccessor, ast.KindSetAccessor:
@@ -8013,6 +8038,8 @@ func (c *Checker) checkExpressionWorker(node *ast.Node, checkMode CheckMode) *Ty
 		return c.checkBinaryExpression(node, checkMode)
 	case ast.KindConditionalExpression:
 		return c.checkConditionalExpression(node, checkMode)
+	case ast.KindKvsNullingExpression:
+		return c.checkKvsNullingExpression(node, checkMode)
 	case ast.KindSpreadElement:
 		return c.checkSpreadExpression(node, checkMode)
 	case ast.KindOmittedExpression:
@@ -8022,9 +8049,14 @@ func (c *Checker) checkExpressionWorker(node *ast.Node, checkMode CheckMode) *Ty
 	case ast.KindKvsNullableAssertionExpression:
 		return c.getNullableType(c.checkExpressionEx(node.Expression(), checkMode), TypeFlagsNullable)
 	case ast.KindKvsExtantAssertionExpression:
-		return c.GetNonNullableType(c.checkExpressionEx(node.Expression(), checkMode))
+		return c.checkNonNullAssertion(node)
 	case ast.KindKvsExtantAssignmentExpression:
 		return c.checkKvsExtantAssignmentExpression(node, checkMode)
+	case ast.KindKvsExtantTestExpression:
+		c.checkExpressionEx(node.Expression(), checkMode)
+		return c.booleanType
+	case ast.KindKvsDefaultExpression:
+		return c.checkKvsDefaultExpression(node, checkMode)
 	case ast.KindKvsCollectExpression:
 		return c.checkKvsCollectExpression(node)
 	case ast.KindKvsSelectExpression:
@@ -8045,6 +8077,34 @@ func (c *Checker) checkExpressionWorker(node *ast.Node, checkMode CheckMode) *Ty
 		panic("Should never directly check a JsxOpeningElement")
 	}
 	return c.errorType
+}
+
+func (c *Checker) checkKvsDefaultExpression(node *ast.Node, checkMode CheckMode) *Type {
+	operandType := c.checkExpressionEx(node.Expression(), checkMode)
+	presentType := c.GetNonNullableType(operandType)
+	if presentType.flags&TypeFlagsNever != 0 && operandType.flags&TypeFlagsNullable != 0 {
+		c.error(node, diagnostics.Kvs_terminal_default_cannot_determine_a_default_for_an_absence_only_type)
+	} else if c.getKvsDefaultKindForType(presentType) == ast.KvsDefaultKindUnsupported {
+		c.error(node, diagnostics.Kvs_terminal_default_requires_a_single_supported_primitive_or_array_family)
+	}
+	return presentType
+}
+
+func (c *Checker) getKvsDefaultKindForType(t *Type) ast.KvsDefaultKind {
+	switch {
+	case everyType(t, func(part *Type) bool { return part.flags&TypeFlagsStringLike != 0 }):
+		return ast.KvsDefaultKindString
+	case everyType(t, func(part *Type) bool { return part.flags&TypeFlagsNumberLike != 0 }):
+		return ast.KvsDefaultKindNumber
+	case everyType(t, func(part *Type) bool { return part.flags&TypeFlagsBooleanLike != 0 }):
+		return ast.KvsDefaultKindBoolean
+	case everyType(t, func(part *Type) bool { return part.flags&TypeFlagsBigIntLike != 0 }):
+		return ast.KvsDefaultKindBigInt
+	case everyType(t, func(part *Type) bool { return c.isArrayType(part) && !isTupleType(part) }):
+		return ast.KvsDefaultKindArray
+	default:
+		return ast.KvsDefaultKindUnsupported
+	}
 }
 
 func (c *Checker) checkPrivateIdentifierExpression(node *ast.Node) *Type {
@@ -11170,6 +11230,14 @@ func (c *Checker) checkConditionalExpression(node *ast.Node, checkMode CheckMode
 	return c.getUnionTypeEx([]*Type{type1, type2}, UnionReductionSubtype, nil, nil)
 }
 
+func (c *Checker) checkKvsNullingExpression(node *ast.Node, checkMode CheckMode) *Type {
+	expr := node.AsKvsNullingExpression()
+	t := c.checkTruthinessExpression(expr.Condition, checkMode)
+	c.checkTestingKnownTruthyCallableOrAwaitableOrEnumMemberType(expr.Condition, t, expr.WhenTrue)
+	whenTrueType := c.checkExpressionEx(expr.WhenTrue, checkMode)
+	return c.getUnionTypeEx([]*Type{whenTrueType, c.nullType}, UnionReductionSubtype, nil, nil)
+}
+
 func (c *Checker) checkTruthinessExpression(node *ast.Node, checkMode CheckMode) *Type {
 	return c.checkTruthinessOfType(c.checkExpressionEx(node, checkMode), node)
 }
@@ -13154,6 +13222,8 @@ func (c *Checker) getSyntacticTruthySemantics(node *ast.Node) PredicateSemantics
 		return PredicateSemanticsNever
 	case ast.KindConditionalExpression:
 		return c.getSyntacticTruthySemantics(node.AsConditionalExpression().WhenTrue) | c.getSyntacticTruthySemantics(node.AsConditionalExpression().WhenFalse)
+	case ast.KindKvsNullingExpression:
+		return c.getSyntacticTruthySemantics(node.AsKvsNullingExpression().WhenTrue) | PredicateSemanticsNever
 	case ast.KindIdentifier:
 		if c.getResolvedSymbol(node) == c.undefinedSymbol {
 			return PredicateSemanticsNever
@@ -13241,6 +13311,8 @@ func (c *Checker) getSyntacticNullishnessSemantics(node *ast.Node) PredicateSema
 		return PredicateSemanticsNever
 	case ast.KindConditionalExpression:
 		return c.getSyntacticNullishnessSemantics(node.AsConditionalExpression().WhenTrue) | c.getSyntacticNullishnessSemantics(node.AsConditionalExpression().WhenFalse)
+	case ast.KindKvsNullingExpression:
+		return c.getSyntacticNullishnessSemantics(node.AsKvsNullingExpression().WhenTrue) | PredicateSemanticsAlways
 	case ast.KindNullKeyword:
 		return PredicateSemanticsAlways
 	case ast.KindIdentifier:
@@ -13271,6 +13343,8 @@ func (c *Checker) isSideEffectFree(node *ast.Node) bool {
 		return true
 	case ast.KindConditionalExpression:
 		return c.isSideEffectFree(node.AsConditionalExpression().WhenTrue) && c.isSideEffectFree(node.AsConditionalExpression().WhenFalse)
+	case ast.KindKvsNullingExpression:
+		return c.isSideEffectFree(node.AsKvsNullingExpression().WhenTrue)
 	case ast.KindBinaryExpression:
 		if ast.IsAssignmentOperator(node.AsBinaryExpression().OperatorToken.Kind) {
 			return false
@@ -17035,7 +17109,6 @@ func (c *Checker) getTypeForVariableLikeDeclaration(declaration *ast.Node, inclu
 		return c.getTypeForBindingElement(declaration)
 	}
 	isProperty := ast.IsPropertyDeclaration(declaration) && !ast.HasAccessorModifier(declaration) || ast.IsPropertySignatureDeclaration(declaration)
-	isOptional := includeOptionality && isOptionalDeclaration(declaration)
 	// Use type from type annotation if one is present
 	declaredType := c.tryGetTypeFromTypeNode(declaration)
 	if ast.IsCatchClauseVariableDeclarationOrBindingElement(declaration) {
@@ -17055,7 +17128,7 @@ func (c *Checker) getTypeForVariableLikeDeclaration(declaration *ast.Node, inclu
 		}
 	}
 	if declaredType != nil {
-		return c.addOptionalityEx(declaredType, isProperty, isOptional)
+		return c.addOptionalityEx(declaredType, isProperty, includeOptionality && isOptionalDeclaration(declaration))
 	}
 	if c.noImplicitAny && ast.IsVariableDeclaration(declaration) && !ast.IsBindingPattern(declaration.Name()) &&
 		c.getCombinedModifierFlagsCached(declaration)&ast.ModifierFlagsExport == 0 && declaration.Flags&ast.NodeFlagsAmbient == 0 {
@@ -17103,7 +17176,7 @@ func (c *Checker) getTypeForVariableLikeDeclaration(declaration *ast.Node, inclu
 			t = c.getContextuallyTypedParameterType(declaration)
 		}
 		if t != nil {
-			return c.addOptionalityEx(t, false /*isProperty*/, isOptional)
+			return c.addOptionalityEx(t, false /*isProperty*/, includeOptionality && isOptionalDeclaration(declaration))
 		}
 	}
 	// Use the type of the initializer expression if one is present and the declaration is
@@ -17116,7 +17189,7 @@ func (c *Checker) getTypeForVariableLikeDeclaration(declaration *ast.Node, inclu
 		if declaration.Flags&ast.NodeFlagsKvsExtantBinding != 0 {
 			return c.GetNonNullableType(t)
 		}
-		return c.addOptionalityEx(t, isProperty, isOptional)
+		return c.addOptionalityEx(t, isProperty, includeOptionality && isOptionalDeclaration(declaration))
 	}
 	if c.noImplicitAny && ast.IsPropertyDeclaration(declaration) {
 		// We have a property declaration with no type annotation or initializer, in noImplicitAny mode or a .js file.
@@ -17133,7 +17206,7 @@ func (c *Checker) getTypeForVariableLikeDeclaration(declaration *ast.Node, inclu
 			if t == nil {
 				return nil
 			}
-			return c.addOptionalityEx(t, true /*isProperty*/, isOptional)
+			return c.addOptionalityEx(t, true /*isProperty*/, includeOptionality && isOptionalDeclaration(declaration))
 		} else {
 			staticBlocks := core.Filter(declaration.Parent.Members(), ast.IsClassStaticBlockDeclaration)
 			var t *Type
@@ -17146,7 +17219,7 @@ func (c *Checker) getTypeForVariableLikeDeclaration(declaration *ast.Node, inclu
 			if t == nil {
 				return nil
 			}
-			return c.addOptionalityEx(t, true /*isProperty*/, isOptional)
+			return c.addOptionalityEx(t, true /*isProperty*/, includeOptionality && isOptionalDeclaration(declaration))
 		}
 	}
 	if ast.IsJsxAttribute(declaration) {
@@ -18065,7 +18138,21 @@ func (c *Checker) checkRightHandSideOfForOf(statement *ast.Node) *Type {
 	if statement.Kind == ast.KindForOfStatement && statement.AsForInOrOfStatement().AwaitModifier != nil {
 		use = IterationUseForAwaitOf
 	}
-	return c.checkIteratedTypeOrElementType(use, c.checkNonNullExpression(statement.Expression()), c.undefinedType, statement.Expression())
+	sourceType := c.checkExpression(statement.Expression())
+	if use == IterationUseForOf {
+		absenceOnly := c.isKvsAbsenceOnlyType(sourceType)
+		sourceType = c.GetNonNullableType(sourceType)
+		if absenceOnly {
+			return sourceType
+		}
+	} else {
+		sourceType = c.checkNonNullType(sourceType, statement.Expression())
+	}
+	return c.checkIteratedTypeOrElementType(use, sourceType, c.undefinedType, statement.Expression())
+}
+
+func (c *Checker) isKvsAbsenceOnlyType(t *Type) bool {
+	return t.flags&TypeFlagsNullable != 0 && c.GetNonNullableType(t).flags&TypeFlagsNever != 0
 }
 
 func (c *Checker) checkKvsCollectExpression(node *ast.Node) *Type {
@@ -18116,7 +18203,11 @@ func (c *Checker) checkKvsProducerExpression(node *ast.Node, initializer *ast.Fo
 	if selectProducer {
 		return c.getUnionType([]*Type{elementType, c.nullType})
 	}
-	return c.createArrayType(elementType)
+	result := c.createArrayType(elementType)
+	if c.maybeTypeOfKind(c.checkExpressionCached(expression), TypeFlagsNullable) {
+		return c.getUnionType([]*Type{result, c.nullType})
+	}
+	return result
 }
 
 // Return the inferred type for a binding element
@@ -23333,6 +23424,10 @@ func (c *Checker) getTypeFromTypeNodeWorker(node *ast.Node) *Type {
 		return c.getTypeFromArrayOrTupleTypeNode(node)
 	case ast.KindOptionalType:
 		return c.getTypeFromOptionalTypeNode(node)
+	case ast.KindKvsNullableType:
+		return c.getNullableType(c.getTypeFromTypeNode(node.Type()), TypeFlagsNullable)
+	case ast.KindKvsExtantType:
+		return c.GetNonNullableType(c.getTypeFromTypeNode(node.Type()))
 	case ast.KindUnionType:
 		return c.getTypeFromUnionTypeNode(node)
 	case ast.KindIntersectionType:
@@ -24630,7 +24725,7 @@ func (c *Checker) getArrayOrTupleTargetType(node *ast.Node) *Type {
 		}
 		return c.globalArrayType
 	}
-	return c.getTupleTargetType(core.Map(node.Elements(), c.getTupleElementInfo), readonly)
+	return c.getTupleTargetType(c.getTupleElementInfos(node.Elements()), readonly)
 }
 
 func (c *Checker) isReadonlyTypeOperator(node *ast.Node) bool {
@@ -25206,6 +25301,26 @@ func (c *Checker) getTupleElementInfo(node *ast.Node) TupleElementInfo {
 		flags:              c.getTupleElementFlags(node),
 		labeledDeclaration: core.IfElse(ast.IsNamedTupleMember(node) || ast.IsParameterDeclaration(node), node, nil),
 	}
+}
+
+func (c *Checker) getTupleElementInfos(elements []*ast.Node) []TupleElementInfo {
+	infos := core.Map(elements, c.getTupleElementInfo)
+	trailing := true
+	for i := len(elements) - 1; i >= 0; i-- {
+		element := elements[i]
+		typeNode := element
+		if ast.IsNamedTupleMember(element) {
+			typeNode = element.Type()
+		}
+		typeNode = ast.SkipTypeParentheses(typeNode)
+		if trailing && infos[i].flags == ElementFlagsRequired && ast.IsKvsNullableType(typeNode) {
+			infos[i].flags = ElementFlagsOptional
+		}
+		if infos[i].flags != ElementFlagsOptional {
+			trailing = false
+		}
+	}
+	return infos
 }
 
 func (c *Checker) createTupleType(elementTypes []*Type) *Type {
@@ -29235,6 +29350,8 @@ func (c *Checker) getEntityNameForDecoratorMetadata(node *ast.Node) *ast.Node {
 		return c.getEntityNameForDecoratorMetadataFromTypeList([]*ast.Node{node.AsConditionalTypeNode().TrueType, node.AsConditionalTypeNode().FalseType})
 	case ast.KindParenthesizedType:
 		return c.getEntityNameForDecoratorMetadata(node.AsParenthesizedTypeNode().Type)
+	case ast.KindKvsNullableType, ast.KindKvsExtantType:
+		return c.getEntityNameForDecoratorMetadata(node.Type())
 	case ast.KindNamedTupleMember:
 		return c.getEntityNameForDecoratorMetadata(node.AsNamedTupleMember().Type)
 	case ast.KindTypeReference:
@@ -29863,11 +29980,16 @@ func (c *Checker) getContextualType(node *ast.Node, contextFlags ContextFlags) *
 		return c.getContextualTypeForElementExpression(t, elementIndex, len(parent.Elements()), firstSpreadIndex, lastSpreadIndex)
 	case ast.KindConditionalExpression:
 		return c.getContextualTypeForConditionalOperand(node, contextFlags)
+	case ast.KindKvsNullingExpression:
+		if node == parent.AsKvsNullingExpression().WhenTrue {
+			return c.getContextualType(parent, contextFlags)
+		}
+		return nil
 	case ast.KindTemplateSpan:
 		return c.getContextualTypeForSubstitutionExpression(parent.Parent, node)
 	case ast.KindParenthesizedExpression:
 		return c.getContextualType(parent, contextFlags)
-	case ast.KindNonNullExpression:
+	case ast.KindNonNullExpression, ast.KindKvsExtantAssertionExpression:
 		return c.getContextualType(parent, contextFlags)
 	case ast.KindSatisfiesExpression:
 		return c.getTypeFromTypeNode(parent.Type())
@@ -31380,6 +31502,8 @@ func (c *Checker) isContextSensitive(node *ast.Node) bool {
 		return core.Some(node.Elements(), c.isContextSensitive)
 	case ast.KindConditionalExpression:
 		return c.isContextSensitive(node.AsConditionalExpression().WhenTrue) || c.isContextSensitive(node.AsConditionalExpression().WhenFalse)
+	case ast.KindKvsNullingExpression:
+		return c.isContextSensitive(node.AsKvsNullingExpression().WhenTrue)
 	case ast.KindBinaryExpression:
 		binary := node.AsBinaryExpression()
 		return ast.NodeKindIs(binary.OperatorToken, ast.KindBarBarToken, ast.KindQuestionQuestionToken) && (c.isContextSensitive(binary.Left) || c.isContextSensitive(binary.Right))

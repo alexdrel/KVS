@@ -16,3 +16,6 @@ const firstOpenChannel = select (const station of stations) {
 } ?? "No open channel";
 
 console.log(firstOpenChannel);
+
+const singleChannel = select (stations) { yield? _.channels.length == 1 ?: _.name };
+console.log(singleChannel);

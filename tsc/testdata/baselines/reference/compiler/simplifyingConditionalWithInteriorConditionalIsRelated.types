@@ -16,8 +16,8 @@ function ConditionalOrUndefined<T>(): ConditionalType<T> | undefined {
 function JustConditional<T>(): ConditionalType<T> {
 >JustConditional : <T>() => ConditionalType<T>
 
-    return ConditionalOrUndefined<T>()!; // shouldn't error
->ConditionalOrUndefined<T>()! : ConditionalType<T>
+    return ConditionalOrUndefined<T>() as!; // shouldn't error
+>ConditionalOrUndefined<T>() as! : ConditionalType<T>
 >ConditionalOrUndefined<T>() : ConditionalType<T> | undefined
 >ConditionalOrUndefined : <T_1>() => ConditionalType<T_1> | undefined
 }
@@ -35,8 +35,8 @@ function genericOrUndefined<T>(): T | undefined {
 function JustGeneric<T>(): T {
 >JustGeneric : <T>() => T
 
-    return genericOrUndefined<T>()!; // no error
->genericOrUndefined<T>()! : NonNullable<T>
+    return genericOrUndefined<T>() as!; // no error
+>genericOrUndefined<T>() as! : NonNullable<T>
 >genericOrUndefined<T>() : T | undefined
 >genericOrUndefined : <T_1>() => T_1 | undefined
 }

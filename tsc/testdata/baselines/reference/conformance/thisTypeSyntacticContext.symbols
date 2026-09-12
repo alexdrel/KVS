@@ -26,22 +26,22 @@ o.test();
 >o : Symbol(o, Decl(thisTypeSyntacticContext.ts, 3, 5))
 >test : Symbol(test, Decl(thisTypeSyntacticContext.ts, 3, 21))
 
-o!.test();
->o!.test : Symbol(test, Decl(thisTypeSyntacticContext.ts, 3, 21))
+(o as!).test();
+>(o as!).test : Symbol(test, Decl(thisTypeSyntacticContext.ts, 3, 21))
 >o : Symbol(o, Decl(thisTypeSyntacticContext.ts, 3, 5))
 >test : Symbol(test, Decl(thisTypeSyntacticContext.ts, 3, 21))
 
-o.test!();
+(o.test as!)();
 >o.test : Symbol(test, Decl(thisTypeSyntacticContext.ts, 3, 21))
 >o : Symbol(o, Decl(thisTypeSyntacticContext.ts, 3, 5))
 >test : Symbol(test, Decl(thisTypeSyntacticContext.ts, 3, 21))
 
-o.test!!!();
+(o.test as! as! as!)();
 >o.test : Symbol(test, Decl(thisTypeSyntacticContext.ts, 3, 21))
 >o : Symbol(o, Decl(thisTypeSyntacticContext.ts, 3, 5))
 >test : Symbol(test, Decl(thisTypeSyntacticContext.ts, 3, 21))
 
-(o.test!)();
+(o.test as!)();
 >o.test : Symbol(test, Decl(thisTypeSyntacticContext.ts, 3, 21))
 >o : Symbol(o, Decl(thisTypeSyntacticContext.ts, 3, 5))
 >test : Symbol(test, Decl(thisTypeSyntacticContext.ts, 3, 21))

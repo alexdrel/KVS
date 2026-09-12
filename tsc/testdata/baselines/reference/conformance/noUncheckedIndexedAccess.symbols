@@ -218,7 +218,7 @@ function generic2<T extends { [s: string]: boolean }>(arg: T): boolean {
 >T : Symbol(T, Decl(noUncheckedIndexedAccess.ts, 56, 18))
 
     // Should OK
-    return arg["blah"]!;
+    return arg["blah"] as!;
 >arg : Symbol(arg, Decl(noUncheckedIndexedAccess.ts, 56, 54))
 }
 function generic3<T extends string>(arg: T): boolean {

@@ -84,6 +84,7 @@ type Parser struct {
 	functionDepth               int
 	kvsProducerActive           bool
 	kvsProducerFunctionDepth    int
+	parsingConditionalTypePart  bool
 	hasDeprecatedTag            bool
 	hasParseError               bool
 
@@ -1265,6 +1266,28 @@ func (p *Parser) parseIfStatement() *ast.Node {
 	p.parseExpected(ast.KindIfKeyword)
 	openParenPosition := p.scanner.TokenStart()
 	openParenParsed := p.parseExpected(ast.KindOpenParenToken)
+	if p.token == ast.KindConstKeyword {
+		p.nextToken()
+		declaration := p.parseVariableDeclaration()
+		declarationList := p.finishNode(
+			p.factory.NewVariableDeclarationList(p.factory.NewNodeList([]*ast.Node{declaration}), ast.NodeFlagsConst),
+			declaration.Pos(),
+		)
+		name := declaration.Name()
+		if name.Kind != ast.KindIdentifier {
+			p.parseErrorAt(name.Pos(), name.End(), diagnostics.Variable_declaration_expected)
+		}
+		p.parseExpectedMatchingBrackets(ast.KindOpenParenToken, ast.KindCloseParenToken, openParenParsed, openParenPosition)
+		thenStatement := p.parseStatement()
+		var elseStatement *ast.Statement
+		if p.parseOptional(ast.KindElseKeyword) {
+			elseStatement = p.parseStatement()
+		}
+		clause := p.finishNode(p.factory.NewKvsIfBindingClause(declarationList, thenStatement), declaration.Pos())
+		result := p.finishNode(p.factory.NewKvsIfBindingStatement(clause, elseStatement), pos)
+		p.withJSDoc(result, jsdoc)
+		return result
+	}
 	expression := p.parseExpressionAllowIn()
 	p.parseExpectedMatchingBrackets(ast.KindOpenParenToken, ast.KindCloseParenToken, openParenParsed, openParenPosition)
 	thenStatement := p.parseStatement()
@@ -1334,6 +1357,11 @@ func (p *Parser) parseForOrForInOrForOfStatement() *ast.Node {
 		expression := doInContext(p, ast.NodeFlagsDisallowInContext, false, (*Parser).parseAssignmentExpressionOrHigher)
 		p.parseExpected(ast.KindCloseParenToken)
 		result = p.factory.NewForInOrOfStatement(ast.KindForOfStatement, awaitToken, initializer, expression, p.parseStatement())
+	case awaitToken == nil && p.token == ast.KindCloseParenToken && initializer != nil && initializer.Pos() < initializer.End() && !ast.IsVariableDeclarationList(initializer):
+		p.nextToken()
+		statement := p.parseStatement()
+		result = p.factory.NewForInOrOfStatement(ast.KindForOfStatement, nil, p.newKvsImplicitSubjectInitializer(initializer, statement), initializer, statement)
+		result.Flags |= ast.NodeFlagsKvsImplicitSubject
 	case p.parseOptional(ast.KindInKeyword):
 		expression := p.parseExpressionAllowIn()
 		p.parseExpected(ast.KindCloseParenToken)
@@ -2711,7 +2739,7 @@ func (p *Parser) parseType() *ast.TypeNode {
 		typeNode = p.parseUnionTypeOrHigher()
 		if !p.inDisallowConditionalTypesContext() && !p.hasPrecedingLineBreak() && p.parseOptional(ast.KindExtendsKeyword) {
 			// The type following 'extends' is not permitted to be another conditional type
-			extendsType := doInContext(p, ast.NodeFlagsDisallowConditionalTypesContext, true, (*Parser).parseType)
+			extendsType := p.parseConditionalTypePart()
 			p.parseExpected(ast.KindQuestionToken)
 			trueType := doInContext(p, ast.NodeFlagsDisallowConditionalTypesContext, false, (*Parser).parseType)
 			p.parseExpected(ast.KindColonToken)
@@ -2799,7 +2827,7 @@ func (p *Parser) parseTypeParameterOfInferType() *ast.Node {
 func (p *Parser) tryParseConstraintOfInferType() *ast.Node {
 	state := p.mark()
 	if p.parseOptional(ast.KindExtendsKeyword) {
-		constraint := doInContext(p, ast.NodeFlagsDisallowConditionalTypesContext, true, (*Parser).parseType)
+		constraint := p.parseConditionalTypePart()
 		if p.inDisallowConditionalTypesContext() || p.token != ast.KindQuestionToken {
 			return constraint
 		}
@@ -2814,15 +2842,31 @@ func (p *Parser) parsePostfixTypeOrHigher() *ast.Node {
 	for !p.hasPrecedingLineBreak() {
 		switch p.token {
 		case ast.KindExclamationToken:
-			p.nextToken()
-			typeNode = p.finishNode(p.factory.NewJSDocNonNullableType(typeNode), pos)
+			if p.contextFlags&ast.NodeFlagsJSDoc == 0 {
+				if p.scanner.TokenStart() != typeNode.End() {
+					return typeNode
+				}
+				exclamationToken := p.parseTokenNode()
+				typeNode = p.finishNode(p.factory.NewKvsExtantType(typeNode, exclamationToken), pos)
+			} else {
+				p.nextToken()
+				typeNode = p.finishNode(p.factory.NewJSDocNonNullableType(typeNode), pos)
+			}
 		case ast.KindQuestionToken:
 			// If next token is start of a type we have a conditional type
-			if p.lookAhead((*Parser).nextIsStartOfType) {
+			if (p.contextFlags&ast.NodeFlagsJSDoc != 0 || p.parsingConditionalTypePart) && p.lookAhead((*Parser).nextIsStartOfType) {
 				return typeNode
 			}
-			p.nextToken()
-			typeNode = p.finishNode(p.factory.NewJSDocNullableType(typeNode), pos)
+			if p.contextFlags&ast.NodeFlagsJSDoc == 0 {
+				if p.scanner.TokenStart() != typeNode.End() {
+					return typeNode
+				}
+				questionToken := p.parseTokenNode()
+				typeNode = p.finishNode(p.factory.NewKvsNullableType(typeNode, questionToken), pos)
+			} else {
+				p.nextToken()
+				typeNode = p.finishNode(p.factory.NewJSDocNullableType(typeNode), pos)
+			}
 		case ast.KindOpenBracketToken:
 			p.parseExpected(ast.KindOpenBracketToken)
 			if p.isStartOfType(false /*isStartOfParameter*/) {
@@ -2843,6 +2887,14 @@ func (p *Parser) parsePostfixTypeOrHigher() *ast.Node {
 func (p *Parser) nextIsStartOfType() bool {
 	p.nextToken()
 	return p.isStartOfType(false /*inStartOfParameter*/)
+}
+
+func (p *Parser) parseConditionalTypePart() *ast.TypeNode {
+	saved := p.parsingConditionalTypePart
+	p.parsingConditionalTypePart = true
+	typeNode := doInContext(p, ast.NodeFlagsDisallowConditionalTypesContext, true, (*Parser).parseType)
+	p.parsingConditionalTypePart = saved
+	return typeNode
 }
 
 func (p *Parser) parseNonArrayType() *ast.Node {
@@ -3867,9 +3919,37 @@ func (p *Parser) parseFunctionOrConstructorTypeToError(isInUnionType bool, parse
 
 func (p *Parser) isStartOfFunctionTypeOrConstructorType() bool {
 	return p.token == ast.KindLessThanToken ||
-		p.token == ast.KindOpenParenToken && p.lookAhead((*Parser).nextIsUnambiguouslyStartOfFunctionType) ||
+		p.token == ast.KindOpenParenToken && !p.lookAhead((*Parser).nextIsParenthesizedKvsPostfixType) && p.lookAhead((*Parser).nextIsUnambiguouslyStartOfFunctionType) ||
 		p.token == ast.KindNewKeyword ||
 		p.token == ast.KindAbstractKeyword && p.lookAhead((*Parser).nextTokenIsNewKeyword)
+}
+
+func (p *Parser) nextIsParenthesizedKvsPostfixType() bool {
+	p.nextToken()
+	depth := 0
+	previousEnd := -1
+	foundPostfixType := false
+	for p.token != ast.KindEndOfFile {
+		switch p.token {
+		case ast.KindOpenParenToken:
+			depth++
+		case ast.KindCloseParenToken:
+			if depth == 0 {
+				isFunctionType := p.lookAhead(func(p *Parser) bool { return p.nextToken() == ast.KindEqualsGreaterThanToken })
+				return foundPostfixType && !isFunctionType
+			}
+			depth--
+		case ast.KindQuestionToken:
+			if p.scanner.TokenStart() == previousEnd && !p.lookAhead(func(p *Parser) bool { return p.nextToken() == ast.KindColonToken }) {
+				foundPostfixType = true
+			}
+		case ast.KindExclamationToken:
+			foundPostfixType = foundPostfixType || p.scanner.TokenStart() == previousEnd
+		}
+		previousEnd = p.scanner.TokenEnd()
+		p.nextToken()
+	}
+	return false
 }
 
 func (p *Parser) parseFunctionOrConstructorType() *ast.TypeNode {
@@ -4666,6 +4746,12 @@ func (p *Parser) parseSimpleArrowFunctionExpression(pos int, identifier *ast.Nod
 
 func (p *Parser) parseConditionalExpressionRest(leftOperand *ast.Expression, pos int, allowReturnTypeInArrowFunction bool) *ast.Expression {
 	// Note: we are passed in an expression which was produced from parseBinaryExpressionOrHigher.
+	if p.isKvsNullingOperator(leftOperand) {
+		questionToken := p.parseTokenNode()
+		colonToken := p.parseTokenNode()
+		whenTrue := p.parseAssignmentExpressionOrHigherWorker(allowReturnTypeInArrowFunction)
+		return p.finishNode(p.factory.NewKvsNullingExpression(leftOperand, questionToken, colonToken, whenTrue), pos)
+	}
 	questionToken := p.parseOptionalToken(ast.KindQuestionToken)
 	if questionToken == nil {
 		return leftOperand
@@ -4684,6 +4770,33 @@ func (p *Parser) parseConditionalExpressionRest(leftOperand *ast.Expression, pos
 		falseExpression = p.createMissingIdentifier()
 	}
 	return p.finishNode(p.factory.NewConditionalExpression(leftOperand, questionToken, trueExpression, colonToken, falseExpression), pos)
+}
+
+func (p *Parser) isKvsNullingOperator(leftOperand *ast.Node) bool {
+	if p.token != ast.KindQuestionToken {
+		return false
+	}
+	questionEnd := p.scanner.TokenEnd()
+	return p.lookAhead(func(p *Parser) bool {
+		if p.nextToken() != ast.KindColonToken || p.scanner.TokenStart() != questionEnd {
+			return false
+		}
+		p.nextToken()
+		if ast.IsIdentifier(leftOperand) && p.isStartOfType(false /*inStartOfParameter*/) {
+			if p.lookAhead(func(p *Parser) bool {
+				p.nextToken()
+				return p.token == ast.KindCommaToken || p.token == ast.KindCloseParenToken ||
+					p.token == ast.KindEqualsToken || p.token == ast.KindOpenBraceToken
+			}) {
+				return false
+			}
+			p.parseType()
+			if p.token == ast.KindCommaToken || p.token == ast.KindCloseParenToken || p.token == ast.KindEqualsToken {
+				return false
+			}
+		}
+		return true
+	})
 }
 
 func (p *Parser) parseBinaryExpressionOrHigher(precedence ast.OperatorPrecedence) *ast.Expression {
@@ -4854,12 +4967,29 @@ func (p *Parser) parseUpdateExpression() *ast.Expression {
 		return p.parseJsxElementOrSelfClosingElementOrFragment(true /*inExpressionContext*/, -1 /*topInvalidNodePosition*/, nil /*openingTag*/, false /*mustBeUnary*/)
 	}
 	expression := p.parseLeftHandSideExpressionOrHigher()
+	if p.isKvsExtantTest() {
+		questionToken := p.parseTokenNode()
+		expression = p.finishNode(p.factory.NewKvsExtantTestExpression(expression, questionToken), pos)
+	}
 	if (p.token == ast.KindPlusPlusToken || p.token == ast.KindMinusMinusToken) && !p.hasPrecedingLineBreak() {
 		operator := p.token
 		p.nextToken()
 		return p.finishNode(p.factory.NewPostfixUnaryExpression(expression, operator), pos)
 	}
 	return expression
+}
+
+func (p *Parser) isKvsExtantTest() bool {
+	if p.token != ast.KindQuestionToken {
+		return false
+	}
+	return p.lookAhead(func(p *Parser) bool {
+		p.nextToken()
+		if p.token == ast.KindColonToken || p.token == ast.KindEqualsToken {
+			return false
+		}
+		return !p.isStartOfExpression()
+	})
 }
 
 func (p *Parser) parseJsxElementOrSelfClosingElementOrFragment(inExpressionContext bool, topInvalidNodePosition int, openingTag *ast.Node, mustBeUnary bool) *ast.Expression {
@@ -5501,7 +5631,7 @@ func (p *Parser) parseMemberExpressionRest(pos int, expression *ast.Expression, 
 		if questionDotToken == nil {
 			if p.token == ast.KindExclamationToken && !p.hasPrecedingLineBreak() {
 				p.nextToken()
-				expression = p.checkJSSyntax(p.finishNode(p.factory.NewNonNullExpression(expression, ast.NodeFlagsNone), pos))
+				expression = p.checkJSSyntax(p.finishNode(p.factory.NewKvsDefaultExpression(expression), pos))
 				continue
 			}
 			typeArguments := p.tryParseTypeArgumentsInExpression()
@@ -5676,7 +5806,7 @@ func (p *Parser) parseTemplateSpan(isTaggedTemplate bool) *ast.Node {
 }
 
 func (p *Parser) parsePrimaryExpression() *ast.Expression {
-	if p.token == ast.KindIdentifier && (p.scanner.TokenValue() == "collect" || p.scanner.TokenValue() == "select") && p.lookAhead((*Parser).nextTokenIsOpenParenThenConstKeyword) {
+	if p.token == ast.KindIdentifier && (p.scanner.TokenValue() == "collect" || p.scanner.TokenValue() == "select") && p.lookAhead((*Parser).nextTokenIsOpenParen) {
 		return p.parseKvsProducerExpression()
 	}
 	switch p.token {
@@ -5723,30 +5853,72 @@ func (p *Parser) parsePrimaryExpression() *ast.Expression {
 	return p.parseIdentifierWithDiagnostic(diagnostics.Expression_expected, nil)
 }
 
-func (p *Parser) nextTokenIsOpenParenThenConstKeyword() bool {
-	return p.nextToken() == ast.KindOpenParenToken && p.nextToken() == ast.KindConstKeyword
-}
-
 func (p *Parser) parseKvsProducerExpression() *ast.Expression {
 	pos := p.nodePos()
 	kind := p.scanner.TokenValue()
 	p.nextToken()
 	p.parseExpected(ast.KindOpenParenToken)
-	initializer := p.parseVariableDeclarationList(true)
-	p.parseExpected(ast.KindOfKeyword)
-	expression := doInContext(p, ast.NodeFlagsDisallowInContext, false, (*Parser).parseAssignmentExpressionOrHigher)
+	implicitSubject := p.token != ast.KindConstKeyword
+	var initializer *ast.ForInitializer
+	var expression *ast.Expression
+	if implicitSubject {
+		expression = p.parseExpressionAllowIn()
+	} else {
+		initializer = p.parseVariableDeclarationList(true)
+		p.parseExpected(ast.KindOfKeyword)
+		expression = doInContext(p, ast.NodeFlagsDisallowInContext, false, (*Parser).parseAssignmentExpressionOrHigher)
+	}
 	p.parseExpected(ast.KindCloseParenToken)
 	saveActive := p.kvsProducerActive
 	saveFunctionDepth := p.kvsProducerFunctionDepth
 	p.kvsProducerActive = true
 	p.kvsProducerFunctionDepth = p.functionDepth
 	statement := p.parseStatement()
+	if implicitSubject {
+		initializer = p.newKvsImplicitSubjectInitializer(expression, statement)
+	}
 	p.kvsProducerActive = saveActive
 	p.kvsProducerFunctionDepth = saveFunctionDepth
+	var result *ast.Node
 	if kind == "select" {
-		return p.finishNode(p.factory.NewKvsSelectExpression(initializer, expression, statement), pos)
+		result = p.factory.NewKvsSelectExpression(initializer, expression, statement)
+	} else {
+		result = p.factory.NewKvsCollectExpression(initializer, expression, statement)
 	}
-	return p.finishNode(p.factory.NewKvsCollectExpression(initializer, expression, statement), pos)
+	if implicitSubject {
+		result.Flags |= ast.NodeFlagsKvsImplicitSubject
+	}
+	return p.finishNode(result, pos)
+}
+
+func (p *Parser) newKvsImplicitSubjectInitializer(source *ast.Node, statement *ast.Node) *ast.Node {
+	name := p.factory.NewIdentifier("_")
+	declaration := p.factory.NewVariableDeclaration(name, nil, nil, nil)
+	initializer := p.factory.NewVariableDeclarationList(p.factory.NewNodeList([]*ast.Node{declaration}), ast.NodeFlagsConst)
+	anchor := source
+	var findAnchor func(*ast.Node) bool
+	findAnchor = func(node *ast.Node) bool {
+		if node.Kind == ast.KindIdentifier && node.Flags&ast.NodeFlagsSynthesized == 0 && node.Text() == "_" {
+			anchor = node
+			return true
+		}
+		return node.ForEachChild(findAnchor)
+	}
+	findAnchor(statement)
+	// The declaration is semantic rather than written. Anchor it to a real `_`
+	// use when available so diagnostics and symbol displays still have source.
+	loc := core.NewTextRange(anchor.Pos(), anchor.End())
+	if loc.Pos() == loc.End() {
+		loc = core.NewTextRange(source.Pos(), source.Pos()+1)
+	}
+	name.Loc = loc
+	declaration.Loc = loc
+	initializer.Loc = loc
+	name.Flags |= ast.NodeFlagsSynthesized
+	declaration.Flags |= ast.NodeFlagsSynthesized
+	initializer.Flags |= ast.NodeFlagsSynthesized
+	ast.SetParentInChildren(initializer)
+	return initializer
 }
 
 func (p *Parser) parseParenthesizedExpression() *ast.Expression {

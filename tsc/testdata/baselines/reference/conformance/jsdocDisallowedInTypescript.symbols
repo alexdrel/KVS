@@ -53,23 +53,23 @@ var g: function(number, number): number = (n,m) => n + m;
 var most: !string = 'definite';
 >most : Symbol(most, Decl(jsdocDisallowedInTypescript.ts, 15, 3))
 
+// Postfix forms are KVS types rather than JSDoc syntax.
 var postfixdef: number! = 101;
->postfixdef : Symbol(postfixdef, Decl(jsdocDisallowedInTypescript.ts, 16, 3))
+>postfixdef : Symbol(postfixdef, Decl(jsdocDisallowedInTypescript.ts, 17, 3))
 
 var postfixopt: number? = undefined;
->postfixopt : Symbol(postfixopt, Decl(jsdocDisallowedInTypescript.ts, 17, 3))
+>postfixopt : Symbol(postfixopt, Decl(jsdocDisallowedInTypescript.ts, 18, 3))
 >undefined : Symbol(undefined)
 
 var nns: Array<?number>;
->nns : Symbol(nns, Decl(jsdocDisallowedInTypescript.ts, 19, 3))
+>nns : Symbol(nns, Decl(jsdocDisallowedInTypescript.ts, 20, 3))
 >Array : Symbol(Array, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --), Decl(lib.es2015.core.d.ts, --, --), Decl(lib.es2015.iterable.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --))
 
 var dns: Array<!number>;
->dns : Symbol(dns, Decl(jsdocDisallowedInTypescript.ts, 20, 3))
+>dns : Symbol(dns, Decl(jsdocDisallowedInTypescript.ts, 21, 3))
 >Array : Symbol(Array, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --), Decl(lib.es2015.core.d.ts, --, --), Decl(lib.es2015.iterable.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --))
 
 var anys: Array<*>;
->anys : Symbol(anys, Decl(jsdocDisallowedInTypescript.ts, 21, 3))
+>anys : Symbol(anys, Decl(jsdocDisallowedInTypescript.ts, 22, 3))
 >Array : Symbol(Array, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --), Decl(lib.es2015.core.d.ts, --, --), Decl(lib.es2015.iterable.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --))
-
 

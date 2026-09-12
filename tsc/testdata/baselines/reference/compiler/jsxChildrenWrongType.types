@@ -7,7 +7,7 @@
 
 interface PropsType {
     children: [string, number?] | Iterable<boolean>;
->children : Iterable<boolean> | [string, number?]
+>children : Iterable<boolean> | [string, (number | null | undefined)?]
 }
 declare class Foo extends React.Component<PropsType, {}> {}
 >Foo : Foo

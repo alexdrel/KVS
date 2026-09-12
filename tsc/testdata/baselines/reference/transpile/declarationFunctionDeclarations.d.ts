@@ -1,7 +1,7 @@
 //// [fnDecl.ts] ////
 type T = number[]
 export function fnDeclBasic1(p: number[] | string[] | [T] = [], rParam: string): void { };
-export function fnDeclBasic2(p: (n: T) => T = () => null!, rParam: string): void { };
+export function fnDeclBasic2(p: (n: T) => T = () => null as!, rParam: string): void { };
 export function fnDeclBasic3(p: new () => any = class {}, rParam: string): void { };
 export function fnDeclBasic4(p: [T] = [[]], rParam: string): void { };
 export function fnDeclBasic5(p: { a: T } = { a: [] }, rParam: string): void { };
@@ -152,7 +152,7 @@ fnDecl.ts(41,37): error TS9025: Declaration emit for this parameter requires imp
 ==== fnDecl.ts (7 errors) ====
     type T = number[]
     export function fnDeclBasic1(p: number[] | string[] | [T] = [], rParam: string): void { };
-    export function fnDeclBasic2(p: (n: T) => T = () => null!, rParam: string): void { };
+    export function fnDeclBasic2(p: (n: T) => T = () => null as!, rParam: string): void { };
     export function fnDeclBasic3(p: new () => any = class {}, rParam: string): void { };
     export function fnDeclBasic4(p: [T] = [[]], rParam: string): void { };
     export function fnDeclBasic5(p: { a: T } = { a: [] }, rParam: string): void { };

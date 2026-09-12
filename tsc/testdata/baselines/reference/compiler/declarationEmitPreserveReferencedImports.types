@@ -9,12 +9,12 @@ export interface Evt { }
 import {Evt} from './utils'
 >Evt : any
 
-export const o = <T>(o: T) => () : T => null!
+export const o = <T>(o: T) => () : T => null as!
 >o : <T>(o: T) => () => T
-><T>(o: T) => () : T => null! : <T>(o: T) => () => T
+><T>(o: T) => () : T => null as! : <T>(o: T) => () => T
 >o : T
->() : T => null! : () => T
->null! : never
+>() : T => null as! : () => T
+>null as! : never
 
 === main.ts ===
 import { o }  from './decl'
@@ -23,14 +23,14 @@ import { o }  from './decl'
 import { Evt }  from './utils'
 >Evt : any
 
-export const f = { o: o({ v: null! as Evt}) };
+export const f = { o: o({ v: null as! as Evt}) };
 >f : { o: () => { v: Evt; }; }
->{ o: o({ v: null! as Evt}) } : { o: () => { v: Evt; }; }
+>{ o: o({ v: null as! as Evt}) } : { o: () => { v: Evt; }; }
 >o : () => { v: Evt; }
->o({ v: null! as Evt}) : () => { v: Evt; }
+>o({ v: null as! as Evt}) : () => { v: Evt; }
 >o : <T>(o: T) => () => T
->{ v: null! as Evt} : { v: Evt; }
+>{ v: null as! as Evt} : { v: Evt; }
 >v : Evt
->null! as Evt : Evt
->null! : never
+>null as! as Evt : Evt
+>null as! : never
 

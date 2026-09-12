@@ -859,11 +859,11 @@ function getConfigOrDefault<T extends keyof Config>(
 >userConfig : Partial<Config>
 >key : T
 
-  const assertedCheck = userValue ? userValue! : defaultValue;
+  const assertedCheck = userValue ? userValue as! : defaultValue;
 >assertedCheck : Config[T]
->userValue ? userValue! : defaultValue : Config[T]
+>userValue ? userValue as! : defaultValue : Config[T]
 >userValue : Partial<Config>[T]
->userValue! : NonNullable<Partial<Config>[T]>
+>userValue as! : NonNullable<Partial<Config>[T]>
 >userValue : NonNullable<Partial<Config>[T]>
 >defaultValue : Config[T]
 

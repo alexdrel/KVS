@@ -14,10 +14,11 @@ type WorkingType = {
     { name: 'Correct', id: string }
 };
 const working: WorkingType = null as unknown as WorkingType;
-if (working.thing!.name !== "Correct") {
-    console.log(working.thing!.message)
+const workingThing = working.thing as!;
+if (workingThing.name !== "Correct") {
+    console.log(workingThing.message)
 } else {
-    console.log(working.thing!.id);
+    console.log(workingThing.id);
 }
 
 type BorkedType = {
@@ -33,10 +34,11 @@ type BorkedType = {
     { name: 'Correct', id: string }
 };
 const borked: BorkedType = null as unknown as BorkedType;
-if (borked.thing!.name !== "Correct") {
-    console.log(borked.thing!.message);
+const borkedThing = borked.thing as!;
+if (borkedThing.name !== "Correct") {
+    console.log(borkedThing.message);
 } else {
-    console.log(borked.thing!.id);
+    console.log(borkedThing.id);
 }
 
 export type FixedType = {
@@ -54,7 +56,7 @@ export type FixedType = {
 const fixed: FixedType = null as unknown as FixedType;
 
 if (fixed.thing?.name !== "Correct") {
-    console.log(fixed.thing!.message);
+    console.log((fixed.thing as!).message);
 } else {
     console.log(fixed.thing.id);
 }

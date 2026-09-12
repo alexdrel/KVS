@@ -60,7 +60,7 @@ type NeededInfo<MyNamespaceSchema = {}> = {
 
 export type MyInfo = NeededInfo<ToB<{ initialize: any }>>;
 
-const tmp1: MyInfo = null!;
+const tmp1: MyInfo = null as!;
 function tmp2<N extends NeededInfo>(n: N) {}
 // tmp2(tmp1); // uncommenting this line removes a type error from a completely unrelated line ?? (see test 1, needs to behave the same)
 

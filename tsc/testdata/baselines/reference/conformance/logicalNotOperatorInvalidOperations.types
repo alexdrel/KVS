@@ -6,9 +6,9 @@ declare var b: number;
 >b : number
 
 // operand before !
-var BOOLEAN1 = b!;  //expect error
+var BOOLEAN1 = b as!;  //expect error
 >BOOLEAN1 : number
->b! : number
+>b as! : number
 >b : number
 
 // miss parentheses

@@ -20,7 +20,7 @@ type GetResult<
   : Id extends [...Args, ...infer Rest]
   ? Iterable<[...Rest, Value]>
   : never;
-const x: MultiKeyMap<[id1: string, id2: string], object> = null!;
+const x: MultiKeyMap<[id1: string, id2: string], object> = null as!;
 const id1 = "abc" as string;
 const matches = x.get(id1);
 

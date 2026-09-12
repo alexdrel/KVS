@@ -3,7 +3,7 @@
 //// [inferenceOfNullableObjectTypesWithCommonBase.ts]
 function equal<T>(a: T, b: T) { }
 
-let v = null!;
+let v = null as!;
 
 // Object types with common base types
 

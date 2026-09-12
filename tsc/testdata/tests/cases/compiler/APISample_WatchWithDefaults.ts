@@ -51,7 +51,7 @@ function watchMain() {
 
     host.afterProgramCreate = program => {
         console.log("** We finished making the program! **");
-        origPostProgramCreate!(program);
+        (origPostProgramCreate as!)(program);
     };
 
     // `createWatchProgram` creates an initial program, watches files, and updates the program over time.

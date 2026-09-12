@@ -1,5 +1,5 @@
 contextuallyTypedOptionalProperty.ts(6,21): error TS18048: 'y' is possibly 'undefined'.
-contextuallyTypedOptionalProperty.ts(9,18): error TS18048: 'y' is possibly 'undefined'.
+contextuallyTypedOptionalProperty.ts(9,18): error TS18049: 'y' is possibly 'null' or 'undefined'.
 
 
 ==== contextuallyTypedOptionalProperty.ts (2 errors) ====
@@ -15,5 +15,5 @@ contextuallyTypedOptionalProperty.ts(9,18): error TS18048: 'y' is possibly 'unde
     declare function foo2(point: [number?]): boolean;
     foo2([match(y => y > 0)])
                      ~
-!!! error TS18048: 'y' is possibly 'undefined'.
+!!! error TS18049: 'y' is possibly 'null' or 'undefined'.
     

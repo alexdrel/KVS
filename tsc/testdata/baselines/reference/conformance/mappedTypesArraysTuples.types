@@ -9,13 +9,13 @@ type Boxified<T> = { [P in keyof T]: Box<T[P]> };
 >Boxified : Boxified<T>
 
 type T00 = Boxified<[number, string?, ...boolean[]]>;
->T00 : [Box<number>, (Box<string | undefined> | undefined)?, ...Box<boolean>[]]
+>T00 : [Box<number>, Box<string | null | undefined>, ...Box<boolean>[]]
 
 type T01 = Partial<[number, string?, ...boolean[]]>;
->T01 : [(number | undefined)?, (string | undefined)?, ...(boolean | undefined)[]]
+>T01 : [(number | undefined)?, (string | null | undefined)?, ...(boolean | undefined)[]]
 
 type T02 = Required<[number, string?, ...boolean[]]>;
->T02 : [number, string, ...boolean[]]
+>T02 : [number, string | null | undefined, ...boolean[]]
 
 type T10 = Boxified<string[]>;
 >T10 : Box<string>[]
@@ -126,13 +126,13 @@ declare function nonpartial<T>(x: Partial<T>): T;
 >x : Partial<T>
 
 declare let x20: [number | undefined, string?, ...boolean[]];
->x20 : [number | undefined, (string | undefined)?, ...boolean[]]
+>x20 : [number | undefined, string | null | undefined, ...boolean[]]
 
 let y20 = nonpartial(x20);
->y20 : [number, string, ...boolean[]]
->nonpartial(x20) : [number, string, ...boolean[]]
+>y20 : [number, string | null, ...boolean[]]
+>nonpartial(x20) : [number, string | null, ...boolean[]]
 >nonpartial : <T>(x: Partial<T>) => T
->x20 : [number | undefined, (string | undefined)?, ...boolean[]]
+>x20 : [number | undefined, string | null | undefined, ...boolean[]]
 
 declare let x21: (number | undefined)[];
 >x21 : (number | undefined)[]

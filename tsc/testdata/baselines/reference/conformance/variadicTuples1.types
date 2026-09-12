@@ -24,7 +24,7 @@ type TN2 = TV1<[]>;
 >TN2 : [string, number]
 
 type TN3 = TV1<[boolean?]>;
->TN3 : [string, boolean | undefined, number]
+>TN3 : [string, boolean | null | undefined, number]
 
 type TN4 = TV1<string[]>;
 >TN4 : [string, ...string[], number]
@@ -411,7 +411,7 @@ type Arrayify<T> = { [P in keyof T]: T[P][] };
 >Arrayify : Arrayify<T>
 
 type TM1<U extends unknown[]> = Arrayify<readonly [string, number?, ...U, ...boolean[]]>;  // [string[], (number | undefined)[]?, Arrayify<U>, ...boolean[][]]
->TM1 : readonly [string[], ((number | undefined)[] | undefined)?, ...Arrayify<U>, ...boolean[][]]
+>TM1 : readonly [string[], (number | null | undefined)[], ...Arrayify<U>, ...boolean[][]]
 
 type TP1<T extends unknown[]> = Partial<[string, ...T, number]>;  // [string?, Partial<T>, number?]
 >TP1 : [(string | undefined)?, ...Partial<T>, (number | undefined)?]
@@ -844,7 +844,7 @@ type T04 = First<[symbol, ...string[]]>;
 >T04 : symbol
 
 type T05 = First<[string?]>;
->T05 : string | undefined
+>T05 : string | null | undefined
 
 type T06 = First<string[]>;
 >T06 : string | undefined
@@ -874,13 +874,13 @@ type T14 = DropFirst<[symbol, ...string[]]>;
 >T14 : string[]
 
 type T15 = DropFirst<[string?]>;
->T15 : []
+>T15 : [(string | null | undefined)?]
 
 type T16 = DropFirst<string[]>;
 >T16 : string[]
 
 type T17 = DropFirst<[]>;
->T17 : unknown[]
+>T17 : []
 
 type T18 = DropFirst<any>;
 >T18 : any[] | unknown[]
@@ -904,7 +904,7 @@ type T24 = Last<[symbol, ...string[]]>;
 >T24 : string | symbol
 
 type T25 = Last<[string?]>;
->T25 : string | undefined
+>T25 : string | null | undefined
 
 type T26 = Last<string[]>;
 >T26 : string | undefined
@@ -934,7 +934,7 @@ type T34 = DropLast<[symbol, ...string[]]>;
 >T34 : [symbol, ...string[]]
 
 type T35 = DropLast<[string?]>;
->T35 : [(string | undefined)?]
+>T35 : [(string | null | undefined)?]
 
 type T36 = DropLast<string[]>;
 >T36 : string[]
@@ -988,7 +988,7 @@ type R15 = DropFirst<readonly string[]>;
 >R15 : string[]
 
 type R16 = DropFirst<readonly []>;
->R16 : unknown[]
+>R16 : []
 
 type R20 = Last<readonly [number, symbol, string]>;
 >R20 : string
@@ -1218,7 +1218,7 @@ curry2(fn10, ['hello'], [42, true]);
 declare function ft<T extends unknown[]>(t1: [...T], t2: [...T, number?]): T;
 >ft : <T extends unknown[]>(t1: [...T], t2: [...T, number?]) => T
 >t1 : [...T]
->t2 : [...T, (number | undefined)?]
+>t2 : [...T, (number | null | undefined)?]
 
 ft([1, 2, 3], [1, 2, 3]);
 >ft([1, 2, 3], [1, 2, 3]) : [number, number, number]
@@ -1294,17 +1294,17 @@ call(...sa, (...x) => 42);
 
 declare function f20<T extends unknown[] = []>(args: [...T, number?]): T;
 >f20 : <T extends unknown[] = []>(args: [...T, number?]) => T
->args : [...T, (number | undefined)?]
+>args : [...T, (number | null | undefined)?]
 
 function f21<U extends string[]>(args: [...U, number?]) {
 >f21 : <U extends string[]>(args: [...U, number?]) => void
->args : [...U, (number | undefined)?]
+>args : [...U, (number | null | undefined)?]
 
     let v1 = f20(args);  // U
 >v1 : U
 >f20(args) : U
 >f20 : <T extends unknown[] = []>(args: [...T, number?]) => T
->args : [...U, (number | undefined)?]
+>args : [...U, (number | null | undefined)?]
 
     let v2 = f20(["foo", "bar"]);  // [string]
 >v2 : [string]

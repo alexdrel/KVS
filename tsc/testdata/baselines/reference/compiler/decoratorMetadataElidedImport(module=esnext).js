@@ -13,7 +13,7 @@ class Test {
         @whatever arg1: string,
         @whatever arg2: number
     ): Observable<string> {
-        return null!;
+        return null as!;
     }
 }
 

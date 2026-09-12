@@ -9,7 +9,7 @@ function ConditionalOrUndefined<T>(): ConditionalType<T> | undefined {
 }
 
 function JustConditional<T>(): ConditionalType<T> {
-    return ConditionalOrUndefined<T>()!; // shouldn't error
+    return ConditionalOrUndefined<T>() as!; // shouldn't error
 }
 
 
@@ -19,7 +19,7 @@ function genericOrUndefined<T>(): T | undefined {
 }
 
 function JustGeneric<T>(): T {
-    return genericOrUndefined<T>()!; // no error
+    return genericOrUndefined<T>() as!; // no error
 }
 
 // Simplified example:

@@ -143,36 +143,18 @@ o6<number>()?.["x"];
 >o6 : <T>() => undefined | ({ x: number; })
 >"x" : "x"
 
-// GH#36031
-o2?.["b"]!.c;
->o2?.["b"]!.c : string | undefined
->o2?.["b"]! : { c: string; } | undefined
+// GH#36031 covered TypeScript `!` inside an optional chain; KVS keeps only terminal assertions.
+o2?.["b"].c as!;
+>o2?.["b"].c as! : string
+>o2?.["b"].c : string | undefined
 >o2?.["b"] : { c: string; } | undefined
 >o2 : { b: { c: string; }; } | undefined
 >"b" : "b"
 >c : string | undefined
 
-o2?.["b"]!["c"];
->o2?.["b"]!["c"] : string | undefined
->o2?.["b"]! : { c: string; } | undefined
->o2?.["b"] : { c: string; } | undefined
->o2 : { b: { c: string; }; } | undefined
->"b" : "b"
->"c" : "c"
-
-o2?.["b"]!.c!;
->o2?.["b"]!.c! : string
->o2?.["b"]!.c : string | undefined
->o2?.["b"]! : { c: string; } | undefined
->o2?.["b"] : { c: string; } | undefined
->o2 : { b: { c: string; }; } | undefined
->"b" : "b"
->c : string | undefined
-
-o2?.["b"]!["c"]!;
->o2?.["b"]!["c"]! : string
->o2?.["b"]!["c"] : string | undefined
->o2?.["b"]! : { c: string; } | undefined
+o2?.["b"]["c"] as!;
+>o2?.["b"]["c"] as! : string
+>o2?.["b"]["c"] : string | undefined
 >o2?.["b"] : { c: string; } | undefined
 >o2 : { b: { c: string; }; } | undefined
 >"b" : "b"

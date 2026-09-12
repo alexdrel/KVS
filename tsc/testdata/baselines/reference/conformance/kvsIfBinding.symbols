@@ -1,0 +1,47 @@
+//// [tests/cases/conformance/kvs/kvsIfBinding.ts] ////
+
+=== kvsIfBinding.ts ===
+declare function findValue(): string | number | undefined;
+>findValue : Symbol(findValue, Decl(kvsIfBinding.ts, 0, 0))
+
+if (const value = findValue()) {
+>value : Symbol(value, Decl(kvsIfBinding.ts, 2, 9))
+>findValue : Symbol(findValue, Decl(kvsIfBinding.ts, 0, 0))
+
+    const narrowed = value;
+>narrowed : Symbol(narrowed, Decl(kvsIfBinding.ts, 3, 9))
+>value : Symbol(value, Decl(kvsIfBinding.ts, 2, 9))
+
+    const displayed = typeof value === "string" ? value.toUpperCase() : value.toFixed(2);
+>displayed : Symbol(displayed, Decl(kvsIfBinding.ts, 4, 9))
+>value : Symbol(value, Decl(kvsIfBinding.ts, 2, 9))
+>value.toUpperCase : Symbol(String.toUpperCase, Decl(lib.es5.d.ts, --, --))
+>value : Symbol(value, Decl(kvsIfBinding.ts, 2, 9))
+>toUpperCase : Symbol(String.toUpperCase, Decl(lib.es5.d.ts, --, --))
+>value.toFixed : Symbol(Number.toFixed, Decl(lib.es5.d.ts, --, --))
+>value : Symbol(value, Decl(kvsIfBinding.ts, 2, 9))
+>toFixed : Symbol(Number.toFixed, Decl(lib.es5.d.ts, --, --))
+}
+
+// Rejected: the binding exists only in the successful branch.
+if (const scopedValue = findValue()) {
+>scopedValue : Symbol(scopedValue, Decl(kvsIfBinding.ts, 8, 9))
+>findValue : Symbol(findValue, Decl(kvsIfBinding.ts, 0, 0))
+
+    scopedValue;
+>scopedValue : Symbol(scopedValue, Decl(kvsIfBinding.ts, 8, 9))
+
+} else {
+    scopedValue;
+}
+
+scopedValue;
+
+// Rejected: an if binding requires a complete const initializer.
+if (const missing: string) {
+>missing : Symbol(missing, Decl(kvsIfBinding.ts, 17, 9))
+
+    missing;
+>missing : Symbol(missing, Decl(kvsIfBinding.ts, 17, 9))
+}
+

@@ -2473,7 +2473,7 @@ func TestNoTrailingCommaAfterTransform(t *testing.T) {
 	var visitor *ast.NodeVisitor
 	visitor = emitContext.NewNodeVisitor(func(node *ast.Node) *ast.Node {
 		switch node.Kind {
-		case ast.KindNonNullExpression:
+		case ast.KindNonNullExpression, ast.KindKvsDefaultExpression:
 			node = node.Expression()
 		default:
 			node = node.VisitEachChild(visitor)
@@ -2494,7 +2494,7 @@ func TestTrailingCommaAfterTransform(t *testing.T) {
 	var visitor *ast.NodeVisitor
 	visitor = emitContext.NewNodeVisitor(func(node *ast.Node) *ast.Node {
 		switch node.Kind {
-		case ast.KindNonNullExpression:
+		case ast.KindNonNullExpression, ast.KindKvsDefaultExpression:
 			node = node.Expression()
 		default:
 			node = node.VisitEachChild(visitor)

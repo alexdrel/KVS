@@ -59,7 +59,7 @@ func TestTypeEraser(t *testing.T) {
 		{title: "NewExpression1", input: "new f<T>()", output: "new f();"},
 		{title: "NewExpression2", input: "new f<T>", output: "new f;"},
 		{title: "TaggedTemplateExpression", input: "f<T>``", output: "f ``;"},
-		{title: "NonNullExpression", input: "x!", output: "x;"},
+		{title: "KvsDefaultExpression", input: "x!", output: "x!;"},
 		{title: "TypeAssertionExpression#1", input: "<T>x", output: "x;"},
 		{title: "TypeAssertionExpression#2", input: "(<T>x).c", output: "x.c;"},
 		{title: "AsExpression#1", input: "x as T", output: "x;"},

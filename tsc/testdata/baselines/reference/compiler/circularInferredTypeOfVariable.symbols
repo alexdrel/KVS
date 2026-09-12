@@ -22,7 +22,7 @@
 >a1 : Symbol(a1, Decl(circularInferredTypeOfVariable.ts, 11, 7))
 
     while (true) {
-        let a2 = foo(a1!);
+        let a2 = foo(a1 as!);
 >a2 : Symbol(a2, Decl(circularInferredTypeOfVariable.ts, 14, 11))
 >foo : Symbol(foo, Decl(circularInferredTypeOfVariable.ts, 2, 14))
 >a1 : Symbol(a1, Decl(circularInferredTypeOfVariable.ts, 11, 7))
@@ -33,3 +33,4 @@
 >a2 : Symbol(a2, Decl(circularInferredTypeOfVariable.ts, 14, 11))
     }
 });
+

@@ -375,7 +375,7 @@
 
     const strings = monthsByDays[30].map(zdt => zdt.toLocaleString("en", { month: "long" }));
     // Shuffle to improve poem as determined empirically
-    strings.unshift(strings.pop()!);
+    strings.unshift(strings.pop() as!);
     const format = new Intl.ListFormat("en");
     const poem = `Thirty days hath ${format.format(strings)}`;
 
@@ -549,12 +549,12 @@
     const tz = Temporal.Now.timeZoneId();
     const now = Temporal.Now.zonedDateTimeISO(tz);
     const nextTransition = now.getTimeZoneTransition("next");
-    duration = nextTransition!.since(now);
+    duration = (nextTransition as!).since(now);
     duration.toLocaleString(); // output will vary
 
     // How long until the previous offset change from now, in the current location?
     const previousTransition = now.getTimeZoneTransition("previous");
-    duration = now.since(previousTransition!);
+    duration = now.since(previousTransition as!);
     duration.toLocaleString(); // output will vary
 }
 
@@ -710,7 +710,7 @@
 
     const strings = monthsByDays[30].map(date => date.toLocaleString("en", { month: "long" }));
     // Shuffle to improve poem as determined empirically
-    strings.unshift(strings.pop()!);
+    strings.unshift(strings.pop() as!);
     const format = new Intl.ListFormat("en");
     const poem = `Thirty days hath ${format.format(strings)}`;
 
@@ -1133,7 +1133,7 @@
 
     const strings = monthsByDays[30].map(dt => dt.toLocaleString("en", { month: "long" }));
     // Shuffle to improve poem as determined empirically
-    strings.unshift(strings.pop()!);
+    strings.unshift(strings.pop() as!);
     const format = new Intl.ListFormat("en");
     const poem = `Thirty days hath ${format.format(strings)}`;
 
@@ -1362,7 +1362,7 @@
 
     const strings = monthsByDays[30].map(ym => ym.toLocaleString("en", { month: "long", calendar: "iso8601" }));
     // Shuffle to improve poem as determined empirically
-    strings.unshift(strings.pop()!);
+    strings.unshift(strings.pop() as!);
     const format = new Intl.ListFormat("en");
     const poem = `Thirty days hath ${format.format(strings)}`;
 
@@ -2297,7 +2297,7 @@
     const tz = Temporal.Now.timeZoneId();
     const now = Temporal.Now.zonedDateTimeISO(tz);
     const nextTransition = now.getTimeZoneTransition("next");
-    duration = nextTransition.since(now);
+    duration = (nextTransition).since(now);
     duration.toLocaleString(); // output will vary
     // How long until the previous offset change from now, in the current location?
     const previousTransition = now.getTimeZoneTransition("previous");

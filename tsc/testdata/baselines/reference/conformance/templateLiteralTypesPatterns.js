@@ -199,7 +199,7 @@ export class AA {}
 export abstract class BB {
     abstract get(id: Id<AA>): void;
     update(id: Id<AA>): void {
-        this.get(id!);
+        this.get(id as!);
     }
 }
 
@@ -216,6 +216,7 @@ conversionTest4("testDowncast");
 function foo(str: `${`a${string}` & `${string}a`}Test`) {}
 foo("abaTest"); // ok
 foo("abcTest"); // error
+
 
 //// [templateLiteralTypesPatterns.js]
 // ok

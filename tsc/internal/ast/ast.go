@@ -186,6 +186,17 @@ type Node struct {
 	data   nodeData
 }
 
+type KvsDefaultKind uint8
+
+const (
+	KvsDefaultKindUnsupported KvsDefaultKind = iota
+	KvsDefaultKindString
+	KvsDefaultKindNumber
+	KvsDefaultKindBoolean
+	KvsDefaultKindBigInt
+	KvsDefaultKindArray
+)
+
 // Node accessors. Some accessors are implemented as methods on NodeData, others are implemented though
 // type switches. Either approach is fine. Interface methods are likely more performant, but have higher
 // code size costs because we have hundreds of implementations of the NodeData interface.
@@ -354,6 +365,10 @@ func (n *Node) Expression() *Node {
 		return n.AsKvsNullableAssertionExpression().Expression
 	case KindKvsExtantAssertionExpression:
 		return n.AsKvsExtantAssertionExpression().Expression
+	case KindKvsExtantTestExpression:
+		return n.AsKvsExtantTestExpression().Expression
+	case KindKvsDefaultExpression:
+		return n.AsKvsDefaultExpression().Expression
 	case KindKvsSelectExpression:
 		return n.AsKvsSelectExpression().Expression
 	case KindPartiallyEmittedExpression:
@@ -455,6 +470,10 @@ func (m *MutableNode) SetExpression(expr *Node) {
 		n.AsKvsNullableAssertionExpression().Expression = expr
 	case KindKvsExtantAssertionExpression:
 		n.AsKvsExtantAssertionExpression().Expression = expr
+	case KindKvsExtantTestExpression:
+		n.AsKvsExtantTestExpression().Expression = expr
+	case KindKvsDefaultExpression:
+		n.AsKvsDefaultExpression().Expression = expr
 	case KindKvsCollectExpression:
 		n.AsKvsCollectExpression().Expression = expr
 	case KindKvsSelectExpression:
@@ -688,6 +707,10 @@ func (n *Node) Type() *Node {
 		return n.AsNamedTupleMember().Type
 	case KindOptionalType:
 		return n.AsOptionalTypeNode().Type
+	case KindKvsNullableType:
+		return n.AsKvsNullableType().Type
+	case KindKvsExtantType:
+		return n.AsKvsExtantType().Type
 	case KindRestType:
 		return n.AsRestTypeNode().Type
 	case KindTemplateLiteralTypeSpan:
@@ -749,6 +772,10 @@ func (m *MutableNode) SetType(t *Node) {
 		n.AsNamedTupleMember().Type = t
 	case KindOptionalType:
 		n.AsOptionalTypeNode().Type = t
+	case KindKvsNullableType:
+		n.AsKvsNullableType().Type = t
+	case KindKvsExtantType:
+		n.AsKvsExtantType().Type = t
 	case KindRestType:
 		n.AsRestTypeNode().Type = t
 	case KindTemplateLiteralTypeSpan:
@@ -1137,6 +1164,10 @@ func (n *Node) QuestionToken() *TokenNode {
 		return n.AsParameterDeclaration().QuestionToken
 	case KindConditionalExpression:
 		return n.AsConditionalExpression().QuestionToken
+	case KindKvsNullingExpression:
+		return n.AsKvsNullingExpression().QuestionToken
+	case KindKvsNullableType:
+		return n.AsKvsNullableType().QuestionToken
 	case KindMappedType:
 		return n.AsMappedTypeNode().QuestionToken
 	case KindNamedTupleMember:
@@ -2142,6 +2173,14 @@ func (node *AsExpression) propagateSubtreeFacts() SubtreeFacts {
 	return node.SubtreeFacts() & ^SubtreeExclusionsOuterExpression
 }
 
+func (node *KvsNullableType) computeSubtreeFacts() SubtreeFacts {
+	return propagateSubtreeFacts(node.Type) | SubtreeContainsTypeScript
+}
+
+func (node *KvsExtantType) computeSubtreeFacts() SubtreeFacts {
+	return propagateSubtreeFacts(node.Type) | SubtreeContainsTypeScript
+}
+
 func (node *KvsNullableAssertionExpression) computeSubtreeFacts() SubtreeFacts {
 	return propagateSubtreeFacts(node.Expression) | SubtreeContainsTypeScript
 }
@@ -2212,6 +2251,10 @@ func (node *MetaProperty) computeSubtreeFacts() SubtreeFacts {
 
 func (node *NonNullExpression) computeSubtreeFacts() SubtreeFacts {
 	return propagateSubtreeFacts(node.Expression) | SubtreeContainsTypeScript
+}
+
+func (node *KvsDefaultExpression) computeSubtreeFacts() SubtreeFacts {
+	return propagateSubtreeFacts(node.Expression)
 }
 
 func (node *SpreadElement) computeSubtreeFacts() SubtreeFacts {

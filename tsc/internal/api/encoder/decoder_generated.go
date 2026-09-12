@@ -297,6 +297,16 @@ func (d *astDecoder) createChildrenNode(kind ast.Kind, data uint32, childIndices
 		return d.factory.NewKvsYieldStatement(d.singleChild(childIndices)), nil
 	case ast.KindKvsExtantYieldStatement:
 		return d.factory.NewKvsExtantYieldStatement(d.singleChild(childIndices)), nil
+	case ast.KindKvsIfBindingStatement:
+		it := newChildIter(childIndices)
+		clause := d.nodeAt(it.nextIf(mask, 0))
+		elseStatement := d.nodeAt(it.nextIf(mask, 1))
+		return d.factory.NewKvsIfBindingStatement(clause, elseStatement), nil
+	case ast.KindKvsIfBindingClause:
+		it := newChildIter(childIndices)
+		declarationList := d.nodeAt(it.nextIf(mask, 0))
+		statement := d.nodeAt(it.nextIf(mask, 1))
+		return d.factory.NewKvsIfBindingClause(declarationList, statement), nil
 	case ast.KindKvsNullableAssertionExpression:
 		it := newChildIter(childIndices)
 		expression := d.nodeAt(it.nextIf(mask, 0))
@@ -314,6 +324,20 @@ func (d *astDecoder) createChildrenNode(kind ast.Kind, data uint32, childIndices
 		equalsToken := d.nodeAt(it.nextIf(mask, 2))
 		right := d.nodeAt(it.nextIf(mask, 3))
 		return d.factory.NewKvsExtantAssignmentExpression(left, questionToken, equalsToken, right), nil
+	case ast.KindKvsExtantTestExpression:
+		it := newChildIter(childIndices)
+		expression := d.nodeAt(it.nextIf(mask, 0))
+		questionToken := d.nodeAt(it.nextIf(mask, 1))
+		return d.factory.NewKvsExtantTestExpression(expression, questionToken), nil
+	case ast.KindKvsDefaultExpression:
+		return d.factory.NewKvsDefaultExpression(d.singleChild(childIndices)), nil
+	case ast.KindKvsNullingExpression:
+		it := newChildIter(childIndices)
+		condition := d.nodeAt(it.nextIf(mask, 0))
+		questionToken := d.nodeAt(it.nextIf(mask, 1))
+		colonToken := d.nodeAt(it.nextIf(mask, 2))
+		whenTrue := d.nodeAt(it.nextIf(mask, 3))
+		return d.factory.NewKvsNullingExpression(condition, questionToken, colonToken, whenTrue), nil
 	case ast.KindKvsCollectExpression:
 		it := newChildIter(childIndices)
 		initializer := d.nodeAt(it.nextIf(mask, 0))
@@ -859,6 +883,16 @@ func (d *astDecoder) createChildrenNode(kind ast.Kind, data uint32, childIndices
 		return d.factory.NewNamedTupleMember(dotDotDotToken, name, questionToken, typeNode), nil
 	case ast.KindOptionalType:
 		return d.factory.NewOptionalTypeNode(d.singleChild(childIndices)), nil
+	case ast.KindKvsNullableType:
+		it := newChildIter(childIndices)
+		typeNode := d.nodeAt(it.nextIf(mask, 0))
+		questionToken := d.nodeAt(it.nextIf(mask, 1))
+		return d.factory.NewKvsNullableType(typeNode, questionToken), nil
+	case ast.KindKvsExtantType:
+		it := newChildIter(childIndices)
+		typeNode := d.nodeAt(it.nextIf(mask, 0))
+		exclamationToken := d.nodeAt(it.nextIf(mask, 1))
+		return d.factory.NewKvsExtantType(typeNode, exclamationToken), nil
 	case ast.KindRestType:
 		return d.factory.NewRestTypeNode(d.singleChild(childIndices)), nil
 	case ast.KindParenthesizedType:

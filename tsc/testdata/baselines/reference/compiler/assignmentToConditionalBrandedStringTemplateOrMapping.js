@@ -1,13 +1,13 @@
 //// [tests/cases/compiler/assignmentToConditionalBrandedStringTemplateOrMapping.ts] ////
 
 //// [assignmentToConditionalBrandedStringTemplateOrMapping.ts]
-let a: (<T>() => T extends `${'a' & { a: 1 }}` ? 1 : 2) = null!;
-let b: (<T>() => T extends `${'a' & { a: 1 }}` ? 1 : 2) = null!;
+let a: (<T>() => T extends `${'a' & { a: 1 }}` ? 1 : 2) = null as!;
+let b: (<T>() => T extends `${'a' & { a: 1 }}` ? 1 : 2) = null as!;
 
 a = b;
 
-let c: (<T>() => T extends Uppercase<'a' & { a: 1 }> ? 1 : 2) = null!;
-let d: (<T>() => T extends Uppercase<'a' & { a: 1 }> ? 1 : 2) = null!;
+let c: (<T>() => T extends Uppercase<'a' & { a: 1 }> ? 1 : 2) = null as!;
+let d: (<T>() => T extends Uppercase<'a' & { a: 1 }> ? 1 : 2) = null as!;
 
 c = d;
 

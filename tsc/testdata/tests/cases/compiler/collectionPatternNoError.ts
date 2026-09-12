@@ -12,7 +12,7 @@ interface MessageList<T extends Message> extends Message {
 }
 
 function fetchMsg<V extends Message>(protoCtor: MsgConstructor<V>): V {
-  return null!;
+  return null as!;
 }
 
 class DataProvider<T extends Message, U extends MessageList<T>> {

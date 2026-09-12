@@ -6,7 +6,7 @@ declare var b: number;
 >b : Symbol(b, Decl(logicalNotOperatorInvalidOperations.ts, 1, 11))
 
 // operand before !
-var BOOLEAN1 = b!;  //expect error
+var BOOLEAN1 = b as!;  //expect error
 >BOOLEAN1 : Symbol(BOOLEAN1, Decl(logicalNotOperatorInvalidOperations.ts, 4, 3))
 >b : Symbol(b, Decl(logicalNotOperatorInvalidOperations.ts, 1, 11))
 

@@ -7,6 +7,7 @@ function boo {
   static test(name?:any){ }
 }
 
+
 //// [overloadingStaticFunctionsInFunctions.js]
 "use strict";
 function boo() {

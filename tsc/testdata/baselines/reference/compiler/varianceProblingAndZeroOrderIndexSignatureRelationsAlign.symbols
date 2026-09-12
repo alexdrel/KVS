@@ -223,19 +223,19 @@ export type MyInfo = NeededInfo<ToB<{ initialize: any }>>;
 >ToB : Symbol(ToB, Decl(varianceProblingAndZeroOrderIndexSignatureRelationsAlign.ts, 49, 37))
 >initialize : Symbol(initialize, Decl(varianceProblingAndZeroOrderIndexSignatureRelationsAlign.ts, 58, 37))
 
-const tmp1: MyInfo = null!;
+const tmp1: MyInfo = null as!;
 >tmp1 : Symbol(tmp1, Decl(varianceProblingAndZeroOrderIndexSignatureRelationsAlign.ts, 60, 5))
 >MyInfo : Symbol(MyInfo, Decl(varianceProblingAndZeroOrderIndexSignatureRelationsAlign.ts, 56, 2))
 
 function tmp2<N extends NeededInfo>(n: N) {}
->tmp2 : Symbol(tmp2, Decl(varianceProblingAndZeroOrderIndexSignatureRelationsAlign.ts, 60, 27))
+>tmp2 : Symbol(tmp2, Decl(varianceProblingAndZeroOrderIndexSignatureRelationsAlign.ts, 60, 30))
 >N : Symbol(N, Decl(varianceProblingAndZeroOrderIndexSignatureRelationsAlign.ts, 61, 14))
 >NeededInfo : Symbol(NeededInfo, Decl(varianceProblingAndZeroOrderIndexSignatureRelationsAlign.ts, 52, 45))
 >n : Symbol(n, Decl(varianceProblingAndZeroOrderIndexSignatureRelationsAlign.ts, 61, 36))
 >N : Symbol(N, Decl(varianceProblingAndZeroOrderIndexSignatureRelationsAlign.ts, 61, 14))
 
 tmp2(tmp1); // uncommenting this line removes a type error from a completely unrelated line ??
->tmp2 : Symbol(tmp2, Decl(varianceProblingAndZeroOrderIndexSignatureRelationsAlign.ts, 60, 27))
+>tmp2 : Symbol(tmp2, Decl(varianceProblingAndZeroOrderIndexSignatureRelationsAlign.ts, 60, 30))
 >tmp1 : Symbol(tmp1, Decl(varianceProblingAndZeroOrderIndexSignatureRelationsAlign.ts, 60, 5))
 
 class Server<X extends NeededInfo> {}

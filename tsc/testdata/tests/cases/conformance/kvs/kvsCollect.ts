@@ -74,6 +74,16 @@ function collectNestedValues(groups: Item[][]) {
     return values;
 }
 
+declare function getOptionalItems(): Item[] | null | undefined;
+
+function collectOptionalItems() {
+    const values = collect (const item of getOptionalItems()) {
+        yield item.value;
+    };
+    const expected: string[] | null = values;
+    return expected;
+}
+
 function consume(_values: string[]) {}
 
 function rejectNestedPlacement(items: Item[]) {

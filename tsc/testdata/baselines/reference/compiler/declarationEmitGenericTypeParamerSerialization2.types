@@ -44,13 +44,13 @@ type G<T = string> = {
 
 };
 
-export const x = (() => null! as ExpandRecursively<G>)();
+export const x = (() => null as! as ExpandRecursively<G>)();
 >x : { readonly readonlyProperty: string; field: string; method: (p: string) => string; fnField: (p: string) => string; writeOnlyProperty: string; property: string; divergentProperty: string; }
->(() => null! as ExpandRecursively<G>)() : { readonly readonlyProperty: string; field: string; method: (p: string) => string; fnField: (p: string) => string; writeOnlyProperty: string; property: string; divergentProperty: string; }
->(() => null! as ExpandRecursively<G>) : () => ExpandRecursively<G>
->() => null! as ExpandRecursively<G> : () => ExpandRecursively<G>
->null! as ExpandRecursively<G> : { readonly readonlyProperty: string; field: string; method: (p: string) => string; fnField: (p: string) => string; writeOnlyProperty: string; property: string; divergentProperty: string; }
->null! : never
+>(() => null as! as ExpandRecursively<G>)() : { readonly readonlyProperty: string; field: string; method: (p: string) => string; fnField: (p: string) => string; writeOnlyProperty: string; property: string; divergentProperty: string; }
+>(() => null as! as ExpandRecursively<G>) : () => ExpandRecursively<G>
+>() => null as! as ExpandRecursively<G> : () => ExpandRecursively<G>
+>null as! as ExpandRecursively<G> : { readonly readonlyProperty: string; field: string; method: (p: string) => string; fnField: (p: string) => string; writeOnlyProperty: string; property: string; divergentProperty: string; }
+>null as! : never
 
 
 function makeV() {
@@ -91,9 +91,9 @@ function makeV() {
 >divergentProperty : string | T
 >p : number | T
    }
-  return null! as X<number>
->null! as X<number> : { readonly readonlyProperty: number; field: number; method(p: number): number; fnField: (p: number) => number; writeOnlyProperty: number; property: number; get divergentProperty(): string | number; set divergentProperty(p: number); }
->null! : never
+  return null as! as X<number>
+>null as! as X<number> : { readonly readonlyProperty: number; field: number; method(p: number): number; fnField: (p: number) => number; writeOnlyProperty: number; property: number; get divergentProperty(): string | number; set divergentProperty(p: number); }
+>null as! : never
 }
 
 export const v = makeV();

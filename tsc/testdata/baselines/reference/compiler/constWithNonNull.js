@@ -4,10 +4,10 @@
 // Fixes #21848
 
 declare const x: number | undefined;
-x!++;
+(x as!)++;
 
 
 //// [constWithNonNull.js]
 "use strict";
 // Fixes #21848
-x++;
+(x)++;

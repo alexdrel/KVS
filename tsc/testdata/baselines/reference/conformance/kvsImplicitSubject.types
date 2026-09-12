@@ -1,0 +1,122 @@
+//// [tests/cases/conformance/kvs/kvsImplicitSubject.ts] ////
+
+=== kvsImplicitSubject.ts ===
+interface Group {
+    name: string;
+>name : string
+
+    values: (number | null)[];
+>values : (number | null)[]
+}
+
+function visitGroups(groups: Group[]) {
+>visitGroups : (groups: Group[]) => string[]
+>groups : Group[]
+
+    const names: string[] = [];
+>names : string[]
+>[] : never[]
+
+    for (groups) {
+>groups : Group[]
+
+        names.push(_.name);
+>names.push(_.name) : number
+>names.push : (...items: string[]) => number
+>names : string[]
+>push : (...items: string[]) => number
+>_.name : string
+>_ : Group
+>name : string
+    }
+    return names;
+>names : string[]
+}
+
+function collectNames(groups: Group[]) {
+>collectNames : (groups: Group[]) => string[]
+>groups : Group[]
+
+    return collect (groups) {
+>collect (groups) {        yield _.name;    } : string[]
+>groups : Group[]
+
+        yield _.name;
+>_.name : string
+>_ : Group
+>name : string
+
+    };
+}
+
+function selectValue(groups: Group[]) {
+>selectValue : (groups: Group[]) => number | null
+>groups : Group[]
+
+    return select (groups) {
+>select (groups) {        for (const value of _.values) {            yield? value;        }    } : number | null
+>groups : Group[]
+
+        for (const value of _.values) {
+>value : number | null
+>_.values : (number | null)[]
+>_ : Group
+>values : (number | null)[]
+
+            yield? value;
+>value : number | null
+        }
+    };
+}
+
+function nestedSubjects(groups: Group[]) {
+>nestedSubjects : (groups: Group[]) => string[]
+>groups : Group[]
+
+    return collect (groups) {
+>collect (groups) {        const groupName = _.name;        for (_.values) {            yield `${groupName}:${_}`;        }    } : string[]
+>groups : Group[]
+
+        const groupName = _.name;
+>groupName : string
+>_.name : string
+>_ : Group
+>name : string
+
+        for (_.values) {
+>_.values : (number | null)[]
+>_ : Group
+>values : (number | null)[]
+
+            yield `${groupName}:${_}`;
+>`${groupName}:${_}` : string
+>groupName : string
+>_ : number | null
+        }
+    };
+}
+
+function explicitLoopKeepsOuterSubject(groups: Group[]) {
+>explicitLoopKeepsOuterSubject : (groups: Group[]) => string[]
+>groups : Group[]
+
+    return collect (groups) {
+>collect (groups) {        for (const value of _.values) {            if (value?) yield _.name;        }    } : string[]
+>groups : Group[]
+
+        for (const value of _.values) {
+>value : number | null
+>_.values : (number | null)[]
+>_ : Group
+>values : (number | null)[]
+
+            if (value?) yield _.name;
+>value? : boolean
+>value : number | null
+>_.name : string
+>_ : Group
+>name : string
+        }
+    };
+}
+

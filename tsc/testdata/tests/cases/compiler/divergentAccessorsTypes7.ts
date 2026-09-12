@@ -5,12 +5,12 @@ class Test<S> {
     set value(value: string | ((item: S) => string)) {}
 
     get value(): string {
-        return null!;
+        return null as!;
     }
 
     // -- Replacing the getter such that the getter/setter types match, removes the error:
     // get value(): string | ((item: S) => string) {
-    //     return null!;
+    //     return null as!;
     // }
 
     // -- Or, replacing the setter such that a concrete type is used, removes the error:

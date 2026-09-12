@@ -175,12 +175,12 @@ xx = ([1, 2, x++], xx);
 >x : number
 >xx : any
 
-xx = (xx!, xx);
->xx = (xx!, xx) : any
+xx = (xx as!, xx);
+>xx = (xx as!, xx) : any
 >xx : any
->(xx!, xx) : any
->xx!, xx : any
->xx! : any
+>(xx as!, xx) : any
+>xx as!, xx : any
+>xx as! : any
 >xx : any
 >xx : any
 

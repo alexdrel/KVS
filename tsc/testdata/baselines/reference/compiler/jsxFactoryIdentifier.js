@@ -44,7 +44,7 @@ class A {
 	view() {
 		return [
 			<meta content="helloworld"></meta>,
-			<meta content={c.a!.b}></meta>
+			<meta content={(c.a as!).b}></meta>
 		];
 	}
 }
@@ -80,7 +80,7 @@ class A {
     view() {
         return [
             createElement("meta", { content: "helloworld" }),
-            createElement("meta", { content: c.a.b })
+            createElement("meta", { content: (c.a).b })
         ];
     }
 }

@@ -1,10 +1,10 @@
 //// [tests/cases/compiler/exactOptionalPropertyTypesIdentical.ts] ////
 
 === exactOptionalPropertyTypesIdentical.ts ===
-export let a: <T>() => T extends {a?: string} ? 0 : 1 = null!;
+export let a: <T>() => T extends {a?: string} ? 0 : 1 = null as!;
 >a : <T>() => T extends { a?: string; } ? 0 : 1
 >a : string | undefined
->null! : never
+>null as! : never
 
 export let b: <T>() => T extends {a?: string | undefined} ? 0 : 1 = a;
 >b : <T>() => T extends { a?: string | undefined; } ? 0 : 1

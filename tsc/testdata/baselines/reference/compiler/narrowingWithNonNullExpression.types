@@ -9,17 +9,17 @@ const m = ''.match('');
 >match : { (regexp: string | RegExp): RegExpMatchArray | null; (matcher: { [Symbol.match](string: string): RegExpMatchArray | null; }): RegExpMatchArray | null; }
 >'' : ""
 
-m! && m[0];
->m! && m[0] : string
->m! : RegExpMatchArray
+m as! && m[0];
+>m as! && m[0] : string
+>m as! : RegExpMatchArray
 >m : RegExpMatchArray | null
 >m[0] : string
 >m : RegExpMatchArray
 >0 : 0
 
-m?.[0]! && m[0];
->m?.[0]! && m[0] : string
->m?.[0]! : string
+m?.[0] as! && m[0];
+>m?.[0] as! && m[0] : string
+>m?.[0] as! : string
 >m?.[0] : string | undefined
 >m : RegExpMatchArray | null
 >0 : 0

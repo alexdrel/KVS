@@ -10,4 +10,4 @@ const n4: number | undefined = a?.m?.({x: absorb()}); // likewise
 
 // Also a test showing `!` vs `?` for good measure
 let t1 = a?.m?.({x: 12});
-t1 = a!.m!({x: 12});
+t1 = ((a as!).m as!)({x: 12});

@@ -11,11 +11,16 @@ const constellation: Satellite[] = [
     { name: "Kepler", online: false, downlink: "Transmit orbital survey" },
 ];
 
-const launchManifest = collect (const satellite of constellation) {
-    if (!satellite.online) continue;
+// An absent constellation produces null; a present empty one produces [].
+function prepareLaunches(satellites: Satellite[] | null) {
+    return collect (const satellite of satellites) {
+        if (!satellite.online) continue;
 
-    yield `Calibrate ${satellite.name}`;
-    yield? satellite.downlink;
-}.join("\n");
+        yield `Calibrate ${satellite.name}`;
+        yield? satellite.downlink;
+    };
+}
+
+const launchManifest = prepareLaunches(constellation)!.join("\n");
 
 console.log(launchManifest);

@@ -46,7 +46,7 @@ function f<T>() {
 >f : Symbol(f, Decl(optionalPropertyAssignableToStringIndexSignature.ts, 12, 56))
 >T : Symbol(T, Decl(optionalPropertyAssignableToStringIndexSignature.ts, 14, 11))
 
-	let optional: { k1?: T } = undefined!;
+	let optional: { k1?: T } = undefined as!;
 >optional : Symbol(optional, Decl(optionalPropertyAssignableToStringIndexSignature.ts, 15, 4))
 >k1 : Symbol(k1, Decl(optionalPropertyAssignableToStringIndexSignature.ts, 15, 16))
 >T : Symbol(T, Decl(optionalPropertyAssignableToStringIndexSignature.ts, 14, 11))

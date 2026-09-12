@@ -22,8 +22,8 @@ class Test<T extends A> {
     m() {
 >m : Symbol(Test.m, Decl(strictNullNotNullIndexTypeShouldWork.ts, 5, 23))
 
-        this.attrs.params!.name;
->this.attrs.params!.name : Symbol(name, Decl(strictNullNotNullIndexTypeShouldWork.ts, 1, 14))
+        (this.attrs.params as!).name;
+>(this.attrs.params as!).name : Symbol(name, Decl(strictNullNotNullIndexTypeShouldWork.ts, 1, 14))
 >this.attrs.params : Symbol(params, Decl(strictNullNotNullIndexTypeShouldWork.ts, 0, 13))
 >this.attrs : Symbol(Test.attrs, Decl(strictNullNotNullIndexTypeShouldWork.ts, 4, 25))
 >this : Symbol(Test, Decl(strictNullNotNullIndexTypeShouldWork.ts, 2, 1))
@@ -78,7 +78,7 @@ class Test2<T extends A> {
     m() {
 >m : Symbol(Test2.m, Decl(strictNullNotNullIndexTypeShouldWork.ts, 26, 23))
 
-        return this.attrs.params!; // Return type should maintain relationship with `T` after being not-null-asserted, ideally
+        return this.attrs.params as!; // Return type should maintain relationship with `T` after being not-null-asserted, ideally
 >this.attrs.params : Symbol(params, Decl(strictNullNotNullIndexTypeShouldWork.ts, 0, 13))
 >this.attrs : Symbol(Test2.attrs, Decl(strictNullNotNullIndexTypeShouldWork.ts, 25, 26))
 >this : Symbol(Test2, Decl(strictNullNotNullIndexTypeShouldWork.ts, 23, 1))

@@ -17,10 +17,10 @@ var whatevs: * = 1001;
 var ques: ? = 'what';
 var g: function(number, number): number = (n,m) => n + m;
 var most: !string = 'definite';
+// Postfix forms are KVS types rather than JSDoc syntax.
 var postfixdef: number! = 101;
 var postfixopt: number? = undefined;
 
 var nns: Array<?number>;
 var dns: Array<!number>;
 var anys: Array<*>;
-

@@ -259,6 +259,33 @@ function collectNestedValues(groups: Item[][]) {
 >values : string[][]
 }
 
+declare function getOptionalItems(): Item[] | null | undefined;
+>getOptionalItems : () => Item[] | null | undefined
+
+function collectOptionalItems() {
+>collectOptionalItems : () => string[] | null
+
+    const values = collect (const item of getOptionalItems()) {
+>values : string[] | null
+>collect (const item of getOptionalItems()) {        yield item.value;    } : string[] | null
+>item : Item
+>getOptionalItems() : Item[] | null | undefined
+>getOptionalItems : () => Item[] | null | undefined
+
+        yield item.value;
+>item.value : string
+>item : Item
+>value : string
+
+    };
+    const expected: string[] | null = values;
+>expected : string[] | null
+>values : string[] | null
+
+    return expected;
+>expected : string[] | null
+}
+
 function consume(_values: string[]) {}
 >consume : (_values: string[]) => void
 >_values : string[]

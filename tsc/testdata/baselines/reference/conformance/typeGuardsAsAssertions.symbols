@@ -258,16 +258,16 @@ function f6() {
     let x: string | undefined | null;
 >x : Symbol(x, Decl(typeGuardsAsAssertions.ts, 105, 7))
 
-    x!.slice();
->x!.slice : Symbol(String.slice, Decl(lib.es5.d.ts, --, --))
+    (x as!).slice();
+>(x as!).slice : Symbol(String.slice, Decl(lib.es5.d.ts, --, --))
 >x : Symbol(x, Decl(typeGuardsAsAssertions.ts, 105, 7))
 >slice : Symbol(String.slice, Decl(lib.es5.d.ts, --, --))
 
     x = "";
 >x : Symbol(x, Decl(typeGuardsAsAssertions.ts, 105, 7))
 
-    x!.slice();
->x!.slice : Symbol(String.slice, Decl(lib.es5.d.ts, --, --))
+    (x as!).slice();
+>(x as!).slice : Symbol(String.slice, Decl(lib.es5.d.ts, --, --))
 >x : Symbol(x, Decl(typeGuardsAsAssertions.ts, 105, 7))
 >slice : Symbol(String.slice, Decl(lib.es5.d.ts, --, --))
 
@@ -275,16 +275,16 @@ function f6() {
 >x : Symbol(x, Decl(typeGuardsAsAssertions.ts, 105, 7))
 >undefined : Symbol(undefined)
 
-    x!.slice();
->x!.slice : Symbol(String.slice, Decl(lib.es5.d.ts, --, --))
+    (x as unknown as string).slice();
+>(x as unknown as string).slice : Symbol(String.slice, Decl(lib.es5.d.ts, --, --))
 >x : Symbol(x, Decl(typeGuardsAsAssertions.ts, 105, 7))
 >slice : Symbol(String.slice, Decl(lib.es5.d.ts, --, --))
 
     x = null;
 >x : Symbol(x, Decl(typeGuardsAsAssertions.ts, 105, 7))
 
-    x!.slice();
->x!.slice : Symbol(String.slice, Decl(lib.es5.d.ts, --, --))
+    (x as unknown as string).slice();
+>(x as unknown as string).slice : Symbol(String.slice, Decl(lib.es5.d.ts, --, --))
 >x : Symbol(x, Decl(typeGuardsAsAssertions.ts, 105, 7))
 >slice : Symbol(String.slice, Decl(lib.es5.d.ts, --, --))
 
@@ -292,24 +292,24 @@ function f6() {
 >x : Symbol(x, Decl(typeGuardsAsAssertions.ts, 105, 7))
 >undefined : Symbol(undefined)
 
-    x!.slice();
->x!.slice : Symbol(String.slice, Decl(lib.es5.d.ts, --, --))
+    (x as unknown as string).slice();
+>(x as unknown as string).slice : Symbol(String.slice, Decl(lib.es5.d.ts, --, --))
 >x : Symbol(x, Decl(typeGuardsAsAssertions.ts, 105, 7))
 >slice : Symbol(String.slice, Decl(lib.es5.d.ts, --, --))
 
     x = <string | undefined>"";
 >x : Symbol(x, Decl(typeGuardsAsAssertions.ts, 105, 7))
 
-    x!.slice();
->x!.slice : Symbol(String.slice, Decl(lib.es5.d.ts, --, --))
+    (x as!).slice();
+>(x as!).slice : Symbol(String.slice, Decl(lib.es5.d.ts, --, --))
 >x : Symbol(x, Decl(typeGuardsAsAssertions.ts, 105, 7))
 >slice : Symbol(String.slice, Decl(lib.es5.d.ts, --, --))
 
     x = <string | null>"";
 >x : Symbol(x, Decl(typeGuardsAsAssertions.ts, 105, 7))
 
-    x!.slice();
->x!.slice : Symbol(String.slice, Decl(lib.es5.d.ts, --, --))
+    (x as!).slice();
+>(x as!).slice : Symbol(String.slice, Decl(lib.es5.d.ts, --, --))
 >x : Symbol(x, Decl(typeGuardsAsAssertions.ts, 105, 7))
 >slice : Symbol(String.slice, Decl(lib.es5.d.ts, --, --))
 }
@@ -320,8 +320,8 @@ function f7() {
     let x: string;
 >x : Symbol(x, Decl(typeGuardsAsAssertions.ts, 122, 7))
 
-    x!.slice();
->x!.slice : Symbol(String.slice, Decl(lib.es5.d.ts, --, --))
+    (x as!).slice();
+>(x as!).slice : Symbol(String.slice, Decl(lib.es5.d.ts, --, --))
 >x : Symbol(x, Decl(typeGuardsAsAssertions.ts, 122, 7))
 >slice : Symbol(String.slice, Decl(lib.es5.d.ts, --, --))
 }

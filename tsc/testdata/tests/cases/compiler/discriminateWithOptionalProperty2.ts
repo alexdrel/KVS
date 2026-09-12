@@ -52,7 +52,7 @@ function mapAsyncIterable<T, U, R = undefined>(
       return this;
     },
     async [Symbol.asyncDispose]() {
-      await this.return(undefined!);
+      await this.return(undefined as!);
     }
   };
 }

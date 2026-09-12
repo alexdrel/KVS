@@ -1,7 +1,7 @@
 //// [tests/cases/conformance/types/spread/objectSpreadNegativeParse.ts] ////
 
 === objectSpreadNegativeParse.ts ===
-let o7 = { ...o? };
+let o7 = { ...o ?? };
 >o7 : Symbol(o7, Decl(objectSpreadNegativeParse.ts, 0, 3))
 
 let o8 = { ...*o };

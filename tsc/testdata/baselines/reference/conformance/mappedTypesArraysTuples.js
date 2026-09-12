@@ -180,7 +180,7 @@ declare let y12: {
 };
 declare function nonpartial<T>(x: Partial<T>): T;
 declare let x20: [number | undefined, string?, ...boolean[]];
-declare let y20: [number, string, ...boolean[]];
+declare let y20: [number, string | null, ...boolean[]];
 declare let x21: (number | undefined)[];
 declare let y21: number[];
 declare let x22: {

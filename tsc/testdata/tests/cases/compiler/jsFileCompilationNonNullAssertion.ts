@@ -2,4 +2,4 @@
 // @allowJs: true
 // @filename: /src/a.js
 // @outDir: out
-0!
+0 as!

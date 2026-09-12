@@ -91,6 +91,6 @@ async function* f(): AsyncGenerator<"NOT_FOUND_AUTHOR" | "NOT_FOUND_BOOK", BookW
 >x2 : Symbol(x2, Decl(asyncYieldStarContextualType.ts, 24, 9))
 >g : Symbol(g, Decl(asyncYieldStarContextualType.ts, 11, 13))
 
-    return null! as BookWithAuthor;
+    return null as! as BookWithAuthor;
 >BookWithAuthor : Symbol(BookWithAuthor, Decl(asyncYieldStarContextualType.ts, 6, 43))
 }

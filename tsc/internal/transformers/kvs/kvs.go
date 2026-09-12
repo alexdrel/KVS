@@ -2,11 +2,13 @@ package kvs
 
 import (
 	"github.com/microsoft/TypeScript/tsc/internal/ast"
+	"github.com/microsoft/TypeScript/tsc/internal/printer"
 	"github.com/microsoft/TypeScript/tsc/internal/transformers"
 )
 
 type transformer struct {
 	transformers.Transformer
+	resolver printer.EmitResolver
 	// The following fields describe the producer currently being lowered. Yield
 	// statements use them to append to a collect result or complete a select.
 	producerResult      *ast.IdentifierNode
@@ -16,11 +18,11 @@ type transformer struct {
 	// Producers are lowered into statements before their containing value. The
 	// original producer node is then replaced by its generated result temporary
 	// while the rest of that value is visited.
-	headReplacements    map[*ast.Node]*ast.Node
+	headReplacements map[*ast.Node]*ast.Node
 }
 
 func NewTransformer(opts *transformers.TransformOptions) *transformers.Transformer {
-	tx := &transformer{}
+	tx := &transformer{resolver: opts.EmitResolver}
 	return tx.NewTransformer(tx.visit, opts.Context)
 }
 
@@ -29,6 +31,10 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 		return replacement
 	}
 	switch node.Kind {
+	case ast.KindForOfStatement:
+		return tx.transformForOfStatement(node.AsForInOrOfStatement())
+	case ast.KindKvsIfBindingStatement:
+		return tx.transformIfBindingStatement(node.AsKvsIfBindingStatement())
 	case ast.KindKvsExtantReturnStatement:
 		if result := tx.lowerHeadProducers(node.Expression(), func(expression *ast.Expression) *ast.Node {
 			return tx.transformExtantReturnValue(expression)
@@ -89,6 +95,12 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 		return tx.transformYield(node.Expression(), true)
 	case ast.KindKvsExtantAssignmentExpression:
 		return tx.transformExtantAssignment(node.AsKvsExtantAssignmentExpression())
+	case ast.KindKvsExtantTestExpression:
+		return tx.transformExtantTest(node.AsKvsExtantTestExpression())
+	case ast.KindKvsDefaultExpression:
+		return tx.transformDefault(node.AsKvsDefaultExpression())
+	case ast.KindKvsNullingExpression:
+		return tx.transformNullingExpression(node.AsKvsNullingExpression())
 	case ast.KindKvsNullableAssertionExpression, ast.KindKvsExtantAssertionExpression:
 		return tx.Visitor().VisitNode(node.Expression())
 	case ast.KindKvsCollectExpression, ast.KindKvsSelectExpression:
@@ -100,6 +112,144 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 		return tx.Factory().NewArrayLiteralExpression(nil, false)
 	}
 	return tx.Visitor().VisitEachChild(node)
+}
+
+func (tx *transformer) transformForOfStatement(node *ast.ForInOrOfStatement) *ast.Node {
+	implicitSubject := node.Flags&ast.NodeFlagsKvsImplicitSubject != 0
+	// An empty declaration list is parser recovery for malformed TypeScript such
+	// as `for (var of source)`. It may not have reached semantic checking, so an
+	// emit-resolver query here could introduce diagnostics after the pre-emit
+	// snapshot.
+	validInitializer := !ast.IsVariableDeclarationList(node.Initializer) || len(node.Initializer.AsVariableDeclarationList().Declarations.Nodes) != 0
+	nullableSource := validInitializer && node.AwaitModifier == nil && tx.resolver.IsKvsNullableIterableSource(node.Expression)
+	if node.AwaitModifier != nil || !implicitSubject && !nullableSource {
+		return tx.Visitor().VisitEachChild(node.AsNode())
+	}
+	factory := tx.Factory()
+	source := tx.Visitor().VisitNode(node.Expression)
+	spillSource := implicitSubject && containsImplicitSubjectReference(node.Expression)
+	var sourceStatement *ast.Node
+	if spillSource {
+		temp := factory.NewTempVariable()
+		declaration := factory.NewVariableDeclaration(temp, nil, nil, source)
+		sourceStatement = factory.NewVariableStatement(nil, factory.NewVariableDeclarationList(factory.NewNodeList([]*ast.Node{declaration}), ast.NodeFlagsNone))
+		source = temp
+	}
+	if nullableSource {
+		source = factory.NewBinaryExpression(nil, source, nil, factory.NewToken(ast.KindQuestionQuestionToken), factory.NewArrayLiteralExpression(nil, false))
+	}
+	result := factory.UpdateForInOrOfStatement(
+		node,
+		node.AwaitModifier,
+		tx.transformIterationInitializer(node.Initializer, implicitSubject),
+		source,
+		tx.Visitor().VisitNode(node.Statement),
+	)
+	if implicitSubject {
+		if result == node.AsNode() {
+			result = node.AsNode().Clone(factory)
+		}
+		result.Flags &^= ast.NodeFlagsKvsImplicitSubject
+	}
+	if sourceStatement != nil {
+		return factory.NewBlock(factory.NewNodeList([]*ast.Node{sourceStatement, result}), true)
+	}
+	return result
+}
+
+func (tx *transformer) transformIterationInitializer(initializer *ast.Node, implicitSubject bool) *ast.Node {
+	if !implicitSubject {
+		return tx.Visitor().VisitNode(initializer)
+	}
+	factory := tx.Factory()
+	name := factory.NewIdentifier("_")
+	declaration := factory.NewVariableDeclaration(name, nil, nil, nil)
+	return factory.NewVariableDeclarationList(factory.NewNodeList([]*ast.Node{declaration}), ast.NodeFlagsConst)
+}
+
+func containsImplicitSubjectReference(node *ast.Node) bool {
+	var visit func(*ast.Node, *ast.Node) bool
+	visit = func(current *ast.Node, parent *ast.Node) bool {
+		if current.Kind == ast.KindIdentifier && current.Text() == "_" && (parent == nil || transformers.IsIdentifierReference(current, parent)) {
+			return true
+		}
+		found := false
+		current.ForEachChild(func(child *ast.Node) bool {
+			found = visit(child, current)
+			return found
+		})
+		return found
+	}
+	return visit(node, nil)
+}
+
+func (tx *transformer) transformDefault(node *ast.KvsDefaultExpression) *ast.Node {
+	factory := tx.Factory()
+	value := tx.Visitor().VisitNode(node.Expression)
+	var fallback *ast.Node
+	switch tx.resolver.GetKvsDefaultKind(node.AsNode()) {
+	case ast.KvsDefaultKindString:
+		fallback = factory.NewStringLiteral("", ast.TokenFlagsNone)
+	case ast.KvsDefaultKindNumber:
+		fallback = factory.NewNumericLiteral("0", ast.TokenFlagsNone)
+	case ast.KvsDefaultKindBoolean:
+		fallback = factory.NewKeywordExpression(ast.KindFalseKeyword)
+	case ast.KvsDefaultKindBigInt:
+		fallback = factory.NewBigIntLiteral("0n", ast.TokenFlagsNone)
+	case ast.KvsDefaultKindArray:
+		fallback = factory.NewArrayLiteralExpression(nil, false)
+	default:
+		return value
+	}
+	return factory.NewBinaryExpression(nil, value, nil, factory.NewToken(ast.KindQuestionQuestionToken), fallback)
+}
+
+func (tx *transformer) transformExtantTest(node *ast.KvsExtantTestExpression) *ast.Node {
+	// `value?` is a boolean presence test. Loose null inequality excludes both
+	// null and undefined while preserving every present falsy value.
+	factory := tx.Factory()
+	return factory.NewBinaryExpression(
+		nil,
+		tx.Visitor().VisitNode(node.Expression),
+		nil,
+		factory.NewToken(ast.KindExclamationEqualsToken),
+		factory.NewKeywordExpression(ast.KindNullKeyword),
+	)
+}
+
+func (tx *transformer) transformIfBindingStatement(node *ast.KvsIfBindingStatement) *ast.Node {
+	//     if (const value = initializer) body
+	// becomes
+	//     const _a = initializer;
+	//     if (_a) { const value = _a; body }
+	//
+	// The temporary evaluates the initializer once. Keeping the source binding
+	// inside the successful block preserves its intentionally one-sided scope.
+	// The condition deliberately uses JavaScript truthiness in this prototype.
+	factory := tx.Factory()
+	clause := node.Clause.AsKvsIfBindingClause()
+	declaration := clause.DeclarationList.AsVariableDeclarationList().Declarations.Nodes[0].AsVariableDeclaration()
+	temp := factory.NewTempVariable()
+	tempDeclaration := factory.NewVariableDeclaration(temp, nil, nil, tx.Visitor().VisitNode(declaration.Initializer))
+	tempStatement := factory.NewVariableStatement(nil, factory.NewVariableDeclarationList(factory.NewNodeList([]*ast.Node{tempDeclaration}), ast.NodeFlagsConst))
+
+	binding := factory.NewVariableDeclaration(
+		tx.Visitor().VisitNode(declaration.Name()),
+		nil,
+		tx.Visitor().VisitNode(declaration.Type),
+		temp,
+	)
+	bindingStatement := factory.NewVariableStatement(nil, factory.NewVariableDeclarationList(factory.NewNodeList([]*ast.Node{binding}), ast.NodeFlagsConst))
+	body := tx.Visitor().VisitNode(clause.Statement)
+	statements := []*ast.Node{bindingStatement}
+	if ast.IsBlock(body) {
+		statements = append(statements, body.AsBlock().Statements.Nodes...)
+	} else {
+		statements = append(statements, body)
+	}
+	thenBlock := factory.NewBlock(factory.NewNodeList(statements), true)
+	ifStatement := factory.NewIfStatement(temp, thenBlock, tx.Visitor().VisitNode(node.ElseStatement))
+	return factory.NewSyntaxList([]*ast.Node{tempStatement, ifStatement})
 }
 
 func (tx *transformer) transformExtantAssignment(node *ast.KvsExtantAssignmentExpression) *ast.Node {
@@ -121,6 +271,24 @@ func (tx *transformer) transformExtantAssignment(node *ast.KvsExtantAssignmentEx
 	assignment := factory.NewAssignmentExpression(left, temp)
 	conditional := factory.NewConditionalExpression(condition, factory.NewToken(ast.KindQuestionToken), assignment, factory.NewToken(ast.KindColonToken), temp)
 	return conditional
+}
+
+func (tx *transformer) transformNullingExpression(node *ast.KvsNullingExpression) *ast.Node {
+	//     condition ?: value
+	// becomes
+	//     condition ? value : null
+	//
+	// The ordinary conditional preserves lazy RHS evaluation. Until KVS
+	// truthiness has its own lowering, the emitted condition intentionally uses
+	// JavaScript truthiness; that is a recorded prototype limitation.
+	factory := tx.Factory()
+	return factory.NewConditionalExpression(
+		tx.Visitor().VisitNode(node.Condition),
+		factory.NewToken(ast.KindQuestionToken),
+		tx.Visitor().VisitNode(node.WhenTrue),
+		factory.NewToken(ast.KindColonToken),
+		factory.NewKeywordExpression(ast.KindNullKeyword),
+	)
 }
 
 func isKvsProducer(node *ast.Node) bool {
@@ -209,8 +377,9 @@ func (tx *transformer) lowerProducer(producer *ast.Node, continuation func(*ast.
 	//
 	// into a result declaration, any yield? temporaries, an ordinary for-of
 	// loop, and finally the surrounding statement supplied by continuation.
-	// collect starts with [], while select starts with null and exits its loop
-	// after the first production.
+	// A nullable source is captured once and guards the loop. Collect changes
+	// its initial null result to [] only on that present-source path; select
+	// remains null until its first production.
 	factory := tx.Factory()
 	selectProducer := producer.Kind == ast.KindKvsSelectExpression
 	var initializer *ast.ForInitializer
@@ -223,9 +392,11 @@ func (tx *transformer) lowerProducer(producer *ast.Node, continuation func(*ast.
 		data := producer.AsKvsCollectExpression()
 		initializer, expression, statement = data.Initializer, data.Expression, data.Statement
 	}
+	nullableSource := tx.resolver.IsKvsNullableIterableSource(expression)
+	captureSource := nullableSource || producer.Flags&ast.NodeFlagsKvsImplicitSubject != 0 && containsImplicitSubjectReference(expression)
 	result := factory.NewTempVariable()
 	resultInitializer := factory.NewArrayLiteralExpression(nil, false)
-	if selectProducer {
+	if selectProducer || nullableSource {
 		resultInitializer = factory.NewKeywordExpression(ast.KindNullKeyword)
 	}
 	resultDeclaration := factory.NewVariableDeclaration(result, nil, nil, resultInitializer)
@@ -251,11 +422,24 @@ func (tx *transformer) lowerProducer(producer *ast.Node, continuation func(*ast.
 	tx.producerTemporaries = savedTemporaries
 	tx.selectProducer = savedSelectProducer
 	tx.selectLabel = savedLabel
-	loop := factory.NewForInOrOfStatement(ast.KindForOfStatement, nil, tx.Visitor().VisitNode(initializer), tx.Visitor().VisitNode(expression), body)
+	var visitedSource *ast.Node
+	var sourceTemp *ast.IdentifierNode
+	if captureSource {
+		sourceTemp = factory.NewTempVariable()
+		visitedSource = sourceTemp
+	} else {
+		visitedSource = tx.Visitor().VisitNode(expression)
+	}
+	loop := factory.NewForInOrOfStatement(ast.KindForOfStatement, nil, tx.transformIterationInitializer(initializer, producer.Flags&ast.NodeFlagsKvsImplicitSubject != 0), visitedSource, body)
 	if label != nil {
 		loop = factory.NewLabeledStatement(label, loop)
 	}
-	statements := []*ast.Node{resultStatement}
+	statements := make([]*ast.Node, 0, 4)
+	if captureSource {
+		sourceDeclaration := factory.NewVariableDeclaration(sourceTemp, nil, nil, tx.Visitor().VisitNode(expression))
+		statements = append(statements, factory.NewVariableStatement(nil, factory.NewVariableDeclarationList(factory.NewNodeList([]*ast.Node{sourceDeclaration}), ast.NodeFlagsNone)))
+	}
+	statements = append(statements, resultStatement)
 	if len(temporaries) != 0 {
 		declarations := make([]*ast.Node, 0, len(temporaries))
 		for _, temp := range temporaries {
@@ -266,7 +450,17 @@ func (tx *transformer) lowerProducer(producer *ast.Node, continuation func(*ast.
 			factory.NewVariableDeclarationList(factory.NewNodeList(declarations), ast.NodeFlagsNone),
 		))
 	}
-	statements = append(statements, loop)
+	if nullableSource {
+		presentStatements := make([]*ast.Node, 0, 2)
+		if !selectProducer {
+			presentStatements = append(presentStatements, factory.NewExpressionStatement(factory.NewAssignmentExpression(result, factory.NewArrayLiteralExpression(nil, false))))
+		}
+		presentStatements = append(presentStatements, loop)
+		condition := factory.NewBinaryExpression(nil, sourceTemp, nil, factory.NewToken(ast.KindExclamationEqualsToken), factory.NewKeywordExpression(ast.KindNullKeyword))
+		statements = append(statements, factory.NewIfStatement(condition, factory.NewBlock(factory.NewNodeList(presentStatements), true), nil))
+	} else {
+		statements = append(statements, loop)
+	}
 	continued := continuation(result)
 	if continued.Kind == ast.KindSyntaxList {
 		statements = append(statements, continued.AsSyntaxList().Children...)

@@ -567,7 +567,7 @@ namespace TypeScriptAllInOne {
             if (myEvent() == 1)
 >myEvent : Symbol(myEvent, Decl(constructorWithIncompleteTypeAnnotation.ts, 223, 15))
 
-                return true ? 
+                return true ? false
             else
                 return false;
         }

@@ -6,7 +6,7 @@ export const v1 = (...a: [n: "n", a: "a"]): {
     /** r rest param */
     a: typeof a,
 } => {
-    return null!
+    return null as!
 }
 
 // @fileName: v2.ts
@@ -17,5 +17,5 @@ export const v2 = (...a: [n: "n", a: "a"]): {
     /** module var */
     n: typeof n,
 } => {
-    return null!
+    return null as!
 }

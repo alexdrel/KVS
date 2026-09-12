@@ -11,7 +11,7 @@ export const v1 = (...a: [n: "n", a: "a"]): {
 >a : Symbol(a, Decl(v1.ts, 0, 19))
 
 } => {
-    return null!
+    return null as!
 }
 
 === v2.ts ===
@@ -34,5 +34,5 @@ export const v2 = (...a: [n: "n", a: "a"]): {
 >n : Symbol(n, Decl(v2.ts, 0, 5))
 
 } => {
-    return null!
+    return null as!
 }

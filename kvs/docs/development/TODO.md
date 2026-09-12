@@ -20,6 +20,14 @@ Implemented vertical slices:
   values.
 - Static nullability assertions and inferred binding suffixes: `as?`, `as!`,
   `let value?`, and `const`/`let value!`.
+- Nulling operator: `condition ?: expression`.
+- Nullability type operators: `T?` and `T!`.
+- Successful-branch binding: `if (const value = expression)`.
+- Extant test: postfix `value?`, including presence narrowing.
+- Terminal defaults for strings, numbers, booleans, bigints, and ordinary
+  arrays: postfix `value!`.
+- Nullable sources for synchronous `for...of`, eager `collect`, and `select`.
+- Implicit subjects for synchronous `for`, eager `collect`, and `select`.
 
 Known semantic debts:
 
@@ -28,6 +36,10 @@ Known semantic debts:
   earlier property values, computed names, and spreads may therefore run late.
 - Extant assignment is currently RHS-first and skips target evaluation when
   the RHS is absent.
+- The nulling operator currently lowers through JavaScript truthiness; KVS
+  truthiness is not implemented.
+- Conditional binding currently tests with JavaScript truthiness; KVS
+  truthiness is not implemented.
 - Nullable producer sources, implicit subjects, lazy `collect*`, and
   expression-valued `for` are not implemented.
 
@@ -38,6 +50,10 @@ Focused conformance inputs:
 - `tsc/testdata/tests/cases/conformance/kvs/kvsSelect.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsExtantAssignment.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsStaticNullability.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsNulling.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsNullabilityTypes.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsIfBinding.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsExtantTest.ts`
 
 Run all implemented KVS slices together:
 
@@ -66,10 +82,10 @@ them; generated example `.js` files are intentionally ignored.
 
 ### Nullable types
 
-- [ ] `T?` adds absence
-- [ ] `T!` removes top-level absence
-- [ ] Nullable type composition/idempotence
-- [ ] Nullable type union interaction
+- [x] `T?` adds absence
+- [x] `T!` removes top-level absence
+- [x] Nullable type composition/idempotence
+- [x] Nullable type union interaction
 
 ### Static nullability
 
@@ -83,8 +99,8 @@ them; generated example `.js` files are intentionally ignored.
 
 ### Extant test and conditions
 
-- [ ] Postfix `value?`
-- [ ] Flow narrowing after `value?`
+- [x] Postfix `value?`
+- [x] Flow narrowing after `value?`
 - [ ] Nullable boolean condition: only `true` enters branch
 - [ ] Successful lifted comparisons narrow required operands
 
@@ -110,15 +126,16 @@ them; generated example `.js` files are intentionally ignored.
 
 ### Default values
 
-- [ ] `number` default is `0`
-- [ ] `boolean` default is `false`
-- [ ] `string` default is `""`
-- [ ] Array default is `[]`
+- [x] `number` default is `0`
+- [x] `boolean` default is `false`
+- [x] `string` default is `""`
+- [x] `bigint` default is `0n`
+- [x] Array default is `[]`
 - [ ] Map/set defaults
 - [ ] Structural/POD defaults
-- [ ] Fresh mutable defaults
-- [ ] Reject non-defaultable types
-- [ ] Terminal `value!`
+- [x] Fresh mutable array defaults
+- [x] Reject non-defaultable types in the implemented slice
+- [x] Terminal `value!`
 
 ### Comparison conveniences
 
@@ -133,6 +150,14 @@ them; generated example `.js` files are intentionally ignored.
 
 ## 2. Structured production and procedural expressions
 
+### Binding in an `if` condition
+
+- [x] `if (const value = expression)`
+- [x] Initializer evaluated once
+- [x] Binding scoped only to the successful branch
+- [x] Successful branch narrows the binding to its truthy type
+- [ ] Ordinary KVS truthiness determines the selected branch
+
 ### Range expressions
 
 - [ ] Exclusive upper bound: `lower..upper`
@@ -146,11 +171,17 @@ them; generated example `.js` files are intentionally ignored.
 
 ### Implicit subject
 
-- [ ] Implicit iterable form: `for (items)`
-- [ ] `_` current subject
-- [ ] Nearest-subject scoping
-- [ ] Explicit iteration remains unchanged
+- [x] Implicit iterable form for `for`, `collect`, and `select`
+- [x] `_` current subject
+- [x] Nearest-subject scoping
+- [x] Explicit iteration remains unchanged
 - [ ] Nested `%` callbacks preserve outer `_`
+
+### Shared iteration
+
+- [x] Synchronous `for...of` skips an absent source
+- [x] Nullable source is evaluated once
+- [ ] Nullable `for await...of`
 
 ### Expression-valued `for`
 
@@ -175,9 +206,9 @@ them; generated example `.js` files are intentionally ignored.
 - [x] `continue`
 - [ ] `break`
 - [ ] Nested ordinary loops
-- [ ] Absent source -> `null`
-- [ ] Present empty source -> `[]`
-- [ ] Present source with no yields -> `[]`
+- [x] Absent source -> `null`
+- [x] Present empty source -> `[]`
+- [x] Present source with no yields -> `[]`
 - [ ] Terminal `!` collapses absent result to `[]`
 - [ ] Do not flatten yielded arrays/iterables
 - [ ] `return` retains containing-function meaning
@@ -202,7 +233,7 @@ them; generated example `.js` files are intentionally ignored.
 - [x] `yield? null` continues
 - [x] `yield null` stops with `null`
 - [x] Nested ordinary loops
-- [ ] Absent source semantics
+- [x] Absent source -> `null`
 
 ### Producing-loop expression placement
 
@@ -291,12 +322,12 @@ them; generated example `.js` files are intentionally ignored.
 - [ ] Result element type inference
 - [ ] Result property type inference
 
-### Compact ternary
+### Nulling operator `?:`
 
-- [ ] `condition ?: expression`
-- [ ] False/null branch -> `null`
+- [x] `condition ?: expression`
+- [x] False/null branch -> `null`
 - [ ] KVS truthiness
-- [ ] Lazy RHS
+- [x] Lazy RHS
 
 ## 4. Structural data and PODs
 

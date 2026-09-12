@@ -1,6 +1,8 @@
-//// [tests/cases/compiler/parseInvalidNonNullableTypes.ts] ////
+//// [tests/cases/compiler/parseExtantTypes.ts] ////
 
-//// [parseInvalidNonNullableTypes.ts]
+//// [parseExtantTypes.ts]
+// KVS accepts postfix extant types; prefix JSDoc-style types remain invalid.
+
 function f1(a: string): a is string! {
     return true;
 }
@@ -25,8 +27,9 @@ const c = 1 as !any;
 const d: !number = 1;
 
 
-//// [parseInvalidNonNullableTypes.js]
+//// [parseExtantTypes.js]
 "use strict";
+// KVS accepts postfix extant types; prefix JSDoc-style types remain invalid.
 function f1(a) {
     return true;
 }

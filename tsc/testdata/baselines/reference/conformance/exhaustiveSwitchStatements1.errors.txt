@@ -1,6 +1,6 @@
 exhaustiveSwitchStatements1.ts(7,9): error TS7027: Unreachable code detected.
 exhaustiveSwitchStatements1.ts(235,5): error TS2367: This comparison appears to be unintentional because the types 'keyof O' and '"c"' have no overlap.
-exhaustiveSwitchStatements1.ts(247,10): error TS2339: Property 'kind' does not exist on type 'never'.
+exhaustiveSwitchStatements1.ts(247,15): error TS2339: Property 'kind' does not exist on type 'never'.
 
 
 ==== exhaustiveSwitchStatements1.ts (3 errors) ====
@@ -254,8 +254,8 @@ exhaustiveSwitchStatements1.ts(247,10): error TS2339: Property 'kind' does not e
         case "abc":
         case "def": return;
         default:
-          a!.kind; // Error expected
-             ~~~~
+          (a as!).kind; // Error expected
+                  ~~~~
 !!! error TS2339: Property 'kind' does not exist on type 'never'.
       }
     }

@@ -13,7 +13,7 @@ bad.ts(7,5): error TS1061: Enum member must have initializer.
         ~
 !!! error TS18056: Enum member following a non-literal numeric member must have an initializer when 'isolatedModules' is enabled.
         c = 10,
-        d = (c)! satisfies number as any,
+        d = (c) as! satisfies number as any,
         e,
         ~
 !!! error TS1061: Enum member must have initializer.

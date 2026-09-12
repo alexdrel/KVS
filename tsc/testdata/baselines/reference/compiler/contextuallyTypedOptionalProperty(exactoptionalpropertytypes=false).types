@@ -29,17 +29,17 @@ foo({ y: match(y => y > 0) })
 
 declare function foo2(point: [number?]): boolean;
 >foo2 : (point: [number?]) => boolean
->point : [(number | undefined)?]
+>point : [(number | null | undefined)?]
 
 foo2([match(y => y > 0)])
 >foo2([match(y => y > 0)]) : boolean
 >foo2 : (point: [number?]) => boolean
->[match(y => y > 0)] : [number | undefined]
->match(y => y > 0) : number | undefined
+>[match(y => y > 0)] : [number | null | undefined]
+>match(y => y > 0) : number | null | undefined
 >match : <T>(cb: (value: T) => boolean) => T
->y => y > 0 : (y: number | undefined) => boolean
->y : number | undefined
+>y => y > 0 : (y: number | null | undefined) => boolean
+>y : number | null | undefined
 >y > 0 : boolean
->y : number | undefined
+>y : number | null | undefined
 >0 : 0
 

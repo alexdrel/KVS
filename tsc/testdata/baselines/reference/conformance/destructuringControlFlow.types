@@ -166,7 +166,7 @@ type KeyValue = [string, string?];
 
 let [key, value]: KeyValue = ["foo"];
 >key : string
->value : string | undefined
+>value : string | null | undefined
 >["foo"] : [string]
 >"foo" : "foo"
 

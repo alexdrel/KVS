@@ -71,7 +71,7 @@ type GetResult<
 >Value : Symbol(Value, Decl(partiallyNamedTuples2.ts, 12, 27))
 
   : never;
-const x: MultiKeyMap<[id1: string, id2: string], object> = null!;
+const x: MultiKeyMap<[id1: string, id2: string], object> = null as!;
 >x : Symbol(x, Decl(partiallyNamedTuples2.ts, 19, 5))
 >MultiKeyMap : Symbol(MultiKeyMap, Decl(partiallyNamedTuples2.ts, 0, 0))
 

@@ -107,6 +107,28 @@ function selectField(groups: Group[]) {
     };
 }
 
+declare function getOptionalGroups(): Group[] | null | undefined;
+>getOptionalGroups : () => Group[] | null | undefined
+
+function selectFromOptionalGroups() {
+>selectFromOptionalGroups : () => number | null
+
+    return select (const group of getOptionalGroups()) {
+>select (const group of getOptionalGroups()) {        yield? group.candidates[0];    } : number | null
+>group : Group
+>getOptionalGroups() : Group[] | null | undefined
+>getOptionalGroups : () => Group[] | null | undefined
+
+        yield? group.candidates[0];
+>group.candidates[0] : number | null | undefined
+>group.candidates : (number | null | undefined)[]
+>group : Group
+>candidates : (number | null | undefined)[]
+>0 : 0
+
+    };
+}
+
 function rejectNestedPosition(groups: Group[]) {
 >rejectNestedPosition : (groups: Group[]) => void
 >groups : Group[]

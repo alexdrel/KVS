@@ -48,10 +48,10 @@ let dict: { [key: string]: string } = optionalUndefined; // error
 function f<T>() {
 >f : <T>() => void
 
-	let optional: { k1?: T } = undefined!;
+	let optional: { k1?: T } = undefined as!;
 >optional : { k1?: T; }
 >k1 : T | undefined
->undefined! : never
+>undefined as! : never
 >undefined : undefined
 
 	let dict: { [key: string]: T | number } = optional; // ok

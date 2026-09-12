@@ -1607,12 +1607,12 @@
 >"long" : "long"
 
     // Shuffle to improve poem as determined empirically
-    strings.unshift(strings.pop()!);
->strings.unshift(strings.pop()!) : number
+    strings.unshift(strings.pop() as!);
+>strings.unshift(strings.pop() as!) : number
 >strings.unshift : (...items: string[]) => number
 >strings : string[]
 >unshift : (...items: string[]) => number
->strings.pop()! : string
+>strings.pop() as! : string
 >strings.pop() : string | undefined
 >strings.pop : () => string | undefined
 >strings : string[]
@@ -2379,12 +2379,13 @@
 >getTimeZoneTransition : { (direction: "next" | "previous"): Temporal.ZonedDateTime | null; (direction: Temporal.TransitionOptions): Temporal.ZonedDateTime | null; }
 >"next" : "next"
 
-    duration = nextTransition!.since(now);
->duration = nextTransition!.since(now) : Temporal.Duration
+    duration = (nextTransition as!).since(now);
+>duration = (nextTransition as!).since(now) : Temporal.Duration
 >duration : Temporal.Duration
->nextTransition!.since(now) : Temporal.Duration
->nextTransition!.since : (other: Temporal.ZonedDateTimeLike, options?: Temporal.RoundingOptionsWithLargestUnit<Temporal.DateUnit | Temporal.TimeUnit>) => Temporal.Duration
->nextTransition! : Temporal.ZonedDateTime
+>(nextTransition as!).since(now) : Temporal.Duration
+>(nextTransition as!).since : (other: Temporal.ZonedDateTimeLike, options?: Temporal.RoundingOptionsWithLargestUnit<Temporal.DateUnit | Temporal.TimeUnit>) => Temporal.Duration
+>(nextTransition as!) : Temporal.ZonedDateTime
+>nextTransition as! : Temporal.ZonedDateTime
 >nextTransition : Temporal.ZonedDateTime | null
 >since : (other: Temporal.ZonedDateTimeLike, options?: Temporal.RoundingOptionsWithLargestUnit<Temporal.DateUnit | Temporal.TimeUnit>) => Temporal.Duration
 >now : Temporal.ZonedDateTime
@@ -2404,14 +2405,14 @@
 >getTimeZoneTransition : { (direction: "next" | "previous"): Temporal.ZonedDateTime | null; (direction: Temporal.TransitionOptions): Temporal.ZonedDateTime | null; }
 >"previous" : "previous"
 
-    duration = now.since(previousTransition!);
->duration = now.since(previousTransition!) : Temporal.Duration
+    duration = now.since(previousTransition as!);
+>duration = now.since(previousTransition as!) : Temporal.Duration
 >duration : Temporal.Duration
->now.since(previousTransition!) : Temporal.Duration
+>now.since(previousTransition as!) : Temporal.Duration
 >now.since : (other: Temporal.ZonedDateTimeLike, options?: Temporal.RoundingOptionsWithLargestUnit<Temporal.DateUnit | Temporal.TimeUnit>) => Temporal.Duration
 >now : Temporal.ZonedDateTime
 >since : (other: Temporal.ZonedDateTimeLike, options?: Temporal.RoundingOptionsWithLargestUnit<Temporal.DateUnit | Temporal.TimeUnit>) => Temporal.Duration
->previousTransition! : Temporal.ZonedDateTime
+>previousTransition as! : Temporal.ZonedDateTime
 >previousTransition : Temporal.ZonedDateTime | null
 
     duration.toLocaleString(); // output will vary
@@ -3261,12 +3262,12 @@
 >"long" : "long"
 
     // Shuffle to improve poem as determined empirically
-    strings.unshift(strings.pop()!);
->strings.unshift(strings.pop()!) : number
+    strings.unshift(strings.pop() as!);
+>strings.unshift(strings.pop() as!) : number
 >strings.unshift : (...items: string[]) => number
 >strings : string[]
 >unshift : (...items: string[]) => number
->strings.pop()! : string
+>strings.pop() as! : string
 >strings.pop() : string | undefined
 >strings.pop : () => string | undefined
 >strings : string[]
@@ -5476,12 +5477,12 @@
 >"long" : "long"
 
     // Shuffle to improve poem as determined empirically
-    strings.unshift(strings.pop()!);
->strings.unshift(strings.pop()!) : number
+    strings.unshift(strings.pop() as!);
+>strings.unshift(strings.pop() as!) : number
 >strings.unshift : (...items: string[]) => number
 >strings : string[]
 >unshift : (...items: string[]) => number
->strings.pop()! : string
+>strings.pop() as! : string
 >strings.pop() : string | undefined
 >strings.pop : () => string | undefined
 >strings : string[]
@@ -6630,12 +6631,12 @@
 >"iso8601" : "iso8601"
 
     // Shuffle to improve poem as determined empirically
-    strings.unshift(strings.pop()!);
->strings.unshift(strings.pop()!) : number
+    strings.unshift(strings.pop() as!);
+>strings.unshift(strings.pop() as!) : number
 >strings.unshift : (...items: string[]) => number
 >strings : string[]
 >unshift : (...items: string[]) => number
->strings.pop()! : string
+>strings.pop() as! : string
 >strings.pop() : string | undefined
 >strings.pop : () => string | undefined
 >strings : string[]

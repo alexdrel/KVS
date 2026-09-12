@@ -12,7 +12,8 @@ class Bar<T> { constructor(public x: T) { } }
 >Bar : Bar<T>
 >x : T
 
-// Errors expected on all of the following
+// JSDoc-only prefix forms remain errors. KVS postfix nullable type arguments
+// such as `string?` are valid and include both null and undefined.
 
 const WhatFoo = foo<?>;
 >WhatFoo : (x: any) => any
@@ -20,8 +21,8 @@ const WhatFoo = foo<?>;
 >foo : <T>(x: T) => T
 
 const HuhFoo = foo<string?>;
->HuhFoo : (x: string | null) => string | null
->foo<string?> : (x: string | null) => string | null
+>HuhFoo : (x: string | null | undefined) => string | null | undefined
+>foo<string?> : (x: string | null | undefined) => string | null | undefined
 >foo : <T>(x: T) => T
 
 const NopeFoo = foo<?string>;
@@ -30,8 +31,8 @@ const NopeFoo = foo<?string>;
 >foo : <T>(x: T) => T
 
 const ComeOnFoo = foo<?string?>;
->ComeOnFoo : (x: string | null) => string | null
->foo<?string?> : (x: string | null) => string | null
+>ComeOnFoo : (x: string | null | undefined) => string | null | undefined
+>foo<?string?> : (x: string | null | undefined) => string | null | undefined
 >foo : <T>(x: T) => T
 
 type TWhatFoo = typeof foo<?>;
@@ -39,7 +40,7 @@ type TWhatFoo = typeof foo<?>;
 >foo : <T>(x: T) => T
 
 type THuhFoo = typeof foo<string?>;
->THuhFoo : typeof foo<string | null>
+>THuhFoo : typeof foo<string?>
 >foo : <T>(x: T) => T
 
 type TNopeFoo = typeof foo<?string>;
@@ -47,7 +48,7 @@ type TNopeFoo = typeof foo<?string>;
 >foo : <T>(x: T) => T
 
 type TComeOnFoo = typeof foo<?string?>;
->TComeOnFoo : typeof foo<(string | null) | null>
+>TComeOnFoo : typeof foo<string? | null>
 >foo : <T>(x: T) => T
 
 const WhatBar = Bar<?>;
@@ -56,8 +57,8 @@ const WhatBar = Bar<?>;
 >Bar : typeof Bar
 
 const HuhBar = Bar<string?>;
->HuhBar : { new (x: string | null): Bar<string | null>; prototype: Bar<any>; }
->Bar<string?> : { new (x: string | null): Bar<string | null>; prototype: Bar<any>; }
+>HuhBar : { new (x: string | null | undefined): Bar<string | null | undefined>; prototype: Bar<any>; }
+>Bar<string?> : { new (x: string | null | undefined): Bar<string | null | undefined>; prototype: Bar<any>; }
 >Bar : typeof Bar
 
 const NopeBar = Bar<?string>;
@@ -66,8 +67,8 @@ const NopeBar = Bar<?string>;
 >Bar : typeof Bar
 
 const ComeOnBar = Bar<?string?>;
->ComeOnBar : { new (x: string | null): Bar<string | null>; prototype: Bar<any>; }
->Bar<?string?> : { new (x: string | null): Bar<string | null>; prototype: Bar<any>; }
+>ComeOnBar : { new (x: string | null | undefined): Bar<string | null | undefined>; prototype: Bar<any>; }
+>Bar<?string?> : { new (x: string | null | undefined): Bar<string | null | undefined>; prototype: Bar<any>; }
 >Bar : typeof Bar
 
 type TWhatBar = typeof Bar<?>;
@@ -75,7 +76,7 @@ type TWhatBar = typeof Bar<?>;
 >Bar : typeof Bar
 
 type THuhBar = typeof Bar<string?>;
->THuhBar : typeof Bar<string | null>
+>THuhBar : typeof Bar<string?>
 >Bar : typeof Bar
 
 type TNopeBar = typeof Bar<?string>;
@@ -83,6 +84,6 @@ type TNopeBar = typeof Bar<?string>;
 >Bar : typeof Bar
 
 type TComeOnBar = typeof Bar<?string?>;
->TComeOnBar : typeof Bar<(string | null) | null>
+>TComeOnBar : typeof Bar<string? | null>
 >Bar : typeof Bar
 

@@ -1,6 +1,8 @@
 // @target: es2015
 // @strict: true
 
+// KVS accepts postfix extant types; prefix JSDoc-style types remain invalid.
+
 function f1(a: string): a is string! {
     return true;
 }

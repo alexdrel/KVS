@@ -50,12 +50,12 @@ export abstract class ConvenientObservable<T, TChange> implements IObservable<T,
 >T : Symbol(T, Decl(classExtendingAbstractClassWithMemberCalledTheSameAsItsOwnTypeParam.ts, 13, 43))
 >TChange : Symbol(TChange, Decl(classExtendingAbstractClassWithMemberCalledTheSameAsItsOwnTypeParam.ts, 13, 45), Decl(classExtendingAbstractClassWithMemberCalledTheSameAsItsOwnTypeParam.ts, 13, 91))
 
-	get TChange(): TChange { return null!; }
+	get TChange(): TChange { return null as!; }
 >TChange : Symbol(TChange, Decl(classExtendingAbstractClassWithMemberCalledTheSameAsItsOwnTypeParam.ts, 13, 45), Decl(classExtendingAbstractClassWithMemberCalledTheSameAsItsOwnTypeParam.ts, 13, 91))
 >TChange : Symbol(TChange, Decl(classExtendingAbstractClassWithMemberCalledTheSameAsItsOwnTypeParam.ts, 13, 45), Decl(classExtendingAbstractClassWithMemberCalledTheSameAsItsOwnTypeParam.ts, 13, 91))
 
 	public abstract get(): T;
->get : Symbol(ConvenientObservable.get, Decl(classExtendingAbstractClassWithMemberCalledTheSameAsItsOwnTypeParam.ts, 14, 41))
+>get : Symbol(ConvenientObservable.get, Decl(classExtendingAbstractClassWithMemberCalledTheSameAsItsOwnTypeParam.ts, 14, 44))
 >T : Symbol(T, Decl(classExtendingAbstractClassWithMemberCalledTheSameAsItsOwnTypeParam.ts, 13, 43))
 }
 

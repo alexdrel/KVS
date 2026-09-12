@@ -3,7 +3,7 @@ other.tsx(11,9): error TS2769: No overload matches this call.
     Type 'unknown' is not assignable to type 'string | boolean'.
 other.tsx(12,9): error TS2769: No overload matches this call.
   The last overload gave the following error.
-    Type 'string' is not assignable to type 'number | boolean'.
+    Type 'string' is not assignable to type 'number | boolean | null | undefined'.
 
 
 ==== other.tsx (2 errors) ====
@@ -27,7 +27,7 @@ other.tsx(12,9): error TS2769: No overload matches this call.
             ~~~~~~
 !!! error TS2769: No overload matches this call.
 !!! error TS2769:   The last overload gave the following error.
-!!! error TS2769:     Type 'string' is not assignable to type 'number | boolean'.
+!!! error TS2769:     Type 'string' is not assignable to type 'number | boolean | null | undefined'.
 !!! related TS2771 react18/react18.d.ts:478:9: The last overload is declared here.
         </Foo>
     );

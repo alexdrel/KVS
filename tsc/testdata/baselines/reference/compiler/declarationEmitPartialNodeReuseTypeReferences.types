@@ -11,15 +11,15 @@ export namespace N {
     export type SpecialString = string;
 >SpecialString : string
 }
-export const o = (p1: SpecialString, p2: PrivateSpecialString, p3: N.SpecialString) => null! as { foo: SpecialString, bar: PrivateSpecialString, baz: N.SpecialString };
+export const o = (p1: SpecialString, p2: PrivateSpecialString, p3: N.SpecialString) => null as! as { foo: SpecialString, bar: PrivateSpecialString, baz: N.SpecialString };
 >o : (p1: SpecialString, p2: PrivateSpecialString, p3: N.SpecialString) => { foo: SpecialString; bar: PrivateSpecialString; baz: N.SpecialString; }
->(p1: SpecialString, p2: PrivateSpecialString, p3: N.SpecialString) => null! as { foo: SpecialString, bar: PrivateSpecialString, baz: N.SpecialString } : (p1: SpecialString, p2: PrivateSpecialString, p3: N.SpecialString) => { foo: SpecialString; bar: PrivateSpecialString; baz: N.SpecialString; }
+>(p1: SpecialString, p2: PrivateSpecialString, p3: N.SpecialString) => null as! as { foo: SpecialString, bar: PrivateSpecialString, baz: N.SpecialString } : (p1: SpecialString, p2: PrivateSpecialString, p3: N.SpecialString) => { foo: SpecialString; bar: PrivateSpecialString; baz: N.SpecialString; }
 >p1 : string
 >p2 : string
 >p3 : string
 >N : any
->null! as { foo: SpecialString, bar: PrivateSpecialString, baz: N.SpecialString } : { foo: SpecialString; bar: PrivateSpecialString; baz: N.SpecialString; }
->null! : never
+>null as! as { foo: SpecialString, bar: PrivateSpecialString, baz: N.SpecialString } : { foo: SpecialString; bar: PrivateSpecialString; baz: N.SpecialString; }
+>null as! : never
 >foo : string
 >bar : string
 >baz : string

@@ -69,7 +69,7 @@ value?
 can lower to:
 
 ```ts
-value !== null && value !== undefined
+value != null
 ```
 
 In a branch, the KVS type checker narrows `T?` to `T`.
@@ -134,7 +134,7 @@ const options = ?{ title, query, ...overrides };
 
 They can lower to ordinary array pushes and conditional property assignments. For `?{...source}`, the lowering enumerates the source's own enumerable properties and copies only present values. Every source expression and property access is evaluated once in JavaScript order.
 
-The compact ternary lowers directly:
+The nulling operator lowers directly:
 
 ```kvs
 const footer = showFooter ?: renderFooter();
@@ -161,6 +161,11 @@ A complete lowering preserves ordinary target-path evaluation and delays any sta
 ## Producing and result loops
 
 `collect` lowers to an eager loop that appends each `yield`; `select` lowers to a zero-or-one producer boundary that exits on the first `yield` and produces null when none is reached. A `yield?` adds a presence guard and otherwise continues execution. Ordinary loops nested inside `select` do not intercept production.
+
+An iterable-only header lowers with a generated lexical `_` binding. When a
+nested header source refers to an enclosing `_`, that source is evaluated into
+a temporary before the inner binding is introduced; independent sources need
+no temporary.
 
 When a producing loop heads a larger value expression, its statements are
 lifted into the surrounding scope and its generated result temporary replaces

@@ -1,30 +1,30 @@
 //// [tests/cases/compiler/assignmentToConditionalBrandedStringTemplateOrMapping.ts] ////
 
 === assignmentToConditionalBrandedStringTemplateOrMapping.ts ===
-let a: (<T>() => T extends `${'a' & { a: 1 }}` ? 1 : 2) = null!;
+let a: (<T>() => T extends `${'a' & { a: 1 }}` ? 1 : 2) = null as!;
 >a : <T>() => T extends `${'a' & { a: 1; }}` ? 1 : 2
 >a : 1
->null! : never
+>null as! : never
 
-let b: (<T>() => T extends `${'a' & { a: 1 }}` ? 1 : 2) = null!;
+let b: (<T>() => T extends `${'a' & { a: 1 }}` ? 1 : 2) = null as!;
 >b : <T>() => T extends `${'a' & { a: 1; }}` ? 1 : 2
 >a : 1
->null! : never
+>null as! : never
 
 a = b;
 >a = b : <T>() => T extends `${'a' & { a: 1; }}` ? 1 : 2
 >a : <T>() => T extends `${'a' & { a: 1; }}` ? 1 : 2
 >b : <T>() => T extends `${'a' & { a: 1; }}` ? 1 : 2
 
-let c: (<T>() => T extends Uppercase<'a' & { a: 1 }> ? 1 : 2) = null!;
+let c: (<T>() => T extends Uppercase<'a' & { a: 1 }> ? 1 : 2) = null as!;
 >c : <T>() => T extends Uppercase<'a' & { a: 1; }> ? 1 : 2
 >a : 1
->null! : never
+>null as! : never
 
-let d: (<T>() => T extends Uppercase<'a' & { a: 1 }> ? 1 : 2) = null!;
+let d: (<T>() => T extends Uppercase<'a' & { a: 1 }> ? 1 : 2) = null as!;
 >d : <T>() => T extends Uppercase<'a' & { a: 1; }> ? 1 : 2
 >a : 1
->null! : never
+>null as! : never
 
 c = d;
 >c = d : <T>() => T extends Uppercase<'a' & { a: 1; }> ? 1 : 2

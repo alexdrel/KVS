@@ -12,6 +12,16 @@ const impossible = null as!;
 const rejectedAddition = nullableNumber + 2;
 const assertedAddition = nullableNumber as! + 2;
 
+const omittedTrailingTuple: [string, boolean?] = ["pending"];
+const omittedParenthesizedTrailingTuple: [string, (boolean?)] = ["pending"];
+const presentTrailingTuple: [string, boolean?] = ["visible", true];
+const nullTrailingTuple: [string, boolean?] = ["unknown", null];
+const undefinedTrailingTuple: [string, boolean?] = ["unknown", undefined];
+declare const nullableTuple: [string, boolean?];
+const nullableTupleElement: boolean? = nullableTuple[1];
+const presentNonTrailingTuple: [boolean?, string] = [null, "ready"];
+const rejectOmittedNonTrailingTuple: [boolean?, string] = [];
+
 let request? = "ready";
 request = null;
 request = "ready";

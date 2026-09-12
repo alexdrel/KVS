@@ -17,7 +17,7 @@ interface Bar extends Base {
 }
 
 function getV(): Foo | Bar {
-  return null!;
+  return null as!;
 }
 
 const v = getV();

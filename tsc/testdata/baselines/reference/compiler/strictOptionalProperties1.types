@@ -268,60 +268,60 @@ function f3(obj: Partial<{ a: string, b: string | undefined }>) {
 
 function f4(t: [string?]) {
 >f4 : (t: [string?]) => void
->t : [string?]
+>t : [(string | null | undefined)?]
 
     let x = t[0];  // string | undefined
->x : string | undefined
->t[0] : string | undefined
->t : [string?]
+>x : string | null | undefined
+>t[0] : string | null | undefined
+>t : [(string | null | undefined)?]
 >0 : 0
 
     t[0] = 'hello';
 >t[0] = 'hello' : "hello"
->t[0] : string
->t : [string?]
+>t[0] : string | null | undefined
+>t : [(string | null | undefined)?]
 >0 : 0
 >'hello' : "hello"
 
     t[0] = undefined;  // Error
 >t[0] = undefined : undefined
->t[0] : string
->t : [string?]
+>t[0] : string | null | undefined
+>t : [(string | null | undefined)?]
 >0 : 0
 >undefined : undefined
 }
 
 function f4a(t1: [number, string?], t2: [number, string?, string?]) {
 >f4a : (t1: [number, string?], t2: [number, string?, string?]) => void
->t1 : [number, string?]
->t2 : [number, string?, string?]
+>t1 : [number, (string | null | undefined)?]
+>t2 : [number, (string | null | undefined)?, (string | null | undefined)?]
 
     t1 = t2;  // Wasn't an error, but should be
->t1 = t2 : [number, string?, string?]
->t1 : [number, string?]
->t2 : [number, string?, string?]
+>t1 = t2 : [number, (string | null | undefined)?, (string | null | undefined)?]
+>t1 : [number, (string | null | undefined)?]
+>t2 : [number, (string | null | undefined)?, (string | null | undefined)?]
 }
 
 function f5(t: [number, string?, boolean?]) {
 >f5 : (t: [number, string?, boolean?]) => void
->t : [number, string?, boolean?]
+>t : [number, (string | null | undefined)?, (boolean | null | undefined)?]
 
     t = [42];
 >t = [42] : [number]
->t : [number, string?, boolean?]
+>t : [number, (string | null | undefined)?, (boolean | null | undefined)?]
 >[42] : [number]
 >42 : 42
 
     t = [42, 'abc'];
 >t = [42, 'abc'] : [number, string]
->t : [number, string?, boolean?]
+>t : [number, (string | null | undefined)?, (boolean | null | undefined)?]
 >[42, 'abc'] : [number, string]
 >42 : 42
 >'abc' : "abc"
 
     t = [42, 'abc', true];
 >t = [42, 'abc', true] : [number, string, true]
->t : [number, string?, boolean?]
+>t : [number, (string | null | undefined)?, (boolean | null | undefined)?]
 >[42, 'abc', true] : [number, string, true]
 >42 : 42
 >'abc' : "abc"
@@ -329,31 +329,31 @@ function f5(t: [number, string?, boolean?]) {
 
     t = [42, ,];
 >t = [42, ,] : [number, never?]
->t : [number, string?, boolean?]
+>t : [number, (string | null | undefined)?, (boolean | null | undefined)?]
 >[42, ,] : [number, never?]
 >42 : 42
 
     t = [42, , ,];
 >t = [42, , ,] : [number, never?, never?]
->t : [number, string?, boolean?]
+>t : [number, (string | null | undefined)?, (boolean | null | undefined)?]
 >[42, , ,] : [number, never?, never?]
 >42 : 42
 
     t = [42, , , ,];  // Error
 >t = [42, , , ,] : [number, never?, never?, never?]
->t : [number, string?, boolean?]
+>t : [number, (string | null | undefined)?, (boolean | null | undefined)?]
 >[42, , , ,] : [number, never?, never?, never?]
 >42 : 42
 
     t = [, , true];  // Error
 >t = [, , true] : [never?, never?, true?]
->t : [number, string?, boolean?]
+>t : [number, (string | null | undefined)?, (boolean | null | undefined)?]
 >[, , true] : [never?, never?, true?]
 >true : true
 
     t = [42, undefined, true];  // Error
 >t = [42, undefined, true] : [number, undefined, true]
->t : [number, string?, boolean?]
+>t : [number, (string | null | undefined)?, (boolean | null | undefined)?]
 >[42, undefined, true] : [number, undefined, true]
 >42 : 42
 >undefined : undefined
@@ -444,25 +444,25 @@ const completeProps: Props = { ...defaultProps, ...inputProps };
 // Example from #13195
 
 const t1: [number, string?, boolean?] = [1];
->t1 : [number, string?, boolean?]
+>t1 : [number, (string | null | undefined)?, (boolean | null | undefined)?]
 >[1] : [number]
 >1 : 1
 
 const t2: [number, string?, boolean?] = [1, undefined];
->t2 : [number, string?, boolean?]
+>t2 : [number, (string | null | undefined)?, (boolean | null | undefined)?]
 >[1, undefined] : [number, undefined]
 >1 : 1
 >undefined : undefined
 
 const t3: [number, string?, boolean?] = [1, "string", undefined];
->t3 : [number, string?, boolean?]
+>t3 : [number, (string | null | undefined)?, (boolean | null | undefined)?]
 >[1, "string", undefined] : [number, string, undefined]
 >1 : 1
 >"string" : "string"
 >undefined : undefined
 
 const t4: [number, string?, boolean?] = [1, undefined, undefined];
->t4 : [number, string?, boolean?]
+>t4 : [number, (string | null | undefined)?, (boolean | null | undefined)?]
 >[1, undefined, undefined] : [number, undefined, undefined]
 >1 : 1
 >undefined : undefined
@@ -523,10 +523,10 @@ declare let tx2: [string | undefined];
 >tx2 : [string | undefined]
 
 declare let tx3: [string?];
->tx3 : [string?]
+>tx3 : [(string | null | undefined)?]
 
 declare let tx4: [(string | undefined)?];
->tx4 : [(string | undefined)?]
+>tx4 : [(string | null | undefined)?]
 
 declare function f11<T>(x: { p?: T }): T;
 >f11 : <T>(x: { p?: T; }) => T
@@ -555,7 +555,7 @@ f11(ox4);  // string | undefined
 
 declare function f12<T>(x: [T?]): T;
 >f12 : <T>(x: [T?]) => T
->x : [T?]
+>x : [(T | null | undefined)?]
 
 f12(tx1);  // string
 >f12(tx1) : string
@@ -563,19 +563,19 @@ f12(tx1);  // string
 >tx1 : [string]
 
 f12(tx2);  // string | undefined
->f12(tx2) : string | undefined
+>f12(tx2) : string
 >f12 : <T>(x: [T?]) => T
 >tx2 : [string | undefined]
 
 f12(tx3);  // string
 >f12(tx3) : string
 >f12 : <T>(x: [T?]) => T
->tx3 : [string?]
+>tx3 : [(string | null | undefined)?]
 
 f12(tx4);  // string | undefined
->f12(tx4) : string | undefined
+>f12(tx4) : string
 >f12 : <T>(x: [T?]) => T
->tx4 : [(string | undefined)?]
+>tx4 : [(string | null | undefined)?]
 
 declare function f13<T>(x: Partial<T>): T;
 >f13 : <T>(x: Partial<T>) => T
@@ -612,14 +612,14 @@ f13(tx2);  // [string | undefined]
 >tx2 : [string | undefined]
 
 f13(tx3);  // [string]
->f13(tx3) : [string]
+>f13(tx3) : [string | null | undefined]
 >f13 : <T>(x: Partial<T>) => T
->tx3 : [string?]
+>tx3 : [(string | null | undefined)?]
 
 f13(tx4);  // [string | undefined]
->f13(tx4) : [string | undefined]
+>f13(tx4) : [string | null | undefined]
 >f13 : <T>(x: Partial<T>) => T
->tx4 : [(string | undefined)?]
+>tx4 : [(string | null | undefined)?]
 
 // Repro from #44388
 

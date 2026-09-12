@@ -47,6 +47,7 @@ const (
 	NodeFlagsReparserTransformedLiteral    NodeFlags = 1 << 28 // If node was transformed during parsing, making its' naive text source not match the AST
 	NodeFlagsKvsNullableBinding            NodeFlags = 1 << 29 // KVS inferred nullable binding suffix
 	NodeFlagsKvsExtantBinding              NodeFlags = 1 << 30 // KVS inferred required binding suffix
+	NodeFlagsKvsImplicitSubject            NodeFlags = 1 << 31 // KVS iterable-only header with a synthesized `_` binding
 
 	NodeFlagsBlockScoped = NodeFlagsLet | NodeFlagsConst | NodeFlagsUsing
 	NodeFlagsConstant    = NodeFlagsConst | NodeFlagsUsing

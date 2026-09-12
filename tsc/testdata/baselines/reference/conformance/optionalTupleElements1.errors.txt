@@ -1,4 +1,3 @@
-optionalTupleElements1.ts(11,29): error TS1257: A required element cannot follow an optional element.
 optionalTupleElements1.ts(15,5): error TS2322: Type 'T2' is not assignable to type 'T1'.
   Source provides no match for required element at position 2 in target.
 optionalTupleElements1.ts(16,5): error TS2322: Type 'T3' is not assignable to type 'T1'.
@@ -13,7 +12,7 @@ optionalTupleElements1.ts(25,5): error TS2322: Type 'T4' is not assignable to ty
   Source provides no match for required element at position 0 in target.
 
 
-==== optionalTupleElements1.ts (7 errors) ====
+==== optionalTupleElements1.ts (6 errors) ====
     type T1 = [number, string, boolean];
     type T2 = [number, string, boolean?];
     type T3 = [number, string?, boolean?];
@@ -25,8 +24,6 @@ optionalTupleElements1.ts(25,5): error TS2322: Type 'T4' is not assignable to ty
     type L4 = T4["length"];
     
     type T5 = [number, string?, boolean];  // Error
-                                ~~~~~~~
-!!! error TS1257: A required element cannot follow an optional element.
     
     function f1(t1: T1, t2: T2, t3: T3, t4: T4) {
         t1 = t1;

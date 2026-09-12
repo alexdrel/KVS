@@ -11,7 +11,7 @@ function MyComp2(props: { className?: string, htmlFor?: string }) {
 >className : Symbol(className, Decl(spellingSuggestionJSXAttribute.tsx, 3, 25))
 >htmlFor : Symbol(htmlFor, Decl(spellingSuggestionJSXAttribute.tsx, 3, 45))
 
-    return null!;
+    return (null as!);
 }
 class MyComp extends React.Component<{ className?: string, htmlFor?: string }> { }
 >MyComp : Symbol(MyComp, Decl(spellingSuggestionJSXAttribute.tsx, 5, 1))

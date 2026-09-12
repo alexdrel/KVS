@@ -190,7 +190,7 @@ function f90<T extends { x: number }>() {
 }
 
 function f<T extends { x: {} }>(): Partial<T> {
-    return undefined! as T;
+    return undefined as! as T;
 }
 
 // #32365

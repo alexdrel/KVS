@@ -17,26 +17,26 @@ type Test = [a: 1, b?: 2] extends Foo ? true : false;  // true
 // Types in the following declarations should be identical
 
 var v: [1, 2?];
->v : [1, (2 | undefined)?]
+>v : [1, (2 | null | undefined)?]
 
 var v: [1, (2 | undefined)?];
->v : [1, (2 | undefined)?]
+>v : [1, (2 | null | undefined)?]
 
 var v: [a: 1, b?: 2];
->v : [1, (2 | undefined)?]
+>v : [1, (2 | null | undefined)?]
 
 var v: [a: 1, b?: 2 | undefined];
->v : [1, (2 | undefined)?]
+>v : [1, (2 | null | undefined)?]
 
 var v: UnNullify<[1, 2?]>;
->v : [1, (2 | undefined)?]
+>v : [1, (2 | null | undefined)?]
 
 var v: UnNullify<[1, (2 | undefined)?]>;
->v : [1, (2 | undefined)?]
+>v : [1, (2 | null | undefined)?]
 
 var v: UnNullify<[a: 1, b?: 2]>;
->v : [1, (2 | undefined)?]
+>v : [1, (2 | null | undefined)?]
 
 var v: UnNullify<[a: 1, b?: 2 | undefined]>;
->v : [1, (2 | undefined)?]
+>v : [1, (2 | null | undefined)?]
 

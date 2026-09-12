@@ -50,6 +50,19 @@ func newEmitResolver(checker *Checker) *EmitResolver {
 	return e
 }
 
+func (r *EmitResolver) GetKvsDefaultKind(node *ast.Node) ast.KvsDefaultKind {
+	r.checkerMu.Lock()
+	defer r.checkerMu.Unlock()
+	t := r.checker.GetNonNullableType(r.checker.checkExpression(node.Expression()))
+	return r.checker.getKvsDefaultKindForType(t)
+}
+
+func (r *EmitResolver) IsKvsNullableIterableSource(node *ast.Node) bool {
+	r.checkerMu.Lock()
+	defer r.checkerMu.Unlock()
+	return r.checker.maybeTypeOfKind(r.checker.checkExpression(node), TypeFlagsNullable)
+}
+
 func (r *EmitResolver) GetJsxFactoryEntity(location *ast.Node) *ast.Node {
 	r.checkerMu.Lock()
 	defer r.checkerMu.Unlock()

@@ -8,3 +8,4 @@ function boo {
   static test(name:string)
   static test(name?:any){ }
 }
+

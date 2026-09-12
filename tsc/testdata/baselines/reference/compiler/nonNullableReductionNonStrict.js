@@ -12,11 +12,11 @@ function test<T>(f1: Transform1<T>, f2: Transform2<T>) {
 }
 
 function f1<T>(x: T | (string extends T ? null | undefined : never)) {
-    let z = x!;  // NonNullable<T>
+    let z = x as!;  // NonNullable<T>
 }
 
 function f2<T, U extends null | undefined>(x: T | U) {
-    let z = x!;  // NonNullable<T>
+    let z = x as!;  // NonNullable<T>
 }
 
 

@@ -7,7 +7,7 @@ import (
 	"github.com/microsoft/TypeScript/tsc/internal/testutil"
 )
 
-func TestFormattingNonNullAssertionOperator(t *testing.T) {
+func TestFormattingKvsDefaultOperator(t *testing.T) {
 	t.Parallel()
 	defer testutil.RecoverAndFail(t, "Panic on fourslash test")
 	const content = `/*1*/ 'bar' ! ;

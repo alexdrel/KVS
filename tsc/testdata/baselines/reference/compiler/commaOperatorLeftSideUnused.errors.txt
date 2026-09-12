@@ -14,7 +14,6 @@ commaOperatorLeftSideUnused.ts(31,7): error TS2695: Left side of comma operator 
 commaOperatorLeftSideUnused.ts(32,7): error TS2695: Left side of comma operator is unused and has no side effects.
 commaOperatorLeftSideUnused.ts(33,7): error TS2695: Left side of comma operator is unused and has no side effects.
 commaOperatorLeftSideUnused.ts(34,7): error TS2695: Left side of comma operator is unused and has no side effects.
-commaOperatorLeftSideUnused.ts(35,7): error TS2695: Left side of comma operator is unused and has no side effects.
 commaOperatorLeftSideUnused.ts(36,7): error TS2695: Left side of comma operator is unused and has no side effects.
 commaOperatorLeftSideUnused.ts(37,7): error TS2695: Left side of comma operator is unused and has no side effects.
 commaOperatorLeftSideUnused.ts(38,7): error TS2695: Left side of comma operator is unused and has no side effects.
@@ -24,7 +23,7 @@ commaOperatorLeftSideUnused.ts(41,7): error TS2695: Left side of comma operator 
 commaOperatorLeftSideUnused.ts(42,7): error TS2695: Left side of comma operator is unused and has no side effects.
 
 
-==== commaOperatorLeftSideUnused.ts (24 errors) ====
+==== commaOperatorLeftSideUnused.ts (23 errors) ====
     var xx: any;
     var yy: any;
     
@@ -91,9 +90,7 @@ commaOperatorLeftSideUnused.ts(42,7): error TS2695: Left side of comma operator 
     xx = ([1, 2, x++], xx);
           ~~~~~~~~~~~
 !!! error TS2695: Left side of comma operator is unused and has no side effects.
-    xx = (xx!, xx);
-          ~~~
-!!! error TS2695: Left side of comma operator is unused and has no side effects.
+    xx = (xx as!, xx);
     xx = (xx ? 3 : 4, 10);
           ~~~~~~~~~~
 !!! error TS2695: Left side of comma operator is unused and has no side effects.

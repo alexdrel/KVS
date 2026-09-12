@@ -63,4 +63,4 @@ function fn12<T>(x: TemplatedConditional<T, T, T, never>) {
 }
 
 declare var z: any;
-const zee = z!!!; // since x is `any`, `x extends null | undefined` should be both true and false - and thus yield `any` 
+const zee = z as! as! as!; // since x is `any`, `x extends null | undefined` should be both true and false - and thus yield `any` 

@@ -10,7 +10,7 @@ export class WithData {
     }
 }
 
-export const a = (new WithData())["ahahahaahah"]!();
+export const a = ((new WithData())["ahahahaahah"] as!)();
 
 //// [declarationEmitComputedNameWithQuestionToken.js]
 "use strict";
@@ -23,7 +23,7 @@ class WithData {
     }
 }
 exports.WithData = WithData;
-exports.a = (new WithData())["ahahahaahah"]();
+exports.a = ((new WithData())["ahahahaahah"])();
 
 
 //// [declarationEmitComputedNameWithQuestionToken.d.ts]

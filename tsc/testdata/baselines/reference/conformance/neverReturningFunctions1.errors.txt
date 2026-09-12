@@ -296,7 +296,7 @@ neverReturningFunctions1.ts(153,5): error TS7027: Unreachable code detected.
     
     	multiply(f: number) {
     		// Reference to system because both were registered with the same name.
-    		return f * this.data.num * this.system!.data.counter;
+    		return f * this.data.num * (this.system as!).data.counter;
     	}
     });
     

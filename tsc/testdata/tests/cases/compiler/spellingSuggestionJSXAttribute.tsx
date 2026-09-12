@@ -4,7 +4,7 @@
 import * as React from "react";
 
 function MyComp2(props: { className?: string, htmlFor?: string }) {
-    return null!;
+    return (null as!);
 }
 class MyComp extends React.Component<{ className?: string, htmlFor?: string }> { }
 <a class="" />;

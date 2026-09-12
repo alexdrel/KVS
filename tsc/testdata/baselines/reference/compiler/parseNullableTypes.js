@@ -1,6 +1,8 @@
-//// [tests/cases/compiler/parseInvalidNullableTypes.ts] ////
+//// [tests/cases/compiler/parseNullableTypes.ts] ////
 
-//// [parseInvalidNullableTypes.ts]
+//// [parseNullableTypes.ts]
+// KVS accepts postfix nullable types; prefix JSDoc-style types remain invalid.
+
 function f1(a: string): a is ?string {
     return true;
 }
@@ -27,8 +29,9 @@ let g: void?;
 let h: undefined?;
 
 
-//// [parseInvalidNullableTypes.js]
+//// [parseNullableTypes.js]
 "use strict";
+// KVS accepts postfix nullable types; prefix JSDoc-style types remain invalid.
 function f1(a) {
     return true;
 }

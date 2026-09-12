@@ -728,9 +728,10 @@ function f35431(a: A) {
 >"def" : "def"
 
     default:
-      a!.kind; // Error expected
->a!.kind : any
->a! : never
+      (a as!).kind; // Error expected
+>(a as!).kind : any
+>(a as!) : never
+>a as! : never
 >a : never
 >kind : any
   }

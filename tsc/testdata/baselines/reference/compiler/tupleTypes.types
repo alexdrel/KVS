@@ -242,12 +242,12 @@ b.length = 0; // Error
 >0 : 0
 
 declare const b1: readonly [number?];
->b1 : readonly [(number | undefined)?]
+>b1 : readonly [(number | null | undefined)?]
 
 b1.length = 0; // Error
 >b1.length = 0 : 0
 >b1.length : any
->b1 : readonly [(number | undefined)?]
+>b1 : readonly [(number | null | undefined)?]
 >length : any
 >0 : 0
 
@@ -272,12 +272,12 @@ b3.length = 0; // Error
 >0 : 0
 
 declare const b4: [number?];
->b4 : [(number | undefined)?]
+>b4 : [(number | null | undefined)?]
 
 b4.length = 0;
 >b4.length = 0 : 0
 >b4.length : 0 | 1
->b4 : [(number | undefined)?]
+>b4 : [(number | null | undefined)?]
 >length : 0 | 1
 >0 : 0
 

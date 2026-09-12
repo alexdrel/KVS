@@ -25,10 +25,9 @@ jsdocDisallowedInTypescript.ts(15,32): error TS1005: ';' expected.
 jsdocDisallowedInTypescript.ts(15,34): error TS2693: 'number' only refers to a type, but is being used as a value here.
 jsdocDisallowedInTypescript.ts(15,44): error TS7006: Parameter 'n' implicitly has an 'any' type.
 jsdocDisallowedInTypescript.ts(15,46): error TS7006: Parameter 'm' implicitly has an 'any' type.
-jsdocDisallowedInTypescript.ts(18,5): error TS2322: Type 'undefined' is not assignable to type 'number | null'.
 
 
-==== jsdocDisallowedInTypescript.ts (28 errors) ====
+==== jsdocDisallowedInTypescript.ts (27 errors) ====
     // grammar error from checker
     var ara: Array.<number> = [1,2,3];
     
@@ -102,13 +101,11 @@ jsdocDisallowedInTypescript.ts(18,5): error TS2322: Type 'undefined' is not assi
                                                  ~
 !!! error TS7006: Parameter 'm' implicitly has an 'any' type.
     var most: !string = 'definite';
+    // Postfix forms are KVS types rather than JSDoc syntax.
     var postfixdef: number! = 101;
     var postfixopt: number? = undefined;
-        ~~~~~~~~~~
-!!! error TS2322: Type 'undefined' is not assignable to type 'number | null'.
     
     var nns: Array<?number>;
     var dns: Array<!number>;
     var anys: Array<*>;
-    
     

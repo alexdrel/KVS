@@ -21,8 +21,8 @@ class Table<S extends Schema>  {
     getRows<C extends keyof S>(): Array<UnrollOnHover<Pick<S, C>>> {
 >getRows : <C extends keyof S>() => Array<UnrollOnHover<Pick<S, C>>>
 
-        return null!
->null! : never
+        return null as!
+>null as! : never
     }
 }
 

@@ -53,39 +53,37 @@ const working: WorkingType = null as unknown as WorkingType;
 >null as unknown as WorkingType : WorkingType
 >null as unknown : unknown
 
-if (working.thing!.name !== "Correct") {
->working.thing!.name !== "Correct" : boolean
->working.thing!.name : "Correct" | "Error1" | "Error2" | "Error3" | "Error4" | "Error5" | "Error6" | "Error7" | "Error8" | "Error9"
->working.thing! : { name: 'Error1'; message: string; } | { name: 'Error2'; message: string; } | { name: 'Error3'; message: string; } | { name: 'Error4'; message: string; } | { name: 'Error5'; message: string; } | { name: 'Error6'; message: string; } | { name: 'Error7'; message: string; } | { name: 'Error8'; message: string; } | { name: 'Error9'; message: string; } | { name: 'Correct'; id: string; }
+const workingThing = working.thing as!;
+>workingThing : { name: 'Error1'; message: string; } | { name: 'Error2'; message: string; } | { name: 'Error3'; message: string; } | { name: 'Error4'; message: string; } | { name: 'Error5'; message: string; } | { name: 'Error6'; message: string; } | { name: 'Error7'; message: string; } | { name: 'Error8'; message: string; } | { name: 'Error9'; message: string; } | { name: 'Correct'; id: string; }
+>working.thing as! : { name: 'Error1'; message: string; } | { name: 'Error2'; message: string; } | { name: 'Error3'; message: string; } | { name: 'Error4'; message: string; } | { name: 'Error5'; message: string; } | { name: 'Error6'; message: string; } | { name: 'Error7'; message: string; } | { name: 'Error8'; message: string; } | { name: 'Error9'; message: string; } | { name: 'Correct'; id: string; }
 >working.thing : { name: 'Error1'; message: string; } | { name: 'Error2'; message: string; } | { name: 'Error3'; message: string; } | { name: 'Error4'; message: string; } | { name: 'Error5'; message: string; } | { name: 'Error6'; message: string; } | { name: 'Error7'; message: string; } | { name: 'Error8'; message: string; } | { name: 'Error9'; message: string; } | { name: 'Correct'; id: string; } | undefined
 >working : WorkingType
 >thing : { name: 'Error1'; message: string; } | { name: 'Error2'; message: string; } | { name: 'Error3'; message: string; } | { name: 'Error4'; message: string; } | { name: 'Error5'; message: string; } | { name: 'Error6'; message: string; } | { name: 'Error7'; message: string; } | { name: 'Error8'; message: string; } | { name: 'Error9'; message: string; } | { name: 'Correct'; id: string; } | undefined
+
+if (workingThing.name !== "Correct") {
+>workingThing.name !== "Correct" : boolean
+>workingThing.name : "Correct" | "Error1" | "Error2" | "Error3" | "Error4" | "Error5" | "Error6" | "Error7" | "Error8" | "Error9"
+>workingThing : { name: 'Error1'; message: string; } | { name: 'Error2'; message: string; } | { name: 'Error3'; message: string; } | { name: 'Error4'; message: string; } | { name: 'Error5'; message: string; } | { name: 'Error6'; message: string; } | { name: 'Error7'; message: string; } | { name: 'Error8'; message: string; } | { name: 'Error9'; message: string; } | { name: 'Correct'; id: string; }
 >name : "Correct" | "Error1" | "Error2" | "Error3" | "Error4" | "Error5" | "Error6" | "Error7" | "Error8" | "Error9"
 >"Correct" : "Correct"
 
-    console.log(working.thing!.message)
->console.log(working.thing!.message) : void
+    console.log(workingThing.message)
+>console.log(workingThing.message) : void
 >console.log : (...data: any[]) => void
 >console : Console
 >log : (...data: any[]) => void
->working.thing!.message : string
->working.thing! : { name: 'Error1'; message: string; } | { name: 'Error2'; message: string; } | { name: 'Error3'; message: string; } | { name: 'Error4'; message: string; } | { name: 'Error5'; message: string; } | { name: 'Error6'; message: string; } | { name: 'Error7'; message: string; } | { name: 'Error8'; message: string; } | { name: 'Error9'; message: string; }
->working.thing : { name: 'Error1'; message: string; } | { name: 'Error2'; message: string; } | { name: 'Error3'; message: string; } | { name: 'Error4'; message: string; } | { name: 'Error5'; message: string; } | { name: 'Error6'; message: string; } | { name: 'Error7'; message: string; } | { name: 'Error8'; message: string; } | { name: 'Error9'; message: string; } | undefined
->working : WorkingType
->thing : { name: 'Error1'; message: string; } | { name: 'Error2'; message: string; } | { name: 'Error3'; message: string; } | { name: 'Error4'; message: string; } | { name: 'Error5'; message: string; } | { name: 'Error6'; message: string; } | { name: 'Error7'; message: string; } | { name: 'Error8'; message: string; } | { name: 'Error9'; message: string; } | undefined
+>workingThing.message : string
+>workingThing : { name: 'Error1'; message: string; } | { name: 'Error2'; message: string; } | { name: 'Error3'; message: string; } | { name: 'Error4'; message: string; } | { name: 'Error5'; message: string; } | { name: 'Error6'; message: string; } | { name: 'Error7'; message: string; } | { name: 'Error8'; message: string; } | { name: 'Error9'; message: string; }
 >message : string
 
 } else {
-    console.log(working.thing!.id);
->console.log(working.thing!.id) : void
+    console.log(workingThing.id);
+>console.log(workingThing.id) : void
 >console.log : (...data: any[]) => void
 >console : Console
 >log : (...data: any[]) => void
->working.thing!.id : string
->working.thing! : { name: 'Correct'; id: string; }
->working.thing : { name: 'Correct'; id: string; }
->working : WorkingType
->thing : { name: 'Correct'; id: string; }
+>workingThing.id : string
+>workingThing : { name: 'Correct'; id: string; }
 >id : string
 }
 
@@ -137,39 +135,37 @@ const borked: BorkedType = null as unknown as BorkedType;
 >null as unknown as BorkedType : BorkedType
 >null as unknown : unknown
 
-if (borked.thing!.name !== "Correct") {
->borked.thing!.name !== "Correct" : boolean
->borked.thing!.name : "Correct" | "Error1" | "Error2" | "Error3" | "Error4" | "Error5" | "Error6" | "Error7" | "Error8"
->borked.thing! : { name: 'Error1'; message: string; } | { name: 'Error2'; message: string; } | { name: 'Error3'; message: string; } | { name: 'Error4'; message: string; } | { name: 'Error5'; message: string; } | { name: 'Error6'; message: string; } | { name: 'Error7'; message: string; } | { name: 'Error8'; message: string; } | { name: 'Correct'; id: string; }
+const borkedThing = borked.thing as!;
+>borkedThing : { name: 'Error1'; message: string; } | { name: 'Error2'; message: string; } | { name: 'Error3'; message: string; } | { name: 'Error4'; message: string; } | { name: 'Error5'; message: string; } | { name: 'Error6'; message: string; } | { name: 'Error7'; message: string; } | { name: 'Error8'; message: string; } | { name: 'Correct'; id: string; }
+>borked.thing as! : { name: 'Error1'; message: string; } | { name: 'Error2'; message: string; } | { name: 'Error3'; message: string; } | { name: 'Error4'; message: string; } | { name: 'Error5'; message: string; } | { name: 'Error6'; message: string; } | { name: 'Error7'; message: string; } | { name: 'Error8'; message: string; } | { name: 'Correct'; id: string; }
 >borked.thing : { name: 'Error1'; message: string; } | { name: 'Error2'; message: string; } | { name: 'Error3'; message: string; } | { name: 'Error4'; message: string; } | { name: 'Error5'; message: string; } | { name: 'Error6'; message: string; } | { name: 'Error7'; message: string; } | { name: 'Error8'; message: string; } | { name: 'Correct'; id: string; } | undefined
 >borked : BorkedType
 >thing : { name: 'Error1'; message: string; } | { name: 'Error2'; message: string; } | { name: 'Error3'; message: string; } | { name: 'Error4'; message: string; } | { name: 'Error5'; message: string; } | { name: 'Error6'; message: string; } | { name: 'Error7'; message: string; } | { name: 'Error8'; message: string; } | { name: 'Correct'; id: string; } | undefined
+
+if (borkedThing.name !== "Correct") {
+>borkedThing.name !== "Correct" : boolean
+>borkedThing.name : "Correct" | "Error1" | "Error2" | "Error3" | "Error4" | "Error5" | "Error6" | "Error7" | "Error8"
+>borkedThing : { name: 'Error1'; message: string; } | { name: 'Error2'; message: string; } | { name: 'Error3'; message: string; } | { name: 'Error4'; message: string; } | { name: 'Error5'; message: string; } | { name: 'Error6'; message: string; } | { name: 'Error7'; message: string; } | { name: 'Error8'; message: string; } | { name: 'Correct'; id: string; }
 >name : "Correct" | "Error1" | "Error2" | "Error3" | "Error4" | "Error5" | "Error6" | "Error7" | "Error8"
 >"Correct" : "Correct"
 
-    console.log(borked.thing!.message);
->console.log(borked.thing!.message) : void
+    console.log(borkedThing.message);
+>console.log(borkedThing.message) : void
 >console.log : (...data: any[]) => void
 >console : Console
 >log : (...data: any[]) => void
->borked.thing!.message : string
->borked.thing! : { name: 'Error1'; message: string; } | { name: 'Error2'; message: string; } | { name: 'Error3'; message: string; } | { name: 'Error4'; message: string; } | { name: 'Error5'; message: string; } | { name: 'Error6'; message: string; } | { name: 'Error7'; message: string; } | { name: 'Error8'; message: string; }
->borked.thing : { name: 'Error1'; message: string; } | { name: 'Error2'; message: string; } | { name: 'Error3'; message: string; } | { name: 'Error4'; message: string; } | { name: 'Error5'; message: string; } | { name: 'Error6'; message: string; } | { name: 'Error7'; message: string; } | { name: 'Error8'; message: string; } | undefined
->borked : BorkedType
->thing : { name: 'Error1'; message: string; } | { name: 'Error2'; message: string; } | { name: 'Error3'; message: string; } | { name: 'Error4'; message: string; } | { name: 'Error5'; message: string; } | { name: 'Error6'; message: string; } | { name: 'Error7'; message: string; } | { name: 'Error8'; message: string; } | undefined
+>borkedThing.message : string
+>borkedThing : { name: 'Error1'; message: string; } | { name: 'Error2'; message: string; } | { name: 'Error3'; message: string; } | { name: 'Error4'; message: string; } | { name: 'Error5'; message: string; } | { name: 'Error6'; message: string; } | { name: 'Error7'; message: string; } | { name: 'Error8'; message: string; }
 >message : string
 
 } else {
-    console.log(borked.thing!.id);
->console.log(borked.thing!.id) : void
+    console.log(borkedThing.id);
+>console.log(borkedThing.id) : void
 >console.log : (...data: any[]) => void
 >console : Console
 >log : (...data: any[]) => void
->borked.thing!.id : string
->borked.thing! : { name: 'Correct'; id: string; }
->borked.thing : { name: 'Correct'; id: string; } | undefined
->borked : BorkedType
->thing : { name: 'Correct'; id: string; } | undefined
+>borkedThing.id : string
+>borkedThing : { name: 'Correct'; id: string; }
 >id : string
 }
 
@@ -230,13 +226,14 @@ if (fixed.thing?.name !== "Correct") {
 >name : "Correct" | "Error1" | "Error2" | "Error3" | "Error4" | "Error5" | "Error6" | "Error7" | "Error8" | undefined
 >"Correct" : "Correct"
 
-    console.log(fixed.thing!.message);
->console.log(fixed.thing!.message) : void
+    console.log((fixed.thing as!).message);
+>console.log((fixed.thing as!).message) : void
 >console.log : (...data: any[]) => void
 >console : Console
 >log : (...data: any[]) => void
->fixed.thing!.message : string
->fixed.thing! : { name: 'Error1'; message: string; } | { name: 'Error2'; message: string; } | { name: 'Error3'; message: string; } | { name: 'Error4'; message: string; } | { name: 'Error5'; message: string; } | { name: 'Error6'; message: string; } | { name: 'Error7'; message: string; } | { name: 'Error8'; message: string; }
+>(fixed.thing as!).message : string
+>(fixed.thing as!) : { name: 'Error1'; message: string; } | { name: 'Error2'; message: string; } | { name: 'Error3'; message: string; } | { name: 'Error4'; message: string; } | { name: 'Error5'; message: string; } | { name: 'Error6'; message: string; } | { name: 'Error7'; message: string; } | { name: 'Error8'; message: string; }
+>fixed.thing as! : { name: 'Error1'; message: string; } | { name: 'Error2'; message: string; } | { name: 'Error3'; message: string; } | { name: 'Error4'; message: string; } | { name: 'Error5'; message: string; } | { name: 'Error6'; message: string; } | { name: 'Error7'; message: string; } | { name: 'Error8'; message: string; }
 >fixed.thing : { name: 'Error1'; message: string; } | { name: 'Error2'; message: string; } | { name: 'Error3'; message: string; } | { name: 'Error4'; message: string; } | { name: 'Error5'; message: string; } | { name: 'Error6'; message: string; } | { name: 'Error7'; message: string; } | { name: 'Error8'; message: string; } | undefined
 >fixed : FixedType
 >thing : { name: 'Error1'; message: string; } | { name: 'Error2'; message: string; } | { name: 'Error3'; message: string; } | { name: 'Error4'; message: string; } | { name: 'Error5'; message: string; } | { name: 'Error6'; message: string; } | { name: 'Error7'; message: string; } | { name: 'Error8'; message: string; } | undefined
@@ -254,3 +251,4 @@ if (fixed.thing?.name !== "Correct") {
 >thing : { name: 'Correct'; id: string; }
 >id : string
 }
+

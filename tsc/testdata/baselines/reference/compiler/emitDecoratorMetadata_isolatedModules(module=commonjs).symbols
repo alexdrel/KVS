@@ -75,7 +75,7 @@ class HelloWorld {
   @EventListener('3')
 >EventListener : Symbol(EventListener, Decl(index.ts, 4, 11))
 
-  handleEvent3(event: C3): T1 { return undefined! } // Ok, Error
+  handleEvent3(event: C3): T1 { return undefined as! } // Ok, Error
 >handleEvent3 : Symbol(HelloWorld.handleEvent3, Decl(index.ts, 20, 10))
 >event : Symbol(event, Decl(index.ts, 23, 15))
 >C3 : Symbol(C3, Decl(index.ts, 3, 8))

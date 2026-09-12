@@ -528,7 +528,7 @@ func isYieldOrYieldStarWithOperand(context *FormattingContext) bool {
 }
 
 func isNonNullAssertionContext(context *FormattingContext) bool {
-	return context.contextNode.Kind == ast.KindNonNullExpression
+	return context.contextNode.Kind == ast.KindNonNullExpression || context.contextNode.Kind == ast.KindKvsDefaultExpression
 }
 
 func isNotStatementConditionContext(context *FormattingContext) bool {

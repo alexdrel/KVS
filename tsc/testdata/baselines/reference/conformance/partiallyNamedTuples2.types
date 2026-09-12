@@ -26,9 +26,9 @@ type GetResult<
   : Id extends [...Args, ...infer Rest]
   ? Iterable<[...Rest, Value]>
   : never;
-const x: MultiKeyMap<[id1: string, id2: string], object> = null!;
+const x: MultiKeyMap<[id1: string, id2: string], object> = null as!;
 >x : MultiKeyMap<[id1: string, id2: string], object>
->null! : never
+>null as! : never
 
 const id1 = "abc" as string;
 >id1 : string

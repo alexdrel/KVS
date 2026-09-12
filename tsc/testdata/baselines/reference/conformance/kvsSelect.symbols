@@ -95,21 +95,40 @@ function selectField(groups: Group[]) {
     };
 }
 
+declare function getOptionalGroups(): Group[] | null | undefined;
+>getOptionalGroups : Symbol(getOptionalGroups, Decl(kvsSelect.ts, 34, 1))
+>Group : Symbol(Group, Decl(kvsSelect.ts, 0, 0))
+
+function selectFromOptionalGroups() {
+>selectFromOptionalGroups : Symbol(selectFromOptionalGroups, Decl(kvsSelect.ts, 36, 65))
+
+    return select (const group of getOptionalGroups()) {
+>group : Symbol(group, Decl(kvsSelect.ts, 39, 24))
+>getOptionalGroups : Symbol(getOptionalGroups, Decl(kvsSelect.ts, 34, 1))
+
+        yield? group.candidates[0];
+>group.candidates : Symbol(Group.candidates, Decl(kvsSelect.ts, 1, 18))
+>group : Symbol(group, Decl(kvsSelect.ts, 39, 24))
+>candidates : Symbol(Group.candidates, Decl(kvsSelect.ts, 1, 18))
+
+    };
+}
+
 function rejectNestedPosition(groups: Group[]) {
->rejectNestedPosition : Symbol(rejectNestedPosition, Decl(kvsSelect.ts, 34, 1))
->groups : Symbol(groups, Decl(kvsSelect.ts, 36, 30))
+>rejectNestedPosition : Symbol(rejectNestedPosition, Decl(kvsSelect.ts, 42, 1))
+>groups : Symbol(groups, Decl(kvsSelect.ts, 44, 30))
 >Group : Symbol(Group, Decl(kvsSelect.ts, 0, 0))
 
     console.log(select (const group of groups) {
 >console.log : Symbol(Console.log, Decl(lib.dom.d.ts, --, --))
 >console : Symbol(console, Decl(lib.dom.d.ts, --, --))
 >log : Symbol(Console.log, Decl(lib.dom.d.ts, --, --))
->group : Symbol(group, Decl(kvsSelect.ts, 37, 29))
->groups : Symbol(groups, Decl(kvsSelect.ts, 36, 30))
+>group : Symbol(group, Decl(kvsSelect.ts, 45, 29))
+>groups : Symbol(groups, Decl(kvsSelect.ts, 44, 30))
 
         yield group.value;
 >group.value : Symbol(Group.value, Decl(kvsSelect.ts, 0, 17))
->group : Symbol(group, Decl(kvsSelect.ts, 37, 29))
+>group : Symbol(group, Decl(kvsSelect.ts, 45, 29))
 >value : Symbol(Group.value, Decl(kvsSelect.ts, 0, 17))
 
     });

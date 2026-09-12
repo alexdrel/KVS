@@ -305,6 +305,11 @@ func (walker *typeWriterWalker) visitNode(node *ast.Node, isSymbolWalk bool) []*
 	nodes := forEachASTNode(node)
 	var results []*typeWriterResult
 	for _, n := range nodes {
+		if n.Kind == ast.KindIdentifier && n.Flags&ast.NodeFlagsSynthesized != 0 && n.Parent != nil && n.Parent.Kind == ast.KindVariableDeclaration && n.Parent.Parent != nil && n.Parent.Parent.Flags&ast.NodeFlagsSynthesized != 0 {
+			// Parser-created semantic bindings, such as the hidden `_` in a KVS
+			// implicit-subject header, have no source text to annotate.
+			continue
+		}
 		if ast.IsExpressionNode(n) || n.Kind == ast.KindIdentifier || ast.IsDeclarationName(n) ||
 			ast.IsQualifiedName(n) && ast.IsNameOfHeritageClauseTypeReference(n) && (isSymbolWalk || ast.IsQualifiedName(n.Parent)) {
 			result := walker.writeTypeOrSymbol(n, isSymbolWalk)

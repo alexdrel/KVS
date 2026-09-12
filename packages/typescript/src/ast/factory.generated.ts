@@ -150,11 +150,18 @@ import type {
     KeywordTypeNode,
     KeywordTypeSyntaxKind,
     KvsCollectExpression,
+    KvsDefaultExpression,
     KvsExtantAssertionExpression,
     KvsExtantAssignmentExpression,
     KvsExtantReturnStatement,
+    KvsExtantTestExpression,
+    KvsExtantType,
     KvsExtantYieldStatement,
+    KvsIfBindingClause,
+    KvsIfBindingStatement,
     KvsNullableAssertionExpression,
+    KvsNullableType,
+    KvsNullingExpression,
     KvsSelectExpression,
     KvsYieldStatement,
     LabeledStatement,
@@ -338,6 +345,9 @@ export class NodeObject {
     }
     get className(): any {
         return this._data?.className;
+    }
+    get clause(): any {
+        return this._data?.clause;
     }
     get clauses(): any {
         return this._data?.clauses;
@@ -825,12 +835,22 @@ function cloneNodeData(node: Node): any {
             return { expression: n.expression };
         case SyntaxKind.KvsExtantYieldStatement:
             return { expression: n.expression };
+        case SyntaxKind.KvsIfBindingStatement:
+            return { clause: n.clause, elseStatement: n.elseStatement };
+        case SyntaxKind.KvsIfBindingClause:
+            return { declarationList: n.declarationList, statement: n.statement };
         case SyntaxKind.KvsNullableAssertionExpression:
             return { expression: n.expression, questionToken: n.questionToken };
         case SyntaxKind.KvsExtantAssertionExpression:
             return { expression: n.expression, exclamationToken: n.exclamationToken };
         case SyntaxKind.KvsExtantAssignmentExpression:
             return { left: n.left, questionToken: n.questionToken, equalsToken: n.equalsToken, right: n.right };
+        case SyntaxKind.KvsExtantTestExpression:
+            return { expression: n.expression, questionToken: n.questionToken };
+        case SyntaxKind.KvsDefaultExpression:
+            return { expression: n.expression };
+        case SyntaxKind.KvsNullingExpression:
+            return { condition: n.condition, questionToken: n.questionToken, colonToken: n.colonToken, whenTrue: n.whenTrue };
         case SyntaxKind.KvsCollectExpression:
             return { initializer: n.initializer, expression: n.expression, statement: n.statement };
         case SyntaxKind.KvsSelectExpression:
@@ -1021,6 +1041,10 @@ function cloneNodeData(node: Node): any {
             return { dotDotDotToken: n.dotDotDotToken, name: n.name, questionToken: n.questionToken, type: n.type };
         case SyntaxKind.OptionalType:
             return { type: n.type };
+        case SyntaxKind.KvsNullableType:
+            return { type: n.type, questionToken: n.questionToken };
+        case SyntaxKind.KvsExtantType:
+            return { type: n.type, exclamationToken: n.exclamationToken };
         case SyntaxKind.RestType:
             return { type: n.type };
         case SyntaxKind.ParenthesizedType:
@@ -1216,6 +1240,12 @@ const forEachChildTable: Record<number, ForEachChildFunction> = {
     [SyntaxKind.KvsExtantReturnStatement]: (data, cbNode, cbNodes) => visitNode(cbNode, data.expression),
     [SyntaxKind.KvsYieldStatement]: (data, cbNode, cbNodes) => visitNode(cbNode, data.expression),
     [SyntaxKind.KvsExtantYieldStatement]: (data, cbNode, cbNodes) => visitNode(cbNode, data.expression),
+    [SyntaxKind.KvsIfBindingStatement]: (data, cbNode, cbNodes) =>
+        visitNode(cbNode, data.clause) ||
+        visitNode(cbNode, data.elseStatement),
+    [SyntaxKind.KvsIfBindingClause]: (data, cbNode, cbNodes) =>
+        visitNode(cbNode, data.declarationList) ||
+        visitNode(cbNode, data.statement),
     [SyntaxKind.KvsNullableAssertionExpression]: (data, cbNode, cbNodes) =>
         visitNode(cbNode, data.expression) ||
         visitNode(cbNode, data.questionToken),
@@ -1227,6 +1257,15 @@ const forEachChildTable: Record<number, ForEachChildFunction> = {
         visitNode(cbNode, data.questionToken) ||
         visitNode(cbNode, data.equalsToken) ||
         visitNode(cbNode, data.right),
+    [SyntaxKind.KvsExtantTestExpression]: (data, cbNode, cbNodes) =>
+        visitNode(cbNode, data.expression) ||
+        visitNode(cbNode, data.questionToken),
+    [SyntaxKind.KvsDefaultExpression]: (data, cbNode, cbNodes) => visitNode(cbNode, data.expression),
+    [SyntaxKind.KvsNullingExpression]: (data, cbNode, cbNodes) =>
+        visitNode(cbNode, data.condition) ||
+        visitNode(cbNode, data.questionToken) ||
+        visitNode(cbNode, data.colonToken) ||
+        visitNode(cbNode, data.whenTrue),
     [SyntaxKind.KvsCollectExpression]: (data, cbNode, cbNodes) =>
         visitNode(cbNode, data.initializer) ||
         visitNode(cbNode, data.expression) ||
@@ -1534,6 +1573,12 @@ const forEachChildTable: Record<number, ForEachChildFunction> = {
         visitNode(cbNode, data.questionToken) ||
         visitNode(cbNode, data.type),
     [SyntaxKind.OptionalType]: (data, cbNode, cbNodes) => visitNode(cbNode, data.type),
+    [SyntaxKind.KvsNullableType]: (data, cbNode, cbNodes) =>
+        visitNode(cbNode, data.type) ||
+        visitNode(cbNode, data.questionToken),
+    [SyntaxKind.KvsExtantType]: (data, cbNode, cbNodes) =>
+        visitNode(cbNode, data.type) ||
+        visitNode(cbNode, data.exclamationToken),
     [SyntaxKind.RestType]: (data, cbNode, cbNodes) => visitNode(cbNode, data.type),
     [SyntaxKind.ParenthesizedType]: (data, cbNode, cbNodes) => visitNode(cbNode, data.type),
     [SyntaxKind.FunctionType]: (data, cbNode, cbNodes) =>
@@ -1901,6 +1946,20 @@ export function createKvsExtantYieldStatement(expression: Expression): KvsExtant
     }) as unknown as KvsExtantYieldStatement;
 }
 
+export function createKvsIfBindingStatement(clause: KvsIfBindingClause, elseStatement?: Statement): KvsIfBindingStatement {
+    return new NodeObject(SyntaxKind.KvsIfBindingStatement, {
+        clause,
+        elseStatement,
+    }) as unknown as KvsIfBindingStatement;
+}
+
+export function createKvsIfBindingClause(declarationList: VariableDeclarationList, statement: Statement): KvsIfBindingClause {
+    return new NodeObject(SyntaxKind.KvsIfBindingClause, {
+        declarationList,
+        statement,
+    }) as unknown as KvsIfBindingClause;
+}
+
 export function createKvsNullableAssertionExpression(expression: Expression, questionToken: QuestionToken): KvsNullableAssertionExpression {
     return new NodeObject(SyntaxKind.KvsNullableAssertionExpression, {
         expression,
@@ -1922,6 +1981,28 @@ export function createKvsExtantAssignmentExpression(left: Expression, questionTo
         equalsToken,
         right,
     }) as unknown as KvsExtantAssignmentExpression;
+}
+
+export function createKvsExtantTestExpression(expression: Expression, questionToken: QuestionToken): KvsExtantTestExpression {
+    return new NodeObject(SyntaxKind.KvsExtantTestExpression, {
+        expression,
+        questionToken,
+    }) as unknown as KvsExtantTestExpression;
+}
+
+export function createKvsDefaultExpression(expression: Expression): KvsDefaultExpression {
+    return new NodeObject(SyntaxKind.KvsDefaultExpression, {
+        expression,
+    }) as unknown as KvsDefaultExpression;
+}
+
+export function createKvsNullingExpression(condition: Expression, questionToken: QuestionToken, colonToken: ColonToken, whenTrue: Expression): KvsNullingExpression {
+    return new NodeObject(SyntaxKind.KvsNullingExpression, {
+        condition,
+        questionToken,
+        colonToken,
+        whenTrue,
+    }) as unknown as KvsNullingExpression;
 }
 
 export function createKvsCollectExpression(initializer: ForInitializer, expression: Expression, statement: Statement): KvsCollectExpression {
@@ -2698,6 +2779,20 @@ export function createOptionalTypeNode(type: TypeNode): OptionalTypeNode {
     }) as unknown as OptionalTypeNode;
 }
 
+export function createKvsNullableType(type: TypeNode, questionToken: QuestionToken): KvsNullableType {
+    return new NodeObject(SyntaxKind.KvsNullableType, {
+        type,
+        questionToken,
+    }) as unknown as KvsNullableType;
+}
+
+export function createKvsExtantType(type: TypeNode, exclamationToken: ExclamationToken): KvsExtantType {
+    return new NodeObject(SyntaxKind.KvsExtantType, {
+        type,
+        exclamationToken,
+    }) as unknown as KvsExtantType;
+}
+
 export function createRestTypeNode(type: TypeNode): RestTypeNode {
     return new NodeObject(SyntaxKind.RestType, {
         type,
@@ -3332,6 +3427,14 @@ export function updateKvsExtantYieldStatement(node: KvsExtantYieldStatement, exp
     return node.expression !== expression ? createKvsExtantYieldStatement(expression) : node;
 }
 
+export function updateKvsIfBindingStatement(node: KvsIfBindingStatement, clause: KvsIfBindingClause, elseStatement?: Statement): KvsIfBindingStatement {
+    return node.clause !== clause || node.elseStatement !== elseStatement ? createKvsIfBindingStatement(clause, elseStatement) : node;
+}
+
+export function updateKvsIfBindingClause(node: KvsIfBindingClause, declarationList: VariableDeclarationList, statement: Statement): KvsIfBindingClause {
+    return node.declarationList !== declarationList || node.statement !== statement ? createKvsIfBindingClause(declarationList, statement) : node;
+}
+
 export function updateKvsNullableAssertionExpression(node: KvsNullableAssertionExpression, expression: Expression, questionToken: QuestionToken): KvsNullableAssertionExpression {
     return node.expression !== expression || node.questionToken !== questionToken ? createKvsNullableAssertionExpression(expression, questionToken) : node;
 }
@@ -3342,6 +3445,18 @@ export function updateKvsExtantAssertionExpression(node: KvsExtantAssertionExpre
 
 export function updateKvsExtantAssignmentExpression(node: KvsExtantAssignmentExpression, left: Expression, questionToken: QuestionToken, equalsToken: EqualsToken, right: Expression): KvsExtantAssignmentExpression {
     return node.left !== left || node.questionToken !== questionToken || node.equalsToken !== equalsToken || node.right !== right ? createKvsExtantAssignmentExpression(left, questionToken, equalsToken, right) : node;
+}
+
+export function updateKvsExtantTestExpression(node: KvsExtantTestExpression, expression: Expression, questionToken: QuestionToken): KvsExtantTestExpression {
+    return node.expression !== expression || node.questionToken !== questionToken ? createKvsExtantTestExpression(expression, questionToken) : node;
+}
+
+export function updateKvsDefaultExpression(node: KvsDefaultExpression, expression: Expression): KvsDefaultExpression {
+    return node.expression !== expression ? createKvsDefaultExpression(expression) : node;
+}
+
+export function updateKvsNullingExpression(node: KvsNullingExpression, condition: Expression, questionToken: QuestionToken, colonToken: ColonToken, whenTrue: Expression): KvsNullingExpression {
+    return node.condition !== condition || node.questionToken !== questionToken || node.colonToken !== colonToken || node.whenTrue !== whenTrue ? createKvsNullingExpression(condition, questionToken, colonToken, whenTrue) : node;
 }
 
 export function updateKvsCollectExpression(node: KvsCollectExpression, initializer: ForInitializer, expression: Expression, statement: Statement): KvsCollectExpression {
@@ -3698,6 +3813,14 @@ export function updateNamedTupleMember(node: NamedTupleMember, dotDotDotToken: D
 
 export function updateOptionalTypeNode(node: OptionalTypeNode, type: TypeNode): OptionalTypeNode {
     return node.type !== type ? createOptionalTypeNode(type) : node;
+}
+
+export function updateKvsNullableType(node: KvsNullableType, type: TypeNode, questionToken: QuestionToken): KvsNullableType {
+    return node.type !== type || node.questionToken !== questionToken ? createKvsNullableType(type, questionToken) : node;
+}
+
+export function updateKvsExtantType(node: KvsExtantType, type: TypeNode, exclamationToken: ExclamationToken): KvsExtantType {
+    return node.type !== type || node.exclamationToken !== exclamationToken ? createKvsExtantType(type, exclamationToken) : node;
 }
 
 export function updateRestTypeNode(node: RestTypeNode, type: TypeNode): RestTypeNode {

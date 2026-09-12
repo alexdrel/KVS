@@ -231,7 +231,9 @@ func GetOperatorPrecedence(nodeKind Kind, operatorKind Kind, flags OperatorPrece
 		return OperatorPrecedenceAssignment
 	case KindKvsExtantAssignmentExpression:
 		return OperatorPrecedenceAssignment
-	case KindConditionalExpression:
+	case KindKvsExtantTestExpression, KindKvsDefaultExpression:
+		return OperatorPrecedenceUpdate
+	case KindConditionalExpression, KindKvsNullingExpression:
 		return OperatorPrecedenceConditional
 	case KindBinaryExpression:
 		switch operatorKind {
@@ -377,11 +379,20 @@ func GetLeftmostExpression(node *Expression, stopAtCallExpressions bool) *Expres
 		case KindPostfixUnaryExpression:
 			node = node.AsPostfixUnaryExpression().Operand
 			continue
+		case KindKvsExtantTestExpression:
+			node = node.AsKvsExtantTestExpression().Expression
+			continue
+		case KindKvsDefaultExpression:
+			node = node.AsKvsDefaultExpression().Expression
+			continue
 		case KindBinaryExpression:
 			node = node.AsBinaryExpression().Left
 			continue
 		case KindConditionalExpression:
 			node = node.AsConditionalExpression().Condition
+			continue
+		case KindKvsNullingExpression:
+			node = node.AsKvsNullingExpression().Condition
 			continue
 		case KindTaggedTemplateExpression:
 			node = node.AsTaggedTemplateExpression().Tag
@@ -677,7 +688,7 @@ func GetTypeNodePrecedence(n *TypeNode) TypePrecedence {
 			return TypePrecedenceFunction
 		}
 		return TypePrecedenceTypeOperator
-	case KindIndexedAccessType, KindArrayType, KindOptionalType:
+	case KindIndexedAccessType, KindArrayType, KindOptionalType, KindKvsNullableType, KindKvsExtantType:
 		return TypePrecedencePostfix
 	case KindTypeQuery:
 		// TypeQueryNode is actually a NonArrayType, but we treat it as TypeOperatorNode

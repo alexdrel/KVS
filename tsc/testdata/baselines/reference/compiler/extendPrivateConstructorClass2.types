@@ -95,11 +95,11 @@ abstract class j3 {
       method2() {
 >method2 : () => void
 
-        const jS: typeof j3 & typeof j4 = null!;
+        const jS: typeof j3 & typeof j4 = null as!;
 >jS : typeof j3 & typeof j4
 >j3 : typeof j3
 >j4 : typeof j4
->null! : never
+>null as! : never
 
         // bizarre but ok
         class j0 extends jS {
@@ -135,11 +135,11 @@ abstract class j5 {
       method2() {}
 >method2 : () => void
     }
-    const jS: typeof j5 & typeof j6 = null!;
+    const jS: typeof j5 & typeof j6 = null as!;
 >jS : typeof j5 & typeof j6
 >j5 : typeof j5
 >j6 : typeof j6
->null! : never
+>null as! : never
 
     // bizarre but ok too given the base is a result of a mixin
     class j0 extends jS {
@@ -173,11 +173,11 @@ abstract class j7 {
       method2() {
 >method2 : () => void
 
-        const jS: typeof j7 & typeof j8 = null!;
+        const jS: typeof j7 & typeof j8 = null as!;
 >jS : typeof j7 & typeof j8
 >j7 : typeof j7
 >j8 : typeof j8
->null! : never
+>null as! : never
 
         // error
         class j0 extends jS {
@@ -213,11 +213,11 @@ abstract class j9 {
       method2() {}
 >method2 : () => void
     }
-    const jS: typeof j9 & typeof j10 = null!;
+    const jS: typeof j9 & typeof j10 = null as!;
 >jS : typeof j9 & typeof j10
 >j9 : typeof j9
 >j10 : typeof j10
->null! : never
+>null as! : never
 
     // error
     class j0 extends jS {
@@ -247,11 +247,11 @@ abstract class j11 {
 >arg : number
 
       static {
-        const jS: typeof j11 & typeof j12 = null!;
+        const jS: typeof j11 & typeof j12 = null as!;
 >jS : typeof j11 & typeof j12
 >j11 : typeof j11
 >j12 : typeof j12
->null! : never
+>null as! : never
 
         // ok
         class j0 extends jS {}
@@ -275,11 +275,11 @@ abstract class j13 {
       private constructor(arg: number) {}
 >arg : number
     }
-    const jS: typeof j13 & typeof j14 = null!;
+    const jS: typeof j13 & typeof j14 = null as!;
 >jS : typeof j13 & typeof j14
 >j13 : typeof j13
 >j14 : typeof j14
->null! : never
+>null as! : never
 
     // error
     class j0 extends jS {}

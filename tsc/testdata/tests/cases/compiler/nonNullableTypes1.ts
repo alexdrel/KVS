@@ -15,7 +15,7 @@ function f2<T>(x: T) {  // NonNullable<T>
 }
 
 function f3(x: unknown) {
-    let y = x!;  // {}
+    let y = x as!;  // {}
 }
 
 function f4<T extends { x: string } | undefined>(obj: T) {

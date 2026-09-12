@@ -105,9 +105,9 @@ export function series<T>(tasks: Task<T>[], callback: Callback<T[]>): void {
 
         } else {
             task((error, result) => {
->task((error, result) => {                if (error) {                    callback(error, null)                } else {                    // must use postfix-!, since `error` and `result` don't have a                    // causal relationship when the overloads are combined                    results.push(result!)                    next()                }            }) : unknown
+>task((error, result) => {                if (error) {                    callback(error, null)                } else {                    // must use postfix-!, since `error` and `result` don't have a                    // causal relationship when the overloads are combined                    results.push(result as!)                    next()                }            }) : unknown
 >task : Task<T>
->(error, result) => {                if (error) {                    callback(error, null)                } else {                    // must use postfix-!, since `error` and `result` don't have a                    // causal relationship when the overloads are combined                    results.push(result!)                    next()                }            } : (error: Error | null, result: T | null) => void
+>(error, result) => {                if (error) {                    callback(error, null)                } else {                    // must use postfix-!, since `error` and `result` don't have a                    // causal relationship when the overloads are combined                    results.push(result as!)                    next()                }            } : (error: Error | null, result: T | null) => void
 >error : Error | null
 >result : T | null
 
@@ -122,12 +122,12 @@ export function series<T>(tasks: Task<T>[], callback: Callback<T[]>): void {
                 } else {
                     // must use postfix-!, since `error` and `result` don't have a
                     // causal relationship when the overloads are combined
-                    results.push(result!)
->results.push(result!) : number
+                    results.push(result as!)
+>results.push(result as!) : number
 >results.push : (...items: T[]) => number
 >results : T[]
 >push : (...items: T[]) => number
->result! : NonNullable<T>
+>result as! : NonNullable<T>
 >result : T | null
 
                     next()

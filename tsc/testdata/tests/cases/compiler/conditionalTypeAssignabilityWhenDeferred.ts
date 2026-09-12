@@ -4,14 +4,14 @@ export type FilterPropsByType<T, TT> = {
   [K in keyof T]: T[K] extends TT ? K : never
 }[keyof T];
 
-function select<
+function selectValue<
   T extends string | number,
   TList extends object,
   TValueProp extends FilterPropsByType<TList, T>
 >(property: T, list: TList[], valueProp: TValueProp) {}
 
 export function func<XX extends string>(x: XX, tipos: { value: XX }[]) {
-  select(x, tipos, "value");
+  selectValue(x, tipos, "value");
 }
 
 declare function onlyNullablePlease<T extends null extends T ? any : never>(
@@ -54,7 +54,7 @@ function testAssignabilityToConditionalType<T>() {
   const o = { a: 1, b: 2 };
   const x: [T] extends [string]
     ? { y: number }
-    : { a: number; b: number } = undefined!;
+    : { a: number; b: number } = undefined as!;
   // Simple case: OK
   const o1: [T] extends [number] ? { a: number } : { b: number } = o;
   // Simple case where source happens to be a conditional type: also OK

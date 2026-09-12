@@ -67,6 +67,8 @@ func (tx *TypeEraserTransformer) visit(node *ast.Node) *ast.Node {
 		ast.KindArrayType,
 		ast.KindTupleType,
 		ast.KindOptionalType,
+		ast.KindKvsNullableType,
+		ast.KindKvsExtantType,
 		ast.KindRestType,
 		ast.KindTypeLiteral,
 		ast.KindTypePredicate,

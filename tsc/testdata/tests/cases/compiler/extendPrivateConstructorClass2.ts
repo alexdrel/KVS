@@ -41,7 +41,7 @@ abstract class j3 {
     abstract class j4 {
       private constructor(...args: any[]) {}
       method2() {
-        const jS: typeof j3 & typeof j4 = null!;
+        const jS: typeof j3 & typeof j4 = null as!;
 
         // bizarre but ok
         class j0 extends jS {
@@ -60,7 +60,7 @@ abstract class j5 {
       private constructor(...args: any[]) {}
       method2() {}
     }
-    const jS: typeof j5 & typeof j6 = null!;
+    const jS: typeof j5 & typeof j6 = null as!;
 
     // bizarre but ok too given the base is a result of a mixin
     class j0 extends jS {
@@ -76,7 +76,7 @@ abstract class j7 {
     abstract class j8 {
       private constructor(arg: number) {}
       method2() {
-        const jS: typeof j7 & typeof j8 = null!;
+        const jS: typeof j7 & typeof j8 = null as!;
 
         // error
         class j0 extends jS {
@@ -95,7 +95,7 @@ abstract class j9 {
       private constructor(arg: number) {}
       method2() {}
     }
-    const jS: typeof j9 & typeof j10 = null!;
+    const jS: typeof j9 & typeof j10 = null as!;
 
     // error
     class j0 extends jS {
@@ -111,7 +111,7 @@ abstract class j11 {
     abstract class j12 {
       private constructor(arg: number) {}
       static {
-        const jS: typeof j11 & typeof j12 = null!;
+        const jS: typeof j11 & typeof j12 = null as!;
 
         // ok
         class j0 extends jS {}
@@ -126,7 +126,7 @@ abstract class j13 {
     abstract class j14 {
       private constructor(arg: number) {}
     }
-    const jS: typeof j13 & typeof j14 = null!;
+    const jS: typeof j13 & typeof j14 = null as!;
 
     // error
     class j0 extends jS {}

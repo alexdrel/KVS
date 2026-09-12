@@ -36,7 +36,7 @@ export function compile(fileNames: string[], options: ts.CompilerOptions): void 
             console.log(message);
             return;
         }
-        var { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start!);
+        var { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start as!);
         console.log(`${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message}`);
     });
 

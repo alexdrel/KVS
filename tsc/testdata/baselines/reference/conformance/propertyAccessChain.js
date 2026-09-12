@@ -23,9 +23,9 @@ o6<number>()?.x;
 // GH#34109
 o1?.b ? 1 : 0;
 
-// GH#36031
-o2?.b!.c;
-o2?.b!.c!;
+// GH#36031 covered TypeScript `!` inside an optional chain; KVS keeps only the terminal assertion.
+o2?.b.c as!;
+
 
 //// [propertyAccessChain.js]
 "use strict";
@@ -38,6 +38,5 @@ o2 === null || o2 === void 0 ? void 0 : o2.b.c;
 (_f = o6()) === null || _f === void 0 ? void 0 : _f.x;
 // GH#34109
 (o1 === null || o1 === void 0 ? void 0 : o1.b) ? 1 : 0;
-// GH#36031
-o2 === null || o2 === void 0 ? void 0 : o2.b.c;
+// GH#36031 covered TypeScript `!` inside an optional chain; KVS keeps only the terminal assertion.
 o2 === null || o2 === void 0 ? void 0 : o2.b.c;

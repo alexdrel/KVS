@@ -1,0 +1,62 @@
+//// [tests/cases/conformance/kvs/kvsNulling.ts] ////
+
+=== kvsNulling.ts ===
+declare const condition: boolean;
+>condition : Symbol(condition, Decl(kvsNulling.ts, 0, 13))
+
+const value = condition ?: "ready";
+>value : Symbol(value, Decl(kvsNulling.ts, 2, 5))
+>condition : Symbol(condition, Decl(kvsNulling.ts, 0, 13))
+
+value;
+>value : Symbol(value, Decl(kvsNulling.ts, 2, 5))
+
+function useNarrowing(candidate: { length: number } | null) {
+>useNarrowing : Symbol(useNarrowing, Decl(kvsNulling.ts, 3, 6))
+>candidate : Symbol(candidate, Decl(kvsNulling.ts, 5, 22))
+>length : Symbol(length, Decl(kvsNulling.ts, 5, 34))
+
+    return candidate ?: candidate.length;
+>candidate : Symbol(candidate, Decl(kvsNulling.ts, 5, 22))
+>candidate.length : Symbol(length, Decl(kvsNulling.ts, 5, 34))
+>candidate : Symbol(candidate, Decl(kvsNulling.ts, 5, 22))
+>length : Symbol(length, Decl(kvsNulling.ts, 5, 34))
+}
+
+const calculation = condition ?: 1 + 2;
+>calculation : Symbol(calculation, Decl(kvsNulling.ts, 9, 5))
+>condition : Symbol(condition, Decl(kvsNulling.ts, 0, 13))
+
+const nested = condition ?: false ?: "ready";
+>nested : Symbol(nested, Decl(kvsNulling.ts, 10, 5))
+>condition : Symbol(condition, Decl(kvsNulling.ts, 0, 13))
+
+const mapper: ((value: string) => number) | null = condition ?: value => value.length;
+>mapper : Symbol(mapper, Decl(kvsNulling.ts, 12, 5))
+>value : Symbol(value, Decl(kvsNulling.ts, 12, 16))
+>condition : Symbol(condition, Decl(kvsNulling.ts, 0, 13))
+>value : Symbol(value, Decl(kvsNulling.ts, 12, 63))
+>value.length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+>value : Symbol(value, Decl(kvsNulling.ts, 12, 63))
+>length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+
+function describeCollected(items: string[]) {
+>describeCollected : Symbol(describeCollected, Decl(kvsNulling.ts, 12, 86))
+>items : Symbol(items, Decl(kvsNulling.ts, 14, 27))
+
+    return collect (const item of items) {
+>collect (const item of items) {        yield item;    }.length : Symbol(Array.length, Decl(lib.es5.d.ts, --, --))
+>item : Symbol(item, Decl(kvsNulling.ts, 15, 25))
+>items : Symbol(items, Decl(kvsNulling.ts, 14, 27))
+
+        yield item;
+>item : Symbol(item, Decl(kvsNulling.ts, 15, 25))
+
+    }.length > 0 ?: "Items collected";
+>length : Symbol(Array.length, Decl(lib.es5.d.ts, --, --))
+}
+
+const rejectSpaced = condition ? : "ready";
+>rejectSpaced : Symbol(rejectSpaced, Decl(kvsNulling.ts, 20, 5))
+>condition : Symbol(condition, Decl(kvsNulling.ts, 0, 13))
+

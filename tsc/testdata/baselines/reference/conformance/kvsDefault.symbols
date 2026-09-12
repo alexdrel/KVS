@@ -1,0 +1,92 @@
+//// [tests/cases/conformance/kvs/kvsDefault.ts] ////
+
+=== kvsDefault.ts ===
+declare const maybeString: string | null | undefined;
+>maybeString : Symbol(maybeString, Decl(kvsDefault.ts, 0, 13))
+
+declare const maybeNumber: number | null;
+>maybeNumber : Symbol(maybeNumber, Decl(kvsDefault.ts, 1, 13))
+
+declare const maybeBoolean: boolean | undefined;
+>maybeBoolean : Symbol(maybeBoolean, Decl(kvsDefault.ts, 2, 13))
+
+declare const maybeBigInt: bigint | null;
+>maybeBigInt : Symbol(maybeBigInt, Decl(kvsDefault.ts, 3, 13))
+
+declare const maybeStrings: string[] | null;
+>maybeStrings : Symbol(maybeStrings, Decl(kvsDefault.ts, 4, 13))
+
+declare const maybeReadonlyNumbers: readonly number[] | undefined;
+>maybeReadonlyNumbers : Symbol(maybeReadonlyNumbers, Decl(kvsDefault.ts, 5, 13))
+
+declare const maybeArrayFamily: string[] | readonly number[] | null;
+>maybeArrayFamily : Symbol(maybeArrayFamily, Decl(kvsDefault.ts, 6, 13))
+
+const stringValue = maybeString!;
+>stringValue : Symbol(stringValue, Decl(kvsDefault.ts, 8, 5))
+>maybeString : Symbol(maybeString, Decl(kvsDefault.ts, 0, 13))
+
+const numberValue = maybeNumber!;
+>numberValue : Symbol(numberValue, Decl(kvsDefault.ts, 9, 5))
+>maybeNumber : Symbol(maybeNumber, Decl(kvsDefault.ts, 1, 13))
+
+const booleanValue = maybeBoolean!;
+>booleanValue : Symbol(booleanValue, Decl(kvsDefault.ts, 10, 5))
+>maybeBoolean : Symbol(maybeBoolean, Decl(kvsDefault.ts, 2, 13))
+
+const bigintValue = maybeBigInt!;
+>bigintValue : Symbol(bigintValue, Decl(kvsDefault.ts, 11, 5))
+>maybeBigInt : Symbol(maybeBigInt, Decl(kvsDefault.ts, 3, 13))
+
+const strings = maybeStrings!;
+>strings : Symbol(strings, Decl(kvsDefault.ts, 12, 5))
+>maybeStrings : Symbol(maybeStrings, Decl(kvsDefault.ts, 4, 13))
+
+const readonlyNumbers = maybeReadonlyNumbers!;
+>readonlyNumbers : Symbol(readonlyNumbers, Decl(kvsDefault.ts, 13, 5))
+>maybeReadonlyNumbers : Symbol(maybeReadonlyNumbers, Decl(kvsDefault.ts, 5, 13))
+
+const arrayFamily = maybeArrayFamily!;
+>arrayFamily : Symbol(arrayFamily, Decl(kvsDefault.ts, 14, 5))
+>maybeArrayFamily : Symbol(maybeArrayFamily, Decl(kvsDefault.ts, 6, 13))
+
+const stringLength = maybeString!.length;
+>stringLength : Symbol(stringLength, Decl(kvsDefault.ts, 15, 5))
+>maybeString!.length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+>maybeString : Symbol(maybeString, Decl(kvsDefault.ts, 0, 13))
+>length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+
+const incremented = maybeNumber! + 1;
+>incremented : Symbol(incremented, Decl(kvsDefault.ts, 16, 5))
+>maybeNumber : Symbol(maybeNumber, Decl(kvsDefault.ts, 1, 13))
+
+declare const stringLiteral: "left" | "right" | null;
+>stringLiteral : Symbol(stringLiteral, Decl(kvsDefault.ts, 18, 13))
+
+const literalValue = stringLiteral!;
+>literalValue : Symbol(literalValue, Decl(kvsDefault.ts, 19, 5))
+>stringLiteral : Symbol(stringLiteral, Decl(kvsDefault.ts, 18, 13))
+
+declare const mixed: string | number | null;
+>mixed : Symbol(mixed, Decl(kvsDefault.ts, 21, 13))
+
+mixed!;
+>mixed : Symbol(mixed, Decl(kvsDefault.ts, 21, 13))
+
+declare const tuple: [string, number] | null;
+>tuple : Symbol(tuple, Decl(kvsDefault.ts, 24, 13))
+
+tuple!;
+>tuple : Symbol(tuple, Decl(kvsDefault.ts, 24, 13))
+
+declare const object: { value: string } | null;
+>object : Symbol(object, Decl(kvsDefault.ts, 27, 13))
+>value : Symbol(value, Decl(kvsDefault.ts, 27, 23))
+
+object!;
+>object : Symbol(object, Decl(kvsDefault.ts, 27, 13))
+
+null!;
+undefined!;
+>undefined : Symbol(undefined)
+

@@ -35,9 +35,9 @@ function f3(x: unknown) {
 >f3 : (x: unknown) => void
 >x : unknown
 
-    let y = x!;  // {}
+    let y = x as!;  // {}
 >y : {}
->x! : {}
+>x as! : {}
 >x : unknown
 }
 

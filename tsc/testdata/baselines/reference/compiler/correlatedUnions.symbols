@@ -970,7 +970,7 @@ function getConfigOrDefault<T extends keyof Config>(
 >userConfig : Symbol(userConfig, Decl(correlatedUnions.ts, 277, 52))
 >key : Symbol(key, Decl(correlatedUnions.ts, 278, 30))
 
-  const assertedCheck = userValue ? userValue! : defaultValue;
+  const assertedCheck = userValue ? userValue as! : defaultValue;
 >assertedCheck : Symbol(assertedCheck, Decl(correlatedUnions.ts, 283, 7))
 >userValue : Symbol(userValue, Decl(correlatedUnions.ts, 282, 7))
 >userValue : Symbol(userValue, Decl(correlatedUnions.ts, 282, 7))

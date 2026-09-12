@@ -22,7 +22,7 @@ function JustConditional<T>(): ConditionalType<T> {
 >ConditionalType : Symbol(ConditionalType, Decl(simplifyingConditionalWithInteriorConditionalIsRelated.ts, 0, 0))
 >T : Symbol(T, Decl(simplifyingConditionalWithInteriorConditionalIsRelated.ts, 7, 25))
 
-    return ConditionalOrUndefined<T>()!; // shouldn't error
+    return ConditionalOrUndefined<T>() as!; // shouldn't error
 >ConditionalOrUndefined : Symbol(ConditionalOrUndefined, Decl(simplifyingConditionalWithInteriorConditionalIsRelated.ts, 1, 61))
 >T : Symbol(T, Decl(simplifyingConditionalWithInteriorConditionalIsRelated.ts, 7, 25))
 }
@@ -42,7 +42,7 @@ function JustGeneric<T>(): T {
 >T : Symbol(T, Decl(simplifyingConditionalWithInteriorConditionalIsRelated.ts, 17, 21))
 >T : Symbol(T, Decl(simplifyingConditionalWithInteriorConditionalIsRelated.ts, 17, 21))
 
-    return genericOrUndefined<T>()!; // no error
+    return genericOrUndefined<T>() as!; // no error
 >genericOrUndefined : Symbol(genericOrUndefined, Decl(simplifyingConditionalWithInteriorConditionalIsRelated.ts, 9, 1))
 >T : Symbol(T, Decl(simplifyingConditionalWithInteriorConditionalIsRelated.ts, 17, 21))
 }

@@ -20,4 +20,4 @@ callChain.3.ts(4,7): error TS2322: Type 'number | undefined' is not assignable t
     
     // Also a test showing `!` vs `?` for good measure
     let t1 = a?.m?.({x: 12});
-    t1 = a!.m!({x: 12});
+    t1 = ((a as!).m as!)({x: 12});

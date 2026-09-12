@@ -1,7 +1,7 @@
-expressionWithJSDocTypeArguments.ts(9,22): error TS1110: Type expected.
-expressionWithJSDocTypeArguments.ts(14,29): error TS1110: Type expected.
-expressionWithJSDocTypeArguments.ts(19,22): error TS1110: Type expected.
-expressionWithJSDocTypeArguments.ts(24,29): error TS1110: Type expected.
+expressionWithJSDocTypeArguments.ts(10,22): error TS1110: Type expected.
+expressionWithJSDocTypeArguments.ts(15,29): error TS1110: Type expected.
+expressionWithJSDocTypeArguments.ts(20,22): error TS1110: Type expected.
+expressionWithJSDocTypeArguments.ts(25,29): error TS1110: Type expected.
 
 
 ==== expressionWithJSDocTypeArguments.ts (4 errors) ====
@@ -11,7 +11,8 @@ expressionWithJSDocTypeArguments.ts(24,29): error TS1110: Type expected.
     
     class Bar<T> { constructor(public x: T) { } }
     
-    // Errors expected on all of the following
+    // JSDoc-only prefix forms remain errors. KVS postfix nullable type arguments
+    // such as `string?` are valid and include both null and undefined.
     
     const WhatFoo = foo<?>;
                          ~

@@ -52,6 +52,51 @@ const assertedAddition = nullableNumber as! + 2;
 >nullableNumber : number | null | undefined
 >2 : 2
 
+const omittedTrailingTuple: [string, boolean?] = ["pending"];
+>omittedTrailingTuple : [string, (boolean | null | undefined)?]
+>["pending"] : [string]
+>"pending" : "pending"
+
+const omittedParenthesizedTrailingTuple: [string, (boolean?)] = ["pending"];
+>omittedParenthesizedTrailingTuple : [string, (boolean | null | undefined)?]
+>["pending"] : [string]
+>"pending" : "pending"
+
+const presentTrailingTuple: [string, boolean?] = ["visible", true];
+>presentTrailingTuple : [string, (boolean | null | undefined)?]
+>["visible", true] : [string, true]
+>"visible" : "visible"
+>true : true
+
+const nullTrailingTuple: [string, boolean?] = ["unknown", null];
+>nullTrailingTuple : [string, (boolean | null | undefined)?]
+>["unknown", null] : [string, null]
+>"unknown" : "unknown"
+
+const undefinedTrailingTuple: [string, boolean?] = ["unknown", undefined];
+>undefinedTrailingTuple : [string, (boolean | null | undefined)?]
+>["unknown", undefined] : [string, undefined]
+>"unknown" : "unknown"
+>undefined : undefined
+
+declare const nullableTuple: [string, boolean?];
+>nullableTuple : [string, (boolean | null | undefined)?]
+
+const nullableTupleElement: boolean? = nullableTuple[1];
+>nullableTupleElement : boolean | null | undefined
+>nullableTuple[1] : boolean | null | undefined
+>nullableTuple : [string, (boolean | null | undefined)?]
+>1 : 1
+
+const presentNonTrailingTuple: [boolean?, string] = [null, "ready"];
+>presentNonTrailingTuple : [boolean | null | undefined, string]
+>[null, "ready"] : [null, string]
+>"ready" : "ready"
+
+const rejectOmittedNonTrailingTuple: [boolean?, string] = [];
+>rejectOmittedNonTrailingTuple : [boolean | null | undefined, string]
+>[] : []
+
 let request? = "ready";
 >request : string | null | undefined
 >"ready" : "ready"

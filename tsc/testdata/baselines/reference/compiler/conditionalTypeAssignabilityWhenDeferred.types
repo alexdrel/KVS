@@ -7,8 +7,8 @@ export type FilterPropsByType<T, TT> = {
   [K in keyof T]: T[K] extends TT ? K : never
 }[keyof T];
 
-function select<
->select : <T extends string | number, TList extends object, TValueProp extends FilterPropsByType<TList, T>>(property: T, list: TList[], valueProp: TValueProp) => void
+function selectValue<
+>selectValue : <T extends string | number, TList extends object, TValueProp extends FilterPropsByType<TList, T>>(property: T, list: TList[], valueProp: TValueProp) => void
 
   T extends string | number,
   TList extends object,
@@ -24,9 +24,9 @@ export function func<XX extends string>(x: XX, tipos: { value: XX }[]) {
 >tipos : { value: XX; }[]
 >value : XX
 
-  select(x, tipos, "value");
->select(x, tipos, "value") : void
->select : <T extends string | number, TList extends object, TValueProp extends FilterPropsByType<TList, T>>(property: T, list: TList[], valueProp: TValueProp) => void
+  selectValue(x, tipos, "value");
+>selectValue(x, tipos, "value") : void
+>selectValue : <T extends string | number, TList extends object, TValueProp extends FilterPropsByType<TList, T>>(property: T, list: TList[], valueProp: TValueProp) => void
 >x : XX
 >tipos : { value: XX; }[]
 >"value" : "value"
@@ -163,10 +163,10 @@ function testAssignabilityToConditionalType<T>() {
     ? { y: number }
 >y : number
 
-    : { a: number; b: number } = undefined!;
+    : { a: number; b: number } = undefined as!;
 >a : number
 >b : number
->undefined! : never
+>undefined as! : never
 >undefined : undefined
 
   // Simple case: OK

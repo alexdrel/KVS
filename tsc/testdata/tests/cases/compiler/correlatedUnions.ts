@@ -285,7 +285,7 @@ function getConfigOrDefault<T extends keyof Config>(
   defaultValue: Config[T]
 ): Config[T] {
   const userValue = userConfig[key]; 
-  const assertedCheck = userValue ? userValue! : defaultValue;
+  const assertedCheck = userValue ? userValue as! : defaultValue;
   return assertedCheck;
 }
 

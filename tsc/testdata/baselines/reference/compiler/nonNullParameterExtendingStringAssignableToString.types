@@ -18,21 +18,22 @@ function fn<T extends string | undefined, U extends string>(one: T, two: U) {
 >one : T
 >two : U
 
-    foo(one!);
->foo(one!) : void
+    foo(one as!);
+>foo(one as!) : void
 >foo : (p: string) => void
->one! : string
+>one as! : string
 >one : string | undefined
 
-    foo(two!);
->foo(two!) : void
+    foo(two as!);
+>foo(two as!) : void
 >foo : (p: string) => void
->two! : U
+>two as! : U
 >two : U
 
-    foo(three!); // this line is the important one
->foo(three!) : void
+    foo(three as!); // this line is the important one
+>foo(three as!) : void
 >foo : (p: string) => void
->three! : string
+>three as! : string
 >three : string | undefined
 }
+

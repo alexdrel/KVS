@@ -34,7 +34,7 @@ class HelloWorld {
   p2!: T2; // Ok
 
   @EventListener('3')
-  handleEvent3(event: C3): T1 { return undefined! } // Ok, Error
+  handleEvent3(event: C3): T1 { return undefined as! } // Ok, Error
 }
 
 

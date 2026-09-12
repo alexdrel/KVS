@@ -106,11 +106,18 @@ import type {
     JsxSelfClosingElement,
     JsxSpreadAttribute,
     KvsCollectExpression,
+    KvsDefaultExpression,
     KvsExtantAssertionExpression,
     KvsExtantAssignmentExpression,
     KvsExtantReturnStatement,
+    KvsExtantTestExpression,
+    KvsExtantType,
     KvsExtantYieldStatement,
+    KvsIfBindingClause,
+    KvsIfBindingStatement,
     KvsNullableAssertionExpression,
+    KvsNullableType,
+    KvsNullingExpression,
     KvsSelectExpression,
     KvsYieldStatement,
     LabeledStatement,
@@ -288,11 +295,18 @@ import {
     updateJsxSelfClosingElement,
     updateJsxSpreadAttribute,
     updateKvsCollectExpression,
+    updateKvsDefaultExpression,
     updateKvsExtantAssertionExpression,
     updateKvsExtantAssignmentExpression,
     updateKvsExtantReturnStatement,
+    updateKvsExtantTestExpression,
+    updateKvsExtantType,
     updateKvsExtantYieldStatement,
+    updateKvsIfBindingClause,
+    updateKvsIfBindingStatement,
     updateKvsNullableAssertionExpression,
+    updateKvsNullableType,
+    updateKvsNullingExpression,
     updateKvsSelectExpression,
     updateKvsYieldStatement,
     updateLabeledStatement,
@@ -398,6 +412,7 @@ import {
     isJsxOpeningElement,
     isJsxOpeningFragment,
     isJsxTagNameExpression,
+    isKvsIfBindingClause,
     isLeftHandSideExpression,
     isMemberName,
     isModuleBody,
@@ -619,6 +634,16 @@ const visitEachChildTable: Record<number, VisitEachChildFunction> = {
         const _expression = visitNode(node.expression, visitor, isExpression);
         return updateKvsExtantYieldStatement(node, _expression);
     },
+    [SyntaxKind.KvsIfBindingStatement]: (node: KvsIfBindingStatement, visitor: Visitor): KvsIfBindingStatement => {
+        const _clause = visitNode(node.clause, visitor, isKvsIfBindingClause);
+        const _elseStatement = visitNode(node.elseStatement, visitor, isStatement);
+        return updateKvsIfBindingStatement(node, _clause, _elseStatement);
+    },
+    [SyntaxKind.KvsIfBindingClause]: (node: KvsIfBindingClause, visitor: Visitor): KvsIfBindingClause => {
+        const _declarationList = visitNode(node.declarationList, visitor, isVariableDeclarationList);
+        const _statement = visitNode(node.statement, visitor, isStatement);
+        return updateKvsIfBindingClause(node, _declarationList, _statement);
+    },
     [SyntaxKind.KvsNullableAssertionExpression]: (node: KvsNullableAssertionExpression, visitor: Visitor): KvsNullableAssertionExpression => {
         const _expression = visitNode(node.expression, visitor, isExpression);
         const _questionToken = visitNode(node.questionToken, visitor, isQuestionToken);
@@ -635,6 +660,22 @@ const visitEachChildTable: Record<number, VisitEachChildFunction> = {
         const _equalsToken = visitNode(node.equalsToken, visitor, isEqualsToken);
         const _right = visitNode(node.right, visitor, isExpression);
         return updateKvsExtantAssignmentExpression(node, _left, _questionToken, _equalsToken, _right);
+    },
+    [SyntaxKind.KvsExtantTestExpression]: (node: KvsExtantTestExpression, visitor: Visitor): KvsExtantTestExpression => {
+        const _expression = visitNode(node.expression, visitor, isExpression);
+        const _questionToken = visitNode(node.questionToken, visitor, isQuestionToken);
+        return updateKvsExtantTestExpression(node, _expression, _questionToken);
+    },
+    [SyntaxKind.KvsDefaultExpression]: (node: KvsDefaultExpression, visitor: Visitor): KvsDefaultExpression => {
+        const _expression = visitNode(node.expression, visitor, isExpression);
+        return updateKvsDefaultExpression(node, _expression);
+    },
+    [SyntaxKind.KvsNullingExpression]: (node: KvsNullingExpression, visitor: Visitor): KvsNullingExpression => {
+        const _condition = visitNode(node.condition, visitor, isExpression);
+        const _questionToken = visitNode(node.questionToken, visitor, isQuestionToken);
+        const _colonToken = visitNode(node.colonToken, visitor, isColonToken);
+        const _whenTrue = visitNode(node.whenTrue, visitor, isExpression);
+        return updateKvsNullingExpression(node, _condition, _questionToken, _colonToken, _whenTrue);
     },
     [SyntaxKind.KvsCollectExpression]: (node: KvsCollectExpression, visitor: Visitor): KvsCollectExpression => {
         const _initializer = visitNode(node.initializer, visitor, isForInitializer);
@@ -1144,6 +1185,16 @@ const visitEachChildTable: Record<number, VisitEachChildFunction> = {
     [SyntaxKind.OptionalType]: (node: OptionalTypeNode, visitor: Visitor): OptionalTypeNode => {
         const _type = visitNode(node.type, visitor, isTypeNode);
         return updateOptionalTypeNode(node, _type);
+    },
+    [SyntaxKind.KvsNullableType]: (node: KvsNullableType, visitor: Visitor): KvsNullableType => {
+        const _type = visitNode(node.type, visitor, isTypeNode);
+        const _questionToken = visitNode(node.questionToken, visitor, isQuestionToken);
+        return updateKvsNullableType(node, _type, _questionToken);
+    },
+    [SyntaxKind.KvsExtantType]: (node: KvsExtantType, visitor: Visitor): KvsExtantType => {
+        const _type = visitNode(node.type, visitor, isTypeNode);
+        const _exclamationToken = visitNode(node.exclamationToken, visitor, isExclamationToken);
+        return updateKvsExtantType(node, _type, _exclamationToken);
     },
     [SyntaxKind.RestType]: (node: RestTypeNode, visitor: Visitor): RestTypeNode => {
         const _type = visitNode(node.type, visitor, isTypeNode);

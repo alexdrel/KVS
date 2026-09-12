@@ -75,6 +75,8 @@ const (
 
 type EmitResolver interface {
 	binder.ReferenceResolver
+	GetKvsDefaultKind(node *ast.Node) ast.KvsDefaultKind
+	IsKvsNullableIterableSource(node *ast.Node) bool
 	IsReferencedAliasDeclaration(node *ast.Node) bool
 	IsValueAliasDeclaration(node *ast.Node) bool
 	IsTopLevelValueImportEqualsWithEntityName(node *ast.Node) bool

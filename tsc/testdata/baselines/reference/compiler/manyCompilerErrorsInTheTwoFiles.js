@@ -3,7 +3,7 @@
 //// [a.ts]
 const a =!@#!@$
 const b = !@#!@#!@#!
-OK!
+OK as!
 HERE's A shouty thing
 GOTTA GO FAST
 

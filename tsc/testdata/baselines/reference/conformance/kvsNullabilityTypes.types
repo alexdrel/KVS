@@ -1,0 +1,121 @@
+//// [tests/cases/conformance/kvs/kvsNullabilityTypes.ts] ////
+
+=== kvsNullabilityTypes.ts ===
+type NullableNumber = number?;
+>NullableNumber : number | null | undefined
+
+type ExtantNumber = NullableNumber!;
+>ExtantNumber : number
+
+type NullableAgain = (number?)?;
+>NullableAgain : number | null | undefined
+
+type ExtantAgain = (NullableNumber!)!;
+>ExtantAgain : number
+
+type ExtantAfterNullable = (number?)!;
+>ExtantAfterNullable : number
+
+type NullableAfterExtant = (number!)?;
+>NullableAfterExtant : number | null | undefined
+
+type NullableUnion = (string | number)?;
+>NullableUnion : string | number | null | undefined
+
+type ExtantUnion = (string | number | null | undefined)!;
+>ExtantUnion : string | number
+
+type ArrayOfNullable = number?[];
+>ArrayOfNullable : ArrayOfNullable
+
+type NullableArray = number[]?;
+>NullableArray : number[] | null | undefined
+
+type ArrayOfExtant = NullableNumber![];
+>ArrayOfExtant : ArrayOfExtant
+
+type ExtantArray = (number[]?)!;
+>ExtantArray : number[]
+
+type ParenthesizedArrayOfNullable = (number?[]);
+>ParenthesizedArrayOfNullable : ParenthesizedArrayOfNullable
+
+declare const nullableValue: NullableNumber;
+>nullableValue : number | null | undefined
+
+declare const extantValue: ExtantNumber;
+>extantValue : number
+
+const acceptNumber: NullableNumber = 1;
+>acceptNumber : number | null | undefined
+>1 : 1
+
+const acceptNull: NullableNumber = null;
+>acceptNull : number | null | undefined
+
+const acceptUndefined: NullableNumber = undefined;
+>acceptUndefined : number | null | undefined
+>undefined : undefined
+
+const rejectNullable: number = nullableValue;
+>rejectNullable : number
+>nullableValue : number | null | undefined
+
+const rejectNullableAsExtant: ExtantNumber = nullableValue;
+>rejectNullableAsExtant : number
+>nullableValue : number | null | undefined
+
+const calculation = extantValue + 1;
+>calculation : number
+>extantValue + 1 : number
+>extantValue : number
+>1 : 1
+
+declare const values: ArrayOfNullable;
+>values : ArrayOfNullable
+
+const rejectNullableElement: number = values[0];
+>rejectNullableElement : number
+>values[0] : number | null | undefined
+>values : ArrayOfNullable
+>0 : 0
+
+function incrementPresent(candidate: number?): number {
+>incrementPresent : (candidate: number?) => number
+>candidate : number | null | undefined
+
+    if (candidate != null) return candidate + 1;
+>candidate != null : boolean
+>candidate : number | null | undefined
+>candidate + 1 : number
+>candidate : number
+>1 : 1
+
+    return 0;
+>0 : 0
+}
+
+function realSqrt(x: number): number? {
+>realSqrt : (x: number) => number?
+>x : number
+
+    return x >= 0 ?: Math.sqrt(x);
+>x >= 0 ?: Math.sqrt(x) : number | null
+>x >= 0 : boolean
+>x : number
+>0 : 0
+>Math.sqrt(x) : number
+>Math.sqrt : (x: number) => number
+>Math : Math
+>sqrt : (x: number) => number
+>x : number
+}
+
+type RejectSpacedNullable = number ?;
+>RejectSpacedNullable : number
+
+type RejectSpacedExtant = NullableNumber !;
+>RejectSpacedExtant : number | null | undefined
+>! : boolean
+> : any
+

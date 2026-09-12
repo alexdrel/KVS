@@ -2039,6 +2039,20 @@ func (p *Printer) emitOptionalType(node *ast.OptionalTypeNode) {
 	p.exitNode(node.AsNode(), state)
 }
 
+func (p *Printer) emitKvsNullableType(node *ast.KvsNullableType) {
+	state := p.enterNode(node.AsNode())
+	p.emitPostfixTypeOperand(node.Type, node.AsNode())
+	p.emitPunctuationNode(node.QuestionToken)
+	p.exitNode(node.AsNode(), state)
+}
+
+func (p *Printer) emitKvsExtantType(node *ast.KvsExtantType) {
+	state := p.enterNode(node.AsNode())
+	p.emitPostfixTypeOperand(node.Type, node.AsNode())
+	p.emitPunctuationNode(node.ExclamationToken)
+	p.exitNode(node.AsNode(), state)
+}
+
 func (p *Printer) emitNamedTupleMember(node *ast.NamedTupleMember) {
 	state := p.enterNode(node.AsNode())
 	p.emitPunctuationNode(node.DotDotDotToken)
@@ -2336,6 +2350,10 @@ func (p *Printer) emitTypeNode(node *ast.TypeNode, precedence ast.TypePrecedence
 		p.emitTupleType(node.AsTupleTypeNode())
 	case ast.KindOptionalType:
 		p.emitOptionalType(node.AsOptionalTypeNode())
+	case ast.KindKvsNullableType:
+		p.emitKvsNullableType(node.AsKvsNullableType())
+	case ast.KindKvsExtantType:
+		p.emitKvsExtantType(node.AsKvsExtantType())
 	case ast.KindRestType:
 		p.emitRestType(node.AsRestTypeNode())
 	case ast.KindUnionType:
@@ -3192,6 +3210,15 @@ func (p *Printer) parenthesizeExpressionForNoAsi(node *ast.Expression) *ast.Expr
 				ce.ColonToken,
 				ce.WhenFalse,
 			)
+		case ast.KindKvsNullingExpression:
+			ne := node.AsKvsNullingExpression()
+			return p.emitContext.Factory.UpdateKvsNullingExpression(
+				ne,
+				p.parenthesizeExpressionForNoAsi(ne.Condition),
+				ne.QuestionToken,
+				ne.ColonToken,
+				ne.WhenTrue,
+			)
 		case ast.KindAsExpression:
 			ae := node.AsAsExpression()
 			return p.emitContext.Factory.UpdateAsExpression(
@@ -3212,6 +3239,12 @@ func (p *Printer) parenthesizeExpressionForNoAsi(node *ast.Expression) *ast.Expr
 				nne,
 				p.parenthesizeExpressionForNoAsi(nne.Expression),
 				nne.Flags,
+			)
+		case ast.KindKvsDefaultExpression:
+			de := node.AsKvsDefaultExpression()
+			return p.emitContext.Factory.UpdateKvsDefaultExpression(
+				de,
+				p.parenthesizeExpressionForNoAsi(de.Expression),
 			)
 		}
 	}
@@ -3293,6 +3326,8 @@ func (p *Printer) emitExpression(node *ast.Expression, precedence ast.OperatorPr
 		p.emitBinaryExpression(node.AsBinaryExpression())
 	case ast.KindConditionalExpression:
 		p.emitConditionalExpression(node.AsConditionalExpression())
+	case ast.KindKvsNullingExpression:
+		p.emitKvsNullingExpression(node.AsKvsNullingExpression())
 	case ast.KindTemplateExpression:
 		p.emitTemplateExpression(node.AsTemplateExpression())
 	case ast.KindYieldExpression:
@@ -3303,6 +3338,10 @@ func (p *Printer) emitExpression(node *ast.Expression, precedence ast.OperatorPr
 		p.emitKvsExtantAssertionExpression(node.AsKvsExtantAssertionExpression())
 	case ast.KindKvsExtantAssignmentExpression:
 		p.emitKvsExtantAssignmentExpression(node.AsKvsExtantAssignmentExpression())
+	case ast.KindKvsExtantTestExpression:
+		p.emitKvsExtantTestExpression(node.AsKvsExtantTestExpression())
+	case ast.KindKvsDefaultExpression:
+		p.emitKvsDefaultExpression(node.AsKvsDefaultExpression())
 	case ast.KindKvsCollectExpression:
 		p.emitKvsCollectExpression(node.AsKvsCollectExpression())
 	case ast.KindKvsSelectExpression:
@@ -3497,6 +3536,23 @@ func (p *Printer) emitIfStatement(node *ast.IfStatement) {
 	p.exitNode(node.AsNode(), state)
 }
 
+func (p *Printer) emitKvsIfBindingStatement(node *ast.KvsIfBindingStatement) {
+	state := p.enterNode(node.AsNode())
+	clause := node.Clause.AsKvsIfBindingClause()
+	p.writeKeyword("if")
+	p.writeSpace()
+	p.writePunctuation("(")
+	p.emitVariableDeclarationList(clause.DeclarationList.AsVariableDeclarationList())
+	p.writePunctuation(")")
+	p.emitEmbeddedStatement(node.AsNode(), clause.Statement)
+	if node.ElseStatement != nil {
+		p.writeLineOrSpace(node.AsNode(), clause.Statement, node.ElseStatement)
+		p.writeKeyword("else")
+		p.emitEmbeddedStatement(node.AsNode(), node.ElseStatement)
+	}
+	p.exitNode(node.AsNode(), state)
+}
+
 func (p *Printer) emitWhileClause(node *ast.Node, expression *ast.Expression, startPos int) {
 	pos := p.emitToken(ast.KindWhileKeyword, startPos, WriteKindKeyword, node)
 	p.writeSpace()
@@ -3585,10 +3641,12 @@ func (p *Printer) emitForOfStatement(node *ast.ForInOrOfStatement) {
 		p.writeSpace()
 	}
 	p.emitToken(ast.KindOpenParenToken, openParenPos, WriteKindPunctuation, node.AsNode())
-	p.emitForInitializer(node.Initializer)
-	p.writeSpace()
-	p.emitToken(ast.KindOfKeyword, node.Initializer.End(), WriteKindKeyword, node.AsNode())
-	p.writeSpace()
+	if node.Flags&ast.NodeFlagsKvsImplicitSubject == 0 {
+		p.emitForInitializer(node.Initializer)
+		p.writeSpace()
+		p.emitToken(ast.KindOfKeyword, node.Initializer.End(), WriteKindKeyword, node.AsNode())
+		p.writeSpace()
+	}
 	p.emitExpression(node.Expression, ast.OperatorPrecedenceLowest)
 	p.emitToken(ast.KindCloseParenToken, node.Expression.End(), WriteKindPunctuation, node.AsNode())
 	p.emitEmbeddedStatement(node.AsNode(), node.Statement)
@@ -3662,10 +3720,12 @@ func (p *Printer) emitKvsCollectExpression(node *ast.KvsCollectExpression) {
 	p.writeKeyword("collect")
 	p.writeSpace()
 	p.writePunctuation("(")
-	p.emitForInitializer(node.Initializer)
-	p.writeSpace()
-	p.writeKeyword("of")
-	p.writeSpace()
+	if node.Flags&ast.NodeFlagsKvsImplicitSubject == 0 {
+		p.emitForInitializer(node.Initializer)
+		p.writeSpace()
+		p.writeKeyword("of")
+		p.writeSpace()
+	}
 	p.emitExpression(node.Expression, ast.OperatorPrecedenceLowest)
 	p.writePunctuation(")")
 	p.emitEmbeddedStatement(node.AsNode(), node.Statement)
@@ -3680,6 +3740,31 @@ func (p *Printer) emitKvsExtantAssignmentExpression(node *ast.KvsExtantAssignmen
 	p.emitPunctuationNode(node.EqualsToken)
 	p.writeSpace()
 	p.emitExpression(node.Right, ast.OperatorPrecedenceAssignment)
+	p.exitNode(node.AsNode(), state)
+}
+
+func (p *Printer) emitKvsExtantTestExpression(node *ast.KvsExtantTestExpression) {
+	state := p.enterNode(node.AsNode())
+	p.emitExpression(node.Expression, ast.OperatorPrecedenceUpdate)
+	p.emitPunctuationNode(node.QuestionToken)
+	p.exitNode(node.AsNode(), state)
+}
+
+func (p *Printer) emitKvsDefaultExpression(node *ast.KvsDefaultExpression) {
+	state := p.enterNode(node.AsNode())
+	p.emitExpression(node.Expression, ast.OperatorPrecedenceUpdate)
+	p.writePunctuation("!")
+	p.exitNode(node.AsNode(), state)
+}
+
+func (p *Printer) emitKvsNullingExpression(node *ast.KvsNullingExpression) {
+	state := p.enterNode(node.AsNode())
+	p.emitExpression(node.Condition, ast.OperatorPrecedenceConditional)
+	p.writeSpace()
+	p.emitPunctuationNode(node.QuestionToken)
+	p.emitPunctuationNode(node.ColonToken)
+	p.writeSpace()
+	p.emitExpression(node.WhenTrue, ast.OperatorPrecedenceAssignment)
 	p.exitNode(node.AsNode(), state)
 }
 
@@ -3706,10 +3791,12 @@ func (p *Printer) emitKvsSelectExpression(node *ast.KvsSelectExpression) {
 	p.writeKeyword("select")
 	p.writeSpace()
 	p.writePunctuation("(")
-	p.emitForInitializer(node.Initializer)
-	p.writeSpace()
-	p.writeKeyword("of")
-	p.writeSpace()
+	if node.Flags&ast.NodeFlagsKvsImplicitSubject == 0 {
+		p.emitForInitializer(node.Initializer)
+		p.writeSpace()
+		p.writeKeyword("of")
+		p.writeSpace()
+	}
 	p.emitExpression(node.Expression, ast.OperatorPrecedenceLowest)
 	p.writePunctuation(")")
 	p.emitEmbeddedStatement(node.AsNode(), node.Statement)
@@ -4275,6 +4362,8 @@ func (p *Printer) emitStatement(node *ast.Statement) {
 		p.emitExpressionStatement(node.AsExpressionStatement())
 	case ast.KindIfStatement:
 		p.emitIfStatement(node.AsIfStatement())
+	case ast.KindKvsIfBindingStatement:
+		p.emitKvsIfBindingStatement(node.AsKvsIfBindingStatement())
 	case ast.KindDoStatement:
 		p.emitDoStatement(node.AsDoStatement())
 	case ast.KindWhileStatement:

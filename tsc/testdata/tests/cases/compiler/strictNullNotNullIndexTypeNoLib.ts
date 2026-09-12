@@ -11,7 +11,7 @@ class Test<T extends A> {
     attrs: Readonly<T>;
 
     m() {
-        this.attrs.params!.name;
+        (this.attrs.params as!).name;
     }
 }
 
@@ -32,6 +32,6 @@ class Test2<T extends A> {
     attrs: Readonly<T>;
 
     m() {
-        return this.attrs.params!; // Return type should maintain relationship with `T` after being not-null-asserted, ideally
+        return this.attrs.params as!; // Return type should maintain relationship with `T` after being not-null-asserted, ideally
     }
 }

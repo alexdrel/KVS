@@ -15,7 +15,7 @@ function testNonNullInference(numbers: number[]) {
     }
 
     last;
-    last!;
+    last as!;
 }
 
 function testNonNullInferenceWithArrays(numbers: number[]) {
@@ -32,7 +32,7 @@ function testNonNullInferenceWithArrays(numbers: number[]) {
     }
 
     result;
-    result!;
+    result as!;
 }
 
 //// [nonNullFullInference.js]

@@ -39,7 +39,7 @@ class Table<S extends Schema>  {
 >S : Symbol(S, Decl(localTypeParameterInferencePriority.ts, 6, 12))
 >C : Symbol(C, Decl(localTypeParameterInferencePriority.ts, 10, 12))
 
-        return null!
+        return null as!
     }
 }
 

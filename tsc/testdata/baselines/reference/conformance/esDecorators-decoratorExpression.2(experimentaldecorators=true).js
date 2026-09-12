@@ -5,11 +5,11 @@ declare let x: any;
 declare let g: <T>(...args: any) => any;
 declare let h: () => <T>(...args: any) => any;
 
-{ @x! class C {} }
+{ @x as! class C {} }
 
-{ @x.y! class C {} }
+{ @x.y as! class C {} }
 
-{ @x!.y class C {} }
+{ @((x as!).y) class C {} }
 
 { @g<number>() class C {} }
 
@@ -25,17 +25,17 @@ declare let h: () => <T>(...args: any) => any;
 
 { @(x.y``) class C {} }
 
-{ @(x?.y!) class C {} }
+{ @(x?.y as!) class C {} }
 
 { @(x["y"]) class C {} }
 
 { @(x?.["y"]) class C {} }
 
-{ class C { @x! m() {} } }
+{ class C { @x as! m() {} } }
 
-{ class C { @x.y! m() {} } }
+{ class C { @x.y as! m() {} } }
 
-{ class C { @x!.y m() {} } }
+{ class C { @((x as!).y) m() {} } }
 
 { class C { @g<number>() m() {} } }
 
@@ -51,7 +51,7 @@ declare let h: () => <T>(...args: any) => any;
 
 { class C { @(x.y``) m() {} } }
 
-{ class C { @(x?.y!) m() {} } }
+{ class C { @(x?.y as!) m() {} } }
 
 { class C { @(x["y"]) m() {} } }
 
@@ -61,24 +61,20 @@ declare let h: () => <T>(...args: any) => any;
 //// [esDecorators-decoratorExpression.2.js]
 "use strict";
 {
-    let C = class C {
-    };
-    C = __decorate([
-        x
-    ], C);
+    as;
+    class C {
+    }
+}
+{
+    as;
+    class C {
+    }
 }
 {
     let C = class C {
     };
     C = __decorate([
-        x.y
-    ], C);
-}
-{
-    let C = class C {
-    };
-    C = __decorate([
-        x.y
+        ((x).y)
     ], C);
 }
 {
@@ -153,26 +149,28 @@ declare let h: () => <T>(...args: any) => any;
 }
 {
     class C {
+        as;
         m() { }
     }
     __decorate([
         x
-    ], C.prototype, "m", null);
+    ], C.prototype, "as", void 0);
+}
+{
+    class C {
+        as;
+        m() { }
+    }
+    __decorate([
+        x.y
+    ], C.prototype, "as", void 0);
 }
 {
     class C {
         m() { }
     }
     __decorate([
-        x.y
-    ], C.prototype, "m", null);
-}
-{
-    class C {
-        m() { }
-    }
-    __decorate([
-        x.y
+        ((x).y)
     ], C.prototype, "m", null);
 }
 {

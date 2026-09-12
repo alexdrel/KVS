@@ -18,8 +18,8 @@ foo.ts(15,7): error TS18055: 'Foo.G' has a string type, but must have syntactica
       E1 = (`${BAR}`) as string, // We could recognize these,
            ~~~~~~~~~~~~~~~~~~~~
 !!! error TS18033: Type 'string' is not assignable to type 'number' as required for computed enum member values.
-      E2 = `${BAR}`!,             // but Babel doesn't
-           ~~~~~~~~~
+      E2 = `${BAR}` as!,             // but Babel doesn't
+           ~~~~~~~~~~~~
 !!! error TS18033: Type 'string' is not assignable to type 'number' as required for computed enum member values.
     
       F = BAR,

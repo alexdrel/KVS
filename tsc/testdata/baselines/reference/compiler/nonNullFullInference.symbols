@@ -29,7 +29,7 @@ function testNonNullInference(numbers: number[]) {
     last;
 >last : Symbol(last, Decl(nonNullFullInference.ts, 3, 7))
 
-    last!;
+    last as!;
 >last : Symbol(last, Decl(nonNullFullInference.ts, 3, 7))
 }
 
@@ -68,6 +68,6 @@ function testNonNullInferenceWithArrays(numbers: number[]) {
     result;
 >result : Symbol(result, Decl(nonNullFullInference.ts, 18, 7))
 
-    result!;
+    result as!;
 >result : Symbol(result, Decl(nonNullFullInference.ts, 18, 7))
 }

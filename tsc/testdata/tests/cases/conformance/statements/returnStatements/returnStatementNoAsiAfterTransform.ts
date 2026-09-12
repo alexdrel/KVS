@@ -57,8 +57,8 @@ function t9() {
     ) satisfies any;
 }
 function t10() {
-    return (
+    return ((
         // comment
         a as any
-    )!;
+    ) as!;
 }

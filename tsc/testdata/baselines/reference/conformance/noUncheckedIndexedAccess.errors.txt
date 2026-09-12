@@ -186,7 +186,7 @@ noUncheckedIndexedAccess.ts(99,11): error TS2322: Type 'undefined' is not assign
     }
     function generic2<T extends { [s: string]: boolean }>(arg: T): boolean {
         // Should OK
-        return arg["blah"]!;
+        return arg["blah"] as!;
     }
     function generic3<T extends string>(arg: T): boolean {
         // Should error

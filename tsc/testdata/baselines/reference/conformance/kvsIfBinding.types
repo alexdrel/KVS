@@ -1,0 +1,58 @@
+//// [tests/cases/conformance/kvs/kvsIfBinding.ts] ////
+
+=== kvsIfBinding.ts ===
+declare function findValue(): string | number | undefined;
+>findValue : () => string | number | undefined
+
+if (const value = findValue()) {
+>value : string | number | undefined
+>findValue() : string | number | undefined
+>findValue : () => string | number | undefined
+
+    const narrowed = value;
+>narrowed : string | number
+>value : string | number
+
+    const displayed = typeof value === "string" ? value.toUpperCase() : value.toFixed(2);
+>displayed : string
+>typeof value === "string" ? value.toUpperCase() : value.toFixed(2) : string
+>typeof value === "string" : boolean
+>typeof value : "bigint" | "boolean" | "function" | "number" | "object" | "string" | "symbol" | "undefined"
+>value : string | number
+>"string" : "string"
+>value.toUpperCase() : string
+>value.toUpperCase : () => string
+>value : string
+>toUpperCase : () => string
+>value.toFixed(2) : string
+>value.toFixed : (fractionDigits?: number) => string
+>value : number
+>toFixed : (fractionDigits?: number) => string
+>2 : 2
+}
+
+// Rejected: the binding exists only in the successful branch.
+if (const scopedValue = findValue()) {
+>scopedValue : string | number | undefined
+>findValue() : string | number | undefined
+>findValue : () => string | number | undefined
+
+    scopedValue;
+>scopedValue : string | number
+
+} else {
+    scopedValue;
+>scopedValue : any
+}
+
+scopedValue;
+>scopedValue : any
+
+// Rejected: an if binding requires a complete const initializer.
+if (const missing: string) {
+>missing : string
+
+    missing;
+>missing : string
+}
+

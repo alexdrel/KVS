@@ -1,0 +1,69 @@
+declarationEmitCastReusesTypeNode3.ts(3,19): error TS2352: Conversion of type 'null' to type '{ name: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+declarationEmitCastReusesTypeNode3.ts(4,23): error TS2352: Conversion of type 'null' to type '{ name: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+declarationEmitCastReusesTypeNode3.ts(6,24): error TS2352: Conversion of type 'null' to type '{ name: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+declarationEmitCastReusesTypeNode3.ts(8,48): error TS2352: Conversion of type 'null' to type '{ name: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+declarationEmitCastReusesTypeNode3.ts(11,13): error TS2352: Conversion of type 'null' to type '{ name: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+declarationEmitCastReusesTypeNode3.ts(12,17): error TS2352: Conversion of type 'null' to type '{ name: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+declarationEmitCastReusesTypeNode3.ts(13,24): error TS2352: Conversion of type 'null' to type '{ name: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+declarationEmitCastReusesTypeNode3.ts(14,16): error TS2352: Conversion of type 'null' to type '{ name: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+declarationEmitCastReusesTypeNode3.ts(15,35): error TS2352: Conversion of type 'null' to type '{ name: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+declarationEmitCastReusesTypeNode3.ts(17,36): error TS2352: Conversion of type 'null' to type '{ name: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+declarationEmitCastReusesTypeNode3.ts(19,22): error TS2352: Conversion of type 'null' to type '{ name: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+declarationEmitCastReusesTypeNode3.ts(23,16): error TS2352: Conversion of type 'null' to type '{ name: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+declarationEmitCastReusesTypeNode3.ts(26,62): error TS2352: Conversion of type 'null' to type '{ name: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+
+
+==== declarationEmitCastReusesTypeNode3.ts (13 errors) ====
+    type P = { } & { name: string }
+    
+    export let vLet = <P>null as!
+                      ~~~~~~~
+!!! error TS2352: Conversion of type 'null' to type '{ name: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+    export const vConst = <P>null as!
+                          ~~~~~~~
+!!! error TS2352: Conversion of type 'null' to type '{ name: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+    
+    export function fn(p = <P>null as!) {}
+                           ~~~~~~~
+!!! error TS2352: Conversion of type 'null' to type '{ name: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+    
+    export function fnWithRequiredDefaultParam(p = <P>null as!, req: number) {}
+                                                   ~~~~~~~
+!!! error TS2352: Conversion of type 'null' to type '{ name: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+    
+    export class C {
+        field = <P>null as!
+                ~~~~~~~
+!!! error TS2352: Conversion of type 'null' to type '{ name: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+        optField? = <P>null as!
+                    ~~~~~~~
+!!! error TS2352: Conversion of type 'null' to type '{ name: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+        readonly roFiled = <P>null as!;
+                           ~~~~~~~
+!!! error TS2352: Conversion of type 'null' to type '{ name: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+        method(p = <P>null as!) {}
+                   ~~~~~~~
+!!! error TS2352: Conversion of type 'null' to type '{ name: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+        methodWithRequiredDefault(p = <P>null as!, req: number) {}
+                                      ~~~~~~~
+!!! error TS2352: Conversion of type 'null' to type '{ name: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+    
+        constructor(public ctorField = <P>null as!) {}
+                                       ~~~~~~~
+!!! error TS2352: Conversion of type 'null' to type '{ name: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+    
+        get x() { return <P>null as! }
+                         ~~~~~~~
+!!! error TS2352: Conversion of type 'null' to type '{ name: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+        set x(v) { }
+    }
+    
+    export default <P>null as!;
+                   ~~~~~~~
+!!! error TS2352: Conversion of type 'null' to type '{ name: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+    
+    // allows `undefined` on the input side, thanks to the initializer
+    export function fnWithPartialAnnotationOnDefaultparam(x: P = <P>null as!, b: number) {}
+                                                                 ~~~~~~~
+!!! error TS2352: Conversion of type 'null' to type '{ name: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+    

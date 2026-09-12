@@ -1,0 +1,44 @@
+//// [tests/cases/conformance/kvs/kvsNullableIteration.ts] ////
+
+=== kvsNullableIteration.ts ===
+interface Item {
+    value: string;
+>value : string
+}
+
+declare function getOptionalItems(): Item[] | null | undefined;
+>getOptionalItems : () => Item[] | null | undefined
+
+function iterateOptionalItems() {
+>iterateOptionalItems : () => string[]
+
+    const values: string[] = [];
+>values : string[]
+>[] : never[]
+
+    for (const item of getOptionalItems()) {
+>item : Item
+>getOptionalItems() : Item[] | null | undefined
+>getOptionalItems : () => Item[] | null | undefined
+
+        values.push(item.value);
+>values.push(item.value) : number
+>values.push : (...items: string[]) => number
+>values : string[]
+>push : (...items: string[]) => number
+>item.value : string
+>item : Item
+>value : string
+    }
+    return values;
+>values : string[]
+}
+
+for (const absentItem of undefined) {
+>absentItem : never
+>undefined : undefined
+
+    absentItem;
+>absentItem : never
+}
+

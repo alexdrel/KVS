@@ -5,7 +5,7 @@
 declare var b: number;
 
 // operand before !
-var BOOLEAN1 = b!;  //expect error
+var BOOLEAN1 = b as!;  //expect error
 
 // miss parentheses
 var BOOLEAN2 = !b + b;

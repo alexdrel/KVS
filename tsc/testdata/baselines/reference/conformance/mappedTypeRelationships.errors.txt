@@ -370,7 +370,7 @@ mappedTypeRelationships.ts(168,5): error TS2322: Type '{ [P in K]: T[P]; }' is n
     }
     
     function f<T extends { x: {} }>(): Partial<T> {
-        return undefined! as T;
+        return undefined as! as T;
     }
     
     // #32365

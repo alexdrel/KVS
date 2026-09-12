@@ -96,7 +96,7 @@ function referencedInSignartureKeyword({ function: alias }: { function: string }
 >function : Symbol(function, Decl(declarationEmitBindingPatternsUnused.ts, 29, 61))
 >alias : Symbol(alias, Decl(declarationEmitBindingPatternsUnused.ts, 29, 40))
 
-    return null!;
+    return null as!;
 }
 
 function referencedInInferredType({ name: alias }: Named) {
@@ -110,7 +110,7 @@ function referencedInInferredType({ name: alias }: Named) {
 >name : Symbol(name, Decl(declarationEmitBindingPatternsUnused.ts, 34, 19))
 >alias : Symbol(alias, Decl(declarationEmitBindingPatternsUnused.ts, 33, 35))
 
-    return null! as Named2
+    return null as! as Named2
 >Named2 : Symbol(Named2, Decl(declarationEmitBindingPatternsUnused.ts, 33, 59))
 }
 
@@ -260,7 +260,7 @@ class ReferencedInSignartureClass {
 >Named : Symbol(Named, Decl(declarationEmitBindingPatternsUnused.ts, 0, 0))
 >alias : Symbol(alias, Decl(declarationEmitBindingPatternsUnused.ts, 83, 14))
 
-        return null!
+        return null as!
     }
 	mRerturnTypeNested({ name: alias }: Named): NonNullable<typeof alias> {
 >mRerturnTypeNested : Symbol(ReferencedInSignartureClass.mRerturnTypeNested, Decl(declarationEmitBindingPatternsUnused.ts, 85, 5))
@@ -270,7 +270,7 @@ class ReferencedInSignartureClass {
 >NonNullable : Symbol(NonNullable, Decl(lib.es5.d.ts, --, --))
 >alias : Symbol(alias, Decl(declarationEmitBindingPatternsUnused.ts, 86, 21))
 
-        return null!
+        return null as!
     }
     mParameter({ name: alias }: Named, p: typeof alias) {
 >mParameter : Symbol(ReferencedInSignartureClass.mParameter, Decl(declarationEmitBindingPatternsUnused.ts, 88, 5))
@@ -280,7 +280,7 @@ class ReferencedInSignartureClass {
 >p : Symbol(p, Decl(declarationEmitBindingPatternsUnused.ts, 89, 38))
 >alias : Symbol(alias, Decl(declarationEmitBindingPatternsUnused.ts, 89, 16))
 
-        return null!
+        return null as!
     }
 }
 

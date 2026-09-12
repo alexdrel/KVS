@@ -245,3 +245,176 @@ required initializer.
 This reuses a source form that TypeScript previously rejected:
 `let value! = initializer`. No valid TypeScript declaration changes meaning;
 typed `let value!: Type` remains the TypeScript definite-assignment assertion.
+
+## First nulling-operator slice
+
+Status: accepted.
+
+`condition ?: expression` is represented by a dedicated
+`KvsNullingExpression`. Its source AST stores the condition, the adjacent `?:`
+punctuation, and the successful expression; it does not invent a source node
+for the implicit `null` branch. The right operand is named `WhenTrue` internally
+to align its role with TypeScript's conditional-expression machinery.
+
+The operator has ordinary conditional precedence and is right-associative.
+Its right operand is checked on the successful-condition flow path, receives
+the contextual type of the whole expression, and is evaluated lazily. The
+result type is the right-operand type unioned with `null`.
+
+Lowering produces the ordinary JavaScript conditional
+`condition ? expression : null`. This directly preserves RHS laziness and
+once-only condition evaluation. It currently inherits JavaScript truthiness;
+the distinct runtime behavior required by KVS truthiness remains an explicit
+future lowering step.
+
+## First extant-test slice
+
+Status: accepted.
+
+Postfix `expression?` is represented by a dedicated
+`KvsExtantTestExpression`. Unlike compound forms such as `return?`, this is an
+expression operator, so whitespace between the operand and `?` is allowed.
+The parser treats `?` followed by a true expression and `:` as TypeScript's
+ordinary ternary; otherwise it forms the postfix presence test. Adjacent `?:`
+and `?=` retain their dedicated KVS meanings.
+
+The expression always has type `boolean`. In control flow, its successful path
+removes `null` and `undefined` from a referenced operand, while its unsuccessful
+path retains only those absent alternatives. Lowering emits `operand != null`,
+which evaluates the operand once and preserves present falsy values.
+
+## First conditional-binding slice
+
+Status: accepted prototype boundary.
+
+`if (const value = initializer)` has a dedicated statement node and an
+implicit clause node. The clause is a lexical container for the declaration,
+its truthiness test, and the successful body. The `else` branch remains a
+sibling outside that container, so the binding is genuinely unavailable there
+and after the statement rather than merely rejected by a special diagnostic.
+
+The first slice accepts one complete `const` declaration with a simple
+identifier. Its initializer is evaluated once. The successful flow path tests
+and narrows the bound identifier using TypeScript's existing JavaScript
+truthiness analysis.
+
+Lowering captures the initializer in a generated temporary, tests that
+temporary, and declares the source binding at the start of the successful
+block. This preserves both once-only evaluation and successful-branch-only
+runtime scope. KVS truthiness remains postponed; replacing the emitted
+JavaScript truthiness test is a later lowering concern.
+
+## First nullability-type slice
+
+Status: accepted.
+
+Postfix `T?` and `T!` use dedicated `KvsNullableType` and `KvsExtantType`
+nodes. `T?` adds both `null` and `undefined`; `T!` removes both from the top
+level. They do not reuse TypeScript's
+`OptionalType` or its JSDoc nullable node. `OptionalType` describes optional
+tuple elements and adds only `undefined`; the JSDoc node prints prefix syntax
+and is rejected outside documentation comments. Neither represents the KVS
+operations.
+
+The parser recognizes `?` and `!` only when adjacent to the preceding type.
+Spaced syntax remains invalid. A narrow parser context preserves compact valid
+TypeScript conditional types such as `T extends U?X:Y`, while a bounded
+lookahead prevents parenthesized KVS postfix types from being mistaken for
+function parameter lists. This supports all four postfix compositions plus
+element/container forms such as `T?[]`, `T![]`, `T[]?`, and `T[]!` without
+changing TypeScript's function-type parse.
+
+Checking either unions the operand with both absent types or applies
+TypeScript's existing top-level non-nullable operation. Existing union
+construction supplies idempotence and distribution over unions, and ordinary
+flow analysis narrows nullable types after a nullish check. JavaScript emit
+erases both operators with other type annotations; KVS declaration emit
+retains their postfix spelling.
+
+## First terminal-default slice
+
+Status: accepted.
+
+Postfix `expression!` is represented by a dedicated `KvsDefaultExpression`.
+In KVS this intentionally replaces TypeScript's postfix non-null assertion:
+the operation resolves absence at runtime rather than only changing the static
+type.
+
+The first slice accepts one statically known default family: string, number,
+boolean, bigint, or ordinary array. Literal unions within a primitive family
+remain in that family, and mutable and readonly array unions share the array
+default. Mixed primitive families, tuples, structural objects, maps, sets,
+type parameters, `any`, and `unknown` remain unsupported. Tuples are postponed
+with structural values because defaulting them requires values for their
+members.
+
+The checker removes top-level `null` and `undefined`, validates the remaining
+type family, and exposes that family to emission through the emit resolver.
+This keeps the source AST syntactic and makes the checker, rather than the AST
+or transformer, own type-directed default selection. Lowering emits `value ??
+fallback`; an array fallback is a fresh `[]` on every evaluation. Unsupported
+forms are diagnosed and lower to the operand alone for recovery.
+
+An absence-only expression cannot name a KVS default family, so `null!` and
+`undefined!` are errors. Inherited TypeScript tests that use those spellings as
+unchecked impossible-value placeholders use `null as!` and `undefined as!`
+instead. Postfix `!` consistently remains a KVS runtime value operation.
+
+## Nullable trailing tuple elements
+
+Status: accepted.
+
+A trailing tuple element whose type is `T?` may be omitted. Its value type
+remains KVS nullable, including both `null` and `undefined`; omission is not a
+separate static absence category. Thus `[string, boolean?]` accepts a
+one-element tuple, a present boolean, `null`, or `undefined` in its second
+position, and reading that position produces `boolean?`.
+
+KVS preserves the runtime representation supplied by the program. Tuple
+length, iteration, keys, and serialization may still distinguish an omitted
+slot from an explicit `undefined`, but ordinary type checking does not. A
+nullable element followed by a required element is not trailing and remains a
+required position, avoiding index shifting.
+
+## First nullable-iterable-source slice
+
+Status: accepted.
+
+Synchronous `for...of`, eager `collect`, and `select` accept an iterable whose
+type includes top-level `null` or `undefined`. The checker removes only that
+top-level absence when determining the loop binding type. This deliberately
+makes nullable ordinary TypeScript `for...of` source syntax valid KVS.
+
+An ordinary `for...of` lowers its source to `source ?? []`, which evaluates the
+source once and performs zero iterations when it is absent. Producer lowering
+captures a nullable source in a generated temporary and guards the generated
+loop with a presence test. `collect` initializes its result to `null` and
+changes it to a fresh `[]` only inside the present-source branch, preserving
+the distinction between an absent source and a present source with no
+production. `select` already initializes to `null`, so its guarded loop needs
+no additional result transition.
+
+The emit resolver reports whether the checked source type is nullable. This
+keeps non-nullable loop output unchanged and avoids duplicating type analysis
+inside the transformer. Async `for await...of` remains outside this slice.
+
+## First implicit-subject slice
+
+Status: accepted.
+
+Iterable-only headers are implemented for synchronous `for`, eager `collect`,
+and `select`. The parser retains the existing loop nodes, marks the header as
+implicit, and supplies a hidden lexical `const _` binding. Source printing uses
+the mark to preserve the iterable-only spelling; lowering emits an ordinary
+explicit `for (const _ of source)` loop.
+
+The new subject begins in the loop body, not in its source expression. Name
+resolution therefore skips the loop's hidden binding while resolving `_` in
+that source, allowing it to refer to an enclosing implicit subject. Explicit
+loops introduce no `_` and leave an enclosing subject visible.
+
+Most implicit sources lower directly. Only a source expression containing `_`
+is evaluated into a temporary before the inner `const _` is introduced. This
+avoids JavaScript's self-shadowing temporal dead zone while adding no temporary
+to independent forms such as `for (items)`. The first slice does not include
+`collect*`, placeholder lambdas, or subject-form `when`.

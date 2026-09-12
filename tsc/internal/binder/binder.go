@@ -1688,6 +1688,8 @@ func (b *Binder) bindChildren(node *ast.Node) {
 		b.bindKvsSelectExpression(node)
 	case ast.KindIfStatement:
 		b.bindIfStatement(node)
+	case ast.KindKvsIfBindingStatement:
+		b.bindKvsIfBindingStatement(node)
 	case ast.KindReturnStatement:
 		b.bindReturnStatement(node)
 	case ast.KindKvsExtantReturnStatement:
@@ -1731,13 +1733,15 @@ func (b *Binder) bindChildren(node *ast.Node) {
 		b.bindDeleteExpressionFlow(node)
 	case ast.KindConditionalExpression:
 		b.bindConditionalExpressionFlow(node)
+	case ast.KindKvsNullingExpression:
+		b.bindKvsNullingExpressionFlow(node)
 	case ast.KindVariableDeclaration:
 		b.bindVariableDeclarationFlow(node)
 	case ast.KindPropertyAccessExpression, ast.KindElementAccessExpression:
 		b.bindAccessExpressionFlow(node)
 	case ast.KindCallExpression:
 		b.bindCallExpressionFlow(node)
-	case ast.KindNonNullExpression:
+	case ast.KindNonNullExpression, ast.KindKvsExtantAssertionExpression:
 		b.bindNonNullExpressionFlow(node)
 	case ast.KindSourceFile:
 		sourceFile := node.AsSourceFile()
@@ -2039,6 +2043,42 @@ func (b *Binder) bindIfStatement(node *ast.Node) {
 	b.currentFlow = b.finishFlowLabel(thenLabel)
 	b.bind(stmt.ThenStatement)
 	b.addAntecedent(postIfLabel, b.currentFlow)
+	b.currentFlow = b.finishFlowLabel(elseLabel)
+	b.bind(stmt.ElseStatement)
+	b.addAntecedent(postIfLabel, b.currentFlow)
+	b.currentFlow = b.finishFlowLabel(postIfLabel)
+}
+
+func (b *Binder) bindKvsIfBindingStatement(node *ast.Node) {
+	stmt := node.AsKvsIfBindingStatement()
+	clause := stmt.Clause.AsKvsIfBindingClause()
+	thenLabel := b.createBranchLabel()
+	elseLabel := b.createBranchLabel()
+	postIfLabel := b.createBranchLabel()
+
+	// The clause is an implicit lexical scope. Bind the declaration and the
+	// successful body there, then restore the surrounding scope before binding
+	// else so the name does not exist on the unsuccessful path.
+	savedBlockScopeContainer := b.blockScopeContainer
+	b.blockScopeContainer = clause.AsNode()
+	b.addToContainerChain(clause.AsNode())
+	b.bind(clause.DeclarationList)
+	name := clause.DeclarationList.AsVariableDeclarationList().Declarations.Nodes[0].Name()
+	conditionName := ""
+	if ast.IsIdentifier(name) {
+		conditionName = name.Text()
+	}
+	condition := b.flowFactory.NewIdentifier(conditionName)
+	condition.Loc = name.Loc
+	condition.Flags |= ast.NodeFlagsSynthesized
+	condition.Parent = clause.AsNode()
+	clause.Condition = condition
+	b.bindCondition(condition, thenLabel, elseLabel)
+	b.currentFlow = b.finishFlowLabel(thenLabel)
+	b.bind(clause.Statement)
+	b.addAntecedent(postIfLabel, b.currentFlow)
+	b.blockScopeContainer = savedBlockScopeContainer
+
 	b.currentFlow = b.finishFlowLabel(elseLabel)
 	b.bind(stmt.ElseStatement)
 	b.addAntecedent(postIfLabel, b.currentFlow)
@@ -2447,6 +2487,30 @@ func (b *Binder) bindConditionalExpressionFlow(node *ast.Node) {
 	b.hasFlowEffects = b.hasFlowEffects || saveHasFlowEffects
 }
 
+func (b *Binder) bindKvsNullingExpressionFlow(node *ast.Node) {
+	expr := node.AsKvsNullingExpression()
+	trueLabel := b.createBranchLabel()
+	falseLabel := b.createBranchLabel()
+	postExpressionLabel := b.createBranchLabel()
+	saveCurrentFlow := b.currentFlow
+	saveHasFlowEffects := b.hasFlowEffects
+	b.hasFlowEffects = false
+	b.bindCondition(expr.Condition, trueLabel, falseLabel)
+	b.currentFlow = b.finishFlowLabel(trueLabel)
+	b.bind(expr.QuestionToken)
+	b.bind(expr.ColonToken)
+	b.bind(expr.WhenTrue)
+	b.addAntecedent(postExpressionLabel, b.currentFlow)
+	b.currentFlow = b.finishFlowLabel(falseLabel)
+	b.addAntecedent(postExpressionLabel, b.currentFlow)
+	if b.hasFlowEffects {
+		b.currentFlow = b.finishFlowLabel(postExpressionLabel)
+	} else {
+		b.currentFlow = saveCurrentFlow
+	}
+	b.hasFlowEffects = b.hasFlowEffects || saveHasFlowEffects
+}
+
 func (b *Binder) bindVariableDeclarationFlow(node *ast.Node) {
 	b.bindEachChild(node)
 	if node.Initializer() != nil || ast.IsForInOrOfStatement(node.Parent.Parent) || node.Parent.Parent.Kind == ast.KindKvsCollectExpression || node.Parent.Parent.Kind == ast.KindKvsSelectExpression {
@@ -2723,7 +2787,7 @@ func GetContainerFlags(node *ast.Node) ContainerFlags {
 		} else {
 			return ContainerFlagsNone
 		}
-	case ast.KindCatchClause, ast.KindForStatement, ast.KindForInStatement, ast.KindForOfStatement, ast.KindKvsCollectExpression, ast.KindKvsSelectExpression, ast.KindCaseBlock:
+	case ast.KindCatchClause, ast.KindKvsIfBindingClause, ast.KindForStatement, ast.KindForInStatement, ast.KindForOfStatement, ast.KindKvsCollectExpression, ast.KindKvsSelectExpression, ast.KindCaseBlock:
 		return ContainerFlagsIsBlockScopedContainer | ContainerFlagsHasLocals
 	case ast.KindBlock:
 		if ast.IsFunctionLike(node.Parent) || ast.IsClassStaticBlockDeclaration(node.Parent) {
@@ -2743,7 +2807,7 @@ func isNarrowingExpression(expr *ast.Node) bool {
 		return containsNarrowableReference(expr)
 	case ast.KindCallExpression:
 		return hasNarrowableArgument(expr)
-	case ast.KindParenthesizedExpression, ast.KindNonNullExpression, ast.KindTypeOfExpression:
+	case ast.KindParenthesizedExpression, ast.KindNonNullExpression, ast.KindKvsExtantAssertionExpression, ast.KindTypeOfExpression, ast.KindKvsExtantTestExpression:
 		return isNarrowingExpression(expr.Expression())
 	case ast.KindBinaryExpression:
 		return isNarrowingBinaryExpression(expr.AsBinaryExpression())
@@ -2770,7 +2834,7 @@ func isNarrowableReference(node *ast.Node) bool {
 	switch node.Kind {
 	case ast.KindIdentifier, ast.KindThisKeyword, ast.KindSuperKeyword, ast.KindMetaProperty:
 		return true
-	case ast.KindPropertyAccessExpression, ast.KindParenthesizedExpression, ast.KindNonNullExpression:
+	case ast.KindPropertyAccessExpression, ast.KindParenthesizedExpression, ast.KindNonNullExpression, ast.KindKvsExtantAssertionExpression:
 		return isNarrowableReference(node.Expression())
 	case ast.KindElementAccessExpression:
 		expr := node.AsElementAccessExpression()
@@ -2896,6 +2960,8 @@ func isStatementCondition(node *ast.Node) bool {
 		return node.Parent.AsForStatement().Condition == node
 	case ast.KindConditionalExpression:
 		return node.Parent.AsConditionalExpression().Condition == node
+	case ast.KindKvsNullingExpression:
+		return node.Parent.AsKvsNullingExpression().Condition == node
 	}
 	return false
 }

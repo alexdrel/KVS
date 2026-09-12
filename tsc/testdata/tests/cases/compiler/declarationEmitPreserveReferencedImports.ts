@@ -9,10 +9,10 @@ export interface Evt { }
 
 // @filename: decl.ts
 import {Evt} from './utils'
-export const o = <T>(o: T) => () : T => null!
+export const o = <T>(o: T) => () : T => null as!
 
 // @filename: main.ts
 import { o }  from './decl'
 import { Evt }  from './utils'
 
-export const f = { o: o({ v: null! as Evt}) };
+export const f = { o: o({ v: null as! as Evt}) };

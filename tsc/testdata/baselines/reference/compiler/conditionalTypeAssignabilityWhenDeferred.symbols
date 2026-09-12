@@ -17,11 +17,11 @@ export type FilterPropsByType<T, TT> = {
 }[keyof T];
 >T : Symbol(T, Decl(conditionalTypeAssignabilityWhenDeferred.ts, 0, 30))
 
-function select<
->select : Symbol(select, Decl(conditionalTypeAssignabilityWhenDeferred.ts, 2, 11))
+function selectValue<
+>selectValue : Symbol(selectValue, Decl(conditionalTypeAssignabilityWhenDeferred.ts, 2, 11))
 
   T extends string | number,
->T : Symbol(T, Decl(conditionalTypeAssignabilityWhenDeferred.ts, 4, 16))
+>T : Symbol(T, Decl(conditionalTypeAssignabilityWhenDeferred.ts, 4, 21))
 
   TList extends object,
 >TList : Symbol(TList, Decl(conditionalTypeAssignabilityWhenDeferred.ts, 5, 28))
@@ -30,11 +30,11 @@ function select<
 >TValueProp : Symbol(TValueProp, Decl(conditionalTypeAssignabilityWhenDeferred.ts, 6, 23))
 >FilterPropsByType : Symbol(FilterPropsByType, Decl(conditionalTypeAssignabilityWhenDeferred.ts, 0, 0))
 >TList : Symbol(TList, Decl(conditionalTypeAssignabilityWhenDeferred.ts, 5, 28))
->T : Symbol(T, Decl(conditionalTypeAssignabilityWhenDeferred.ts, 4, 16))
+>T : Symbol(T, Decl(conditionalTypeAssignabilityWhenDeferred.ts, 4, 21))
 
 >(property: T, list: TList[], valueProp: TValueProp) {}
 >property : Symbol(property, Decl(conditionalTypeAssignabilityWhenDeferred.ts, 8, 2))
->T : Symbol(T, Decl(conditionalTypeAssignabilityWhenDeferred.ts, 4, 16))
+>T : Symbol(T, Decl(conditionalTypeAssignabilityWhenDeferred.ts, 4, 21))
 >list : Symbol(list, Decl(conditionalTypeAssignabilityWhenDeferred.ts, 8, 14))
 >TList : Symbol(TList, Decl(conditionalTypeAssignabilityWhenDeferred.ts, 5, 28))
 >valueProp : Symbol(valueProp, Decl(conditionalTypeAssignabilityWhenDeferred.ts, 8, 29))
@@ -49,8 +49,8 @@ export function func<XX extends string>(x: XX, tipos: { value: XX }[]) {
 >value : Symbol(value, Decl(conditionalTypeAssignabilityWhenDeferred.ts, 10, 55))
 >XX : Symbol(XX, Decl(conditionalTypeAssignabilityWhenDeferred.ts, 10, 21))
 
-  select(x, tipos, "value");
->select : Symbol(select, Decl(conditionalTypeAssignabilityWhenDeferred.ts, 2, 11))
+  selectValue(x, tipos, "value");
+>selectValue : Symbol(selectValue, Decl(conditionalTypeAssignabilityWhenDeferred.ts, 2, 11))
 >x : Symbol(x, Decl(conditionalTypeAssignabilityWhenDeferred.ts, 10, 40))
 >tipos : Symbol(tipos, Decl(conditionalTypeAssignabilityWhenDeferred.ts, 10, 46))
 }
@@ -193,7 +193,7 @@ function testAssignabilityToConditionalType<T>() {
     ? { y: number }
 >y : Symbol(y, Decl(conditionalTypeAssignabilityWhenDeferred.ts, 53, 7))
 
-    : { a: number; b: number } = undefined!;
+    : { a: number; b: number } = undefined as!;
 >a : Symbol(a, Decl(conditionalTypeAssignabilityWhenDeferred.ts, 54, 7))
 >b : Symbol(b, Decl(conditionalTypeAssignabilityWhenDeferred.ts, 54, 18))
 >undefined : Symbol(undefined)

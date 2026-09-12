@@ -10,6 +10,7 @@ if (foo[x] === undefined) {
 }
 else {
     let nu = foo[x]
-    let n = foo[x]
-    foo[x]!++
+    let n = foo[x];
+    (foo[x] as!)++
+    foo[x] as! = 2
 }

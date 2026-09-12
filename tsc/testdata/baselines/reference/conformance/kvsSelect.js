@@ -37,6 +37,14 @@ function selectField(groups: Group[]) {
     };
 }
 
+declare function getOptionalGroups(): Group[] | null | undefined;
+
+function selectFromOptionalGroups() {
+    return select (const group of getOptionalGroups()) {
+        yield? group.candidates[0];
+    };
+}
+
 function rejectNestedPosition(groups: Group[]) {
     console.log(select (const group of groups) {
         yield group.value;
@@ -93,6 +101,20 @@ function selectField(groups) {
         label: "result",
         value: _a ?? 0,
     };
+}
+function selectFromOptionalGroups() {
+    var _a = getOptionalGroups();
+    var _b = null;
+    var _c;
+    if (_a != null) {
+        for (const group of _a) {
+            if ((_c = group.candidates[0]) != null) {
+                _b = _c;
+                break;
+            }
+        }
+    }
+    return _b;
 }
 function rejectNestedPosition(groups) {
     console.log(null);

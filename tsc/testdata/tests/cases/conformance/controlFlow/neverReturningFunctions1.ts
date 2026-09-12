@@ -231,7 +231,7 @@ const Component = registerComponent('test-component', {
 
 	multiply(f: number) {
 		// Reference to system because both were registered with the same name.
-		return f * this.data.num * this.system!.data.counter;
+		return f * this.data.num * (this.system as!).data.counter;
 	}
 });
 

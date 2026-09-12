@@ -31,12 +31,12 @@ function referencedInSignarture({ name: alias }: Named): typeof alias {
 }
 
 function referencedInSignartureKeyword({ function: alias }: { function: string }): typeof alias {
-    return null!;
+    return null as!;
 }
 
 function referencedInInferredType({ name: alias }: Named) {
     type Named2 = { name: typeof alias }
-    return null! as Named2
+    return null as! as Named2
 }
 
 function referencedInNestedFunction({ name: alias }: Named) {
@@ -85,13 +85,13 @@ class ReferencedInSignartureClass {
         
     }
 	mReturnType({ name: alias }: Named): typeof alias {
-        return null!
+        return null as!
     }
 	mRerturnTypeNested({ name: alias }: Named): NonNullable<typeof alias> {
-        return null!
+        return null as!
     }
     mParameter({ name: alias }: Named, p: typeof alias) {
-        return null!
+        return null as!
     }
 }
 

@@ -10,7 +10,7 @@ declare class B {
 }
 
 class C extends B {
-    static x: any = undefined!;
+    static x: any = undefined as!;
     static y1 = this.x;
     static y2 = this.x();
     static y3 = this?.x();

@@ -80,7 +80,7 @@ const list: (Foo | Bar)[] = [];
 const resultBars: Bar[] = list.filter((value) => 'bar' in value);  // should ok
 
 function isBarNonNull(x: Foo | Bar | null) {
-  return ('bar' in x!);
+  return ('bar' in x as!);
 }
 const fooOrBar = list[0];
 if (isBarNonNull(fooOrBar)) {

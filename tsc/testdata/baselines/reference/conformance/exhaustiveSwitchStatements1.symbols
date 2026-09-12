@@ -624,7 +624,7 @@ function f35431(a: A) {
     case "abc":
     case "def": return;
     default:
-      a!.kind; // Error expected
+      (a as!).kind; // Error expected
 >a : Symbol(a, Decl(exhaustiveSwitchStatements1.ts, 241, 16))
   }
 }

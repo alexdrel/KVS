@@ -43,7 +43,7 @@ function f1<T>(x: T | (string extends T ? null | undefined : never)) {
 >T : Symbol(T, Decl(nonNullableReduction.ts, 10, 12))
 >T : Symbol(T, Decl(nonNullableReduction.ts, 10, 12))
 
-    let z = x!;  // NonNullable<T>
+    let z = x as!;  // NonNullable<T>
 >z : Symbol(z, Decl(nonNullableReduction.ts, 11, 7))
 >x : Symbol(x, Decl(nonNullableReduction.ts, 10, 15))
 }
@@ -56,7 +56,7 @@ function f2<T, U extends null | undefined>(x: T | U) {
 >T : Symbol(T, Decl(nonNullableReduction.ts, 14, 12))
 >U : Symbol(U, Decl(nonNullableReduction.ts, 14, 14))
 
-    let z = x!;  // NonNullable<T>
+    let z = x as!;  // NonNullable<T>
 >z : Symbol(z, Decl(nonNullableReduction.ts, 15, 7))
 >x : Symbol(x, Decl(nonNullableReduction.ts, 14, 43))
 }

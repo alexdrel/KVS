@@ -10,7 +10,7 @@ function f<A extends string>(p0: { [key in A]: {} | undefined }, p1: A) {
 >p1 : Symbol(p1, Decl(nonNullMappedType.ts, 0, 64))
 >A : Symbol(A, Decl(nonNullMappedType.ts, 0, 11))
 
-    const v: {} = p0[p1]!;
+    const v: {} = p0[p1] as!;
 >v : Symbol(v, Decl(nonNullMappedType.ts, 1, 9))
 >p0 : Symbol(p0, Decl(nonNullMappedType.ts, 0, 29))
 >p1 : Symbol(p1, Decl(nonNullMappedType.ts, 0, 64))

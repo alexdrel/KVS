@@ -597,6 +597,16 @@ export interface KvsExtantYieldStatement extends StatementBase {
     readonly kind: SyntaxKind.KvsExtantYieldStatement;
     readonly expression: Expression;
 }
+export interface KvsIfBindingStatement extends StatementBase {
+    readonly kind: SyntaxKind.KvsIfBindingStatement;
+    readonly clause: KvsIfBindingClause;
+    readonly elseStatement?: Statement;
+}
+export interface KvsIfBindingClause extends NodeBase {
+    readonly kind: SyntaxKind.KvsIfBindingClause;
+    readonly declarationList: VariableDeclarationList;
+    readonly statement: Statement;
+}
 export interface KvsNullableAssertionExpression extends ExpressionBase {
     readonly kind: SyntaxKind.KvsNullableAssertionExpression;
     readonly expression: Expression;
@@ -613,6 +623,22 @@ export interface KvsExtantAssignmentExpression extends ExpressionBase {
     readonly questionToken: QuestionToken;
     readonly equalsToken: EqualsToken;
     readonly right: Expression;
+}
+export interface KvsExtantTestExpression extends ExpressionBase {
+    readonly kind: SyntaxKind.KvsExtantTestExpression;
+    readonly expression: Expression;
+    readonly questionToken: QuestionToken;
+}
+export interface KvsDefaultExpression extends ExpressionBase {
+    readonly kind: SyntaxKind.KvsDefaultExpression;
+    readonly expression: Expression;
+}
+export interface KvsNullingExpression extends ExpressionBase {
+    readonly kind: SyntaxKind.KvsNullingExpression;
+    readonly condition: Expression;
+    readonly questionToken: QuestionToken;
+    readonly colonToken: ColonToken;
+    readonly whenTrue: Expression;
 }
 export interface KvsCollectExpression extends ExpressionBase {
     readonly kind: SyntaxKind.KvsCollectExpression;
@@ -1083,6 +1109,16 @@ export interface NamedTupleMember extends TypeNodeBase, DeclarationBase {
 export interface OptionalTypeNode extends TypeNodeBase {
     readonly kind: SyntaxKind.OptionalType;
     readonly type: TypeNode;
+}
+export interface KvsNullableType extends TypeNodeBase {
+    readonly kind: SyntaxKind.KvsNullableType;
+    readonly type: TypeNode;
+    readonly questionToken: QuestionToken;
+}
+export interface KvsExtantType extends TypeNodeBase {
+    readonly kind: SyntaxKind.KvsExtantType;
+    readonly type: TypeNode;
+    readonly exclamationToken: ExclamationToken;
 }
 export interface RestTypeNode extends TypeNodeBase {
     readonly kind: SyntaxKind.RestType;

@@ -166,14 +166,14 @@ class TableBaseEnum<
     PublicSpec extends Record<keyof InternalSpec, any>,
     InternalSpec extends Record<keyof PublicSpec, any>  | undefined = undefined> {
     m() {
-        let iSpec = null! as InternalSpec;
-        iSpec[null! as keyof InternalSpec];  // Error, object possibly undefined
-        iSpec[null! as keyof PublicSpec];    // Error, object possibly undefined
+        let iSpec = null as! as InternalSpec;
+        iSpec[null as! as keyof InternalSpec];  // Error, object possibly undefined
+        iSpec[null as! as keyof PublicSpec];    // Error, object possibly undefined
         if (iSpec === undefined) {
             return;
         }
-        iSpec[null! as keyof InternalSpec];
-        iSpec[null! as keyof PublicSpec];
+        iSpec[null as! as keyof InternalSpec];
+        iSpec[null as! as keyof PublicSpec];
     }
 }
 

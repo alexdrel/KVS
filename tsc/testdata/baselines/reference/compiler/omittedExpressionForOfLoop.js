@@ -17,7 +17,7 @@ for (const [] of []) {
 "use strict";
 for (const [,] of doesNotExist) {
 }
-for (const [,] of undefined) {
+for (const [,] of undefined !== null && undefined !== void 0 ? undefined : []) {
 }
 for (const [,] of []) {
 }

@@ -11,7 +11,7 @@ type T1 = { 0?: string | undefined } extends { 0?: string } ? true : false;  // 
 >false : false
 
 type T2 = [(string | undefined)?] extends [string?] ? true : false;  // false
->T2 : false
+>T2 : true
 >true : true
 >false : false
 

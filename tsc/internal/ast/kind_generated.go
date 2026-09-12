@@ -214,6 +214,8 @@ const (
 	KindArrayType
 	KindTupleType
 	KindOptionalType
+	KindKvsNullableType
+	KindKvsExtantType
 	KindRestType
 	KindUnionType
 	KindIntersectionType
@@ -258,6 +260,9 @@ const (
 	KindKvsNullableAssertionExpression
 	KindKvsExtantAssertionExpression
 	KindKvsExtantAssignmentExpression
+	KindKvsExtantTestExpression
+	KindKvsDefaultExpression
+	KindKvsNullingExpression
 	KindKvsCollectExpression
 	KindKvsSelectExpression
 	KindSpreadElement
@@ -295,6 +300,8 @@ const (
 	KindKvsExtantReturnStatement
 	KindKvsYieldStatement
 	KindKvsExtantYieldStatement
+	KindKvsIfBindingStatement
+	KindKvsIfBindingClause
 	KindVariableDeclaration
 	KindVariableDeclarationList
 	KindFunctionDeclaration
@@ -420,7 +427,7 @@ const (
 	KindFirstBinaryOperator     = KindLessThanToken
 	KindLastBinaryOperator      = KindCaretEqualsToken
 	KindFirstStatement          = KindVariableStatement
-	KindLastStatement           = KindKvsExtantYieldStatement
+	KindLastStatement           = KindKvsIfBindingStatement
 	KindFirstNode               = KindQualifiedName
 	KindFirstJSDocNode          = KindJSDocTypeExpression
 	KindLastJSDocNode           = KindJSDocImportTag

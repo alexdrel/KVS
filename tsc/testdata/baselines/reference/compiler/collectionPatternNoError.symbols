@@ -41,7 +41,7 @@ function fetchMsg<V extends Message>(protoCtor: MsgConstructor<V>): V {
 >V : Symbol(V, Decl(collectionPatternNoError.ts, 12, 18))
 >V : Symbol(V, Decl(collectionPatternNoError.ts, 12, 18))
 
-  return null!;
+  return null as!;
 }
 
 class DataProvider<T extends Message, U extends MessageList<T>> {

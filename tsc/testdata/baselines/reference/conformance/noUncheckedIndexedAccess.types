@@ -260,8 +260,8 @@ function generic2<T extends { [s: string]: boolean }>(arg: T): boolean {
 >arg : T
 
     // Should OK
-    return arg["blah"]!;
->arg["blah"]! : boolean
+    return arg["blah"] as!;
+>arg["blah"] as! : boolean
 >arg["blah"] : boolean | undefined
 >arg : T
 >"blah" : "blah"

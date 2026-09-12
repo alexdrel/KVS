@@ -1,0 +1,121 @@
+//// [tests/cases/conformance/kvs/kvsImplicitSubject.ts] ////
+
+=== kvsImplicitSubject.ts ===
+interface Group {
+>Group : Symbol(Group, Decl(kvsImplicitSubject.ts, 0, 0))
+
+    name: string;
+>name : Symbol(Group.name, Decl(kvsImplicitSubject.ts, 0, 17))
+
+    values: (number | null)[];
+>values : Symbol(Group.values, Decl(kvsImplicitSubject.ts, 1, 17))
+}
+
+function visitGroups(groups: Group[]) {
+>visitGroups : Symbol(visitGroups, Decl(kvsImplicitSubject.ts, 3, 1))
+>groups : Symbol(groups, Decl(kvsImplicitSubject.ts, 5, 21))
+>Group : Symbol(Group, Decl(kvsImplicitSubject.ts, 0, 0))
+
+    const names: string[] = [];
+>names : Symbol(names, Decl(kvsImplicitSubject.ts, 6, 9))
+
+    for (groups) {
+>groups : Symbol(groups, Decl(kvsImplicitSubject.ts, 5, 21))
+
+        names.push(_.name);
+>names.push : Symbol(Array.push, Decl(lib.es5.d.ts, --, --))
+>names : Symbol(names, Decl(kvsImplicitSubject.ts, 6, 9))
+>push : Symbol(Array.push, Decl(lib.es5.d.ts, --, --))
+>_.name : Symbol(Group.name, Decl(kvsImplicitSubject.ts, 0, 17))
+>_ : Symbol(_, Decl(kvsImplicitSubject.ts, 8, 19))
+>name : Symbol(Group.name, Decl(kvsImplicitSubject.ts, 0, 17))
+    }
+    return names;
+>names : Symbol(names, Decl(kvsImplicitSubject.ts, 6, 9))
+}
+
+function collectNames(groups: Group[]) {
+>collectNames : Symbol(collectNames, Decl(kvsImplicitSubject.ts, 11, 1))
+>groups : Symbol(groups, Decl(kvsImplicitSubject.ts, 13, 22))
+>Group : Symbol(Group, Decl(kvsImplicitSubject.ts, 0, 0))
+
+    return collect (groups) {
+>groups : Symbol(groups, Decl(kvsImplicitSubject.ts, 13, 22))
+
+        yield _.name;
+>_.name : Symbol(Group.name, Decl(kvsImplicitSubject.ts, 0, 17))
+>_ : Symbol(_, Decl(kvsImplicitSubject.ts, 15, 13))
+>name : Symbol(Group.name, Decl(kvsImplicitSubject.ts, 0, 17))
+
+    };
+}
+
+function selectValue(groups: Group[]) {
+>selectValue : Symbol(selectValue, Decl(kvsImplicitSubject.ts, 17, 1))
+>groups : Symbol(groups, Decl(kvsImplicitSubject.ts, 19, 21))
+>Group : Symbol(Group, Decl(kvsImplicitSubject.ts, 0, 0))
+
+    return select (groups) {
+>groups : Symbol(groups, Decl(kvsImplicitSubject.ts, 19, 21))
+
+        for (const value of _.values) {
+>value : Symbol(value, Decl(kvsImplicitSubject.ts, 21, 18))
+>_.values : Symbol(Group.values, Decl(kvsImplicitSubject.ts, 1, 17))
+>_ : Symbol(_, Decl(kvsImplicitSubject.ts, 21, 27))
+>values : Symbol(Group.values, Decl(kvsImplicitSubject.ts, 1, 17))
+
+            yield? value;
+>value : Symbol(value, Decl(kvsImplicitSubject.ts, 21, 18))
+        }
+    };
+}
+
+function nestedSubjects(groups: Group[]) {
+>nestedSubjects : Symbol(nestedSubjects, Decl(kvsImplicitSubject.ts, 25, 1))
+>groups : Symbol(groups, Decl(kvsImplicitSubject.ts, 27, 24))
+>Group : Symbol(Group, Decl(kvsImplicitSubject.ts, 0, 0))
+
+    return collect (groups) {
+>groups : Symbol(groups, Decl(kvsImplicitSubject.ts, 27, 24))
+
+        const groupName = _.name;
+>groupName : Symbol(groupName, Decl(kvsImplicitSubject.ts, 29, 13))
+>_.name : Symbol(Group.name, Decl(kvsImplicitSubject.ts, 0, 17))
+>_ : Symbol(_, Decl(kvsImplicitSubject.ts, 29, 25))
+>name : Symbol(Group.name, Decl(kvsImplicitSubject.ts, 0, 17))
+
+        for (_.values) {
+>_.values : Symbol(Group.values, Decl(kvsImplicitSubject.ts, 1, 17))
+>_ : Symbol(_, Decl(kvsImplicitSubject.ts, 29, 25))
+>values : Symbol(Group.values, Decl(kvsImplicitSubject.ts, 1, 17))
+
+            yield `${groupName}:${_}`;
+>groupName : Symbol(groupName, Decl(kvsImplicitSubject.ts, 29, 13))
+>_ : Symbol(_, Decl(kvsImplicitSubject.ts, 31, 34))
+        }
+    };
+}
+
+function explicitLoopKeepsOuterSubject(groups: Group[]) {
+>explicitLoopKeepsOuterSubject : Symbol(explicitLoopKeepsOuterSubject, Decl(kvsImplicitSubject.ts, 34, 1))
+>groups : Symbol(groups, Decl(kvsImplicitSubject.ts, 36, 39))
+>Group : Symbol(Group, Decl(kvsImplicitSubject.ts, 0, 0))
+
+    return collect (groups) {
+>groups : Symbol(groups, Decl(kvsImplicitSubject.ts, 36, 39))
+
+        for (const value of _.values) {
+>value : Symbol(value, Decl(kvsImplicitSubject.ts, 38, 18))
+>_.values : Symbol(Group.values, Decl(kvsImplicitSubject.ts, 1, 17))
+>_ : Symbol(_, Decl(kvsImplicitSubject.ts, 38, 27))
+>values : Symbol(Group.values, Decl(kvsImplicitSubject.ts, 1, 17))
+
+            if (value?) yield _.name;
+>value : Symbol(value, Decl(kvsImplicitSubject.ts, 38, 18))
+>_.name : Symbol(Group.name, Decl(kvsImplicitSubject.ts, 0, 17))
+>_ : Symbol(_, Decl(kvsImplicitSubject.ts, 38, 27))
+>name : Symbol(Group.name, Decl(kvsImplicitSubject.ts, 0, 17))
+        }
+    };
+}
+

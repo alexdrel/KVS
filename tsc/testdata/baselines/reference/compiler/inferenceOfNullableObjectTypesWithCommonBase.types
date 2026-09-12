@@ -6,9 +6,9 @@ function equal<T>(a: T, b: T) { }
 >a : T
 >b : T
 
-let v = null!;
+let v = null as!;
 >v : never
->null! : never
+>null as! : never
 
 // Object types with common base types
 

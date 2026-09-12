@@ -58,10 +58,10 @@ function *t9() {
     ) satisfies any;
 }
 function *t10() {
-    yield (
+    yield ((
         // comment
         a as any
-    )!;
+    ) as!;
 }
 
 

@@ -9,7 +9,7 @@ enum A {
     a = foo,
     b,
     c = 10,
-    d = (c)! satisfies number as any,
+    d = (c) as! satisfies number as any,
     e,
 }
 

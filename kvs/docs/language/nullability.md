@@ -27,6 +27,22 @@ Both operations are idempotent and compose predictably:
 
 They distribute over unions by adding or removing the absent members. They do not recursively change fields or other types nested inside `T`.
 
+In a tuple, trailing nullable elements may be omitted:
+
+```kvs
+type Entry = [string, boolean?];
+
+const pending: Entry = ["pending"];
+const visible: Entry = ["visible", true];
+const unknown: Entry = ["unknown", null];
+```
+
+Reading the second element always has type `boolean?`. KVS does not make a
+static distinction between an omitted trailing slot and a slot containing
+`undefined`; JavaScript operations that observe tuple length or keys still see
+the representation that was actually supplied. A nullable element followed by
+a required element is not trailing and therefore cannot be omitted.
+
 These are type operations, not value operations. The related expression forms are described in [Values, Absence, and Defaults](values.md#static-nullability-assertions):
 
 ```kvs

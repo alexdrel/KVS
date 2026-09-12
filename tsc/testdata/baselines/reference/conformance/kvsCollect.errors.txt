@@ -1,10 +1,10 @@
 kvsCollect.ts(61,5): error TS2365: Operator '+=' cannot be applied to types 'number' and 'string[]'.
-kvsCollect.ts(78,13): error TS100069: KVS 'collect' must be at the head of a supported value expression.
-kvsCollect.ts(84,12): error TS2365: Operator '+' cannot be applied to types 'number' and 'string[]'.
-kvsCollect.ts(84,16): error TS100069: KVS 'collect' must be at the head of a supported value expression.
-kvsCollect.ts(90,29): error TS100069: KVS 'collect' must be at the head of a supported value expression.
-kvsCollect.ts(97,15): error TS1109: Expression expected.
-kvsCollect.ts(97,35): error TS1005: ':' expected.
+kvsCollect.ts(88,13): error TS100069: KVS 'collect' must be at the head of a supported value expression.
+kvsCollect.ts(94,12): error TS2365: Operator '+' cannot be applied to types 'number' and 'string[]'.
+kvsCollect.ts(94,16): error TS100069: KVS 'collect' must be at the head of a supported value expression.
+kvsCollect.ts(100,29): error TS100069: KVS 'collect' must be at the head of a supported value expression.
+kvsCollect.ts(107,15): error TS1109: Expression expected.
+kvsCollect.ts(107,35): error TS1005: ':' expected.
 
 
 ==== kvsCollect.ts (7 errors) ====
@@ -84,6 +84,16 @@ kvsCollect.ts(97,35): error TS1005: ':' expected.
             };
         };
         return values;
+    }
+    
+    declare function getOptionalItems(): Item[] | null | undefined;
+    
+    function collectOptionalItems() {
+        const values = collect (const item of getOptionalItems()) {
+            yield item.value;
+        };
+        const expected: string[] | null = values;
+        return expected;
     }
     
     function consume(_values: string[]) {}

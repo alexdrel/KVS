@@ -7,7 +7,7 @@ const a =!@#!@$
 const b = !@#!@#!@#!
 >b : Symbol(b, Decl(a.ts, 1, 5))
 
-OK!
+OK as!
 HERE's A shouty thing
 GOTTA GO FAST
 

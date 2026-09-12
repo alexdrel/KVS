@@ -32,9 +32,9 @@ function testNonNullInference(numbers: number[]) {
     last;
 >last : number | undefined
 
-    last!;
->last! : number
->last : number
+    last as!;
+>last as! : number
+>last : number | undefined
 }
 
 function testNonNullInferenceWithArrays(numbers: number[]) {
@@ -78,7 +78,7 @@ function testNonNullInferenceWithArrays(numbers: number[]) {
     result;
 >result : number[] | undefined
 
-    result!;
->result! : number[]
->result : number[]
+    result as!;
+>result as! : number[]
+>result : number[] | undefined
 }

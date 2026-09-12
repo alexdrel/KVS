@@ -33,21 +33,21 @@ declare function f12(): IterableIterator<number, undefined, any>;
 declare function f13(): IterableIterator<number, BuiltinIteratorReturn>;
 declare function f14(): IterableIterator<number, BuiltinIteratorReturn, any>;
 
-const a1 = (): Iterable<number> => null!;
-const a2 = (): Iterable<number, any> => null!;
-const a3 = (): Iterable<number, any, any> => null!;
-const a4 = (): Iterable<number, undefined> => null!;
-const a5 = (): Iterable<number, undefined, any> => null!;
-const a6 = (): Iterable<number, BuiltinIteratorReturn> => null!;
-const a7 = (): Iterable<number, BuiltinIteratorReturn, any> => null!;
+const a1 = (): Iterable<number> => null as!;
+const a2 = (): Iterable<number, any> => null as!;
+const a3 = (): Iterable<number, any, any> => null as!;
+const a4 = (): Iterable<number, undefined> => null as!;
+const a5 = (): Iterable<number, undefined, any> => null as!;
+const a6 = (): Iterable<number, BuiltinIteratorReturn> => null as!;
+const a7 = (): Iterable<number, BuiltinIteratorReturn, any> => null as!;
 
-const a8 = (): IterableIterator<number> => null!;
-const a9 = (): IterableIterator<number, any> => null!;
-const a10 = (): IterableIterator<number, any, any> => null!;
-const a11 = (): IterableIterator<number, undefined> => null!;
-const a12 = (): IterableIterator<number, undefined, any> => null!;
-const a13 = (): IterableIterator<number, BuiltinIteratorReturn> => null!;
-const a14 = (): IterableIterator<number, BuiltinIteratorReturn, any> => null!;
+const a8 = (): IterableIterator<number> => null as!;
+const a9 = (): IterableIterator<number, any> => null as!;
+const a10 = (): IterableIterator<number, any, any> => null as!;
+const a11 = (): IterableIterator<number, undefined> => null as!;
+const a12 = (): IterableIterator<number, undefined, any> => null as!;
+const a13 = (): IterableIterator<number, BuiltinIteratorReturn> => null as!;
+const a14 = (): IterableIterator<number, BuiltinIteratorReturn, any> => null as!;
 
 //// [isolatedDeclarationsStrictBuiltinIteratorReturn.js]
 "use strict";

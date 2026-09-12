@@ -367,7 +367,7 @@ function parse(node: Tree, index: number[] = []): HTMLUListElement {
 >i : Symbol(i, Decl(recursiveTypeReferences1.ts, 101, 45))
 
     return html('li', [
-      html('a', { href: `#${el.id}`, rel: 'noopener', 'data-index': idx.join('.') }, el.textContent!),
+      html('a', { href: `#${el.id}`, rel: 'noopener', 'data-index': idx.join('.') }, el.textContent as!),
 >href : Symbol(href, Decl(recursiveTypeReferences1.ts, 104, 17))
 >el.id : Symbol(Element.id, Decl(lib.dom.d.ts, --, --))
 >el : Symbol(el, Decl(recursiveTypeReferences1.ts, 101, 31))
@@ -400,7 +400,7 @@ function cons(hs: HTMLHeadingElement[]): Tree {
 >Tree : Symbol(Tree, Decl(recursiveTypeReferences1.ts, 94, 19))
 
   return hs
->hs    .reduce<HTMLHeadingElement[][]>((hss, h) => {      const hs = hss.pop()!;      return hs.length === 0 || level(h) > level(hs[0])        ? concat(hss, [concat(hs, [h])])        : concat(hss, [hs, [h]]);    }, [[]])    .reduce : Symbol(Array.reduce, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --))
+>hs    .reduce<HTMLHeadingElement[][]>((hss, h) => {      const hs = hss.pop() as!;      return hs.length === 0 || level(h) > level(hs[0])        ? concat(hss, [concat(hs, [h])])        : concat(hss, [hs, [h]]);    }, [[]])    .reduce : Symbol(Array.reduce, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --))
 >hs    .reduce : Symbol(Array.reduce, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --))
 >hs : Symbol(hs, Decl(recursiveTypeReferences1.ts, 110, 14))
 
@@ -410,7 +410,7 @@ function cons(hs: HTMLHeadingElement[]): Tree {
 >hss : Symbol(hss, Decl(recursiveTypeReferences1.ts, 112, 37))
 >h : Symbol(h, Decl(recursiveTypeReferences1.ts, 112, 41))
 
-      const hs = hss.pop()!;
+      const hs = hss.pop() as!;
 >hs : Symbol(hs, Decl(recursiveTypeReferences1.ts, 113, 11))
 >hss.pop : Symbol(Array.pop, Decl(lib.es5.d.ts, --, --))
 >hss : Symbol(hss, Decl(recursiveTypeReferences1.ts, 112, 37))
@@ -450,7 +450,7 @@ function cons(hs: HTMLHeadingElement[]): Tree {
         ? node
 >node : Symbol(node, Decl(recursiveTypeReferences1.ts, 118, 19))
 
-        : concat<Tree[number]>(node, [[hs.shift()!, cons(hs)]])
+        : concat<Tree[number]>(node, [[hs.shift() as!, cons(hs)]])
 >Tree : Symbol(Tree, Decl(recursiveTypeReferences1.ts, 94, 19))
 >node : Symbol(node, Decl(recursiveTypeReferences1.ts, 118, 19))
 >hs.shift : Symbol(Array.shift, Decl(lib.es5.d.ts, --, --))

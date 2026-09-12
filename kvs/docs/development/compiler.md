@@ -133,3 +133,61 @@ Presence includes false, zero, and empty values, and excludes both `null` and
 The implemented slice keeps this node through parsing, binding, and checking,
 then lowers it in `tsc/internal/transformers/kvs/`. It does not desugar in the
 parser.
+
+## Conditional binding
+
+`if (const value = initializer)` remains a dedicated KVS statement through
+checking. Its implicit clause is a lexical container holding the declaration,
+the identifier used as the condition, and the successful statement. This puts
+the binding in ordinary symbol scope only where it exists; `else` is outside
+the clause.
+
+The KVS transformer lowers the construct to a generated `const` temporary and
+an ordinary `if`. The source-named `const` is introduced at the start of the
+successful block. The generated condition currently uses JavaScript
+truthiness.
+
+## Terminal defaults
+
+`KvsDefaultExpression` survives parsing and checking so default selection can
+use the checked operand type. The checker classifies the non-nullable operand
+as a supported primitive or ordinary-array family and exposes that compact
+semantic result through `printer.EmitResolver`. The KVS transformer then emits
+the corresponding `??` fallback without reimplementing type analysis.
+
+This is also the deliberate compatibility boundary for TypeScript's postfix
+non-null assertion: source `value!` now has KVS runtime-default semantics.
+
+## Nullable iterable sources
+
+The checker uses the non-nullable part of a synchronous loop source to derive
+its element type. It also exposes source nullability through the emit resolver,
+allowing the KVS transformer to change only loops that need an absence guard.
+
+Ordinary `for...of` uses an inline `source ?? []`. Eager producers need a
+stronger lowering because an absent `collect` produces `null`, not an empty
+array: they capture the source once, initialize the result, and guard the loop.
+On the present path `collect` assigns a fresh empty result before iterating;
+`select` retains its existing null result until production.
+
+Nullable-source analysis is skipped for an empty `VariableDeclarationList`,
+which is parser recovery for malformed TypeScript such as
+`for (var of source)`. Querying its source through the emit resolver could
+otherwise introduce semantic diagnostics only after the pre-emit diagnostic
+snapshot. Valid destructuring initializers, including omitted binding elements,
+still follow ordinary checking.
+
+## Implicit iteration subjects
+
+Implicit headers reuse `ForOfStatement`, `KvsCollectExpression`, and
+`KvsSelectExpression` with `NodeFlagsKvsImplicitSubject`. Their initializer is
+a hidden synthesized `const _` declaration, so ordinary binder and checker
+machinery supplies the subject type and lexical shadowing. The source printer
+omits that initializer and `of`; KVS lowering replaces it with an emitted
+binding identifier.
+
+The name resolver excludes the hidden binding from its own iterable expression.
+When that expression contains an outer `_`, lowering first captures the whole
+source expression and iterates the capture. This prevents output such as
+`for (const _ of _.members)` without paying for a temporary in ordinary
+independent headers.
