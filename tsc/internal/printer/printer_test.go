@@ -98,6 +98,7 @@ func TestEmit(t *testing.T) {
 		{title: "ArrowFunction#5", input: `async a=>{}`, output: `async (a) => { };`},
 		{title: "ArrowFunction#6", input: `async()=>{}`, output: `async () => { };`},
 		{title: "ArrowFunction#7", input: `async<T>()=>{}`, output: `async <T>() => { };`},
+		{title: "ArrowFunctionWithKvsDefaultExpression", input: `()=>value!`, output: `() => value!;`},
 		{title: "ArrowFunction#8", input: `():T=>{}`, output: `(): T => { };`},
 		{title: "ArrowFunction#9", input: `()=>a`, output: `() => a;`},
 		{title: "DeleteExpression", input: `delete a`, output: `delete a;`},

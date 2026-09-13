@@ -1568,7 +1568,7 @@ func (c *Checker) checkGrammarVariableDeclaration(node *ast.VariableDeclaration)
 
 	declarationKind := node.Parent.Flags & ast.NodeFlagsBlockScoped
 	if node.Flags&ast.NodeFlagsKvsNullableBinding != 0 && (declarationKind != ast.NodeFlagsLet || node.Type != nil || node.Initializer == nil) {
-		return c.grammarErrorOnNode(node.Name(), diagnostics.Kvs_nullable_binding_requires_an_inferred_let_declaration_with_an_initializer)
+		return c.grammarErrorOnNode(node.Name(), diagnostics.A_KVS_nullable_binding_requires_an_inferred_let_declaration_with_an_initializer)
 	}
 
 	if node.ExclamationToken != nil && node.Flags&ast.NodeFlagsKvsExtantBinding == 0 && (node.Parent.Parent.Kind != ast.KindVariableStatement || node.Type == nil || node.Initializer != nil || nodeFlags&ast.NodeFlagsAmbient != 0) {

@@ -438,7 +438,15 @@ func IsUnaryExpression(node *Node) bool {
 
 func isExpressionKind(kind Kind) bool {
 	switch kind {
-	case KindConditionalExpression, KindKvsNullingExpression,
+	case KindConditionalExpression,
+		KindKvsNullableAssertionExpression,
+		KindKvsExtantAssertionExpression,
+		KindKvsExtantAssignmentExpression,
+		KindKvsExtantTestExpression,
+		KindKvsDefaultExpression,
+		KindKvsNullingExpression,
+		KindKvsCollectExpression,
+		KindKvsSelectExpression,
 		KindYieldExpression,
 		KindArrowFunction,
 		KindBinaryExpression,

@@ -11865,7 +11865,7 @@ export function createNameResolver({
         // If `result === lastSelfReferenceLocation.symbol`, that means that we are somewhere inside `lastSelfReferenceLocation` looking up a name, and resolving to `lastLocation` itself.
         // That means that this is a self-reference of `lastLocation`, and shouldn't count this when considering whether `lastLocation` is used.
         if (isUse && result && (!lastSelfReferenceLocation || result !== lastSelfReferenceLocation.symbol)) {
-            result.isReferenced! |= meaning;
+            (result.isReferenced as!) |= meaning;
         }
 
         if (!result) {

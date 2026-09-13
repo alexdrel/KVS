@@ -8579,5 +8579,25 @@
     "Private identifiers cannot be used in destructuring patterns.": {
         "category": "Error",
         "code": 18064
+    },
+    "KVS 'collect' must be at the head of a supported value expression.": {
+        "category": "Error",
+        "code": 100069
+    },
+    "KVS 'select' must be at the head of a supported value expression.": {
+        "category": "Error",
+        "code": 100070
+    },
+    "A KVS nullable binding requires an inferred 'let' declaration with an initializer.": {
+        "category": "Error",
+        "code": 100071
+    },
+    "KVS terminal '!' requires string, number, boolean, bigint, or a non-tuple array.": {
+        "category": "Error",
+        "code": 100072
+    },
+    "KVS terminal '!' cannot determine a default value from an absence-only type.": {
+        "category": "Error",
+        "code": 100073
     }
 }

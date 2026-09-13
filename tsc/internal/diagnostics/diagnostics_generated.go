@@ -4426,6 +4426,16 @@ var The_invalid_diagnostic_directive_is_in_supplemental_output_0_returned_by_the
 
 var Diagnostic_directive_0_returned_by_the_content_mapper_has_an_invalid_unusedExpectDirectiveIndex = &Message{code: 100068, category: CategoryMessage, key: "Diagnostic_directive_0_returned_by_the_content_mapper_has_an_invalid_unusedExpectDirectiveIndex_100068", text: "Diagnostic directive {0} returned by the content mapper has an invalid 'unusedExpectDirectiveIndex'."}
 
+var KVS_collect_must_be_at_the_head_of_a_supported_value_expression = &Message{code: 100069, category: CategoryError, key: "KVS_collect_must_be_at_the_head_of_a_supported_value_expression_100069", text: "KVS 'collect' must be at the head of a supported value expression."}
+
+var KVS_select_must_be_at_the_head_of_a_supported_value_expression = &Message{code: 100070, category: CategoryError, key: "KVS_select_must_be_at_the_head_of_a_supported_value_expression_100070", text: "KVS 'select' must be at the head of a supported value expression."}
+
+var A_KVS_nullable_binding_requires_an_inferred_let_declaration_with_an_initializer = &Message{code: 100071, category: CategoryError, key: "A_KVS_nullable_binding_requires_an_inferred_let_declaration_with_an_initializer_100071", text: "A KVS nullable binding requires an inferred 'let' declaration with an initializer."}
+
+var KVS_terminal_requires_string_number_boolean_bigint_or_a_non_tuple_array = &Message{code: 100072, category: CategoryError, key: "KVS_terminal_requires_string_number_boolean_bigint_or_a_non_tuple_array_100072", text: "KVS terminal '!' requires string, number, boolean, bigint, or a non-tuple array."}
+
+var KVS_terminal_cannot_determine_a_default_value_from_an_absence_only_type = &Message{code: 100073, category: CategoryError, key: "KVS_terminal_cannot_determine_a_default_value_from_an_absence_only_type_100073", text: "KVS terminal '!' cannot determine a default value from an absence-only type."}
+
 func keyToMessage(key Key) *Message {
 	switch key {
 	case "Unterminated_string_literal_1002":
@@ -8852,6 +8862,16 @@ func keyToMessage(key Key) *Message {
 		return The_invalid_diagnostic_directive_is_in_supplemental_output_0_returned_by_the_content_mapper
 	case "Diagnostic_directive_0_returned_by_the_content_mapper_has_an_invalid_unusedExpectDirectiveIndex_100068":
 		return Diagnostic_directive_0_returned_by_the_content_mapper_has_an_invalid_unusedExpectDirectiveIndex
+	case "KVS_collect_must_be_at_the_head_of_a_supported_value_expression_100069":
+		return KVS_collect_must_be_at_the_head_of_a_supported_value_expression
+	case "KVS_select_must_be_at_the_head_of_a_supported_value_expression_100070":
+		return KVS_select_must_be_at_the_head_of_a_supported_value_expression
+	case "A_KVS_nullable_binding_requires_an_inferred_let_declaration_with_an_initializer_100071":
+		return A_KVS_nullable_binding_requires_an_inferred_let_declaration_with_an_initializer
+	case "KVS_terminal_requires_string_number_boolean_bigint_or_a_non_tuple_array_100072":
+		return KVS_terminal_requires_string_number_boolean_bigint_or_a_non_tuple_array
+	case "KVS_terminal_cannot_determine_a_default_value_from_an_absence_only_type_100073":
+		return KVS_terminal_cannot_determine_a_default_value_from_an_absence_only_type
 	default:
 		return nil
 	}

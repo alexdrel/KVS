@@ -133,7 +133,16 @@ export function isStatement(node: Node): node is Statement {
 
 export function isExpression(node: Node): node is Expression {
     const kind = node.kind;
-    return kind === SyntaxKind.ConditionalExpression || kind === SyntaxKind.YieldExpression
+    return kind === SyntaxKind.ConditionalExpression
+        || kind === SyntaxKind.KvsNullableAssertionExpression
+        || kind === SyntaxKind.KvsExtantAssertionExpression
+        || kind === SyntaxKind.KvsExtantAssignmentExpression
+        || kind === SyntaxKind.KvsExtantTestExpression
+        || kind === SyntaxKind.KvsDefaultExpression
+        || kind === SyntaxKind.KvsNullingExpression
+        || kind === SyntaxKind.KvsCollectExpression
+        || kind === SyntaxKind.KvsSelectExpression
+        || kind === SyntaxKind.YieldExpression
         || kind === SyntaxKind.ArrowFunction || kind === SyntaxKind.BinaryExpression
         || kind === SyntaxKind.SpreadElement || kind === SyntaxKind.AsExpression
         || kind === SyntaxKind.OmittedExpression

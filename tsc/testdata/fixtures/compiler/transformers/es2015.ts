@@ -803,7 +803,7 @@ export function transformES2015(context: TransformationContext): (x: SourceFile 
         if (convertedLoopState !== undefined) {
             const savedAllowedNonLabeledJumps = convertedLoopState.allowedNonLabeledJumps;
             // for switch statement allow only non-labeled break
-            convertedLoopState.allowedNonLabeledJumps! |= Jump.Break;
+            (convertedLoopState.allowedNonLabeledJumps as!) |= Jump.Break;
             const result = visitEachChild(node, visitor, context);
             convertedLoopState.allowedNonLabeledJumps = savedAllowedNonLabeledJumps;
             return result;
@@ -828,7 +828,7 @@ export function transformES2015(context: TransformationContext): (x: SourceFile 
 
     function visitReturnStatement(node: ReturnStatement): Statement {
         if (convertedLoopState) {
-            convertedLoopState.nonLocalJumps! |= Jump.Return;
+            (convertedLoopState.nonLocalJumps as!) |= Jump.Return;
             if (isReturnVoidStatementInConstructorWithCapturedSuper(node)) {
                 node = returnCapturedThis(node);
             }
@@ -904,11 +904,11 @@ export function transformES2015(context: TransformationContext): (x: SourceFile 
                 const label = node.label;
                 if (!label) {
                     if (node.kind === SyntaxKind.BreakStatement) {
-                        convertedLoopState.nonLocalJumps! |= Jump.Break;
+                        (convertedLoopState.nonLocalJumps as!) |= Jump.Break;
                         labelMarker = "break";
                     }
                     else {
-                        convertedLoopState.nonLocalJumps! |= Jump.Continue;
+                        (convertedLoopState.nonLocalJumps as!) |= Jump.Continue;
                         // note: return value is emitted only to simplify debugging, call to converted loop body does not do any dispatching on it.
                         labelMarker = "continue";
                     }
@@ -3969,7 +3969,7 @@ export function transformES2015(context: TransformationContext): (x: SourceFile 
             if (state.nonLocalJumps! & Jump.Return) {
                 let returnStatement: ReturnStatement;
                 if (outerState) {
-                    outerState.nonLocalJumps! |= Jump.Return;
+                    (outerState.nonLocalJumps as!) |= Jump.Return;
                     returnStatement = factory.createReturnStatement(loopResultName);
                 }
                 else {

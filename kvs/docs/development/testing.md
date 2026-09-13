@@ -2,6 +2,28 @@
 
 Status: observed workflow plus an accepted starting convention.
 
+## Before a commit
+
+Do not rely on `npx hereby test` alone when checking a substantial KVS change.
+Before declaring a commit ready, inspect `.github/workflows/ci.yml` and run the
+applicable CI commands locally. In particular, syntax and AST changes must also
+exercise the checks that have previously found gaps outside the normal suite:
+
+```sh
+# JS API parse-clone-print coverage
+npx hereby test:api
+
+# Go benchmarks, including parse and formatter/printer paths
+go -C ./tsc test -run=- -bench=. -benchtime=1x ./...
+
+# Compile the compiler-sized fixture through both checker modes
+./built/local/tsc -p ./tsc/testdata/fixtures/compiler --noEmit --singleThreaded
+./built/local/tsc -p ./tsc/testdata/fixtures/compiler --noEmit
+```
+
+Build `built/local/tsc` from the current worktree before the smoke commands.
+These checks complement the normal baseline suite; they do not replace it.
+
 ## Native compiler tests
 
 The compiler's end-to-end baseline inputs live in:

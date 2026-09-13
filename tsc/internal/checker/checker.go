@@ -8083,9 +8083,9 @@ func (c *Checker) checkKvsDefaultExpression(node *ast.Node, checkMode CheckMode)
 	operandType := c.checkExpressionEx(node.Expression(), checkMode)
 	presentType := c.GetNonNullableType(operandType)
 	if presentType.flags&TypeFlagsNever != 0 && operandType.flags&TypeFlagsNullable != 0 {
-		c.error(node, diagnostics.Kvs_terminal_default_cannot_determine_a_default_for_an_absence_only_type)
+		c.error(node, diagnostics.KVS_terminal_cannot_determine_a_default_value_from_an_absence_only_type)
 	} else if c.getKvsDefaultKindForType(presentType) == ast.KvsDefaultKindUnsupported {
-		c.error(node, diagnostics.Kvs_terminal_default_requires_a_single_supported_primitive_or_array_family)
+		c.error(node, diagnostics.KVS_terminal_requires_string_number_boolean_bigint_or_a_non_tuple_array)
 	}
 	return presentType
 }
@@ -18167,9 +18167,9 @@ func (c *Checker) checkKvsSelectExpression(node *ast.Node) *Type {
 
 func (c *Checker) checkKvsProducerExpression(node *ast.Node, initializer *ast.ForInitializer, expression *ast.Expression, statement *ast.Statement, selectProducer bool) *Type {
 	if !ast.IsKvsProducerHeadPosition(node) {
-		message := diagnostics.Kvs_collect_is_only_supported_in_a_terminal_value_position
+		message := diagnostics.KVS_collect_must_be_at_the_head_of_a_supported_value_expression
 		if selectProducer {
-			message = diagnostics.Kvs_select_is_only_supported_in_a_terminal_value_position
+			message = diagnostics.KVS_select_must_be_at_the_head_of_a_supported_value_expression
 		}
 		c.error(node, message)
 	}
