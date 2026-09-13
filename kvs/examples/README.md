@@ -17,5 +17,6 @@ compiler. When a goalpost is fully supported, move it to the showcase.
 - [Implicit iteration subjects](implicit-subject.ts)
 - [Nullable operators](nullable-operators.ts)
 - [Presence-aware arrays](presence-aware-arrays.ts)
+- [Presence-aware objects](presence-aware-objects.ts)
 - [Goalposts](goalposts/README.md)
 - [Working showcase](showcase/README.md)

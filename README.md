@@ -18,14 +18,10 @@ function realRoots(a: number, b: number, c: number) {
 
     return ?[
         (-b - d) / (2 * a),
-        d > 0 ?: (-b + d) / (2 * a),
+        d! > 0 ?: (-b + d) / (2 * a),
     ];
 }
 ```
-
-This compact quadratic solver is a [language goalpost](kvs/examples/goalposts/quadratic.ts),
-not yet fully supported by the compiler. The [showcase](kvs/examples/showcase/README.md)
-contains complete programs that compile and run today.
 
 ----
 

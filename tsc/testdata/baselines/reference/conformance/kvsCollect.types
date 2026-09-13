@@ -259,8 +259,142 @@ function collectNestedValues(groups: Item[][]) {
 >values : string[][]
 }
 
+function stopCollecting(items: Item[]) {
+>stopCollecting : (items: Item[]) => string[]
+>items : Item[]
+
+    return collect (const item of items) {
+>collect (const item of items) {        if (!item.included) break;        yield item.value;    } : string[]
+>item : Item
+>items : Item[]
+
+        if (!item.included) break;
+>!item.included : boolean
+>item.included : boolean
+>item : Item
+>included : boolean
+
+        yield item.value;
+>item.value : string
+>item : Item
+>value : string
+
+    };
+}
+
+function collectFromNestedLoops(groups: Item[][]) {
+>collectFromNestedLoops : (groups: Item[][]) => string[]
+>groups : Item[][]
+
+    return collect (const items of groups) {
+>collect (const items of groups) {        for (const item of items) {            yield item.value;            yield? item.optionalValue;        }    } : string[]
+>items : Item[]
+>groups : Item[][]
+
+        for (const item of items) {
+>item : Item
+>items : Item[]
+
+            yield item.value;
+>item.value : string
+>item : Item
+>value : string
+
+            yield? item.optionalValue;
+>item.optionalValue : string | undefined
+>item : Item
+>optionalValue : string | undefined
+        }
+    };
+}
+
+function collectArrays(values: number[][]) {
+>collectArrays : (values: number[][]) => number[][]
+>values : number[][]
+
+    return collect (const value of values) {
+>collect (const value of values) {        yield value;    } : number[][]
+>value : number[]
+>values : number[][]
+
+        yield value;
+>value : number[]
+
+    };
+}
+
+function returnFromContainingFunction(items: Item[]) {
+>returnFromContainingFunction : (items: Item[]) => string
+>items : Item[]
+
+    const values = collect (const item of items) {
+>values : string[]
+>collect (const item of items) {        if (!item.included) return "stopped";        yield item.value;    } : string[]
+>item : Item
+>items : Item[]
+
+        if (!item.included) return "stopped";
+>!item.included : boolean
+>item.included : boolean
+>item : Item
+>included : boolean
+>"stopped" : "stopped"
+
+        yield item.value;
+>item.value : string
+>item : Item
+>value : string
+
+    };
+    values;
+>values : string[]
+
+    return "completed";
+>"completed" : "completed"
+}
+
+async function collectAwaited(items: Item[]) {
+>collectAwaited : (items: Item[]) => Promise<string[]>
+>items : Item[]
+
+    return collect (const item of items) {
+>collect (const item of items) {        yield await Promise.resolve(item.value);    } : string[]
+>item : Item
+>items : Item[]
+
+        yield await Promise.resolve(item.value);
+>await Promise.resolve(item.value) : string
+>Promise.resolve(item.value) : Promise<string>
+>Promise.resolve : { (): Promise<void>; <T>(value: T): Promise<Awaited<T>>; <T>(value: T | PromiseLike<T>): Promise<Awaited<T>>; }
+>Promise : PromiseConstructor
+>resolve : { (): Promise<void>; <T>(value: T): Promise<Awaited<T>>; <T>(value: T | PromiseLike<T>): Promise<Awaited<T>>; }
+>item.value : string
+>item : Item
+>value : string
+
+    };
+}
+
 declare function getOptionalItems(): Item[] | null | undefined;
 >getOptionalItems : () => Item[] | null | undefined
+
+function collectOptionalItemsWithDefault() {
+>collectOptionalItemsWithDefault : () => string[]
+
+    return collect (const item of getOptionalItems()) {
+>collect (const item of getOptionalItems()) {        yield item.value;    }! : string[]
+>collect (const item of getOptionalItems()) {        yield item.value;    } : string[] | null
+>item : Item
+>getOptionalItems() : Item[] | null | undefined
+>getOptionalItems : () => Item[] | null | undefined
+
+        yield item.value;
+>item.value : string
+>item : Item
+>value : string
+
+    }!;
+}
 
 function collectOptionalItems() {
 >collectOptionalItems : () => string[] | null

@@ -263,7 +263,9 @@ const (
 	KindKvsExtantTestExpression
 	KindKvsDefaultExpression
 	KindKvsNullingExpression
+	KindKvsConditionalElement
 	KindKvsCompactArrayExpression
+	KindKvsCompactObjectExpression
 	KindKvsCollectExpression
 	KindKvsSelectExpression
 	KindSpreadElement

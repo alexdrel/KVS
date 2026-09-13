@@ -12,8 +12,9 @@ var {"prop"} = { "prop": 1 };
 
 //// [destructuringObjectBindingPatternAndAssignment3.js]
 "use strict";
+var _a;
 // Error
-var { h, } = { h: 1 };
+var { h, } = Object.assign({}, (_a = 1) != null ? { h: _a } : {});
 var { i } = { i: 2 };
 var { i1 } = { i1: 2 };
 var { f2: { f21 } = { f212: "string" } } = undefined;

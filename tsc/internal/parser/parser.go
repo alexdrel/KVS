@@ -850,6 +850,9 @@ func (p *Parser) isListElement(parsingContext ParsingContext, inErrorRecovery bo
 		// which would be a candidate for improved error reporting.
 		return p.token == ast.KindOpenBracketToken || p.isLiteralPropertyName()
 	case PCObjectLiteralMembers:
+		if p.token == ast.KindQuestionToken && p.lookAhead((*Parser).nextTokenIsContiguousColonAndIdentifier) {
+			return true
+		}
 		switch p.token {
 		case ast.KindOpenBracketToken, ast.KindAsteriskToken, ast.KindDotDotDotToken, ast.KindDotToken: // Not an object literal member, but don't want to close the object (see `tests/cases/fourslash/completionsDotInObjectLiteral.ts`)
 			return true
@@ -882,6 +885,9 @@ func (p *Parser) isListElement(parsingContext ParsingContext, inErrorRecovery bo
 	case PCTypeParameters:
 		return p.token == ast.KindInKeyword || p.token == ast.KindConstKeyword || p.isIdentifier()
 	case PCArrayLiteralMembers:
+		if p.token == ast.KindQuestionToken && p.lookAhead((*Parser).nextTokenIsContiguousColon) {
+			return true
+		}
 		// Not an array literal member, but don't want to close the array (see `tests/cases/fourslash/completionsDotInArrayLiteralInObjectLiteral.ts`)
 		if p.token == ast.KindCommaToken || p.token == ast.KindDotToken {
 			return true
@@ -5812,6 +5818,9 @@ func (p *Parser) parsePrimaryExpression() *ast.Expression {
 	if p.token == ast.KindQuestionToken && p.lookAhead((*Parser).nextTokenIsContiguousOpenBracket) {
 		return p.parseKvsCompactArrayExpression()
 	}
+	if p.token == ast.KindQuestionToken && p.lookAhead((*Parser).nextTokenIsContiguousOpenBrace) {
+		return p.parseKvsCompactObjectExpression()
+	}
 	switch p.token {
 	case ast.KindNoSubstitutionTemplateLiteral:
 		if p.scanner.TokenFlags()&ast.TokenFlagsIsInvalid != 0 {
@@ -5859,6 +5868,24 @@ func (p *Parser) parsePrimaryExpression() *ast.Expression {
 func (p *Parser) nextTokenIsContiguousOpenBracket() bool {
 	questionEnd := p.scanner.TokenEnd()
 	return p.nextToken() == ast.KindOpenBracketToken && p.scanner.TokenStart() == questionEnd
+}
+
+func (p *Parser) nextTokenIsContiguousOpenBrace() bool {
+	questionEnd := p.scanner.TokenEnd()
+	return p.nextToken() == ast.KindOpenBraceToken && p.scanner.TokenStart() == questionEnd
+}
+
+func (p *Parser) nextTokenIsContiguousColon() bool {
+	questionEnd := p.scanner.TokenEnd()
+	return p.nextToken() == ast.KindColonToken && p.scanner.TokenStart() == questionEnd
+}
+
+func (p *Parser) nextTokenIsContiguousColonAndIdentifier() bool {
+	if !p.nextTokenIsContiguousColon() {
+		return false
+	}
+	p.nextToken()
+	return p.isIdentifier()
 }
 
 func (p *Parser) parseKvsProducerExpression() *ast.Expression {
@@ -5945,7 +5972,7 @@ func (p *Parser) parseArrayLiteralExpression() *ast.Expression {
 	openBracketPosition := p.scanner.TokenStart()
 	openBracketParsed := p.parseExpected(ast.KindOpenBracketToken)
 	multiLine := p.hasPrecedingLineBreak()
-	elements := p.parseDelimitedList(PCArrayLiteralMembers, (*Parser).parseArgumentOrArrayLiteralElement)
+	elements := p.parseDelimitedList(PCArrayLiteralMembers, (*Parser).parseArrayLiteralElement)
 	p.parseExpectedMatchingBrackets(ast.KindOpenBracketToken, ast.KindCloseBracketToken, openBracketParsed, openBracketPosition)
 	return p.finishNode(p.factory.NewArrayLiteralExpression(elements, multiLine), pos)
 }
@@ -5956,9 +5983,31 @@ func (p *Parser) parseKvsCompactArrayExpression() *ast.Expression {
 	openBracketPosition := p.scanner.TokenStart()
 	openBracketParsed := p.parseExpected(ast.KindOpenBracketToken)
 	multiLine := p.hasPrecedingLineBreak()
-	elements := p.parseDelimitedList(PCArrayLiteralMembers, (*Parser).parseArgumentOrArrayLiteralElement)
+	elements := p.parseDelimitedList(PCArrayLiteralMembers, (*Parser).parseArrayLiteralElement)
 	p.parseExpectedMatchingBrackets(ast.KindOpenBracketToken, ast.KindCloseBracketToken, openBracketParsed, openBracketPosition)
 	return p.finishNode(p.factory.NewKvsCompactArrayExpression(questionToken, elements, multiLine), pos)
+}
+
+func (p *Parser) parseArrayLiteralElement() *ast.Expression {
+	if p.token == ast.KindQuestionToken && p.lookAhead((*Parser).nextTokenIsContiguousColon) {
+		pos := p.nodePos()
+		questionToken := p.parseExpectedToken(ast.KindQuestionToken)
+		colonToken := p.parseExpectedToken(ast.KindColonToken)
+		expression := p.parseAssignmentExpressionOrHigher()
+		return p.finishNode(p.factory.NewKvsConditionalElement(questionToken, colonToken, expression), pos)
+	}
+	return p.parseArgumentOrArrayLiteralElement()
+}
+
+func (p *Parser) parseKvsCompactObjectExpression() *ast.Expression {
+	pos := p.nodePos()
+	questionToken := p.parseExpectedToken(ast.KindQuestionToken)
+	openBracePosition := p.scanner.TokenStart()
+	openBraceParsed := p.parseExpected(ast.KindOpenBraceToken)
+	multiLine := p.hasPrecedingLineBreak()
+	properties := p.parseDelimitedList(PCObjectLiteralMembers, (*Parser).parseObjectLiteralElement)
+	p.parseExpectedMatchingBrackets(ast.KindOpenBraceToken, ast.KindCloseBraceToken, openBraceParsed, openBracePosition)
+	return p.finishNode(p.factory.NewKvsCompactObjectExpression(questionToken, properties, multiLine), pos)
 }
 
 func (p *Parser) parseObjectLiteralExpression() *ast.Expression {
@@ -5974,6 +6023,15 @@ func (p *Parser) parseObjectLiteralExpression() *ast.Expression {
 func (p *Parser) parseObjectLiteralElement() *ast.Node {
 	pos := p.nodePos()
 	jsdoc := p.jsdocScannerInfo()
+	if p.token == ast.KindQuestionToken && p.lookAhead((*Parser).nextTokenIsContiguousColonAndIdentifier) {
+		questionToken := p.parseExpectedToken(ast.KindQuestionToken)
+		p.parseExpected(ast.KindColonToken)
+		name := p.parseIdentifier()
+		node := p.factory.NewShorthandPropertyAssignment(nil, name, questionToken, nil, nil, nil)
+		p.finishNode(node, pos)
+		p.withJSDoc(node, jsdoc)
+		return node
+	}
 	if p.parseOptional(ast.KindDotDotDotToken) {
 		expression := p.parseAssignmentExpressionOrHigher()
 		result := p.finishNode(p.factory.NewSpreadAssignment(expression), pos)
@@ -6523,7 +6581,7 @@ func (p *Parser) isStartOfLeftHandSideExpression() bool {
 	case ast.KindImportKeyword:
 		return p.isNextTokenOpenParenOrLessThanOrDot()
 	case ast.KindQuestionToken:
-		return p.lookAhead((*Parser).nextTokenIsContiguousOpenBracket)
+		return p.lookAhead((*Parser).nextTokenIsContiguousOpenBracket) || p.lookAhead((*Parser).nextTokenIsContiguousOpenBrace)
 	}
 	return p.isIdentifier()
 }

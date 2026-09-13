@@ -1,6 +1,8 @@
 package kvs
 
 import (
+	"slices"
+
 	"github.com/microsoft/TypeScript/tsc/internal/ast"
 	"github.com/microsoft/TypeScript/tsc/internal/printer"
 	"github.com/microsoft/TypeScript/tsc/internal/transformers"
@@ -101,8 +103,14 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 		return tx.transformDefault(node.AsKvsDefaultExpression())
 	case ast.KindKvsNullingExpression:
 		return tx.transformNullingExpression(node.AsKvsNullingExpression())
+	case ast.KindArrayLiteralExpression:
+		return tx.transformArrayExpression(node.AsArrayLiteralExpression())
 	case ast.KindKvsCompactArrayExpression:
 		return tx.transformCompactArrayExpression(node.AsKvsCompactArrayExpression())
+	case ast.KindObjectLiteralExpression:
+		return tx.transformObjectExpression(node.AsObjectLiteralExpression().AsNode(), node.Properties(), node.AsObjectLiteralExpression().MultiLine, false)
+	case ast.KindKvsCompactObjectExpression:
+		return tx.transformObjectExpression(node, node.Properties(), node.AsKvsCompactObjectExpression().MultiLine, true)
 	case ast.KindKvsNullableAssertionExpression, ast.KindKvsExtantAssertionExpression:
 		return tx.Visitor().VisitNode(node.Expression())
 	case ast.KindBinaryExpression:
@@ -120,11 +128,23 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 	return tx.Visitor().VisitEachChild(node)
 }
 
+func (tx *transformer) transformArrayExpression(node *ast.ArrayLiteralExpression) *ast.Node {
+	hasConditional := slices.ContainsFunc(node.Elements.Nodes, ast.IsKvsConditionalElement)
+	if !hasConditional {
+		return tx.Visitor().VisitEachChild(node.AsNode())
+	}
+	return tx.transformArrayElements(node.Elements.Nodes, node.MultiLine, false)
+}
+
 func (tx *transformer) transformCompactArrayExpression(node *ast.KvsCompactArrayExpression) *ast.Node {
+	return tx.transformArrayElements(node.Elements.Nodes, node.MultiLine, true)
+}
+
+func (tx *transformer) transformArrayElements(sourceElements []*ast.Node, multiLine bool, compact bool) *ast.Node {
 	factory := tx.Factory()
 	var temp *ast.IdentifierNode
-	elements := make([]*ast.Node, 0, len(node.Elements.Nodes))
-	for _, element := range node.Elements.Nodes {
+	elements := make([]*ast.Node, 0, len(sourceElements))
+	for _, element := range sourceElements {
 		if ast.IsSpreadElement(element) {
 			source := element.Expression()
 			nullableSource := tx.resolver.IsKvsNullableIterableSource(source)
@@ -149,8 +169,13 @@ func (tx *transformer) transformCompactArrayExpression(node *ast.KvsCompactArray
 			elements = append(elements, factory.NewSpreadElement(visitedSource))
 			continue
 		}
-		visited := tx.Visitor().VisitNode(element)
-		if !tx.resolver.IsKvsNullableExpression(element) {
+		expression := element
+		conditional := ast.IsKvsConditionalElement(element)
+		if conditional {
+			expression = element.Expression()
+		}
+		visited := tx.Visitor().VisitNode(expression)
+		if !conditional && (!compact || !tx.resolver.IsKvsNullableExpression(expression)) {
 			elements = append(elements, visited)
 			continue
 		}
@@ -162,10 +187,87 @@ func (tx *transformer) transformCompactArrayExpression(node *ast.KvsCompactArray
 		present := factory.NewBinaryExpression(nil, assigned, nil, factory.NewToken(ast.KindExclamationEqualsToken), factory.NewKeywordExpression(ast.KindNullKeyword))
 		one := factory.NewArrayLiteralExpression(factory.NewNodeList([]*ast.Node{temp}), false)
 		none := factory.NewArrayLiteralExpression(nil, false)
-		conditional := factory.NewConditionalExpression(present, factory.NewToken(ast.KindQuestionToken), one, factory.NewToken(ast.KindColonToken), none)
-		elements = append(elements, factory.NewSpreadElement(conditional))
+		choice := factory.NewConditionalExpression(present, factory.NewToken(ast.KindQuestionToken), one, factory.NewToken(ast.KindColonToken), none)
+		elements = append(elements, factory.NewSpreadElement(choice))
 	}
-	return factory.NewArrayLiteralExpression(factory.NewNodeList(elements), node.MultiLine)
+	return factory.NewArrayLiteralExpression(factory.NewNodeList(elements), multiLine)
+}
+
+func (tx *transformer) transformObjectExpression(node *ast.Node, sourceProperties []*ast.Node, multiLine bool, compact bool) *ast.Node {
+	factory := tx.Factory()
+	if !compact {
+		hasConditional := slices.ContainsFunc(sourceProperties, ast.IsKvsConditionalObjectProperty)
+		if !hasConditional {
+			return tx.Visitor().VisitEachChild(node)
+		}
+	}
+
+	var valueTemp *ast.IdentifierNode
+	var keyTemp *ast.IdentifierNode
+	properties := make([]*ast.Node, 0, len(sourceProperties))
+	for _, property := range sourceProperties {
+		if ast.IsSpreadAssignment(property) && compact {
+			properties = append(properties, factory.NewSpreadAssignment(tx.compactObjectSpread(property.Expression())))
+			continue
+		}
+		if !ast.IsPropertyAssignment(property) && !ast.IsShorthandPropertyAssignment(property) {
+			properties = append(properties, tx.Visitor().VisitNode(property))
+			continue
+		}
+
+		var expression *ast.Node
+		if ast.IsPropertyAssignment(property) {
+			expression = property.Initializer()
+		} else {
+			expression = property.Name()
+		}
+		conditional := ast.IsKvsConditionalObjectProperty(property)
+		if !conditional && (!compact || !tx.resolver.IsKvsNullableExpression(expression)) {
+			properties = append(properties, tx.Visitor().VisitNode(property))
+			continue
+		}
+		if valueTemp == nil {
+			valueTemp = factory.NewTempVariable()
+			tx.EmitContext().AddVariableDeclaration(valueTemp)
+		}
+
+		name := tx.Visitor().VisitNode(property.Name())
+		var keyAssignment *ast.Node
+		if ast.IsComputedPropertyName(property.Name()) {
+			if keyTemp == nil {
+				keyTemp = factory.NewTempVariable()
+				tx.EmitContext().AddVariableDeclaration(keyTemp)
+			}
+			keyAssignment = factory.NewAssignmentExpression(keyTemp, tx.Visitor().VisitNode(property.Name().Expression()))
+			name = factory.NewComputedPropertyName(keyTemp)
+		}
+		value := tx.Visitor().VisitNode(expression)
+		assigned := factory.NewAssignmentExpression(valueTemp, value)
+		present := factory.NewBinaryExpression(nil, assigned, nil, factory.NewToken(ast.KindExclamationEqualsToken), factory.NewKeywordExpression(ast.KindNullKeyword))
+		included := factory.NewObjectLiteralExpression(factory.NewNodeList([]*ast.Node{factory.NewPropertyAssignment(nil, name, nil, nil, valueTemp)}), false)
+		empty := factory.NewObjectLiteralExpression(nil, false)
+		choice := factory.NewConditionalExpression(present, factory.NewToken(ast.KindQuestionToken), included, factory.NewToken(ast.KindColonToken), empty)
+		if keyAssignment != nil {
+			choice = factory.NewCommaExpression(keyAssignment, choice)
+		}
+		properties = append(properties, factory.NewSpreadAssignment(choice))
+	}
+	return factory.NewObjectLiteralExpression(factory.NewNodeList(properties), multiLine)
+}
+
+func (tx *transformer) compactObjectSpread(source *ast.Node) *ast.Node {
+	factory := tx.Factory()
+	visited := tx.Visitor().VisitNode(source)
+	if tx.resolver.IsKvsNullableExpression(source) {
+		visited = factory.NewBinaryExpression(nil, visited, nil, factory.NewToken(ast.KindQuestionQuestionToken), factory.NewObjectLiteralExpression(nil, false))
+	}
+	entries := factory.NewCallExpression(factory.NewPropertyAccessExpression(factory.NewIdentifier("Object"), nil, factory.NewIdentifier("entries"), ast.NodeFlagsNone), nil, nil, factory.NewNodeList([]*ast.Node{visited}), ast.NodeFlagsNone)
+	parameter := factory.NewParameterDeclaration(nil, nil, factory.NewIdentifier("entry"), nil, nil, nil)
+	value := factory.NewElementAccessExpression(factory.NewIdentifier("entry"), nil, factory.NewNumericLiteral("1", ast.TokenFlagsNone), ast.NodeFlagsNone)
+	present := factory.NewBinaryExpression(nil, value, nil, factory.NewToken(ast.KindExclamationEqualsToken), factory.NewKeywordExpression(ast.KindNullKeyword))
+	predicate := factory.NewArrowFunction(nil, nil, factory.NewNodeList([]*ast.Node{parameter}), nil, nil, factory.NewToken(ast.KindEqualsGreaterThanToken), present)
+	filtered := factory.NewCallExpression(factory.NewPropertyAccessExpression(entries, nil, factory.NewIdentifier("filter"), ast.NodeFlagsNone), nil, nil, factory.NewNodeList([]*ast.Node{predicate}), ast.NodeFlagsNone)
+	return factory.NewCallExpression(factory.NewPropertyAccessExpression(factory.NewIdentifier("Object"), nil, factory.NewIdentifier("fromEntries"), ast.NodeFlagsNone), nil, nil, factory.NewNodeList([]*ast.Node{filtered}), ast.NodeFlagsNone)
 }
 
 func (tx *transformer) transformLiftedBinaryExpression(node *ast.BinaryExpression) *ast.Node {

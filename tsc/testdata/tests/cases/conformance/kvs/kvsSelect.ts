@@ -44,6 +44,12 @@ function selectFromOptionalGroups() {
     };
 }
 
+function selectFirstValueWithDefault(groups: Group[]) {
+    return select (const group of groups) {
+        yield group.value;
+    }!;
+}
+
 function rejectNestedPosition(groups: Group[]) {
     console.log(select (const group of groups) {
         yield group.value;

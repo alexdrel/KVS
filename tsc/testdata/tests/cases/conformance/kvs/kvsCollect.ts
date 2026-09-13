@@ -74,7 +74,50 @@ function collectNestedValues(groups: Item[][]) {
     return values;
 }
 
+function stopCollecting(items: Item[]) {
+    return collect (const item of items) {
+        if (!item.included) break;
+        yield item.value;
+    };
+}
+
+function collectFromNestedLoops(groups: Item[][]) {
+    return collect (const items of groups) {
+        for (const item of items) {
+            yield item.value;
+            yield? item.optionalValue;
+        }
+    };
+}
+
+function collectArrays(values: number[][]) {
+    return collect (const value of values) {
+        yield value;
+    };
+}
+
+function returnFromContainingFunction(items: Item[]) {
+    const values = collect (const item of items) {
+        if (!item.included) return "stopped";
+        yield item.value;
+    };
+    values;
+    return "completed";
+}
+
+async function collectAwaited(items: Item[]) {
+    return collect (const item of items) {
+        yield await Promise.resolve(item.value);
+    };
+}
+
 declare function getOptionalItems(): Item[] | null | undefined;
+
+function collectOptionalItemsWithDefault() {
+    return collect (const item of getOptionalItems()) {
+        yield item.value;
+    }!;
+}
 
 function collectOptionalItems() {
     const values = collect (const item of getOptionalItems()) {

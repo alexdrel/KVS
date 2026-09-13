@@ -7,6 +7,6 @@
 
 //// [objectTypeWithOptionalProperty1.js]
 "use strict";
-var b = {
-    x: 1 // error
-};
+var _a;
+var b = Object.assign({}, (_a = 1 // error
+) != null ? { x: _a } : {});

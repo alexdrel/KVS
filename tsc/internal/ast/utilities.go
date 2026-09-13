@@ -445,6 +445,8 @@ func isExpressionKind(kind Kind) bool {
 		KindKvsExtantTestExpression,
 		KindKvsDefaultExpression,
 		KindKvsNullingExpression,
+		KindKvsConditionalElement,
+		KindKvsCompactObjectExpression,
 		KindKvsCollectExpression,
 		KindKvsSelectExpression,
 		KindYieldExpression,
@@ -2014,11 +2016,11 @@ func getImportTypeNodeLiteral(node *Node) *Node {
 func IsExpressionNode(node *Node) bool {
 	switch node.Kind {
 	case KindSuperKeyword, KindNullKeyword, KindTrueKeyword, KindFalseKeyword, KindRegularExpressionLiteral,
-		KindArrayLiteralExpression, KindKvsCompactArrayExpression, KindObjectLiteralExpression, KindPropertyAccessExpression, KindElementAccessExpression,
+		KindArrayLiteralExpression, KindKvsCompactArrayExpression, KindObjectLiteralExpression, KindKvsCompactObjectExpression, KindPropertyAccessExpression, KindElementAccessExpression,
 		KindCallExpression, KindNewExpression, KindTaggedTemplateExpression, KindAsExpression, KindTypeAssertionExpression,
 		KindSatisfiesExpression, KindNonNullExpression, KindParenthesizedExpression, KindFunctionExpression,
 		KindClassExpression, KindArrowFunction, KindVoidExpression, KindDeleteExpression, KindTypeOfExpression,
-		KindPrefixUnaryExpression, KindPostfixUnaryExpression, KindBinaryExpression, KindConditionalExpression, KindKvsExtantTestExpression, KindKvsDefaultExpression, KindKvsNullingExpression,
+		KindPrefixUnaryExpression, KindPostfixUnaryExpression, KindBinaryExpression, KindConditionalExpression, KindKvsExtantTestExpression, KindKvsDefaultExpression, KindKvsNullingExpression, KindKvsConditionalElement,
 		KindSpreadElement, KindTemplateExpression, KindOmittedExpression, KindJsxElement, KindJsxSelfClosingElement,
 		KindJsxFragment, KindYieldExpression, KindKvsNullableAssertionExpression, KindKvsExtantAssertionExpression, KindKvsExtantAssignmentExpression, KindKvsCollectExpression, KindKvsSelectExpression, KindAwaitExpression:
 		return true
@@ -2046,6 +2048,17 @@ func IsExpressionNode(node *Node) bool {
 	}
 }
 
+func IsKvsConditionalObjectProperty(node *Node) bool {
+	postfix := node.PostfixToken()
+	if postfix == nil || postfix.Kind != KindQuestionToken || IsInJSFile(node) || NodeIsMissing(node.Name()) {
+		return false
+	}
+	if IsPropertyAssignment(node) {
+		return !NodeIsMissing(node.Initializer())
+	}
+	return IsShorthandPropertyAssignment(node) && postfix.Pos() < node.Name().Pos()
+}
+
 func IsKvsProducerHeadPosition(node *Node) bool {
 	current := node
 	for current.Parent != nil {
@@ -2067,7 +2080,8 @@ func IsKvsProducerHeadPosition(node *Node) bool {
 			}
 		case KindParenthesizedExpression, KindAsExpression, KindSatisfiesExpression, KindNonNullExpression,
 			KindTypeAssertionExpression, KindAwaitExpression, KindVoidExpression, KindTypeOfExpression, KindDeleteExpression,
-			KindPropertyAccessExpression, KindElementAccessExpression, KindCallExpression, KindNewExpression:
+			KindPropertyAccessExpression, KindElementAccessExpression, KindCallExpression, KindNewExpression,
+			KindKvsDefaultExpression:
 			if parent.Expression() != current {
 				return false
 			}

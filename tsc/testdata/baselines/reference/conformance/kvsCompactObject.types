@@ -1,0 +1,55 @@
+//// [tests/cases/conformance/kvs/kvsCompactObject.ts] ////
+
+=== kvsCompactObject.ts ===
+declare const title: string?;
+>title : string | null | undefined
+
+declare const count: number?;
+>count : number | null | undefined
+
+declare const fixed: false;
+>fixed : false
+>false : false
+
+declare const nullableOverrides: {
+>nullableOverrides : { color: string?; retries: number; } | null | undefined
+
+    color: string?;
+>color : string | null | undefined
+
+    retries: number;
+>retries : number
+
+}?;
+
+const options = ?{
+>options : { color?: string; retries?: number; title?: string; count?: number; fixed: false; label?: string; }
+>?{    title,    count,    fixed,    label: title,    ...nullableOverrides,} : { color?: string; retries?: number; title?: string; count?: number; fixed: false; label?: string; }
+
+    title,
+>title : string | null | undefined
+
+    count,
+>count : number | null | undefined
+
+    fixed,
+>fixed : false
+
+    label: title,
+>label : string | null | undefined
+>title : string | null | undefined
+
+    ...nullableOverrides,
+>nullableOverrides : { color: string?; retries: number; } | null | undefined
+
+};
+
+const nested = ?{ options, child: ?{ title } };
+>nested : { options: { color?: string; retries?: number; title?: string; count?: number; fixed: false; label?: string; }; child: { title?: string; }; }
+>?{ options, child: ?{ title } } : { options: { color?: string; retries?: number; title?: string; count?: number; fixed: false; label?: string; }; child: { title?: string; }; }
+>options : { color?: string; retries?: number; title?: string; count?: number; fixed: false; label?: string; }
+>child : { title?: string; }
+>?{ title } : { title?: string; }
+>title : string | null | undefined
+
+

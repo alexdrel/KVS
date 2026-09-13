@@ -1,0 +1,90 @@
+//// [tests/cases/conformance/kvs/kvsConditionalPlacement.ts] ////
+
+=== kvsConditionalPlacement.ts ===
+declare const maybeNumber: number?;
+>maybeNumber : number | null | undefined
+
+declare const maybeString: string?;
+>maybeString : string | null | undefined
+
+declare const absent: null;
+>absent : null
+
+const array = [?: maybeNumber, false, ?: 0, ?: absent];
+>array : (number | boolean)[]
+>[?: maybeNumber, false, ?: 0, ?: absent] : (number | boolean)[]
+>?: maybeNumber : number
+>maybeNumber : number | null | undefined
+>false : false
+>?: 0 : number
+>0 : 0
+>?: absent : never
+>absent : null
+
+const object = {
+>object : { maybeString?: string; count?: number; fixed: boolean; }
+>{    ?: maybeString,    count?: maybeNumber,    fixed: false,} : { maybeString?: string; count?: number; fixed: boolean; }
+
+    ?: maybeString,
+>maybeString : string | null | undefined
+
+    count?: maybeNumber,
+>count : number | null | undefined
+>maybeNumber : number | null | undefined
+
+    fixed: false,
+>fixed : boolean
+>false : false
+
+};
+
+let step = 0;
+>step : number
+>0 : 0
+
+function key() {
+>key : () => string
+
+    step++;
+>step++ : number
+>step : number
+
+    return "computed";
+>"computed" : "computed"
+}
+function value(): number? {
+>value : () => number?
+
+    step++;
+>step++ : number
+>step : number
+
+    return step === 2 ? 0 : null;
+>step === 2 ? 0 : null : 0 | null
+>step === 2 : boolean
+>step : number
+>2 : 2
+>0 : 0
+}
+const computed = { [key()]?: value() };
+>computed : { [x: string]: number; }
+>{ [key()]?: value() } : { [x: string]: number; }
+>[key()] : number | null | undefined
+>key() : string
+>key : () => string
+>value() : number | null | undefined
+>value : () => number?
+
+const ordinaryArray = [maybeNumber, absent];
+>ordinaryArray : (number | null | undefined)[]
+>[maybeNumber, absent] : (number | null | undefined)[]
+>maybeNumber : number | null | undefined
+>absent : null
+
+const ordinaryObject = { maybeString, absent };
+>ordinaryObject : { maybeString: string | null | undefined; absent: null; }
+>{ maybeString, absent } : { maybeString: string | null | undefined; absent: null; }
+>maybeString : string | null | undefined
+>absent : null
+
+

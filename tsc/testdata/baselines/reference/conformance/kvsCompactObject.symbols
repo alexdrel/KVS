@@ -1,0 +1,51 @@
+//// [tests/cases/conformance/kvs/kvsCompactObject.ts] ////
+
+=== kvsCompactObject.ts ===
+declare const title: string?;
+>title : Symbol(title, Decl(kvsCompactObject.ts, 0, 13))
+
+declare const count: number?;
+>count : Symbol(count, Decl(kvsCompactObject.ts, 1, 13))
+
+declare const fixed: false;
+>fixed : Symbol(fixed, Decl(kvsCompactObject.ts, 2, 13))
+
+declare const nullableOverrides: {
+>nullableOverrides : Symbol(nullableOverrides, Decl(kvsCompactObject.ts, 3, 13))
+
+    color: string?;
+>color : Symbol(color, Decl(kvsCompactObject.ts, 3, 34))
+
+    retries: number;
+>retries : Symbol(retries, Decl(kvsCompactObject.ts, 4, 19))
+
+}?;
+
+const options = ?{
+>options : Symbol(options, Decl(kvsCompactObject.ts, 8, 5))
+
+    title,
+>title : Symbol(title, Decl(kvsCompactObject.ts, 8, 18))
+
+    count,
+>count : Symbol(count, Decl(kvsCompactObject.ts, 9, 10))
+
+    fixed,
+>fixed : Symbol(fixed, Decl(kvsCompactObject.ts, 10, 10))
+
+    label: title,
+>label : Symbol(label, Decl(kvsCompactObject.ts, 11, 10))
+>title : Symbol(title, Decl(kvsCompactObject.ts, 0, 13))
+
+    ...nullableOverrides,
+>nullableOverrides : Symbol(nullableOverrides, Decl(kvsCompactObject.ts, 3, 13))
+
+};
+
+const nested = ?{ options, child: ?{ title } };
+>nested : Symbol(nested, Decl(kvsCompactObject.ts, 16, 5))
+>options : Symbol(options, Decl(kvsCompactObject.ts, 16, 17))
+>child : Symbol(child, Decl(kvsCompactObject.ts, 16, 26))
+>title : Symbol(title, Decl(kvsCompactObject.ts, 16, 36))
+
+

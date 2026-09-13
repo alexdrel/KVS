@@ -125,6 +125,12 @@ func getChildrenPropertyMask(node *ast.Node) uint8 {
 	case ast.KindKvsCompactArrayExpression:
 		n := node.AsKvsCompactArrayExpression()
 		return (boolToByte(n.QuestionToken != nil) << 0) | (boolToByte(n.Elements != nil) << 1)
+	case ast.KindKvsConditionalElement:
+		n := node.AsKvsConditionalElement()
+		return (boolToByte(n.QuestionToken != nil) << 0) | (boolToByte(n.ColonToken != nil) << 1) | (boolToByte(n.Expression != nil) << 2)
+	case ast.KindKvsCompactObjectExpression:
+		n := node.AsKvsCompactObjectExpression()
+		return (boolToByte(n.QuestionToken != nil) << 0) | (boolToByte(n.Properties != nil) << 1)
 	case ast.KindKvsCollectExpression:
 		n := node.AsKvsCollectExpression()
 		return (boolToByte(n.Initializer != nil) << 0) | (boolToByte(n.Expression != nil) << 1) | (boolToByte(n.Statement != nil) << 2)
@@ -590,6 +596,9 @@ func getNodeCommonData(node *ast.Node) uint32 {
 	switch node.Kind {
 	case ast.KindKvsCompactArrayExpression:
 		n := node.AsKvsCompactArrayExpression()
+		return uint32(boolToByte(n.MultiLine)) << 24
+	case ast.KindKvsCompactObjectExpression:
+		n := node.AsKvsCompactObjectExpression()
 		return uint32(boolToByte(n.MultiLine)) << 24
 	case ast.KindBlock:
 		n := node.AsBlock()

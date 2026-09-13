@@ -116,6 +116,11 @@ call, and binary tails plus multiple named object fields. The same file rejects
 spaced `yield ?`, a call argument, a binary right operand, and a conditional
 branch. Its nullable-source case checks a nullable result type, once-only source
 capture, `null` for absence, and `[]` initialization only on the present path.
+It also checks early `break`, production from nested ordinary loops, array
+values remaining single unflattened elements, ordinary `return` retaining its
+containing-function meaning, and `await` retaining its containing async-function
+meaning. A terminal-`!` case checks that an absent source becomes a fresh `[]`
+after producer lowering.
 
 Run it with:
 
@@ -136,7 +141,8 @@ ordinary break for direct production, and the labelled break used only when a
 production must cross a nested loop to exit the whole producer. It also checks
 a nullish-coalescing tail and a named object field. A nullable-source case
 checks once-only capture and a guarded loop. The same file rejects
-`select` in a call-argument position.
+`select` in a call-argument position. A terminal-`!` case checks that a
+nullable selected string is defaulted only after producer lowering.
 
 Run it with:
 
@@ -309,4 +315,18 @@ Run it with:
 
 ```sh
 go -C ./tsc test -run='TestLocal/kvsCompactArray' ./internal/testrunner
+```
+
+## Conditional-placement and compact-object slice
+
+`kvsConditionalPlacement.ts` checks conditional array elements, shorthand and
+explicit object properties, preservation of falsy values, computed-key
+evaluation order, and unchanged ordinary literals. `kvsCompactObject.ts`
+checks nullable direct values, nullable spread sources, filtering of nullable
+spread values, nested literals, and optional non-nullable result properties.
+
+Run them with:
+
+```sh
+go -C ./tsc test -run='TestLocal/kvs(ConditionalPlacement|CompactObject)' ./internal/testrunner
 ```

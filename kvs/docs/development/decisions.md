@@ -417,9 +417,35 @@ source once. Evaluation remains left to right, though KVS discourages relying
 on optional paths as effect-order control.
 
 The resulting array element type removes `null` and `undefined`. Ordinary
-array literals retain their existing behavior. `?{...}`, conditional
-placement, async iterables, formatter support, and source-map validation remain
-outside this slice.
+array literals retain their existing behavior. Async iterables, formatter
+support, and source-map validation remain outside this slice.
+
+## First conditional-placement and compact-object slice
+
+Status: accepted.
+
+Conditional array elements use a dedicated `KvsConditionalElement` so `?:`
+is accepted only in literal element lists, not as a general expression or call
+argument. Conditional object properties reuse property-assignment nodes with a
+question postfix: `?: name` is the shorthand form and `name?: expression` is
+the explicit form. Their values are captured once and conditionally spread as
+zero-or-one-entry literals. Computed keys are captured before their values, so
+ordinary source order is preserved.
+
+`?{...}` uses a dedicated `KvsCompactObjectExpression`. Nullable direct values
+use the same conditional-property lowering; nonnullable values remain ordinary
+properties. A spread is lowered through `Object.entries`, a nullish-value
+filter, and `Object.fromEntries`; a nullable source is first defaulted with
+`?? {}`. The checked result makes nullable values optional and removes their
+top-level absence. When the spread source itself is nullable, all of its
+properties become optional.
+
+This spread lowering is deliberately a prototype shortcut. It handles own
+enumerable string-keyed properties but drops symbol-keyed properties, allocates
+entry arrays, and requires an ES2019-or-newer runtime for
+`Object.fromEntries`. KVS semantics are not intended to exclude enumerable
+symbols; a production lowering should copy keys directly while retaining the
+same once-only and source-order guarantees.
 
 ## First implicit-subject slice
 

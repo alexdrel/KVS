@@ -369,6 +369,8 @@ func (n *Node) Expression() *Node {
 		return n.AsKvsExtantTestExpression().Expression
 	case KindKvsDefaultExpression:
 		return n.AsKvsDefaultExpression().Expression
+	case KindKvsConditionalElement:
+		return n.AsKvsConditionalElement().Expression
 	case KindKvsSelectExpression:
 		return n.AsKvsSelectExpression().Expression
 	case KindPartiallyEmittedExpression:
@@ -1096,6 +1098,8 @@ func (n *Node) PropertyList() *NodeList {
 	switch n.Kind {
 	case KindObjectLiteralExpression:
 		return n.AsObjectLiteralExpression().Properties
+	case KindKvsCompactObjectExpression:
+		return n.AsKvsCompactObjectExpression().Properties
 	case KindJsxAttributes:
 		return n.AsJsxAttributes().Properties
 	}

@@ -995,12 +995,12 @@ func (c *Checker) checkGrammarForInvalidExclamationToken(postfixToken *ast.Token
 	return postfixToken != nil && postfixToken.Kind == ast.KindExclamationToken && c.grammarErrorOnNode(postfixToken, message)
 }
 
-func (c *Checker) checkGrammarObjectLiteralExpression(node *ast.ObjectLiteralExpression, inDestructuring bool) bool {
+func (c *Checker) checkGrammarObjectLiteralExpression(node *ast.Node, inDestructuring bool) bool {
 	seen := make(map[string]DeclarationMeaning)
 
 	var properties []*ast.Node
-	if node.Properties != nil {
-		properties = node.Properties.Nodes
+	if node.Properties() != nil {
+		properties = node.Properties()
 	}
 	for _, prop := range properties {
 		if prop.Kind == ast.KindSpreadAssignment {
@@ -1084,7 +1084,9 @@ func (c *Checker) checkGrammarObjectLiteralExpression(node *ast.ObjectLiteralExp
 
 			// Grammar checking for computedPropertyName and shorthandPropertyAssignment
 			c.checkGrammarForInvalidExclamationToken(commonProp.PostfixToken, diagnostics.A_definite_assignment_assertion_is_not_permitted_in_this_context)
-			c.checkGrammarForInvalidQuestionMark(commonProp.PostfixToken, diagnostics.An_object_member_cannot_be_declared_optional)
+			if inDestructuring || !ast.IsKvsConditionalObjectProperty(prop) {
+				c.checkGrammarForInvalidQuestionMark(commonProp.PostfixToken, diagnostics.An_object_member_cannot_be_declared_optional)
+			}
 
 			if name.Kind == ast.KindNumericLiteral {
 				c.checkGrammarNumericLiteral(name.AsNumericLiteral())

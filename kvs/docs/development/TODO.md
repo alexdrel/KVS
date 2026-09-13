@@ -30,6 +30,8 @@ Implemented vertical slices:
 - Implicit subjects for synchronous `for`, eager `collect`, and `select`.
 - Arithmetic operators lifted over absence.
 - Presence-aware array literals: `?[...]`.
+- Conditional placement in array and object literals.
+- Presence-aware object literals: `?{...}`.
 
 Known semantic debts:
 
@@ -58,6 +60,8 @@ Focused conformance inputs:
 - `tsc/testdata/tests/cases/conformance/kvs/kvsExtantTest.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsNullableOperators.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsCompactArray.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsConditionalPlacement.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsCompactObject.ts`
 
 Run all implemented KVS slices together:
 
@@ -208,15 +212,15 @@ them; generated example `.js` files are intentionally ignored.
 - [x] Multiple yields per iteration
 - [x] Branching
 - [x] `continue`
-- [ ] `break`
-- [ ] Nested ordinary loops
+- [x] `break`
+- [x] Nested ordinary loops
 - [x] Absent source -> `null`
 - [x] Present empty source -> `[]`
 - [x] Present source with no yields -> `[]`
-- [ ] Terminal `!` collapses absent result to `[]`
-- [ ] Do not flatten yielded arrays/iterables
-- [ ] `return` retains containing-function meaning
-- [ ] `await` retains containing async-function meaning
+- [x] Terminal `!` collapses absent result to `[]`
+- [x] Do not flatten yielded arrays/iterables
+- [x] `return` retains containing-function meaning
+- [x] `await` retains containing async-function meaning
 
 ### `collect*`
 
@@ -251,7 +255,7 @@ them; generated example `.js` files are intentionally ignored.
 - [x] Parentheses on the producer head path
 - [x] Member access after producer
 - [x] Calls after producer
-- [ ] Terminal `!` after producer
+- [x] Terminal `!` after producer
 - [ ] `~` after producer
 - [ ] `~~` after producer
 - [x] `??` after producer
@@ -307,24 +311,24 @@ them; generated example `.js` files are intentionally ignored.
 
 ### Conditional placement
 
-- [ ] Array `?: expr`
-- [ ] Object `?: name`
-- [ ] Object `name?: expr`
-- [ ] Omit absence only
-- [ ] Preserve falsy and empty values
-- [ ] Once-only evaluation
-- [ ] Source-order evaluation
+- [x] Array `?: expr`
+- [x] Object `?: name`
+- [x] Object `name?: expr`
+- [x] Omit absence only
+- [x] Preserve falsy and empty values
+- [x] Once-only evaluation
+- [x] Source-order evaluation
 
 ### Compact literals
 
 - [x] `?[...]`
-- [ ] `?{...}`
+- [x] `?{...}`
 - [x] Omit absent direct values
 - [x] Omit absent spread values
 - [x] Nullable array spread contributes zero elements
-- [ ] Nullable object spread
+- [x] Nullable object spread
 - [x] Result element type inference
-- [ ] Result property type inference
+- [x] Result property type inference
 
 ### Nulling operator `?:`
 

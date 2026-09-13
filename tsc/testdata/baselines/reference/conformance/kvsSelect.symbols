@@ -114,21 +114,38 @@ function selectFromOptionalGroups() {
     };
 }
 
+function selectFirstValueWithDefault(groups: Group[]) {
+>selectFirstValueWithDefault : Symbol(selectFirstValueWithDefault, Decl(kvsSelect.ts, 42, 1))
+>groups : Symbol(groups, Decl(kvsSelect.ts, 44, 37))
+>Group : Symbol(Group, Decl(kvsSelect.ts, 0, 0))
+
+    return select (const group of groups) {
+>group : Symbol(group, Decl(kvsSelect.ts, 45, 24))
+>groups : Symbol(groups, Decl(kvsSelect.ts, 44, 37))
+
+        yield group.value;
+>group.value : Symbol(Group.value, Decl(kvsSelect.ts, 0, 17))
+>group : Symbol(group, Decl(kvsSelect.ts, 45, 24))
+>value : Symbol(Group.value, Decl(kvsSelect.ts, 0, 17))
+
+    }!;
+}
+
 function rejectNestedPosition(groups: Group[]) {
->rejectNestedPosition : Symbol(rejectNestedPosition, Decl(kvsSelect.ts, 42, 1))
->groups : Symbol(groups, Decl(kvsSelect.ts, 44, 30))
+>rejectNestedPosition : Symbol(rejectNestedPosition, Decl(kvsSelect.ts, 48, 1))
+>groups : Symbol(groups, Decl(kvsSelect.ts, 50, 30))
 >Group : Symbol(Group, Decl(kvsSelect.ts, 0, 0))
 
     console.log(select (const group of groups) {
 >console.log : Symbol(Console.log, Decl(lib.dom.d.ts, --, --))
 >console : Symbol(console, Decl(lib.dom.d.ts, --, --))
 >log : Symbol(Console.log, Decl(lib.dom.d.ts, --, --))
->group : Symbol(group, Decl(kvsSelect.ts, 45, 29))
->groups : Symbol(groups, Decl(kvsSelect.ts, 44, 30))
+>group : Symbol(group, Decl(kvsSelect.ts, 51, 29))
+>groups : Symbol(groups, Decl(kvsSelect.ts, 50, 30))
 
         yield group.value;
 >group.value : Symbol(Group.value, Decl(kvsSelect.ts, 0, 17))
->group : Symbol(group, Decl(kvsSelect.ts, 45, 29))
+>group : Symbol(group, Decl(kvsSelect.ts, 51, 29))
 >value : Symbol(Group.value, Decl(kvsSelect.ts, 0, 17))
 
     });

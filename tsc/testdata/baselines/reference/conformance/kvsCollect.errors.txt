@@ -1,10 +1,10 @@
 kvsCollect.ts(61,5): error TS2365: Operator '+=' cannot be applied to types 'number' and 'string[]'.
-kvsCollect.ts(88,13): error TS100069: KVS 'collect' must be at the head of a supported value expression.
-kvsCollect.ts(94,12): error TS2365: Operator '+' cannot be applied to types 'number' and 'string[]'.
-kvsCollect.ts(94,16): error TS100069: KVS 'collect' must be at the head of a supported value expression.
-kvsCollect.ts(100,29): error TS100069: KVS 'collect' must be at the head of a supported value expression.
-kvsCollect.ts(107,15): error TS1109: Expression expected.
-kvsCollect.ts(107,35): error TS1005: ':' expected.
+kvsCollect.ts(131,13): error TS100069: KVS 'collect' must be at the head of a supported value expression.
+kvsCollect.ts(137,12): error TS2365: Operator '+' cannot be applied to types 'number' and 'string[]'.
+kvsCollect.ts(137,16): error TS100069: KVS 'collect' must be at the head of a supported value expression.
+kvsCollect.ts(143,29): error TS100069: KVS 'collect' must be at the head of a supported value expression.
+kvsCollect.ts(150,15): error TS1109: Expression expected.
+kvsCollect.ts(150,35): error TS1005: ':' expected.
 
 
 ==== kvsCollect.ts (7 errors) ====
@@ -86,7 +86,50 @@ kvsCollect.ts(107,35): error TS1005: ':' expected.
         return values;
     }
     
+    function stopCollecting(items: Item[]) {
+        return collect (const item of items) {
+            if (!item.included) break;
+            yield item.value;
+        };
+    }
+    
+    function collectFromNestedLoops(groups: Item[][]) {
+        return collect (const items of groups) {
+            for (const item of items) {
+                yield item.value;
+                yield? item.optionalValue;
+            }
+        };
+    }
+    
+    function collectArrays(values: number[][]) {
+        return collect (const value of values) {
+            yield value;
+        };
+    }
+    
+    function returnFromContainingFunction(items: Item[]) {
+        const values = collect (const item of items) {
+            if (!item.included) return "stopped";
+            yield item.value;
+        };
+        values;
+        return "completed";
+    }
+    
+    async function collectAwaited(items: Item[]) {
+        return collect (const item of items) {
+            yield await Promise.resolve(item.value);
+        };
+    }
+    
     declare function getOptionalItems(): Item[] | null | undefined;
+    
+    function collectOptionalItemsWithDefault() {
+        return collect (const item of getOptionalItems()) {
+            yield item.value;
+        }!;
+    }
     
     function collectOptionalItems() {
         const values = collect (const item of getOptionalItems()) {

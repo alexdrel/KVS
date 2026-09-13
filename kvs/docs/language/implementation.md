@@ -150,6 +150,14 @@ A nullable spread source is first defaulted with `?? []`, because JavaScript
 throws when spreading `null` or `undefined`; its materialized members are then
 filtered by `value != null`. Nested compact arrays own separate temporaries.
 
+The implemented conditional-placement and `?{...}` slice uses the same
+zero-or-one spread pattern for direct object properties. Computed keys are
+captured before their values. Compact object spreads currently use
+`Object.fromEntries(Object.entries(source ?? {}).filter(...))`; this prototype
+lowering handles enumerable string keys only, allocates intermediate arrays,
+and assumes an ES2019-or-newer runtime. These are implementation limitations,
+not restrictions on KVS object-spread semantics.
+
 The nulling operator lowers directly:
 
 ```kvs

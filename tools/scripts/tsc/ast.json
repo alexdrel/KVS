@@ -292,7 +292,9 @@
             "KvsExtantTestExpression",
             "KvsDefaultExpression",
             "KvsNullingExpression",
+            "KvsConditionalElement",
             "KvsCompactArrayExpression",
+            "KvsCompactObjectExpression",
             "KvsCollectExpression",
             "KvsSelectExpression",
             "SpreadElement",
@@ -1823,6 +1825,50 @@
                     {
                         "name": "Elements",
                         "type": "Expression",
+                        "list": "NodeList"
+                    },
+                    {
+                        "name": "MultiLine",
+                        "type": "bool"
+                    }
+                ]
+            },
+            "KvsConditionalElement": {
+                "generateSubtreeFacts": true,
+                "extends": [
+                    "ExpressionBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "QuestionToken",
+                        "type": "QuestionToken"
+                    },
+                    {
+                        "name": "ColonToken",
+                        "type": "ColonToken"
+                    },
+                    {
+                        "name": "Expression",
+                        "type": "Expression"
+                    }
+                ]
+            },
+            "KvsCompactObjectExpression": {
+                "generateSubtreeFacts": true,
+                "extends": [
+                    "PrimaryExpressionBase",
+                    "DeclarationBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "QuestionToken",
+                        "type": "QuestionToken"
+                    },
+                    {
+                        "name": "Properties",
+                        "type": "ObjectLiteralElementLike",
                         "list": "NodeList"
                     },
                     {

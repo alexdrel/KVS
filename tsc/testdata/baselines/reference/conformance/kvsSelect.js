@@ -45,6 +45,12 @@ function selectFromOptionalGroups() {
     };
 }
 
+function selectFirstValueWithDefault(groups: Group[]) {
+    return select (const group of groups) {
+        yield group.value;
+    }!;
+}
+
 function rejectNestedPosition(groups: Group[]) {
     console.log(select (const group of groups) {
         yield group.value;
@@ -115,6 +121,14 @@ function selectFromOptionalGroups() {
         }
     }
     return _b;
+}
+function selectFirstValueWithDefault(groups) {
+    var _a = null;
+    for (const group of groups) {
+        _a = group.value;
+        break;
+    }
+    return _a ?? "";
 }
 function rejectNestedPosition(groups) {
     console.log(null);

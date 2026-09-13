@@ -107,6 +107,8 @@ import type {
     JsxSpreadAttribute,
     KvsCollectExpression,
     KvsCompactArrayExpression,
+    KvsCompactObjectExpression,
+    KvsConditionalElement,
     KvsDefaultExpression,
     KvsExtantAssertionExpression,
     KvsExtantAssignmentExpression,
@@ -297,6 +299,8 @@ import {
     updateJsxSpreadAttribute,
     updateKvsCollectExpression,
     updateKvsCompactArrayExpression,
+    updateKvsCompactObjectExpression,
+    updateKvsConditionalElement,
     updateKvsDefaultExpression,
     updateKvsExtantAssertionExpression,
     updateKvsExtantAssignmentExpression,
@@ -683,6 +687,17 @@ const visitEachChildTable: Record<number, VisitEachChildFunction> = {
         const _questionToken = visitNode(node.questionToken, visitor, isQuestionToken);
         const _elements = visitNodes(node.elements, visitor);
         return updateKvsCompactArrayExpression(node, _questionToken, _elements);
+    },
+    [SyntaxKind.KvsConditionalElement]: (node: KvsConditionalElement, visitor: Visitor): KvsConditionalElement => {
+        const _questionToken = visitNode(node.questionToken, visitor, isQuestionToken);
+        const _colonToken = visitNode(node.colonToken, visitor, isColonToken);
+        const _expression = visitNode(node.expression, visitor, isExpression);
+        return updateKvsConditionalElement(node, _questionToken, _colonToken, _expression);
+    },
+    [SyntaxKind.KvsCompactObjectExpression]: (node: KvsCompactObjectExpression, visitor: Visitor): KvsCompactObjectExpression => {
+        const _questionToken = visitNode(node.questionToken, visitor, isQuestionToken);
+        const _properties = visitNodes(node.properties, visitor);
+        return updateKvsCompactObjectExpression(node, _questionToken, _properties);
     },
     [SyntaxKind.KvsCollectExpression]: (node: KvsCollectExpression, visitor: Visitor): KvsCollectExpression => {
         const _initializer = visitNode(node.initializer, visitor, isForInitializer);

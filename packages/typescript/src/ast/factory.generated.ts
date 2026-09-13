@@ -151,6 +151,8 @@ import type {
     KeywordTypeSyntaxKind,
     KvsCollectExpression,
     KvsCompactArrayExpression,
+    KvsCompactObjectExpression,
+    KvsConditionalElement,
     KvsDefaultExpression,
     KvsExtantAssertionExpression,
     KvsExtantAssignmentExpression,
@@ -854,6 +856,10 @@ function cloneNodeData(node: Node): any {
             return { condition: n.condition, questionToken: n.questionToken, colonToken: n.colonToken, whenTrue: n.whenTrue };
         case SyntaxKind.KvsCompactArrayExpression:
             return { questionToken: n.questionToken, elements: n.elements, multiLine: n.multiLine };
+        case SyntaxKind.KvsConditionalElement:
+            return { questionToken: n.questionToken, colonToken: n.colonToken, expression: n.expression };
+        case SyntaxKind.KvsCompactObjectExpression:
+            return { questionToken: n.questionToken, properties: n.properties, multiLine: n.multiLine };
         case SyntaxKind.KvsCollectExpression:
             return { initializer: n.initializer, expression: n.expression, statement: n.statement };
         case SyntaxKind.KvsSelectExpression:
@@ -1272,6 +1278,13 @@ const forEachChildTable: Record<number, ForEachChildFunction> = {
     [SyntaxKind.KvsCompactArrayExpression]: (data, cbNode, cbNodes) =>
         visitNode(cbNode, data.questionToken) ||
         visitNodes(cbNode, cbNodes, data.elements),
+    [SyntaxKind.KvsConditionalElement]: (data, cbNode, cbNodes) =>
+        visitNode(cbNode, data.questionToken) ||
+        visitNode(cbNode, data.colonToken) ||
+        visitNode(cbNode, data.expression),
+    [SyntaxKind.KvsCompactObjectExpression]: (data, cbNode, cbNodes) =>
+        visitNode(cbNode, data.questionToken) ||
+        visitNodes(cbNode, cbNodes, data.properties),
     [SyntaxKind.KvsCollectExpression]: (data, cbNode, cbNodes) =>
         visitNode(cbNode, data.initializer) ||
         visitNode(cbNode, data.expression) ||
@@ -2017,6 +2030,22 @@ export function createKvsCompactArrayExpression(questionToken: QuestionToken, el
         elements: createNodeArray(elements),
         multiLine,
     }) as unknown as KvsCompactArrayExpression;
+}
+
+export function createKvsConditionalElement(questionToken: QuestionToken, colonToken: ColonToken, expression: Expression): KvsConditionalElement {
+    return new NodeObject(SyntaxKind.KvsConditionalElement, {
+        questionToken,
+        colonToken,
+        expression,
+    }) as unknown as KvsConditionalElement;
+}
+
+export function createKvsCompactObjectExpression(questionToken: QuestionToken, properties: readonly ObjectLiteralElementLike[], multiLine?: boolean): KvsCompactObjectExpression {
+    return new NodeObject(SyntaxKind.KvsCompactObjectExpression, {
+        questionToken,
+        properties: createNodeArray(properties),
+        multiLine,
+    }) as unknown as KvsCompactObjectExpression;
 }
 
 export function createKvsCollectExpression(initializer: ForInitializer, expression: Expression, statement: Statement): KvsCollectExpression {
@@ -3475,6 +3504,14 @@ export function updateKvsNullingExpression(node: KvsNullingExpression, condition
 
 export function updateKvsCompactArrayExpression(node: KvsCompactArrayExpression, questionToken: QuestionToken, elements: readonly Expression[]): KvsCompactArrayExpression {
     return node.questionToken !== questionToken || node.elements !== elements ? createKvsCompactArrayExpression(questionToken, elements, node.multiLine) : node;
+}
+
+export function updateKvsConditionalElement(node: KvsConditionalElement, questionToken: QuestionToken, colonToken: ColonToken, expression: Expression): KvsConditionalElement {
+    return node.questionToken !== questionToken || node.colonToken !== colonToken || node.expression !== expression ? createKvsConditionalElement(questionToken, colonToken, expression) : node;
+}
+
+export function updateKvsCompactObjectExpression(node: KvsCompactObjectExpression, questionToken: QuestionToken, properties: readonly ObjectLiteralElementLike[]): KvsCompactObjectExpression {
+    return node.questionToken !== questionToken || node.properties !== properties ? createKvsCompactObjectExpression(questionToken, properties, node.multiLine) : node;
 }
 
 export function updateKvsCollectExpression(node: KvsCollectExpression, initializer: ForInitializer, expression: Expression, statement: Statement): KvsCollectExpression {

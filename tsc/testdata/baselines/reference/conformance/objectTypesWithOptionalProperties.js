@@ -30,11 +30,11 @@ var b = {
 //// [objectTypesWithOptionalProperties.js]
 "use strict";
 // Basic uses of optional properties
+var _a;
 var a;
 class C {
 }
 class C2 {
 }
-var b = {
-    x: 1 // error
-};
+var b = Object.assign({}, (_a = 1 // error
+) != null ? { x: _a } : {});

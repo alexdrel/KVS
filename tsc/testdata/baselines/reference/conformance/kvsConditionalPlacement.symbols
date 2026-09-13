@@ -1,0 +1,69 @@
+//// [tests/cases/conformance/kvs/kvsConditionalPlacement.ts] ////
+
+=== kvsConditionalPlacement.ts ===
+declare const maybeNumber: number?;
+>maybeNumber : Symbol(maybeNumber, Decl(kvsConditionalPlacement.ts, 0, 13))
+
+declare const maybeString: string?;
+>maybeString : Symbol(maybeString, Decl(kvsConditionalPlacement.ts, 1, 13))
+
+declare const absent: null;
+>absent : Symbol(absent, Decl(kvsConditionalPlacement.ts, 2, 13))
+
+const array = [?: maybeNumber, false, ?: 0, ?: absent];
+>array : Symbol(array, Decl(kvsConditionalPlacement.ts, 4, 5))
+>maybeNumber : Symbol(maybeNumber, Decl(kvsConditionalPlacement.ts, 0, 13))
+>absent : Symbol(absent, Decl(kvsConditionalPlacement.ts, 2, 13))
+
+const object = {
+>object : Symbol(object, Decl(kvsConditionalPlacement.ts, 6, 5))
+
+    ?: maybeString,
+>maybeString : Symbol(maybeString, Decl(kvsConditionalPlacement.ts, 6, 16))
+
+    count?: maybeNumber,
+>count : Symbol(count, Decl(kvsConditionalPlacement.ts, 7, 19))
+>maybeNumber : Symbol(maybeNumber, Decl(kvsConditionalPlacement.ts, 0, 13))
+
+    fixed: false,
+>fixed : Symbol(fixed, Decl(kvsConditionalPlacement.ts, 8, 24))
+
+};
+
+let step = 0;
+>step : Symbol(step, Decl(kvsConditionalPlacement.ts, 12, 3))
+
+function key() {
+>key : Symbol(key, Decl(kvsConditionalPlacement.ts, 12, 13))
+
+    step++;
+>step : Symbol(step, Decl(kvsConditionalPlacement.ts, 12, 3))
+
+    return "computed";
+}
+function value(): number? {
+>value : Symbol(value, Decl(kvsConditionalPlacement.ts, 16, 1))
+
+    step++;
+>step : Symbol(step, Decl(kvsConditionalPlacement.ts, 12, 3))
+
+    return step === 2 ? 0 : null;
+>step : Symbol(step, Decl(kvsConditionalPlacement.ts, 12, 3))
+}
+const computed = { [key()]?: value() };
+>computed : Symbol(computed, Decl(kvsConditionalPlacement.ts, 21, 5))
+>[key()] : Symbol([key()], Decl(kvsConditionalPlacement.ts, 21, 18))
+>key : Symbol(key, Decl(kvsConditionalPlacement.ts, 12, 13))
+>value : Symbol(value, Decl(kvsConditionalPlacement.ts, 16, 1))
+
+const ordinaryArray = [maybeNumber, absent];
+>ordinaryArray : Symbol(ordinaryArray, Decl(kvsConditionalPlacement.ts, 23, 5))
+>maybeNumber : Symbol(maybeNumber, Decl(kvsConditionalPlacement.ts, 0, 13))
+>absent : Symbol(absent, Decl(kvsConditionalPlacement.ts, 2, 13))
+
+const ordinaryObject = { maybeString, absent };
+>ordinaryObject : Symbol(ordinaryObject, Decl(kvsConditionalPlacement.ts, 24, 5))
+>maybeString : Symbol(maybeString, Decl(kvsConditionalPlacement.ts, 24, 24))
+>absent : Symbol(absent, Decl(kvsConditionalPlacement.ts, 24, 37))
+
+

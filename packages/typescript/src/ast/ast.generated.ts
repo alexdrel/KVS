@@ -646,6 +646,18 @@ export interface KvsCompactArrayExpression extends PrimaryExpressionBase {
     readonly elements: NodeArray<Expression>;
     readonly multiLine: boolean;
 }
+export interface KvsConditionalElement extends ExpressionBase {
+    readonly kind: SyntaxKind.KvsConditionalElement;
+    readonly questionToken: QuestionToken;
+    readonly colonToken: ColonToken;
+    readonly expression: Expression;
+}
+export interface KvsCompactObjectExpression extends PrimaryExpressionBase, DeclarationBase {
+    readonly kind: SyntaxKind.KvsCompactObjectExpression;
+    readonly questionToken: QuestionToken;
+    readonly properties: NodeArray<ObjectLiteralElementLike>;
+    readonly multiLine: boolean;
+}
 export interface KvsCollectExpression extends ExpressionBase {
     readonly kind: SyntaxKind.KvsCollectExpression;
     readonly initializer: ForInitializer;

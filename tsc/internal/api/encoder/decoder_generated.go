@@ -344,6 +344,18 @@ func (d *astDecoder) createChildrenNode(kind ast.Kind, data uint32, childIndices
 		questionToken := d.nodeAt(it.nextIf(mask, 0))
 		elements := d.nodeListAt(it.nextIf(mask, 1))
 		return d.factory.NewKvsCompactArrayExpression(questionToken, elements, multiLine), nil
+	case ast.KindKvsConditionalElement:
+		it := newChildIter(childIndices)
+		questionToken := d.nodeAt(it.nextIf(mask, 0))
+		colonToken := d.nodeAt(it.nextIf(mask, 1))
+		expression := d.nodeAt(it.nextIf(mask, 2))
+		return d.factory.NewKvsConditionalElement(questionToken, colonToken, expression), nil
+	case ast.KindKvsCompactObjectExpression:
+		multiLine := commonData&1 != 0
+		it := newChildIter(childIndices)
+		questionToken := d.nodeAt(it.nextIf(mask, 0))
+		properties := d.nodeListAt(it.nextIf(mask, 1))
+		return d.factory.NewKvsCompactObjectExpression(questionToken, properties, multiLine), nil
 	case ast.KindKvsCollectExpression:
 		it := newChildIter(childIndices)
 		initializer := d.nodeAt(it.nextIf(mask, 0))

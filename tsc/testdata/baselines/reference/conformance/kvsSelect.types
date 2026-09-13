@@ -129,6 +129,24 @@ function selectFromOptionalGroups() {
     };
 }
 
+function selectFirstValueWithDefault(groups: Group[]) {
+>selectFirstValueWithDefault : (groups: Group[]) => string
+>groups : Group[]
+
+    return select (const group of groups) {
+>select (const group of groups) {        yield group.value;    }! : string
+>select (const group of groups) {        yield group.value;    } : string | null
+>group : Group
+>groups : Group[]
+
+        yield group.value;
+>group.value : string
+>group : Group
+>value : string
+
+    }!;
+}
+
 function rejectNestedPosition(groups: Group[]) {
 >rejectNestedPosition : (groups: Group[]) => void
 >groups : Group[]

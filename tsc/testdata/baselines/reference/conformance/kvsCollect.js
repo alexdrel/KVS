@@ -75,7 +75,50 @@ function collectNestedValues(groups: Item[][]) {
     return values;
 }
 
+function stopCollecting(items: Item[]) {
+    return collect (const item of items) {
+        if (!item.included) break;
+        yield item.value;
+    };
+}
+
+function collectFromNestedLoops(groups: Item[][]) {
+    return collect (const items of groups) {
+        for (const item of items) {
+            yield item.value;
+            yield? item.optionalValue;
+        }
+    };
+}
+
+function collectArrays(values: number[][]) {
+    return collect (const value of values) {
+        yield value;
+    };
+}
+
+function returnFromContainingFunction(items: Item[]) {
+    const values = collect (const item of items) {
+        if (!item.included) return "stopped";
+        yield item.value;
+    };
+    values;
+    return "completed";
+}
+
+async function collectAwaited(items: Item[]) {
+    return collect (const item of items) {
+        yield await Promise.resolve(item.value);
+    };
+}
+
 declare function getOptionalItems(): Item[] | null | undefined;
+
+function collectOptionalItemsWithDefault() {
+    return collect (const item of getOptionalItems()) {
+        yield item.value;
+    }!;
+}
 
 function collectOptionalItems() {
     const values = collect (const item of getOptionalItems()) {
@@ -198,6 +241,63 @@ function collectNestedValues(groups) {
     }
     const values = _a;
     return values;
+}
+function stopCollecting(items) {
+    var _a = [];
+    for (const item of items) {
+        if (!item.included)
+            break;
+        _a.push(item.value);
+    }
+    return _a;
+}
+function collectFromNestedLoops(groups) {
+    var _a = [];
+    var _b;
+    for (const items of groups) {
+        for (const item of items) {
+            _a.push(item.value);
+            if ((_b = item.optionalValue) != null)
+                _a.push(_b);
+        }
+    }
+    return _a;
+}
+function collectArrays(values) {
+    var _a = [];
+    for (const value of values) {
+        _a.push(value);
+    }
+    return _a;
+}
+function returnFromContainingFunction(items) {
+    var _a = [];
+    for (const item of items) {
+        if (!item.included)
+            return "stopped";
+        _a.push(item.value);
+    }
+    const values = _a;
+    values;
+    return "completed";
+}
+async function collectAwaited(items) {
+    var _a = [];
+    for (const item of items) {
+        _a.push(await Promise.resolve(item.value));
+    }
+    return _a;
+}
+function collectOptionalItemsWithDefault() {
+    var _a = getOptionalItems();
+    var _b = null;
+    if (_a != null) {
+        _b = [];
+        for (const item of _a) {
+            _b.push(item.value);
+        }
+    }
+    return _b ?? [];
 }
 function collectOptionalItems() {
     var _a = getOptionalItems();

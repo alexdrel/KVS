@@ -2498,6 +2498,15 @@ func (p *Printer) emitArrayLiteralExpressionElement(node *ast.Expression) {
 	p.emitExpression(node, ast.OperatorPrecedenceSpread)
 }
 
+func (p *Printer) emitKvsConditionalElement(node *ast.KvsConditionalElement) {
+	state := p.enterNode(node.AsNode())
+	p.emitPunctuationNode(node.QuestionToken)
+	p.emitPunctuationNode(node.ColonToken)
+	p.writeSpace()
+	p.emitExpression(node.Expression, ast.OperatorPrecedenceAssignment)
+	p.exitNode(node.AsNode(), state)
+}
+
 func (p *Printer) emitArrayLiteralExpression(node *ast.ArrayLiteralExpression) {
 	state := p.enterNode(node.AsNode())
 	p.emitList((*Printer).emitArrayLiteralExpressionElement, node.AsNode(), node.Elements, LFArrayLiteralExpressionElements|core.IfElse(node.MultiLine, LFPreferNewLine, LFNone))
@@ -2506,6 +2515,21 @@ func (p *Printer) emitArrayLiteralExpression(node *ast.ArrayLiteralExpression) {
 
 func (p *Printer) emitObjectLiteralExpression(node *ast.ObjectLiteralExpression) {
 	state := p.enterNode(node.AsNode())
+	indented := p.shouldEmitIndented(node.AsNode())
+	p.increaseIndentIf(indented)
+	p.pushNameGenerationScope(node.AsNode())
+	p.generateAllMemberNames(node.Properties)
+	p.emitList((*Printer).emitObjectLiteralElement, node.AsNode(), node.Properties, LFObjectLiteralExpressionProperties|
+		core.IfElse(node.MultiLine, LFPreferNewLine, LFNone)|
+		core.IfElse(p.shouldAllowTrailingComma(node.AsNode(), node.Properties), LFAllowTrailingComma, LFNone))
+	p.popNameGenerationScope(node.AsNode())
+	p.decreaseIndentIf(indented)
+	p.exitNode(node.AsNode(), state)
+}
+
+func (p *Printer) emitKvsCompactObjectExpression(node *ast.KvsCompactObjectExpression) {
+	state := p.enterNode(node.AsNode())
+	p.emitPunctuationNode(node.QuestionToken)
 	indented := p.shouldEmitIndented(node.AsNode())
 	p.increaseIndentIf(indented)
 	p.pushNameGenerationScope(node.AsNode())
@@ -3328,6 +3352,8 @@ func (p *Printer) emitExpression(node *ast.Expression, precedence ast.OperatorPr
 		p.emitConditionalExpression(node.AsConditionalExpression())
 	case ast.KindKvsNullingExpression:
 		p.emitKvsNullingExpression(node.AsKvsNullingExpression())
+	case ast.KindKvsConditionalElement:
+		p.emitKvsConditionalElement(node.AsKvsConditionalElement())
 	case ast.KindTemplateExpression:
 		p.emitTemplateExpression(node.AsTemplateExpression())
 	case ast.KindYieldExpression:
@@ -3344,6 +3370,8 @@ func (p *Printer) emitExpression(node *ast.Expression, precedence ast.OperatorPr
 		p.emitKvsDefaultExpression(node.AsKvsDefaultExpression())
 	case ast.KindKvsCompactArrayExpression:
 		p.emitKvsCompactArrayExpression(node.AsKvsCompactArrayExpression())
+	case ast.KindKvsCompactObjectExpression:
+		p.emitKvsCompactObjectExpression(node.AsKvsCompactObjectExpression())
 	case ast.KindKvsCollectExpression:
 		p.emitKvsCollectExpression(node.AsKvsCollectExpression())
 	case ast.KindKvsSelectExpression:
@@ -4751,6 +4779,9 @@ func (p *Printer) emitCatchClause(node *ast.CatchClause) {
 func (p *Printer) emitPropertyAssignment(node *ast.PropertyAssignment) {
 	state := p.enterNode(node.AsNode())
 	p.emitPropertyName(node.Name())
+	if ast.IsKvsConditionalObjectProperty(node.AsNode()) {
+		p.emitPunctuationNode(node.PostfixToken)
+	}
 	p.writePunctuation(":")
 	p.writeSpace()
 	// This is to ensure that we emit comment in the following case:
@@ -4771,6 +4802,11 @@ func (p *Printer) emitPropertyAssignment(node *ast.PropertyAssignment) {
 
 func (p *Printer) emitShorthandPropertyAssignment(node *ast.ShorthandPropertyAssignment) {
 	state := p.enterNode(node.AsNode())
+	if ast.IsKvsConditionalObjectProperty(node.AsNode()) {
+		p.emitPunctuationNode(node.PostfixToken)
+		p.writePunctuation(":")
+		p.writeSpace()
+	}
 	p.emitPropertyName(node.Name())
 	if node.ObjectAssignmentInitializer != nil {
 		p.writeSpace()

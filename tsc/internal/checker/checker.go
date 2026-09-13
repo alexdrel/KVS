@@ -7991,7 +7991,9 @@ func (c *Checker) checkExpressionWorker(node *ast.Node, checkMode CheckMode) *Ty
 		return c.checkArrayLiteral(node, checkMode)
 	case ast.KindKvsCompactArrayExpression:
 		return c.checkKvsCompactArrayExpression(node, checkMode)
-	case ast.KindObjectLiteralExpression:
+	case ast.KindKvsConditionalElement:
+		return c.GetNonNullableType(c.checkExpressionForMutableLocation(node.Expression(), checkMode))
+	case ast.KindObjectLiteralExpression, ast.KindKvsCompactObjectExpression:
 		return c.checkObjectLiteral(node, checkMode)
 	case ast.KindPropertyAccessExpression:
 		return c.checkPropertyAccessExpression(node, checkMode, false /*writeOnly*/)
@@ -8307,6 +8309,10 @@ func (c *Checker) checkArrayLiteral(node *ast.Node, checkMode CheckMode) *Type {
 	hasOmittedExpression := false
 	for i, e := range elements {
 		switch {
+		case ast.IsKvsConditionalElement(e):
+			t := c.checkExpressionForMutableLocation(e.Expression(), checkMode)
+			elementTypes[i] = c.GetNonNullableType(t)
+			elementInfos[i] = TupleElementInfo{flags: ElementFlagsRequired}
 		case ast.IsSpreadElement(e):
 			spreadType := c.checkExpressionEx(e.Expression(), checkMode)
 			switch {
@@ -13582,7 +13588,8 @@ func (c *Checker) checkObjectLiteral(node *ast.Node, checkMode CheckMode) *Type 
 	c.checkNodeDeferred(node)
 	inDestructuringPattern := ast.IsAssignmentTarget(node)
 	// Grammar checking
-	c.checkGrammarObjectLiteralExpression(node.AsObjectLiteralExpression(), inDestructuringPattern)
+	c.checkGrammarObjectLiteralExpression(node, inDestructuringPattern)
+	compact := node.Kind == ast.KindKvsCompactObjectExpression
 	var allPropertiesTable ast.SymbolTable
 	if c.strictNullChecks {
 		allPropertiesTable = make(ast.SymbolTable)
@@ -13658,6 +13665,12 @@ func (c *Checker) checkObjectLiteral(node *ast.Node, checkMode CheckMode) *Type 
 			default:
 				t = c.checkObjectLiteralMethod(memberDecl, checkMode)
 			}
+			conditional := ast.IsKvsConditionalObjectProperty(memberDecl)
+			presenceAware := ast.IsPropertyAssignment(memberDecl) || ast.IsShorthandPropertyAssignment(memberDecl)
+			wasNullable := isKvsNullableType(t)
+			if presenceAware && (compact || conditional) && wasNullable {
+				t = c.GetNonNullableType(t)
+			}
 			objectFlags |= t.objectFlags & ObjectFlagsPropagatingFlags
 			var nameType *Type
 			if computedNameType != nil && isTypeUsableAsPropertyName(computedNameType) {
@@ -13687,6 +13700,9 @@ func (c *Checker) checkObjectLiteral(node *ast.Node, checkMode CheckMode) *Type 
 					c.error(memberDecl.Name(), diagnostics.Object_literal_may_only_specify_known_properties_and_0_does_not_exist_in_type_1, c.symbolToString(member), c.TypeToString(contextualType))
 				}
 			}
+			if presenceAware && (compact || conditional) && wasNullable {
+				prop.Flags |= ast.SymbolFlagsOptional
+			}
 			prop.Declarations = member.Declarations
 			prop.Parent = member.Parent
 			prop.ValueDeclaration = member.ValueDeclaration
@@ -13715,6 +13731,9 @@ func (c *Checker) checkObjectLiteral(node *ast.Node, checkMode CheckMode) *Type 
 				hasComputedSymbolProperty = false
 			}
 			t := c.getReducedType(c.checkExpressionEx(memberDecl.Expression(), checkMode&CheckModeInferential))
+			if compact {
+				t = c.getKvsCompactObjectSpreadType(t, inConstContext)
+			}
 			if c.isValidSpreadType(t) {
 				mergedType := c.tryMergeUnionOfObjectTypeAndEmptyObject(t, inConstContext)
 				if allPropertiesTable != nil {
@@ -13778,6 +13797,36 @@ func (c *Checker) checkObjectLiteral(node *ast.Node, checkMode CheckMode) *Type 
 		})
 	}
 	return createObjectLiteralType()
+}
+
+func (c *Checker) getKvsCompactObjectSpreadType(t *Type, readonly bool) *Type {
+	sourceNullable := isKvsNullableType(t)
+	t = c.GetNonNullableType(t)
+	return c.mapType(t, func(part *Type) *Type {
+		if part.flags&TypeFlagsObject == 0 {
+			return part
+		}
+		members := make(ast.SymbolTable)
+		for _, source := range c.getPropertiesOfType(part) {
+			if !c.isSpreadableProperty(source) {
+				continue
+			}
+			sourceType := c.getTypeOfSymbol(source)
+			flags := ast.SymbolFlagsProperty | (source.Flags & ast.SymbolFlagsOptional)
+			if sourceNullable || isKvsNullableType(sourceType) {
+				flags |= ast.SymbolFlagsOptional
+			}
+			prop := c.newSymbolEx(flags, source.Name, source.CheckFlags&ast.CheckFlagsLate|core.IfElse(readonly, ast.CheckFlagsReadonly, 0))
+			links := c.valueSymbolLinks.Get(prop)
+			links.resolvedType = c.GetNonNullableType(sourceType)
+			prop.Declarations = source.Declarations
+			links.nameType = c.valueSymbolLinks.Get(source).nameType
+			members[prop.Name] = prop
+		}
+		result := c.newAnonymousType(part.symbol, members, nil, nil, nil)
+		result.objectFlags |= ObjectFlagsObjectLiteral | ObjectFlagsContainsObjectOrArrayLiteral
+		return result
+	})
 }
 
 func (c *Checker) checkContextualDeprecations(node *ast.Node) {
