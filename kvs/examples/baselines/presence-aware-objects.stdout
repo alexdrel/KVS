@@ -1,0 +1,3 @@
+{ query: 'compiler', exact: false }
+{ page: 0, exact: true, query: 'language' }
+{ query: 'compiler', nextPage: 0 }

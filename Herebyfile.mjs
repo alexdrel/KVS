@@ -1426,12 +1426,12 @@ async function runSmokeTest() {
             .filter(entry => entry.isFile() && entry.name.endsWith(".ts"))
             .map(entry => path.join(group, entry.name))
     ).sort();
-    const expectedBaselines = new Set(examples.map(example => example.replace(/\.ts$/, ".out")));
+    const expectedBaselines = new Set(examples.map(example => example.replace(/\.ts$/, ".stdout")));
     const actualBaselines = groups.flatMap(group => {
         const directory = path.join(baselinesDir, group);
         return fs.existsSync(directory)
             ? fs.readdirSync(directory, { withFileTypes: true })
-                .filter(entry => entry.isFile() && entry.name.endsWith(".out"))
+                .filter(entry => entry.isFile() && entry.name.endsWith(".stdout"))
                 .map(entry => path.join(group, entry.name))
             : [];
     });
@@ -1446,7 +1446,7 @@ async function runSmokeTest() {
             const emitted = path.join(exampleOutputDir, path.basename(example, ".ts") + ".js");
             const result = await runOutput(process.execPath, [emitted]);
             assert.strictEqual(result.stderr, "", `${example} wrote to stderr`);
-            const expected = fs.readFileSync(path.join(baselinesDir, example.replace(/\.ts$/, ".out")), "utf8");
+            const expected = fs.readFileSync(path.join(baselinesDir, example.replace(/\.ts$/, ".stdout")), "utf8");
             assert.strictEqual(result.stdout.replaceAll("\r\n", "\n"), expected.replaceAll("\r\n", "\n"), `${example} output changed`);
         }
     }

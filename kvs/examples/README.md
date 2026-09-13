@@ -11,7 +11,7 @@ compiler. When a goalpost is fully supported, move it to the showcase.
 
 `npx hereby test:smoke` compiles and runs every normal and showcase example.
 Expected stdout is reviewed and accepted manually under `baselines/`; every
-runnable `.ts` file must have a matching `.out` file.
+runnable `.ts` file must have a matching `.stdout` file.
 
 - [Extant operations](extant.ts)
 - [Eager collection](collect.ts)
