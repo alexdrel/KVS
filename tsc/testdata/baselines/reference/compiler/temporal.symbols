@@ -1533,7 +1533,7 @@
 >ZonedDateTime : Symbol(Temporal.ZonedDateTime, Decl(lib.esnext.temporal.d.ts, --, --), Decl(lib.esnext.temporal.d.ts, --, --))
 >from : Symbol(Temporal.ZonedDateTimeConstructor.from, Decl(lib.esnext.temporal.d.ts, --, --))
 
-    `${zdt.era} ${zdt.eraYear}`; // => 'heisei 7'
+    `${zdt.era!} ${zdt.eraYear!}`; // => 'heisei 7'
 >zdt.era : Symbol(Temporal.ZonedDateTime.era, Decl(lib.esnext.temporal.d.ts, --, --))
 >zdt : Symbol(zdt, Decl(temporal.ts, 452, 9))
 >era : Symbol(Temporal.ZonedDateTime.era, Decl(lib.esnext.temporal.d.ts, --, --))

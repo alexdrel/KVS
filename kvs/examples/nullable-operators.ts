@@ -17,7 +17,7 @@ console.log(projectedCapacity(null, 2, 3)); // null
 // Comparisons require their operands to be resolved explicitly.
 function warnIfOverBudget(actual: number?, budget: number?) {
     if (actual! > budget!) {
-        const excess: number = actual - budget;
+        const excess = actual! - budget!;
         console.log(`Over budget by ${excess}`);
     }
 }
@@ -39,3 +39,18 @@ const adjustment = readAdjustment();
 const adjusted = base + adjustment;
 
 console.log(adjusted); // null
+
+// Ordinary interpolation requires a present value; `!` chooses the string
+// default. A tagged template receives nullable substitutions unchanged, so the
+// tag can choose its own absence policy.
+function greet(name: string?) {
+    return `Hello, ${name!}`;
+}
+
+function greetGuest(strings: TemplateStringsArray, name: string?) {
+    return `${strings[0]}${name ?? "anonymous"}${strings[1]}`;
+}
+
+console.log(greet("Ada")); // "Hello, Ada"
+console.log(greet(null)); // "Hello, "
+console.log(greetGuest`Hello, ${null}!`); // "Hello, anonymous!"

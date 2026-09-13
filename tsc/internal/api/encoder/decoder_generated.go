@@ -368,6 +368,18 @@ func (d *astDecoder) createChildrenNode(kind ast.Kind, data uint32, childIndices
 		expression := d.nodeAt(it.nextIf(mask, 1))
 		statement := d.nodeAt(it.nextIf(mask, 2))
 		return d.factory.NewKvsSelectExpression(initializer, expression, statement), nil
+	case ast.KindKvsForExpression:
+		tupleResult := commonData&1 != 0
+		objectResult := commonData&2 != 0
+		forIn := commonData&4 != 0
+		it := newChildIter(childIndices)
+		initializer := d.nodeAt(it.nextIf(mask, 0))
+		condition := d.nodeAt(it.nextIf(mask, 1))
+		incrementor := d.nodeAt(it.nextIf(mask, 2))
+		expression := d.nodeAt(it.nextIf(mask, 3))
+		result := d.nodeAt(it.nextIf(mask, 4))
+		statement := d.nodeAt(it.nextIf(mask, 5))
+		return d.factory.NewKvsForExpression(initializer, condition, incrementor, expression, result, tupleResult, objectResult, forIn, statement), nil
 	case ast.KindLabeledStatement:
 		it := newChildIter(childIndices)
 		label := d.nodeAt(it.nextIf(mask, 0))

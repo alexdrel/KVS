@@ -1,0 +1,328 @@
+//// [tests/cases/conformance/kvs/kvsForExpression.ts] ////
+
+=== kvsForExpression.ts ===
+interface Entry {
+    value: number;
+>value : number
+
+    included: boolean;
+>included : boolean
+}
+
+function explicitScalar(entries: Entry[]) {
+>explicitScalar : (entries: Entry[]) => number
+>entries : Entry[]
+
+    return for (const entry of entries; total = 0) {
+>for (const entry of entries; total = 0) {        if (!entry.included) continue;        total += entry.value;    } : number
+>entry : Entry
+>entries : Entry[]
+>total : number
+>0 : 0
+
+        if (!entry.included) continue;
+>!entry.included : boolean
+>entry.included : boolean
+>entry : Entry
+>included : boolean
+
+        total += entry.value;
+>total += entry.value : number
+>total : number
+>entry.value : number
+>entry : Entry
+>value : number
+
+    };
+}
+
+function implicitScalar(entries: Entry[]) {
+>implicitScalar : (entries: Entry[]) => number
+>entries : Entry[]
+
+    const total = for (entries; total = 0) {
+>total : number
+>for (entries; total = 0) {        total += _.value;    } : number
+>entries : Entry[]
+>total : number
+>0 : 0
+
+        total += _.value;
+>total += _.value : number
+>total : number
+>_.value : number
+>_ : Entry
+>value : number
+
+    };
+    return total;
+>total : number
+}
+
+function cStyle(values: number[]) {
+>cStyle : (values: number[]) => number
+>values : number[]
+
+    return for (let i = 0; i < values.length; i++; total = 0) {
+>for (let i = 0; i < values.length; i++; total = 0) {        total += values[i];    } : number
+>i : number
+>0 : 0
+>i < values.length : boolean
+>i : number
+>values.length : number
+>values : number[]
+>length : number
+>i++ : number
+>i : number
+>total : number
+>0 : 0
+
+        total += values[i];
+>total += values[i] : number
+>total : number
+>values[i] : number
+>values : number[]
+>i : number
+
+    };
+}
+
+function tupleResult(entries: Entry[]) {
+>tupleResult : (entries: Entry[]) => [number, number]
+>entries : Entry[]
+
+    return for (const entry of entries; [count = 0, total = 0]) {
+>for (const entry of entries; [count = 0, total = 0]) {        if (!entry.included) continue;        count++;        total += entry.value;    } : [number, number]
+>entry : Entry
+>entries : Entry[]
+>count : number
+>0 : 0
+>total : number
+>0 : 0
+
+        if (!entry.included) continue;
+>!entry.included : boolean
+>entry.included : boolean
+>entry : Entry
+>included : boolean
+
+        count++;
+>count++ : number
+>count : number
+
+        total += entry.value;
+>total += entry.value : number
+>total : number
+>entry.value : number
+>entry : Entry
+>value : number
+
+    };
+}
+
+function objectResult(entries: Entry[]) {
+>objectResult : (entries: Entry[]) => { count: number; total: number; }
+>entries : Entry[]
+
+    return for (entries; {count = 0, total = 0}) {
+>for (entries; {count = 0, total = 0}) {        if (!_.included) continue;        count++;        total += _.value;    } : { count: number; total: number; }
+>entries : Entry[]
+>count : number
+>0 : 0
+>total : number
+>0 : 0
+
+        if (!_.included) continue;
+>!_.included : boolean
+>_.included : boolean
+>_ : Entry
+>included : boolean
+
+        count++;
+>count++ : number
+>count : number
+
+        total += _.value;
+>total += _.value : number
+>total : number
+>_.value : number
+>_ : Entry
+>value : number
+
+    };
+}
+
+function stopEarly(entries: Entry[]) {
+>stopEarly : (entries: Entry[]) => number
+>entries : Entry[]
+
+    return for (entries; total = 0) {
+>for (entries; total = 0) {        if (!_.included) break;        total += _.value;    } : number
+>entries : Entry[]
+>total : number
+>0 : 0
+
+        if (!_.included) break;
+>!_.included : boolean
+>_.included : boolean
+>_ : Entry
+>included : boolean
+
+        total += _.value;
+>total += _.value : number
+>total : number
+>_.value : number
+>_ : Entry
+>value : number
+
+    };
+}
+
+function containingReturn(entries: Entry[]) {
+>containingReturn : (entries: Entry[]) => string
+>entries : Entry[]
+
+    const total = for (entries; total = 0) {
+>total : number
+>for (entries; total = 0) {        if (_.value < 0) return "negative";        total += _.value;    } : number
+>entries : Entry[]
+>total : number
+>0 : 0
+
+        if (_.value < 0) return "negative";
+>_.value < 0 : boolean
+>_.value : number
+>_ : Entry
+>value : number
+>0 : 0
+>"negative" : "negative"
+
+        total += _.value;
+>total += _.value : number
+>total : number
+>_.value : number
+>_ : Entry
+>value : number
+
+    };
+    total;
+>total : number
+
+    return "complete";
+>"complete" : "complete"
+}
+
+function propertyTail(entries: Entry[]) {
+>propertyTail : (entries: Entry[]) => number
+>entries : Entry[]
+
+    return for (entries; [count = 0, total = 0]) {
+>for (entries; [count = 0, total = 0]) {        count++;        total += _.value;    }[1] : number
+>for (entries; [count = 0, total = 0]) {        count++;        total += _.value;    } : [number, number]
+>entries : Entry[]
+>count : number
+>0 : 0
+>total : number
+>0 : 0
+
+        count++;
+>count++ : number
+>count : number
+
+        total += _.value;
+>total += _.value : number
+>total : number
+>_.value : number
+>_ : Entry
+>value : number
+
+    }[1];
+>1 : 1
+}
+
+function enumerate(input: Record<string, number>) {
+>enumerate : (input: Record<string, number>) => string
+>input : Record<string, number>
+
+    return for (const key in input; keys = "") {
+>for (const key in input; keys = "") {        keys += key;    } : string
+>key : string
+>input : Record<string, number>
+>keys : string
+>"" : ""
+
+        keys += key;
+>keys += key : string
+>keys : string
+>key : string
+
+    };
+}
+
+declare const nullableEntries: Entry[]?;
+>nullableEntries : Entry[] | null | undefined
+
+const nullableSourceTotal = for (nullableEntries; total = 0) {
+>nullableSourceTotal : number
+>for (nullableEntries; total = 0) {    total += _.value;} : number
+>nullableEntries : Entry[] | null | undefined
+>total : number
+>0 : 0
+
+    total += _.value;
+>total += _.value : number
+>total : number
+>_.value : number
+>_ : Entry
+>value : number
+
+};
+
+function explicitNullableSource(entries: Entry[]?) {
+>explicitNullableSource : (entries: Entry[]?) => number
+>entries : Entry[] | null | undefined
+
+    return for (const entry of entries; total = 0) {
+>for (const entry of entries; total = 0) {        total += entry.value;    } : number
+>entry : Entry
+>entries : Entry[] | null | undefined
+>total : number
+>0 : 0
+
+        total += entry.value;
+>total += entry.value : number
+>total : number
+>entry.value : number
+>entry : Entry
+>value : number
+
+    };
+}
+
+const total = 100;
+>total : 100
+>100 : 100
+
+const shadowed = for (const entry of [] as Entry[]; total = 0) {
+>shadowed : number
+>for (const entry of [] as Entry[]; total = 0) {    total += entry.value;} : number
+>entry : Entry
+>[] as Entry[] : Entry[]
+>[] : never[]
+>total : number
+>0 : 0
+
+    total += entry.value;
+>total += entry.value : number
+>total : number
+>entry.value : number
+>entry : Entry
+>value : number
+
+};
+total;
+>total : 100
+
+shadowed;
+>shadowed : number
+

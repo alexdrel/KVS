@@ -373,6 +373,8 @@ func (n *Node) Expression() *Node {
 		return n.AsKvsConditionalElement().Expression
 	case KindKvsSelectExpression:
 		return n.AsKvsSelectExpression().Expression
+	case KindKvsForExpression:
+		return n.AsKvsForExpression().Expression
 	case KindPartiallyEmittedExpression:
 		return n.AsPartiallyEmittedExpression().Expression
 	case KindIfStatement:
@@ -480,6 +482,8 @@ func (m *MutableNode) SetExpression(expr *Node) {
 		n.AsKvsCollectExpression().Expression = expr
 	case KindKvsSelectExpression:
 		n.AsKvsSelectExpression().Expression = expr
+	case KindKvsForExpression:
+		n.AsKvsForExpression().Expression = expr
 	case KindPartiallyEmittedExpression:
 		n.AsPartiallyEmittedExpression().Expression = expr
 	case KindIfStatement:
@@ -829,6 +833,8 @@ func (n *Node) Initializer() *Node {
 		return n.AsKvsCollectExpression().Initializer
 	case KindKvsSelectExpression:
 		return n.AsKvsSelectExpression().Initializer
+	case KindKvsForExpression:
+		return n.AsKvsForExpression().Initializer
 	case KindJsxAttribute:
 		return n.AsJsxAttribute().Initializer
 	}
@@ -860,6 +866,8 @@ func (m *MutableNode) SetInitializer(initializer *Node) {
 		n.AsKvsCollectExpression().Initializer = initializer
 	case KindKvsSelectExpression:
 		n.AsKvsSelectExpression().Initializer = initializer
+	case KindKvsForExpression:
+		n.AsKvsForExpression().Initializer = initializer
 	case KindJsxAttribute:
 		n.AsJsxAttribute().Initializer = initializer
 	default:
@@ -1086,6 +1094,8 @@ func (n *Node) Statement() *Statement {
 		return n.AsKvsCollectExpression().Statement
 	case KindKvsSelectExpression:
 		return n.AsKvsSelectExpression().Statement
+	case KindKvsForExpression:
+		return n.AsKvsForExpression().Statement
 	case KindWithStatement:
 		return n.AsWithStatement().Statement
 	case KindLabeledStatement:

@@ -117,11 +117,14 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 		if tx.resolver.IsKvsLiftedBinaryExpression(node) {
 			return tx.transformLiftedBinaryExpression(node.AsBinaryExpression())
 		}
-	case ast.KindKvsCollectExpression, ast.KindKvsSelectExpression:
+	case ast.KindKvsCollectExpression, ast.KindKvsSelectExpression, ast.KindKvsForExpression:
 		// Unsupported placements are diagnosed by the checker. Emit an empty
 		// recovery value instead of leaking KVS syntax into later transformers.
 		if node.Kind == ast.KindKvsSelectExpression {
 			return tx.Factory().NewKeywordExpression(ast.KindNullKeyword)
+		}
+		if node.Kind == ast.KindKvsForExpression {
+			return tx.Factory().NewIdentifier("undefined")
 		}
 		return tx.Factory().NewArrayLiteralExpression(nil, false)
 	}
@@ -478,7 +481,7 @@ func (tx *transformer) transformNullingExpression(node *ast.KvsNullingExpression
 }
 
 func isKvsProducer(node *ast.Node) bool {
-	return node != nil && (node.Kind == ast.KindKvsCollectExpression || node.Kind == ast.KindKvsSelectExpression)
+	return node != nil && (node.Kind == ast.KindKvsCollectExpression || node.Kind == ast.KindKvsSelectExpression || node.Kind == ast.KindKvsForExpression)
 }
 
 func (tx *transformer) transformProducerExpressionStatement(node *ast.ExpressionStatement) *ast.Node {
@@ -557,6 +560,9 @@ func (tx *transformer) lowerHeadProducers(root *ast.Expression, continuation fun
 }
 
 func (tx *transformer) lowerProducer(producer *ast.Node, continuation func(*ast.Expression) *ast.Node) *ast.Node {
+	if producer.Kind == ast.KindKvsForExpression {
+		return tx.lowerKvsFor(producer.AsKvsForExpression(), continuation)
+	}
 	// Lower the common producer shape
 	//
 	//     collect/select (const item of source) { body }
@@ -656,6 +662,86 @@ func (tx *transformer) lowerProducer(producer *ast.Node, continuation func(*ast.
 	return factory.NewSyntaxList(statements)
 }
 
+func (tx *transformer) lowerKvsFor(producer *ast.KvsForExpression, continuation func(*ast.Expression) *ast.Node) *ast.Node {
+	factory := tx.Factory()
+	carrier := factory.NewTempVariable()
+	carrierDeclaration := factory.NewVariableDeclaration(carrier, nil, nil, nil)
+	carrierStatement := factory.NewVariableStatement(nil, factory.NewVariableDeclarationList(
+		factory.NewNodeList([]*ast.Node{carrierDeclaration}), ast.NodeFlagsNone,
+	))
+
+	resultList := tx.Visitor().VisitNode(producer.Result)
+	resultStatement := factory.NewVariableStatement(nil, resultList)
+	body := tx.Visitor().VisitNode(producer.Statement)
+	blockStatements := []*ast.Node{resultStatement}
+
+	var loop *ast.Node
+	if producer.Expression != nil {
+		nullableSource := !producer.ForIn && tx.resolver.IsKvsNullableIterableSource(producer.Expression)
+		source := tx.Visitor().VisitNode(producer.Expression)
+		if producer.Flags&ast.NodeFlagsKvsImplicitSubject != 0 && containsImplicitSubjectReference(producer.Expression) {
+			sourceTemp := factory.NewTempVariable()
+			sourceDeclaration := factory.NewVariableDeclaration(sourceTemp, nil, nil, source)
+			blockStatements = append(blockStatements, factory.NewVariableStatement(nil, factory.NewVariableDeclarationList(
+				factory.NewNodeList([]*ast.Node{sourceDeclaration}), ast.NodeFlagsConst,
+			)))
+			source = sourceTemp
+		}
+		if nullableSource {
+			source = factory.NewBinaryExpression(nil, source, nil, factory.NewToken(ast.KindQuestionQuestionToken), factory.NewArrayLiteralExpression(nil, false))
+		}
+		kind := ast.KindForOfStatement
+		if producer.ForIn {
+			kind = ast.KindForInStatement
+		}
+		loop = factory.NewForInOrOfStatement(
+			kind,
+			nil,
+			tx.transformIterationInitializer(producer.Initializer, producer.Flags&ast.NodeFlagsKvsImplicitSubject != 0),
+			source,
+			body,
+		)
+	} else {
+		loop = factory.NewForStatement(
+			tx.Visitor().VisitNode(producer.Initializer),
+			tx.Visitor().VisitNode(producer.Condition),
+			tx.Visitor().VisitNode(producer.Incrementor),
+			body,
+		)
+	}
+	blockStatements = append(blockStatements, loop)
+
+	declarations := producer.Result.AsVariableDeclarationList().Declarations.Nodes
+	var value *ast.Node
+	if producer.TupleResult {
+		elements := make([]*ast.Node, 0, len(declarations))
+		for _, declaration := range declarations {
+			elements = append(elements, factory.NewIdentifier(declaration.Name().Text()))
+		}
+		value = factory.NewArrayLiteralExpression(factory.NewNodeList(elements), false)
+	} else if producer.ObjectResult {
+		properties := make([]*ast.Node, 0, len(declarations))
+		for _, declaration := range declarations {
+			name := factory.NewIdentifier(declaration.Name().Text())
+			properties = append(properties, factory.NewShorthandPropertyAssignment(nil, name, nil, nil, nil, nil))
+		}
+		value = factory.NewObjectLiteralExpression(factory.NewNodeList(properties), false)
+	} else {
+		value = factory.NewIdentifier(declarations[0].Name().Text())
+	}
+	blockStatements = append(blockStatements, factory.NewExpressionStatement(factory.NewAssignmentExpression(carrier, value)))
+	block := factory.NewBlock(factory.NewNodeList(blockStatements), true)
+
+	continued := continuation(carrier)
+	statements := []*ast.Node{carrierStatement, block}
+	if continued.Kind == ast.KindSyntaxList {
+		statements = append(statements, continued.AsSyntaxList().Children...)
+	} else {
+		statements = append(statements, continued)
+	}
+	return factory.NewSyntaxList(statements)
+}
+
 func selectNeedsLabel(statement *ast.Node) bool {
 	// An unlabeled break is sufficient for a yield directly inside select's
 	// generated loop. A yield beneath another loop or switch must instead break
@@ -663,7 +749,7 @@ func selectNeedsLabel(statement *ast.Node) bool {
 	// their yields belong to a different control-flow scope.
 	var visit func(*ast.Node, bool) bool
 	visit = func(node *ast.Node, beneathBreakTarget bool) bool {
-		if node == nil || ast.IsFunctionLike(node) || isKvsProducer(node) {
+		if node == nil || ast.IsFunctionLike(node) || node.Kind == ast.KindKvsCollectExpression || node.Kind == ast.KindKvsSelectExpression {
 			return false
 		}
 		if node.Kind == ast.KindKvsYieldStatement || node.Kind == ast.KindKvsExtantYieldStatement {

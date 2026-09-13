@@ -204,7 +204,18 @@ computed names, and spreads consequently run later than their final semantics
 require. These are implementation limitations, not changes to language
 evaluation order.
 
-For an expression-valued `for`, the final header slot lowers to mutable bindings initialized before iteration. Normal completion and bare `break` produce their current state. Scalar, bracketed, and braced result declarations lower to a scalar, tuple, or object respectively; result shape is never inferred merely from the number of bindings.
+For an expression-valued `for`, the final header slot lowers to block-scoped
+mutable bindings initialized before the ordinary `for`, `for...of`, or
+`for...in` loop. Normal completion and bare `break` produce their current
+state. Scalar, bracketed, and braced result declarations lower to a scalar,
+tuple, or object respectively; result shape is never inferred merely from the
+number of bindings. A generated carrier moves that result across the block
+boundary into the surrounding value expression without exposing the authored
+bindings.
+
+Header expressions are evaluated once. KVS code should not use effects to
+depend on their relative evaluation order; the straightforward lowering
+initializes result state before beginning the ordinary loop.
 
 ## Path materialization
 

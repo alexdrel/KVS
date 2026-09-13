@@ -160,6 +160,7 @@ import type {
     KvsExtantTestExpression,
     KvsExtantType,
     KvsExtantYieldStatement,
+    KvsForExpression,
     KvsIfBindingClause,
     KvsIfBindingStatement,
     KvsNullableAssertionExpression,
@@ -439,6 +440,9 @@ export class NodeObject {
     get finallyBlock(): any {
         return this._data?.finallyBlock;
     }
+    get forIn(): any {
+        return this._data?.forIn;
+    }
     get head(): any {
         return this._data?.head;
     }
@@ -544,6 +548,9 @@ export class NodeObject {
     get objectAssignmentInitializer(): any {
         return this._data?.objectAssignmentInitializer;
     }
+    get objectResult(): any {
+        return this._data?.objectResult;
+    }
     get objectType(): any {
         return this._data?.objectType;
     }
@@ -603,6 +610,9 @@ export class NodeObject {
     }
     get referencedFiles(): any {
         return this._data?.referencedFiles;
+    }
+    get result(): any {
+        return this._data?.result;
     }
     get right(): any {
         return this._data?.right;
@@ -666,6 +676,9 @@ export class NodeObject {
     }
     get tupleNameSource(): any {
         return this._data?.tupleNameSource;
+    }
+    get tupleResult(): any {
+        return this._data?.tupleResult;
     }
     get type(): any {
         return this._data?.type;
@@ -864,6 +877,8 @@ function cloneNodeData(node: Node): any {
             return { initializer: n.initializer, expression: n.expression, statement: n.statement };
         case SyntaxKind.KvsSelectExpression:
             return { initializer: n.initializer, expression: n.expression, statement: n.statement };
+        case SyntaxKind.KvsForExpression:
+            return { initializer: n.initializer, condition: n.condition, incrementor: n.incrementor, expression: n.expression, result: n.result, tupleResult: n.tupleResult, objectResult: n.objectResult, forIn: n.forIn, statement: n.statement };
         case SyntaxKind.LabeledStatement:
             return { label: n.label, statement: n.statement };
         case SyntaxKind.ExpressionStatement:
@@ -1292,6 +1307,13 @@ const forEachChildTable: Record<number, ForEachChildFunction> = {
     [SyntaxKind.KvsSelectExpression]: (data, cbNode, cbNodes) =>
         visitNode(cbNode, data.initializer) ||
         visitNode(cbNode, data.expression) ||
+        visitNode(cbNode, data.statement),
+    [SyntaxKind.KvsForExpression]: (data, cbNode, cbNodes) =>
+        visitNode(cbNode, data.initializer) ||
+        visitNode(cbNode, data.condition) ||
+        visitNode(cbNode, data.incrementor) ||
+        visitNode(cbNode, data.expression) ||
+        visitNode(cbNode, data.result) ||
         visitNode(cbNode, data.statement),
     [SyntaxKind.LabeledStatement]: (data, cbNode, cbNodes) =>
         visitNode(cbNode, data.label) ||
@@ -2062,6 +2084,20 @@ export function createKvsSelectExpression(initializer: ForInitializer, expressio
         expression,
         statement,
     }) as unknown as KvsSelectExpression;
+}
+
+export function createKvsForExpression(initializer: ForInitializer | undefined, condition: Expression | undefined, incrementor: Expression | undefined, expression: Expression | undefined, result: VariableDeclarationList, tupleResult: boolean = false, objectResult: boolean = false, forIn: boolean = false, statement: Statement): KvsForExpression {
+    return new NodeObject(SyntaxKind.KvsForExpression, {
+        initializer,
+        condition,
+        incrementor,
+        expression,
+        result,
+        tupleResult,
+        objectResult,
+        forIn,
+        statement,
+    }) as unknown as KvsForExpression;
 }
 
 export function createLabeledStatement(label: Identifier, statement: Statement): LabeledStatement {
@@ -3520,6 +3556,10 @@ export function updateKvsCollectExpression(node: KvsCollectExpression, initializ
 
 export function updateKvsSelectExpression(node: KvsSelectExpression, initializer: ForInitializer, expression: Expression, statement: Statement): KvsSelectExpression {
     return node.initializer !== initializer || node.expression !== expression || node.statement !== statement ? createKvsSelectExpression(initializer, expression, statement) : node;
+}
+
+export function updateKvsForExpression(node: KvsForExpression, initializer: ForInitializer | undefined, condition: Expression | undefined, incrementor: Expression | undefined, expression: Expression | undefined, result: VariableDeclarationList, statement: Statement): KvsForExpression {
+    return node.initializer !== initializer || node.condition !== condition || node.incrementor !== incrementor || node.expression !== expression || node.result !== result || node.statement !== statement ? createKvsForExpression(initializer, condition, incrementor, expression, result, node.tupleResult, node.objectResult, node.forIn, statement) : node;
 }
 
 export function updateLabeledStatement(node: LabeledStatement, label: Identifier, statement: Statement): LabeledStatement {

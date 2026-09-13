@@ -56,6 +56,11 @@ numeric and string addition are rejected. Resolve a nullable string explicitly;
 for example, `"Hello, " + name!` uses the string default `""` when `name` is
 absent.
 
+Ordinary template interpolation likewise requires present values. Resolve
+absence explicitly before interpolation, for example `` `Hello ${name!}` ``.
+Tagged templates accept nullable substitutions because the tag defines how
+each substitution is interpreted.
+
 The relational operators `<`, `<=`, `>`, and `>=` do not lift. Nullable
 operands are errors and must be resolved explicitly before comparison. Their
 result remains ordinary binary `boolean`; KVS does not introduce a nullable

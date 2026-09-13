@@ -670,6 +670,18 @@ export interface KvsSelectExpression extends ExpressionBase {
     readonly expression: Expression;
     readonly statement: Statement;
 }
+export interface KvsForExpression extends ExpressionBase {
+    readonly kind: SyntaxKind.KvsForExpression;
+    readonly initializer?: ForInitializer;
+    readonly condition?: Expression;
+    readonly incrementor?: Expression;
+    readonly expression?: Expression;
+    readonly result: VariableDeclarationList;
+    readonly tupleResult: boolean;
+    readonly objectResult: boolean;
+    readonly forIn: boolean;
+    readonly statement: Statement;
+}
 export interface LabeledStatement extends StatementBase {
     readonly kind: SyntaxKind.LabeledStatement;
     readonly label: Identifier;

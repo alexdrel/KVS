@@ -142,6 +142,7 @@ export function isExpression(node: Node): node is Expression {
         || kind === SyntaxKind.KvsNullingExpression
         || kind === SyntaxKind.KvsCollectExpression
         || kind === SyntaxKind.KvsSelectExpression
+        || kind === SyntaxKind.KvsForExpression
         || kind === SyntaxKind.YieldExpression
         || kind === SyntaxKind.ArrowFunction || kind === SyntaxKind.BinaryExpression
         || kind === SyntaxKind.SpreadElement || kind === SyntaxKind.AsExpression

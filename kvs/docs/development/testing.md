@@ -16,13 +16,16 @@ npx hereby test:api
 # Go benchmarks, including parse and formatter/printer paths
 go -C ./tsc test -run=- -bench=. -benchtime=1x ./...
 
-# Compile the compiler-sized fixture through both checker modes
-./built/local/tsc -p ./tsc/testdata/fixtures/compiler --noEmit --singleThreaded
-./built/local/tsc -p ./tsc/testdata/fixtures/compiler --noEmit
+# Compile and run every normal and showcase KVS example, checking stdout
+npx hereby test:smoke
 ```
 
-Build `built/local/tsc` from the current worktree before the smoke commands.
-These checks complement the normal baseline suite; they do not replace it.
+`test:smoke` builds the compiler, discovers every `.ts` file directly under
+`kvs/examples/` and `kvs/examples/showcase/`, compiles each independently, and
+checks its stdout against the corresponding file under
+`kvs/examples/baselines/`. Baseline changes are reviewed and accepted manually.
+Goalposts are deliberately outside this runnable set. These checks complement
+the normal compiler baseline suite; they do not replace it.
 
 ## Native compiler tests
 
@@ -148,6 +151,25 @@ Run it with:
 
 ```sh
 go -C ./tsc test -run='TestLocal/kvsSelect' ./internal/testrunner
+```
+
+## Expression-valued `for` slice
+
+`kvsForExpression.ts` covers synchronous explicit and implicit `for...of`,
+explicit `for...in`, and C-style loops. Scalar, tuple, and object result cases
+verify inferred result types and block-scoped mutable bindings. Control-flow
+cases cover `continue`, bare `break`, no-iteration initial state, and ordinary
+containing-function `return`; a head-tail case exercises tuple indexing after
+the loop producer. Nullable explicit and implicit sources verify zero-iteration
+initial-state results.
+
+The JavaScript baseline verifies the single carrier temporary, block-local
+authored bindings, ordinary loop forms, and final scalar/array/object transfer.
+
+Run it with:
+
+```sh
+go -C ./tsc test -run='TestLocal/kvsForExpression' ./internal/testrunner
 ```
 
 ## Nullable ordinary-iteration slice
@@ -292,8 +314,9 @@ go -C ./tsc test -run='TestLocal/kvsDefault' ./internal/testrunner
 nested propagation. Its JavaScript baseline verifies
 left-to-right evaluation, once-only captures, early absence propagation, and
 unchanged emission for non-nullable arithmetic and strict identity. Nullable
-string concatenation, relational, bitwise, and compound-assignment cases fence
-the unsupported boundary.
+string concatenation, ordinary interpolation, relational, bitwise, and
+compound-assignment cases fence the unsupported boundary. A tagged template
+case verifies that tags continue to receive nullable substitutions.
 
 Run it with:
 

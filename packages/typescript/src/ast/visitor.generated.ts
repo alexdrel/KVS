@@ -116,6 +116,7 @@ import type {
     KvsExtantTestExpression,
     KvsExtantType,
     KvsExtantYieldStatement,
+    KvsForExpression,
     KvsIfBindingClause,
     KvsIfBindingStatement,
     KvsNullableAssertionExpression,
@@ -308,6 +309,7 @@ import {
     updateKvsExtantTestExpression,
     updateKvsExtantType,
     updateKvsExtantYieldStatement,
+    updateKvsForExpression,
     updateKvsIfBindingClause,
     updateKvsIfBindingStatement,
     updateKvsNullableAssertionExpression,
@@ -710,6 +712,15 @@ const visitEachChildTable: Record<number, VisitEachChildFunction> = {
         const _expression = visitNode(node.expression, visitor, isExpression);
         const _statement = visitNode(node.statement, visitor, isStatement);
         return updateKvsSelectExpression(node, _initializer, _expression, _statement);
+    },
+    [SyntaxKind.KvsForExpression]: (node: KvsForExpression, visitor: Visitor): KvsForExpression => {
+        const _initializer = visitNode(node.initializer, visitor, isForInitializer);
+        const _condition = visitNode(node.condition, visitor, isExpression);
+        const _incrementor = visitNode(node.incrementor, visitor, isExpression);
+        const _expression = visitNode(node.expression, visitor, isExpression);
+        const _result = visitNode(node.result, visitor, isVariableDeclarationList);
+        const _statement = visitNode(node.statement, visitor, isStatement);
+        return updateKvsForExpression(node, _initializer, _condition, _incrementor, _expression, _result, _statement);
     },
     [SyntaxKind.LabeledStatement]: (node: LabeledStatement, visitor: Visitor): LabeledStatement => {
         const _label = visitNode(node.label, visitor, isIdentifier);

@@ -449,6 +449,7 @@ func isExpressionKind(kind Kind) bool {
 		KindKvsCompactObjectExpression,
 		KindKvsCollectExpression,
 		KindKvsSelectExpression,
+		KindKvsForExpression,
 		KindYieldExpression,
 		KindArrowFunction,
 		KindBinaryExpression,
@@ -482,6 +483,7 @@ func IsIterationStatement(node *Node, lookInLabeledStatements bool) bool {
 		KindForOfStatement,
 		KindKvsCollectExpression,
 		KindKvsSelectExpression,
+		KindKvsForExpression,
 		KindDoStatement,
 		KindWhileStatement:
 		return true
@@ -2022,7 +2024,7 @@ func IsExpressionNode(node *Node) bool {
 		KindClassExpression, KindArrowFunction, KindVoidExpression, KindDeleteExpression, KindTypeOfExpression,
 		KindPrefixUnaryExpression, KindPostfixUnaryExpression, KindBinaryExpression, KindConditionalExpression, KindKvsExtantTestExpression, KindKvsDefaultExpression, KindKvsNullingExpression, KindKvsConditionalElement,
 		KindSpreadElement, KindTemplateExpression, KindOmittedExpression, KindJsxElement, KindJsxSelfClosingElement,
-		KindJsxFragment, KindYieldExpression, KindKvsNullableAssertionExpression, KindKvsExtantAssertionExpression, KindKvsExtantAssignmentExpression, KindKvsCollectExpression, KindKvsSelectExpression, KindAwaitExpression:
+		KindJsxFragment, KindYieldExpression, KindKvsNullableAssertionExpression, KindKvsExtantAssertionExpression, KindKvsExtantAssignmentExpression, KindKvsCollectExpression, KindKvsSelectExpression, KindKvsForExpression, KindAwaitExpression:
 		return true
 	case KindMetaProperty:
 		// `import.defer` in `import.defer(...)` is not an expression
@@ -2121,7 +2123,7 @@ func IsInExpressionContext(node *Node) bool {
 	case KindForStatement:
 		s := parent.AsForStatement()
 		return s.Initializer == node && s.Initializer.Kind != KindVariableDeclarationList || s.Condition == node || s.Incrementor == node
-	case KindForInStatement, KindForOfStatement, KindKvsCollectExpression, KindKvsSelectExpression:
+	case KindForInStatement, KindForOfStatement, KindKvsCollectExpression, KindKvsSelectExpression, KindKvsForExpression:
 		if parent.Kind == KindKvsCollectExpression {
 			s := parent.AsKvsCollectExpression()
 			return s.Initializer == node && s.Initializer.Kind != KindVariableDeclarationList || s.Expression == node
@@ -2129,6 +2131,10 @@ func IsInExpressionContext(node *Node) bool {
 		if parent.Kind == KindKvsSelectExpression {
 			s := parent.AsKvsSelectExpression()
 			return s.Initializer == node && s.Initializer.Kind != KindVariableDeclarationList || s.Expression == node
+		}
+		if parent.Kind == KindKvsForExpression {
+			s := parent.AsKvsForExpression()
+			return s.Initializer == node && s.Initializer.Kind != KindVariableDeclarationList || s.Expression == node || s.Condition == node || s.Incrementor == node
 		}
 		s := parent.AsForInOrOfStatement()
 		return s.Initializer == node && s.Initializer.Kind != KindVariableDeclarationList || s.Expression == node

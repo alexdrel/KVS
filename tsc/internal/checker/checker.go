@@ -2111,7 +2111,7 @@ func (c *Checker) isUsedInFunctionOrInstanceProperty(usage *ast.Node, declaratio
 
 func isImmediatelyUsedInInitializerOfBlockScopedVariable(declaration *ast.Node, usage *ast.Node, declContainer *ast.Node) bool {
 	switch declaration.Parent.Parent.Kind {
-	case ast.KindVariableStatement, ast.KindForStatement, ast.KindForOfStatement, ast.KindKvsCollectExpression, ast.KindKvsSelectExpression:
+	case ast.KindVariableStatement, ast.KindForStatement, ast.KindForOfStatement, ast.KindKvsCollectExpression, ast.KindKvsSelectExpression, ast.KindKvsForExpression:
 		// variable statement/for/for-of statement case,
 		// use site should not be inside variable declaration (initializer of declaration or binding element)
 		if isSameScopeDescendentOf(usage, declaration, declContainer) {
@@ -2120,7 +2120,7 @@ func isImmediatelyUsedInInitializerOfBlockScopedVariable(declaration *ast.Node, 
 	}
 	// ForIn/ForOf case - use site should not be used in expression part
 	grandparent := declaration.Parent.Parent
-	return (ast.IsForInOrOfStatement(grandparent) || grandparent.Kind == ast.KindKvsCollectExpression || grandparent.Kind == ast.KindKvsSelectExpression) && isSameScopeDescendentOf(usage, grandparent.Expression(), declContainer)
+	return (ast.IsForInOrOfStatement(grandparent) || grandparent.Kind == ast.KindKvsCollectExpression || grandparent.Kind == ast.KindKvsSelectExpression || grandparent.Kind == ast.KindKvsForExpression) && isSameScopeDescendentOf(usage, grandparent.Expression(), declContainer)
 }
 
 // Starting from 'initial' node walk up the parent chain until 'stopAt' node is reached.
@@ -7278,7 +7278,7 @@ func (c *Checker) checkUnusedIdentifiers(potentiallyUnusedIdentifiers []*ast.Nod
 			c.checkUnusedClassMembers(node)
 			c.checkUnusedTypeParameters(node)
 		case ast.KindSourceFile, ast.KindModuleDeclaration, ast.KindBlock, ast.KindCaseBlock, ast.KindKvsIfBindingClause, ast.KindForStatement, ast.KindForInStatement,
-			ast.KindForOfStatement, ast.KindKvsCollectExpression, ast.KindKvsSelectExpression:
+			ast.KindForOfStatement, ast.KindKvsCollectExpression, ast.KindKvsSelectExpression, ast.KindKvsForExpression:
 			c.checkUnusedLocalsAndParameters(node)
 		case ast.KindConstructor, ast.KindFunctionExpression, ast.KindFunctionDeclaration, ast.KindArrowFunction, ast.KindMethodDeclaration,
 			ast.KindGetAccessor, ast.KindSetAccessor:
@@ -7465,7 +7465,7 @@ func (c *Checker) isUnreferencedVariableDeclaration(node *ast.Node) bool {
 		}
 	}
 	if (ast.IsParameterDeclaration(node) ||
-		ast.IsVariableDeclaration(node) && (ast.IsForInOrOfStatement(node.Parent.Parent) || node.Parent.Parent.Kind == ast.KindKvsCollectExpression || node.Parent.Parent.Kind == ast.KindKvsSelectExpression || c.getCombinedNodeFlagsCached(node)&ast.NodeFlagsUsing != 0) ||
+		ast.IsVariableDeclaration(node) && (ast.IsForInOrOfStatement(node.Parent.Parent) || node.Parent.Parent.Kind == ast.KindKvsCollectExpression || node.Parent.Parent.Kind == ast.KindKvsSelectExpression || node.Parent.Parent.Kind == ast.KindKvsForExpression || c.getCombinedNodeFlagsCached(node)&ast.NodeFlagsUsing != 0) ||
 		ast.IsBindingElement(node) && !(ast.IsObjectBindingPattern(node.Parent) && node.PropertyName() == nil)) &&
 		isIdentifierThatStartsWithUnderscore(name) {
 		return false
@@ -8065,6 +8065,8 @@ func (c *Checker) checkExpressionWorker(node *ast.Node, checkMode CheckMode) *Ty
 		return c.checkKvsCollectExpression(node)
 	case ast.KindKvsSelectExpression:
 		return c.checkKvsSelectExpression(node)
+	case ast.KindKvsForExpression:
+		return c.checkKvsForExpression(node)
 	case ast.KindSyntheticExpression:
 		return c.checkSyntheticExpression(node)
 	case ast.KindJsxExpression:
@@ -8258,6 +8260,9 @@ func (c *Checker) checkTemplateExpression(node *ast.Node) *Type {
 	texts[0] = expr.Head.Text()
 	for i, span := range expr.TemplateSpans.Nodes {
 		t := c.checkExpression(span.Expression())
+		if !ast.IsTaggedTemplateExpression(node.Parent) && isKvsNullableType(t) {
+			c.error(span.Expression(), diagnostics.KVS_template_interpolation_does_not_accept_nullable_values_resolve_absence_explicitly)
+		}
 		if c.maybeTypeOfKindConsideringBaseConstraint(t, TypeFlagsESSymbolLike) {
 			c.error(span.Expression(), diagnostics.Implicit_conversion_of_a_symbol_to_a_string_will_fail_at_runtime_Consider_wrapping_this_expression_in_String)
 		}
@@ -11480,7 +11485,7 @@ func (c *Checker) checkIdentifier(node *ast.Node, checkMode CheckMode) *Type {
 	// We only look for uninitialized variables in strict null checking mode, and only when we can analyze
 	// the entire control flow graph from the variable's declaration (i.e. when the flow container and
 	// declaration container are the same).
-	isNeverInitialized := immediateDeclaration != nil && ast.IsVariableDeclaration(immediateDeclaration) && !ast.IsForInOrOfStatement(immediateDeclaration.Parent.Parent) && immediateDeclaration.Parent.Parent.Kind != ast.KindKvsCollectExpression && immediateDeclaration.Parent.Parent.Kind != ast.KindKvsSelectExpression &&
+	isNeverInitialized := immediateDeclaration != nil && ast.IsVariableDeclaration(immediateDeclaration) && !ast.IsForInOrOfStatement(immediateDeclaration.Parent.Parent) && immediateDeclaration.Parent.Parent.Kind != ast.KindKvsCollectExpression && immediateDeclaration.Parent.Parent.Kind != ast.KindKvsSelectExpression && immediateDeclaration.Parent.Parent.Kind != ast.KindKvsForExpression &&
 		immediateDeclaration.Initializer() == nil && immediateDeclaration.AsVariableDeclaration().ExclamationToken == nil &&
 		c.isMutableLocalVariableDeclaration(immediateDeclaration) && !c.isSymbolAssignedDefinitely(symbol)
 	assumeInitialized := isParameter ||
@@ -13385,6 +13390,7 @@ func (c *Checker) getSyntacticNullishnessSemantics(node *ast.Node) PredicateSema
 		ast.KindYieldExpression,
 		ast.KindKvsCollectExpression,
 		ast.KindKvsSelectExpression,
+		ast.KindKvsForExpression,
 		ast.KindThisKeyword:
 		return PredicateSemanticsSometimes
 	case ast.KindBinaryExpression:
@@ -17254,6 +17260,19 @@ func (c *Checker) getTypeForVariableLikeDeclaration(declaration *ast.Node, inclu
 			// [Symbol.iterator] or next). This may be because we accessed properties from anyType,
 			// or it may have led to an error inside getElementTypeOfIterable.
 			return c.checkRightHandSideOfForOf(grandParent)
+		case ast.KindKvsForExpression:
+			loop := grandParent.AsKvsForExpression()
+			if loop.Expression != nil && declaration.Parent == loop.Initializer {
+				if loop.ForIn {
+					sourceType := c.checkNonNullType(c.checkExpressionEx(loop.Expression, checkMode), loop.Expression)
+					indexType := c.getIndexType(sourceType)
+					if indexType.flags&(TypeFlagsTypeParameter|TypeFlagsIndex) != 0 {
+						return c.getExtractStringType(indexType)
+					}
+					return c.stringType
+				}
+				return c.checkRightHandSideOfForOf(grandParent)
+			}
 		}
 	} else if ast.IsBindingElement(declaration) {
 		return c.getTypeForBindingElement(declaration)
@@ -18289,6 +18308,14 @@ func (c *Checker) checkRightHandSideOfForOf(statement *ast.Node) *Type {
 		use = IterationUseForAwaitOf
 	}
 	sourceType := c.checkExpression(statement.Expression())
+	if statement.Kind == ast.KindKvsForExpression {
+		absenceOnly := c.isKvsAbsenceOnlyType(sourceType)
+		sourceType = c.GetNonNullableType(sourceType)
+		if absenceOnly {
+			return sourceType
+		}
+		return c.checkIteratedTypeOrElementType(use, sourceType, c.undefinedType, statement.Expression())
+	}
 	if use == IterationUseForOf {
 		absenceOnly := c.isKvsAbsenceOnlyType(sourceType)
 		sourceType = c.GetNonNullableType(sourceType)
@@ -18313,6 +18340,83 @@ func (c *Checker) checkKvsCollectExpression(node *ast.Node) *Type {
 func (c *Checker) checkKvsSelectExpression(node *ast.Node) *Type {
 	data := node.AsKvsSelectExpression()
 	return c.checkKvsProducerExpression(node, data.Initializer, data.Expression, data.Statement, true)
+}
+
+func (c *Checker) checkKvsForExpression(node *ast.Node) *Type {
+	data := node.AsKvsForExpression()
+	if !ast.IsKvsProducerHeadPosition(node) {
+		c.error(node, diagnostics.KVS_expression_valued_for_must_be_at_the_head_of_a_supported_value_expression)
+	}
+	c.checkVariableDeclarationList(data.Result)
+	if data.Expression != nil {
+		if data.ForIn {
+			rightType := c.checkNonNullType(c.checkExpression(data.Expression), data.Expression)
+			if ast.IsVariableDeclarationList(data.Initializer) {
+				c.checkVariableDeclarationList(data.Initializer)
+			} else {
+				leftType := c.checkExpression(data.Initializer)
+				if !c.isTypeAssignableTo(c.getIndexTypeOrString(rightType), leftType) {
+					c.error(data.Initializer, diagnostics.The_left_hand_side_of_a_for_in_statement_must_be_of_type_string_or_any)
+				} else {
+					c.checkReferenceExpression(data.Initializer, diagnostics.The_left_hand_side_of_a_for_in_statement_must_be_a_variable_or_a_property_access, diagnostics.The_left_hand_side_of_a_for_in_statement_may_not_be_an_optional_property_access)
+				}
+			}
+			if rightType == c.neverType || !c.isTypeAssignableToKind(rightType, TypeFlagsNonPrimitive|TypeFlagsInstantiableNonPrimitive) {
+				c.error(data.Expression, diagnostics.The_right_hand_side_of_a_for_in_statement_must_be_of_type_any_an_object_type_or_a_type_parameter_but_here_has_type_0, c.TypeToString(rightType))
+			}
+		} else if ast.IsVariableDeclarationList(data.Initializer) {
+			c.checkVariableDeclarationList(data.Initializer)
+		} else {
+			iteratedType := c.checkRightHandSideOfForOf(node)
+			leftType := c.checkExpression(data.Initializer)
+			c.checkReferenceExpression(data.Initializer, diagnostics.The_left_hand_side_of_a_for_of_statement_must_be_a_variable_or_a_property_access, diagnostics.The_left_hand_side_of_a_for_of_statement_may_not_be_an_optional_property_access)
+			if iteratedType != nil {
+				c.checkTypeAssignableToAndOptionallyElaborate(iteratedType, leftType, data.Initializer, data.Expression, nil, nil)
+			}
+		}
+	} else {
+		if data.Initializer != nil {
+			if ast.IsVariableDeclarationList(data.Initializer) {
+				c.checkVariableDeclarationList(data.Initializer)
+			} else {
+				c.checkExpression(data.Initializer)
+			}
+		}
+		if data.Condition != nil {
+			c.checkTruthinessExpression(data.Condition, CheckModeNormal)
+		}
+		if data.Incrementor != nil {
+			c.checkExpression(data.Incrementor)
+		}
+	}
+	c.checkSourceElement(data.Statement)
+	declarations := data.Result.AsVariableDeclarationList().Declarations.Nodes
+	types := make([]*Type, 0, len(declarations))
+	for _, declaration := range declarations {
+		types = append(types, c.getTypeOfSymbol(c.getSymbolOfDeclaration(declaration)))
+	}
+	if node.Locals() != nil {
+		c.registerForUnusedIdentifiersCheck(node)
+	}
+	if data.TupleResult {
+		return c.createTupleType(types)
+	}
+	if data.ObjectResult {
+		members := make(ast.SymbolTable, len(declarations))
+		for i, declaration := range declarations {
+			name := declaration.Name().Text()
+			property := c.newSymbol(ast.SymbolFlagsProperty, name)
+			property.ValueDeclaration = declaration
+			property.Declarations = []*ast.Node{declaration}
+			c.valueSymbolLinks.Get(property).resolvedType = types[i]
+			members[name] = property
+		}
+		return c.newAnonymousType(nil, members, nil, nil, nil)
+	}
+	if len(types) == 0 {
+		return c.errorType
+	}
+	return types[0]
 }
 
 func (c *Checker) checkKvsProducerExpression(node *ast.Node, initializer *ast.ForInitializer, expression *ast.Expression, statement *ast.Statement, selectProducer bool) *Type {

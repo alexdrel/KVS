@@ -1418,13 +1418,46 @@ export const validate = task({
 });
 
 async function runSmokeTest() {
-    await run("./built/local/tsc", ["-p", "./tsc/testdata/fixtures/compiler", "--noEmit", "--singleThreaded"]);
-    await run("./built/local/tsc", ["-p", "./tsc/testdata/fixtures/compiler", "--noEmit"]);
+    const examplesDir = path.resolve("kvs/examples");
+    const baselinesDir = path.join(examplesDir, "baselines");
+    const groups = ["", "showcase"];
+    const examples = groups.flatMap(group =>
+        fs.readdirSync(path.join(examplesDir, group), { withFileTypes: true })
+            .filter(entry => entry.isFile() && entry.name.endsWith(".ts"))
+            .map(entry => path.join(group, entry.name))
+    ).sort();
+    const expectedBaselines = new Set(examples.map(example => example.replace(/\.ts$/, ".out")));
+    const actualBaselines = groups.flatMap(group => {
+        const directory = path.join(baselinesDir, group);
+        return fs.existsSync(directory)
+            ? fs.readdirSync(directory, { withFileTypes: true })
+                .filter(entry => entry.isFile() && entry.name.endsWith(".out"))
+                .map(entry => path.join(group, entry.name))
+            : [];
+    });
+    assert.deepStrictEqual(actualBaselines.sort(), [...expectedBaselines].sort(), "KVS example output baselines must match runnable examples");
+
+    const outputDir = fs.mkdtempSync(path.join(os.tmpdir(), "kvs-examples-"));
+    try {
+        for (const example of examples) {
+            const source = path.join(examplesDir, example);
+            const exampleOutputDir = path.join(outputDir, example.replace(/\.ts$/, ""));
+            await run("./built/local/tsc", [source, "--target", "es2020", "--module", "commonjs", "--outDir", exampleOutputDir]);
+            const emitted = path.join(exampleOutputDir, path.basename(example, ".ts") + ".js");
+            const result = await runOutput(process.execPath, [emitted]);
+            assert.strictEqual(result.stderr, "", `${example} wrote to stderr`);
+            const expected = fs.readFileSync(path.join(baselinesDir, example.replace(/\.ts$/, ".out")), "utf8");
+            assert.strictEqual(result.stdout.replaceAll("\r\n", "\n"), expected.replaceAll("\r\n", "\n"), `${example} output changed`);
+        }
+    }
+    finally {
+        fs.rmSync(outputDir, { recursive: true, force: true });
+    }
 }
 
 export const smokeTest = task({
     name: "test:smoke",
-    description: "Runs the smoke tests.",
+    description: "Compiles and runs KVS examples against their output baselines.",
     dependencies: [build],
     run: runSmokeTest,
 });

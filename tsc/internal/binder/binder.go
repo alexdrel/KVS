@@ -1686,6 +1686,8 @@ func (b *Binder) bindChildren(node *ast.Node) {
 		b.bindKvsCollectExpression(node)
 	case ast.KindKvsSelectExpression:
 		b.bindKvsSelectExpression(node)
+	case ast.KindKvsForExpression:
+		b.bindKvsForExpression(node)
 	case ast.KindIfStatement:
 		b.bindIfStatement(node)
 	case ast.KindKvsIfBindingStatement:
@@ -1989,6 +1991,44 @@ func (b *Binder) bindKvsCollectExpression(node *ast.Node) {
 func (b *Binder) bindKvsSelectExpression(node *ast.Node) {
 	expr := node.AsKvsSelectExpression()
 	b.bindKvsProducerExpression(node, expr.Initializer, expr.Expression, expr.Statement, true)
+}
+
+func (b *Binder) bindKvsForExpression(node *ast.Node) {
+	expr := node.AsKvsForExpression()
+	// Result declarations establish loop state before the ordinary loop begins.
+	expr.Result.Parent = node
+	b.bind(expr.Result)
+	if expr.Expression != nil {
+		b.bind(expr.Expression)
+		preLoopLabel := b.setContinueTarget(node, b.createLoopLabel())
+		postLoopLabel := b.createBranchLabel()
+		b.addAntecedent(preLoopLabel, b.currentFlow)
+		b.currentFlow = preLoopLabel
+		b.addAntecedent(postLoopLabel, b.currentFlow)
+		b.bind(expr.Initializer)
+		if expr.Initializer.Kind != ast.KindVariableDeclarationList {
+			b.bindAssignmentTargetFlow(expr.Initializer)
+		}
+		b.bindIterativeStatement(expr.Statement, postLoopLabel, preLoopLabel)
+		b.addAntecedent(preLoopLabel, b.currentFlow)
+		b.currentFlow = b.finishFlowLabel(postLoopLabel)
+		return
+	}
+	b.bind(expr.Initializer)
+	preLoopLabel := b.setContinueTarget(node, b.createLoopLabel())
+	preBodyLabel := b.createBranchLabel()
+	preIncrementorLabel := b.createBranchLabel()
+	postLoopLabel := b.createBranchLabel()
+	b.addAntecedent(preLoopLabel, b.currentFlow)
+	b.currentFlow = preLoopLabel
+	b.bindCondition(expr.Condition, preBodyLabel, postLoopLabel)
+	b.currentFlow = b.finishFlowLabel(preBodyLabel)
+	b.bindIterativeStatement(expr.Statement, postLoopLabel, preIncrementorLabel)
+	b.addAntecedent(preIncrementorLabel, b.currentFlow)
+	b.currentFlow = b.finishFlowLabel(preIncrementorLabel)
+	b.bind(expr.Incrementor)
+	b.addAntecedent(preLoopLabel, b.currentFlow)
+	b.currentFlow = b.finishFlowLabel(postLoopLabel)
 }
 
 func (b *Binder) bindKvsProducerExpression(node *ast.Node, initializer *ast.ForInitializer, expression *ast.Expression, statement *ast.Statement, selectProducer bool) {
@@ -2513,7 +2553,7 @@ func (b *Binder) bindKvsNullingExpressionFlow(node *ast.Node) {
 
 func (b *Binder) bindVariableDeclarationFlow(node *ast.Node) {
 	b.bindEachChild(node)
-	if node.Initializer() != nil || ast.IsForInOrOfStatement(node.Parent.Parent) || node.Parent.Parent.Kind == ast.KindKvsCollectExpression || node.Parent.Parent.Kind == ast.KindKvsSelectExpression {
+	if node.Initializer() != nil || ast.IsForInOrOfStatement(node.Parent.Parent) || node.Parent.Parent.Kind == ast.KindKvsCollectExpression || node.Parent.Parent.Kind == ast.KindKvsSelectExpression || node.Parent.Parent.Kind == ast.KindKvsForExpression {
 		b.bindInitializedVariableFlow(node)
 	}
 }
@@ -2787,7 +2827,7 @@ func GetContainerFlags(node *ast.Node) ContainerFlags {
 		} else {
 			return ContainerFlagsNone
 		}
-	case ast.KindCatchClause, ast.KindKvsIfBindingClause, ast.KindForStatement, ast.KindForInStatement, ast.KindForOfStatement, ast.KindKvsCollectExpression, ast.KindKvsSelectExpression, ast.KindCaseBlock:
+	case ast.KindCatchClause, ast.KindKvsIfBindingClause, ast.KindForStatement, ast.KindForInStatement, ast.KindForOfStatement, ast.KindKvsCollectExpression, ast.KindKvsSelectExpression, ast.KindKvsForExpression, ast.KindCaseBlock:
 		return ContainerFlagsIsBlockScopedContainer | ContainerFlagsHasLocals
 	case ast.KindBlock:
 		if ast.IsFunctionLike(node.Parent) || ast.IsClassStaticBlockDeclaration(node.Parent) {

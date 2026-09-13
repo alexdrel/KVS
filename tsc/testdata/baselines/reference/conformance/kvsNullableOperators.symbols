@@ -51,39 +51,54 @@ const rejectNullableString = "value: " + nullableString;
 >rejectNullableString : Symbol(rejectNullableString, Decl(kvsNullableOperators.ts, 16, 5))
 >nullableString : Symbol(nullableString, Decl(kvsNullableOperators.ts, 1, 13))
 
+const rejectNullableInterpolation = `value: ${nullableString}`;
+>rejectNullableInterpolation : Symbol(rejectNullableInterpolation, Decl(kvsNullableOperators.ts, 17, 5))
+>nullableString : Symbol(nullableString, Decl(kvsNullableOperators.ts, 1, 13))
+
 const rejectKnownAbsent = absent + 1;
->rejectKnownAbsent : Symbol(rejectKnownAbsent, Decl(kvsNullableOperators.ts, 17, 5))
+>rejectKnownAbsent : Symbol(rejectKnownAbsent, Decl(kvsNullableOperators.ts, 18, 5))
 >absent : Symbol(absent, Decl(kvsNullableOperators.ts, 3, 13))
 
+declare function nullableTag(strings: TemplateStringsArray, value: string?): string;
+>nullableTag : Symbol(nullableTag, Decl(kvsNullableOperators.ts, 18, 37))
+>strings : Symbol(strings, Decl(kvsNullableOperators.ts, 19, 29))
+>TemplateStringsArray : Symbol(TemplateStringsArray, Decl(lib.es5.d.ts, --, --))
+>value : Symbol(value, Decl(kvsNullableOperators.ts, 19, 59))
+
+const taggedNullableInterpolation = nullableTag`value: ${nullableString}`;
+>taggedNullableInterpolation : Symbol(taggedNullableInterpolation, Decl(kvsNullableOperators.ts, 20, 5))
+>nullableTag : Symbol(nullableTag, Decl(kvsNullableOperators.ts, 18, 37))
+>nullableString : Symbol(nullableString, Decl(kvsNullableOperators.ts, 1, 13))
+
 const rejectComparison = nullableNumber < 10;
->rejectComparison : Symbol(rejectComparison, Decl(kvsNullableOperators.ts, 19, 5))
+>rejectComparison : Symbol(rejectComparison, Decl(kvsNullableOperators.ts, 22, 5))
 >nullableNumber : Symbol(nullableNumber, Decl(kvsNullableOperators.ts, 0, 13))
 
 const ordinary = 1 + 2;
->ordinary : Symbol(ordinary, Decl(kvsNullableOperators.ts, 21, 5))
+>ordinary : Symbol(ordinary, Decl(kvsNullableOperators.ts, 24, 5))
 
 const exactIdentity = nullableNumber === null;
->exactIdentity : Symbol(exactIdentity, Decl(kvsNullableOperators.ts, 22, 5))
+>exactIdentity : Symbol(exactIdentity, Decl(kvsNullableOperators.ts, 25, 5))
 >nullableNumber : Symbol(nullableNumber, Decl(kvsNullableOperators.ts, 0, 13))
 
 declare function left(): number?;
->left : Symbol(left, Decl(kvsNullableOperators.ts, 22, 46))
+>left : Symbol(left, Decl(kvsNullableOperators.ts, 25, 46))
 
 declare function right(): number?;
->right : Symbol(right, Decl(kvsNullableOperators.ts, 24, 33))
+>right : Symbol(right, Decl(kvsNullableOperators.ts, 27, 33))
 
 const ordered = left() + right();
->ordered : Symbol(ordered, Decl(kvsNullableOperators.ts, 26, 5))
->left : Symbol(left, Decl(kvsNullableOperators.ts, 22, 46))
->right : Symbol(right, Decl(kvsNullableOperators.ts, 24, 33))
+>ordered : Symbol(ordered, Decl(kvsNullableOperators.ts, 29, 5))
+>left : Symbol(left, Decl(kvsNullableOperators.ts, 25, 46))
+>right : Symbol(right, Decl(kvsNullableOperators.ts, 27, 33))
 
 const nested = nullableNumber * 2 + 1;
->nested : Symbol(nested, Decl(kvsNullableOperators.ts, 28, 5))
+>nested : Symbol(nested, Decl(kvsNullableOperators.ts, 31, 5))
 >nullableNumber : Symbol(nullableNumber, Decl(kvsNullableOperators.ts, 0, 13))
 
 // Operators outside this slice retain their TypeScript checking and runtime behavior.
 const rejectBitwise = nullableNumber & 1;
->rejectBitwise : Symbol(rejectBitwise, Decl(kvsNullableOperators.ts, 31, 5))
+>rejectBitwise : Symbol(rejectBitwise, Decl(kvsNullableOperators.ts, 34, 5))
 >nullableNumber : Symbol(nullableNumber, Decl(kvsNullableOperators.ts, 0, 13))
 
 nullableNumber += 1;

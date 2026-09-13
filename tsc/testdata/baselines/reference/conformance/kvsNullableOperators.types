@@ -69,11 +69,28 @@ const rejectNullableString = "value: " + nullableString;
 >"value: " : "value: "
 >nullableString : string | null | undefined
 
+const rejectNullableInterpolation = `value: ${nullableString}`;
+>rejectNullableInterpolation : string
+>`value: ${nullableString}` : string
+>nullableString : string | null | undefined
+
 const rejectKnownAbsent = absent + 1;
 >rejectKnownAbsent : any
 >absent + 1 : any
 >absent : null
 >1 : 1
+
+declare function nullableTag(strings: TemplateStringsArray, value: string?): string;
+>nullableTag : (strings: TemplateStringsArray, value: string?) => string
+>strings : TemplateStringsArray
+>value : string | null | undefined
+
+const taggedNullableInterpolation = nullableTag`value: ${nullableString}`;
+>taggedNullableInterpolation : string
+>nullableTag`value: ${nullableString}` : string
+>nullableTag : (strings: TemplateStringsArray, value: string?) => string
+>`value: ${nullableString}` : string
+>nullableString : string | null | undefined
 
 const rejectComparison = nullableNumber < 10;
 >rejectComparison : boolean

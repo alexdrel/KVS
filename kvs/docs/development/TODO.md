@@ -15,6 +15,7 @@ Implemented vertical slices:
 - Eager `collect` with `yield` and `yield?`.
 - Eager `select` with first-production exit, including production from nested
   ordinary loops.
+- Synchronous expression-valued `for` with scalar, tuple, and object results.
 - Extant assignment: `target ?= value`.
 - Producer head paths through ordinary expression tails and named object-field
   values.
@@ -44,14 +45,17 @@ Known semantic debts:
   truthiness is not implemented.
 - Conditional binding currently tests with JavaScript truthiness; KVS
   truthiness is not implemented.
-- Nullable producer sources, implicit subjects, lazy `collect*`, and
-  expression-valued `for` are not implemented.
+- Lazy `collect*` and asynchronous iteration are not implemented.
+- Implicit-subject `for...in` is postponed until KVS decides whether it should
+  preserve JavaScript's inherited-enumerable-property behavior or iterate only
+  own enumerable properties.
 
 Focused conformance inputs:
 
 - `tsc/testdata/tests/cases/conformance/kvs/kvsExtantReturn.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsCollect.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsSelect.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsForExpression.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsExtantAssignment.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsStaticNullability.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsNulling.ts`
@@ -118,6 +122,8 @@ them; generated example `.js` files are intentionally ignored.
 - [ ] Indexed access propagates absence
 - [x] Arithmetic operators lift over absence
 - [x] Relational operators reject nullable operands
+- [x] Ordinary template interpolation rejects nullable substitutions
+- [x] Tagged templates accept nullable substitutions
 - [ ] `==` / `!=` lift over absence
 - [x] `===` / `!==` retain JavaScript semantics
 
@@ -193,15 +199,19 @@ them; generated example `.js` files are intentionally ignored.
 
 ### Expression-valued `for`
 
-- [ ] Scalar accumulator
-- [ ] Explicit `for...of` form
-- [ ] C-style `for`
-- [ ] Tuple result
-- [ ] Object result
-- [ ] Bare `break` returns current accumulator
-- [ ] No-iteration result is initial value
-- [ ] `continue`
-- [ ] Ordinary function `return`
+- [x] Scalar accumulator
+- [x] Explicit `for...of` form
+- [x] Implicit-subject `for...of` form
+- [x] Nullable `for...of` source returns initialized result
+- [x] Explicit `for...in` form
+- [ ] Implicit-subject `for...in` ownership semantics
+- [x] C-style `for`
+- [x] Tuple result
+- [x] Object result
+- [x] Bare `break` returns current accumulator
+- [x] No-iteration result is initial value
+- [x] `continue`
+- [x] Ordinary function `return`
 - [ ] `await` inside loop
 
 ### `collect`

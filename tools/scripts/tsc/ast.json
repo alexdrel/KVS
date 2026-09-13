@@ -297,6 +297,7 @@
             "KvsCompactObjectExpression",
             "KvsCollectExpression",
             "KvsSelectExpression",
+            "KvsForExpression",
             "SpreadElement",
             "ClassExpression",
             "OmittedExpression",
@@ -1914,6 +1915,57 @@
                     {
                         "name": "Expression",
                         "type": "Expression"
+                    },
+                    {
+                        "name": "Statement",
+                        "type": "Statement",
+                        "visit": "iterationBody"
+                    }
+                ],
+                "arena": true
+            },
+            "KvsForExpression": {
+                "extends": [
+                    "ExpressionBase",
+                    "LocalsContainerBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "Initializer",
+                        "type": "ForInitializer",
+                        "optional": true
+                    },
+                    {
+                        "name": "Condition",
+                        "type": "Expression",
+                        "optional": true
+                    },
+                    {
+                        "name": "Incrementor",
+                        "type": "Expression",
+                        "optional": true
+                    },
+                    {
+                        "name": "Expression",
+                        "type": "Expression",
+                        "optional": true
+                    },
+                    {
+                        "name": "Result",
+                        "type": "VariableDeclarationList"
+                    },
+                    {
+                        "name": "TupleResult",
+                        "type": "bool"
+                    },
+                    {
+                        "name": "ObjectResult",
+                        "type": "bool"
+                    },
+                    {
+                        "name": "ForIn",
+                        "type": "bool"
                     },
                     {
                         "name": "Statement",

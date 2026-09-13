@@ -17,7 +17,10 @@ const bigintAdd = nullableBigInt + 1n;
 // type from an operand known to be absent.
 const rejectMixedAddition = 10 + nullableString;
 const rejectNullableString = "value: " + nullableString;
+const rejectNullableInterpolation = `value: ${nullableString}`;
 const rejectKnownAbsent = absent + 1;
+declare function nullableTag(strings: TemplateStringsArray, value: string?): string;
+const taggedNullableInterpolation = nullableTag`value: ${nullableString}`;
 
 const rejectComparison = nullableNumber < 10;
 

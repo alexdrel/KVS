@@ -4436,6 +4436,10 @@ var KVS_terminal_requires_string_number_boolean_bigint_or_a_non_tuple_array = &M
 
 var KVS_terminal_cannot_determine_a_default_value_from_an_absence_only_type = &Message{code: 100073, category: CategoryError, key: "KVS_terminal_cannot_determine_a_default_value_from_an_absence_only_type_100073", text: "KVS terminal '!' cannot determine a default value from an absence-only type."}
 
+var KVS_expression_valued_for_must_be_at_the_head_of_a_supported_value_expression = &Message{code: 100074, category: CategoryError, key: "KVS_expression_valued_for_must_be_at_the_head_of_a_supported_value_expression_100074", text: "KVS expression-valued 'for' must be at the head of a supported value expression."}
+
+var KVS_template_interpolation_does_not_accept_nullable_values_resolve_absence_explicitly = &Message{code: 100075, category: CategoryError, key: "KVS_template_interpolation_does_not_accept_nullable_values_resolve_absence_explicitly_100075", text: "KVS template interpolation does not accept nullable values; resolve absence explicitly."}
+
 func keyToMessage(key Key) *Message {
 	switch key {
 	case "Unterminated_string_literal_1002":
@@ -8872,6 +8876,10 @@ func keyToMessage(key Key) *Message {
 		return KVS_terminal_requires_string_number_boolean_bigint_or_a_non_tuple_array
 	case "KVS_terminal_cannot_determine_a_default_value_from_an_absence_only_type_100073":
 		return KVS_terminal_cannot_determine_a_default_value_from_an_absence_only_type
+	case "KVS_expression_valued_for_must_be_at_the_head_of_a_supported_value_expression_100074":
+		return KVS_expression_valued_for_must_be_at_the_head_of_a_supported_value_expression
+	case "KVS_template_interpolation_does_not_accept_nullable_values_resolve_absence_explicitly_100075":
+		return KVS_template_interpolation_does_not_accept_nullable_values_resolve_absence_explicitly
 	default:
 		return nil
 	}

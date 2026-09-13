@@ -268,6 +268,7 @@ const (
 	KindKvsCompactObjectExpression
 	KindKvsCollectExpression
 	KindKvsSelectExpression
+	KindKvsForExpression
 	KindSpreadElement
 	KindClassExpression
 	KindOmittedExpression

@@ -17,6 +17,7 @@ import type {
     JsxText,
     KvsCompactArrayExpression,
     KvsCompactObjectExpression,
+    KvsForExpression,
     MetaProperty,
     ModuleDeclaration,
     Node,
@@ -64,6 +65,8 @@ export function getNodeCommonData(node: Node): number {
             return ((node as KvsCompactArrayExpression).multiLine ? 1 : 0) << 24;
         case SyntaxKind.KvsCompactObjectExpression:
             return ((node as KvsCompactObjectExpression).multiLine ? 1 : 0) << 24;
+        case SyntaxKind.KvsForExpression:
+            return ((node as KvsForExpression).tupleResult ? 1 : 0) << 24 | ((node as KvsForExpression).objectResult ? 1 : 0) << 25 | ((node as KvsForExpression).forIn ? 1 : 0) << 26;
         case SyntaxKind.Block:
             return ((node as Block).multiLine ? 1 : 0) << 24;
         case SyntaxKind.HeritageClause:

@@ -468,6 +468,31 @@ avoids JavaScript's self-shadowing temporal dead zone while adding no temporary
 to independent forms such as `for (items)`. The first slice does not include
 `collect*`, placeholder lambdas, or subject-form `when`.
 
+## Synchronous expression-valued `for`
+
+Status: accepted.
+
+The final header slot declares mutable result bindings owned by the loop
+expression. Synchronous explicit `for...of`, implicit-subject `for...of`,
+explicit `for...in`, and C-style `for` support scalar, bracketed tuple, and
+braced object results. Normal completion and bare `break` produce the current
+state; no iteration produces the initialized state. `continue` and containing
+function `return` retain their ordinary meanings.
+
+As with ordinary synchronous `for...of`, an absent explicit or
+implicit-subject source performs zero iterations. The expression therefore
+produces its initialized result state.
+
+The lowering places the authored result bindings and ordinary loop in a block,
+then copies the scalar, tuple, or object result into one generated carrier for
+the surrounding expression. This preserves lexical ownership without an IIFE
+and therefore retains ordinary control flow, `this`, and `arguments` behavior.
+
+Result state is initialized before the ordinary loop begins. Header expressions
+are evaluated once, but KVS code should not depend on their relative evaluation
+order through side effects. Nullable sources and `await` are outside this first
+slice.
+
 ## First nullable-operator slice
 
 Status: accepted.

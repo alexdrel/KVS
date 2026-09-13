@@ -9,9 +9,14 @@ which of their language dependencies remain unimplemented. The `showcase/`
 directory holds coherent programs that compile and run with the current
 compiler. When a goalpost is fully supported, move it to the showcase.
 
+`npx hereby test:smoke` compiles and runs every normal and showcase example.
+Expected stdout is reviewed and accepted manually under `baselines/`; every
+runnable `.ts` file must have a matching `.out` file.
+
 - [Extant operations](extant.ts)
 - [Eager collection](collect.ts)
 - [First production](select.ts)
+- [Accumulator-producing loops](accumulating-loops.ts)
 - [Nulling operator](nulling.ts)
 - [Binding in an `if` condition](if-binding.ts)
 - [Implicit iteration subjects](implicit-subject.ts)

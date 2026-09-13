@@ -485,6 +485,10 @@ export class RemoteNode extends RemoteNodeBase implements Node {
         return (this.data & (1 << 24)) !== 0;
     }
 
+    get forIn(): boolean {
+        return (this.data & (1 << 26)) !== 0;
+    }
+
     get isArrayType(): boolean {
         return (this.data & (1 << 24)) !== 0;
     }
@@ -510,6 +514,14 @@ export class RemoteNode extends RemoteNodeBase implements Node {
     }
 
     get multiLine(): boolean {
+        return (this.data & (1 << 24)) !== 0;
+    }
+
+    get objectResult(): boolean {
+        return (this.data & (1 << 25)) !== 0;
+    }
+
+    get tupleResult(): boolean {
         return (this.data & (1 << 24)) !== 0;
     }
 
@@ -813,6 +825,9 @@ export class RemoteNode extends RemoteNodeBase implements Node {
     }
     get readonlyToken(): RemoteNode | undefined {
         return this.getNamedChild("readonlyToken") as RemoteNode;
+    }
+    get result(): RemoteNode | undefined {
+        return this.getNamedChild("result") as RemoteNode;
     }
     get right(): RemoteNode | undefined {
         return this.getNamedChild("right") as RemoteNode;

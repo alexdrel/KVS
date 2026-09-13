@@ -31,7 +31,7 @@ function nestedSubjects(groups: Group[]) {
     return collect (groups) {
         const groupName = _.name;
         for (_.values) {
-            yield `${groupName}:${_}`;
+            yield `${groupName}:${_!}`;
         }
     };
 }

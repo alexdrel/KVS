@@ -3376,6 +3376,8 @@ func (p *Printer) emitExpression(node *ast.Expression, precedence ast.OperatorPr
 		p.emitKvsCollectExpression(node.AsKvsCollectExpression())
 	case ast.KindKvsSelectExpression:
 		p.emitKvsSelectExpression(node.AsKvsSelectExpression())
+	case ast.KindKvsForExpression:
+		p.emitKvsForExpression(node.AsKvsForExpression())
 	case ast.KindSpreadElement:
 		p.emitSpreadElement(node.AsSpreadElement())
 	case ast.KindClassExpression:
@@ -3835,6 +3837,57 @@ func (p *Printer) emitKvsSelectExpression(node *ast.KvsSelectExpression) {
 		p.writeSpace()
 	}
 	p.emitExpression(node.Expression, ast.OperatorPrecedenceLowest)
+	p.writePunctuation(")")
+	p.emitEmbeddedStatement(node.AsNode(), node.Statement)
+	p.exitNode(node.AsNode(), state)
+}
+
+func (p *Printer) emitKvsForExpression(node *ast.KvsForExpression) {
+	state := p.enterNode(node.AsNode())
+	p.writeKeyword("for")
+	p.writeSpace()
+	p.writePunctuation("(")
+	if node.Expression != nil {
+		if node.Flags&ast.NodeFlagsKvsImplicitSubject == 0 {
+			p.emitForInitializer(node.Initializer)
+			p.writeSpace()
+			if node.ForIn {
+				p.writeKeyword("in")
+			} else {
+				p.writeKeyword("of")
+			}
+			p.writeSpace()
+		}
+		p.emitExpression(node.Expression, ast.OperatorPrecedenceLowest)
+		p.writePunctuation(";")
+	} else {
+		if node.Initializer != nil {
+			p.emitForInitializer(node.Initializer)
+		}
+		p.writePunctuation(";")
+		if node.Condition != nil {
+			p.writeSpace()
+			p.emitExpression(node.Condition, ast.OperatorPrecedenceLowest)
+		}
+		p.writePunctuation(";")
+		if node.Incrementor != nil {
+			p.writeSpace()
+			p.emitExpression(node.Incrementor, ast.OperatorPrecedenceLowest)
+		}
+		p.writePunctuation(";")
+	}
+	p.writeSpace()
+	if node.TupleResult {
+		p.writePunctuation("[")
+	} else if node.ObjectResult {
+		p.writePunctuation("{")
+	}
+	p.emitList((*Printer).emitVariableDeclarationNode, node.AsNode(), node.Result.AsVariableDeclarationList().Declarations, LFVariableDeclarationList)
+	if node.TupleResult {
+		p.writePunctuation("]")
+	} else if node.ObjectResult {
+		p.writePunctuation("}")
+	}
 	p.writePunctuation(")")
 	p.emitEmbeddedStatement(node.AsNode(), node.Statement)
 	p.exitNode(node.AsNode(), state)

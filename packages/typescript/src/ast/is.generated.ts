@@ -195,6 +195,7 @@ import type {
     KvsExtantTestExpression,
     KvsExtantType,
     KvsExtantYieldStatement,
+    KvsForExpression,
     KvsIfBindingClause,
     KvsIfBindingStatement,
     KvsNullableAssertionExpression,
@@ -681,6 +682,15 @@ export declare namespace isKvsSelectExpression {
     function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsSelectExpression>;
 }
 isKvsSelectExpression.Handle = isKvsSelectExpression as any;
+
+export function isKvsForExpression(node: Node): node is KvsForExpression {
+    return node.kind === SyntaxKind.KvsForExpression;
+}
+
+export declare namespace isKvsForExpression {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsForExpression>;
+}
+isKvsForExpression.Handle = isKvsForExpression as any;
 
 export function isLabeledStatement(node: Node): node is LabeledStatement {
     return node.kind === SyntaxKind.LabeledStatement;

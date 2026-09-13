@@ -1,12 +1,13 @@
 kvsNullableOperators.ts(16,29): error TS2365: Operator '+' cannot be applied to types '10' and 'string'.
 kvsNullableOperators.ts(17,30): error TS2365: Operator '+' cannot be applied to types '"value: "' and 'string'.
-kvsNullableOperators.ts(18,27): error TS18047: 'absent' is possibly 'null'.
-kvsNullableOperators.ts(20,26): error TS18049: 'nullableNumber' is possibly 'null' or 'undefined'.
-kvsNullableOperators.ts(32,23): error TS18049: 'nullableNumber' is possibly 'null' or 'undefined'.
-kvsNullableOperators.ts(33,1): error TS2588: Cannot assign to 'nullableNumber' because it is a constant.
+kvsNullableOperators.ts(18,47): error TS100075: KVS template interpolation does not accept nullable values; resolve absence explicitly.
+kvsNullableOperators.ts(19,27): error TS18047: 'absent' is possibly 'null'.
+kvsNullableOperators.ts(23,26): error TS18049: 'nullableNumber' is possibly 'null' or 'undefined'.
+kvsNullableOperators.ts(35,23): error TS18049: 'nullableNumber' is possibly 'null' or 'undefined'.
+kvsNullableOperators.ts(36,1): error TS2588: Cannot assign to 'nullableNumber' because it is a constant.
 
 
-==== kvsNullableOperators.ts (6 errors) ====
+==== kvsNullableOperators.ts (7 errors) ====
     declare const nullableNumber: number?;
     declare const nullableString: string?;
     declare const nullableBigInt: bigint?;
@@ -28,9 +29,14 @@ kvsNullableOperators.ts(33,1): error TS2588: Cannot assign to 'nullableNumber' b
     const rejectNullableString = "value: " + nullableString;
                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~
 !!! error TS2365: Operator '+' cannot be applied to types '"value: "' and 'string'.
+    const rejectNullableInterpolation = `value: ${nullableString}`;
+                                                  ~~~~~~~~~~~~~~
+!!! error TS100075: KVS template interpolation does not accept nullable values; resolve absence explicitly.
     const rejectKnownAbsent = absent + 1;
                               ~~~~~~
 !!! error TS18047: 'absent' is possibly 'null'.
+    declare function nullableTag(strings: TemplateStringsArray, value: string?): string;
+    const taggedNullableInterpolation = nullableTag`value: ${nullableString}`;
     
     const rejectComparison = nullableNumber < 10;
                              ~~~~~~~~~~~~~~

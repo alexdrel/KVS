@@ -51,6 +51,7 @@ type NodeFactory struct {
 	kvsExtantTestExpressionArena        core.Arena[KvsExtantTestExpression]
 	kvsExtantTypeArena                  core.Arena[KvsExtantType]
 	kvsExtantYieldStatementArena        core.Arena[KvsExtantYieldStatement]
+	kvsForExpressionArena               core.Arena[KvsForExpression]
 	kvsIfBindingClauseArena             core.Arena[KvsIfBindingClause]
 	kvsIfBindingStatementArena          core.Arena[KvsIfBindingStatement]
 	kvsNullableAssertionExpressionArena core.Arena[KvsNullableAssertionExpression]
@@ -303,6 +304,7 @@ type (
 	KvsCompactObjectExpressionNode     = Node
 	KvsCollectExpressionNode           = Node
 	KvsSelectExpressionNode            = Node
+	KvsForExpressionNode               = Node
 	LabeledStatementNode               = Node
 	ExpressionStatementNode            = Node
 	BlockNode                          = Node
@@ -2241,6 +2243,67 @@ func (node *KvsSelectExpression) Clone(f NodeFactoryCoercible) *Node {
 
 func IsKvsSelectExpression(node *Node) bool {
 	return node.Kind == KindKvsSelectExpression
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// KvsForExpression
+// ──────────────────────────────────────────────────────────────────────
+
+type KvsForExpression struct {
+	ExpressionBase
+	LocalsContainerBase
+	CompositeBase
+	Initializer  *ForInitializer // Optional
+	Condition    *Expression     // Optional
+	Incrementor  *Expression     // Optional
+	Expression   *Expression     // Optional
+	Result       *VariableDeclarationListNode
+	TupleResult  bool
+	ObjectResult bool
+	ForIn        bool
+	Statement    *Statement
+}
+
+func (f *NodeFactory) NewKvsForExpression(initializer *ForInitializer, condition *Expression, incrementor *Expression, expression *Expression, result *VariableDeclarationListNode, tupleResult bool, objectResult bool, forIn bool, statement *Statement) *Node {
+	data := f.kvsForExpressionArena.New()
+	data.Initializer = initializer
+	data.Condition = condition
+	data.Incrementor = incrementor
+	data.Expression = expression
+	data.Result = result
+	data.TupleResult = tupleResult
+	data.ObjectResult = objectResult
+	data.ForIn = forIn
+	data.Statement = statement
+	return f.newNode(KindKvsForExpression, data)
+}
+
+func (f *NodeFactory) UpdateKvsForExpression(node *KvsForExpression, initializer *ForInitializer, condition *Expression, incrementor *Expression, expression *Expression, result *VariableDeclarationListNode, tupleResult bool, objectResult bool, forIn bool, statement *Statement) *Node {
+	if initializer != node.Initializer || condition != node.Condition || incrementor != node.Incrementor || expression != node.Expression || result != node.Result || tupleResult != node.TupleResult || objectResult != node.ObjectResult || forIn != node.ForIn || statement != node.Statement {
+		return updateNode(f.NewKvsForExpression(initializer, condition, incrementor, expression, result, tupleResult, objectResult, forIn, statement), node.AsNode(), f.hooks)
+	}
+	return node.AsNode()
+}
+
+func (node *KvsForExpression) ForEachChild(v Visitor) bool {
+	return visit(v, node.Initializer) ||
+		visit(v, node.Condition) ||
+		visit(v, node.Incrementor) ||
+		visit(v, node.Expression) ||
+		visit(v, node.Result) ||
+		visit(v, node.Statement)
+}
+
+func (node *KvsForExpression) VisitEachChild(v *NodeVisitor) *Node {
+	return v.Factory.UpdateKvsForExpression(node, v.visitNode(node.Initializer), v.visitNode(node.Condition), v.visitNode(node.Incrementor), v.visitNode(node.Expression), v.visitNode(node.Result), node.TupleResult, node.ObjectResult, node.ForIn, v.visitIterationBody(node.Statement))
+}
+
+func (node *KvsForExpression) Clone(f NodeFactoryCoercible) *Node {
+	return cloneNode(f.AsNodeFactory().NewKvsForExpression(node.Initializer, node.Condition, node.Incrementor, node.Expression, node.Result, node.TupleResult, node.ObjectResult, node.ForIn, node.Statement), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func IsKvsForExpression(node *Node) bool {
+	return node.Kind == KindKvsForExpression
 }
 
 // ──────────────────────────────────────────────────────────────────────
@@ -9566,6 +9629,8 @@ func (n *Node) ForEachChild(v Visitor) bool {
 		return n.data.(*KvsCollectExpression).ForEachChild(v)
 	case KindKvsSelectExpression:
 		return n.data.(*KvsSelectExpression).ForEachChild(v)
+	case KindKvsForExpression:
+		return n.data.(*KvsForExpression).ForEachChild(v)
 	case KindLabeledStatement:
 		return n.data.(*LabeledStatement).ForEachChild(v)
 	case KindExpressionStatement:
@@ -10031,6 +10096,10 @@ func (n *Node) AsKvsCollectExpression() *KvsCollectExpression {
 
 func (n *Node) AsKvsSelectExpression() *KvsSelectExpression {
 	return n.data.(*KvsSelectExpression)
+}
+
+func (n *Node) AsKvsForExpression() *KvsForExpression {
+	return n.data.(*KvsForExpression)
 }
 
 func (n *Node) AsLabeledStatement() *LabeledStatement {

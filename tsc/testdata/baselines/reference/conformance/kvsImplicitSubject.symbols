@@ -89,7 +89,7 @@ function nestedSubjects(groups: Group[]) {
 >_ : Symbol(_, Decl(kvsImplicitSubject.ts, 29, 25))
 >values : Symbol(Group.values, Decl(kvsImplicitSubject.ts, 1, 17))
 
-            yield `${groupName}:${_}`;
+            yield `${groupName}:${_!}`;
 >groupName : Symbol(groupName, Decl(kvsImplicitSubject.ts, 29, 13))
 >_ : Symbol(_, Decl(kvsImplicitSubject.ts, 31, 34))
         }

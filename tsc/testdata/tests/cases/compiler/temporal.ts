@@ -455,7 +455,7 @@
 
 {
     const zdt = Temporal.ZonedDateTime.from("1995-12-07T03:24:30.000003500+09:00[Asia/Tokyo][u-ca=japanese]");
-    `${zdt.era} ${zdt.eraYear}`; // => 'heisei 7'
+    `${zdt.era!} ${zdt.eraYear!}`; // => 'heisei 7'
     zdt.withCalendar("gregory").eraYear; // => 1995
 }
 

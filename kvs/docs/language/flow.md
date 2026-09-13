@@ -117,6 +117,14 @@ const total = for (let i = 0; i < values.length; i++; total = 0) {
 };
 ```
 
+Explicit `for...in` can produce accumulator state in the same way:
+
+```kvs
+const keys = for (const key in object; keys = "") {
+    keys += key;
+};
+```
+
 The author chooses the result shape explicitly. A bare binding produces a scalar, brackets produce a positional result, and braces produce a named structural result:
 
 ```kvs
@@ -134,6 +142,15 @@ const summary = for (orders; {count = 0, total = 0}) {
 ```
 
 The structured forms expose mutable bindings with the declared names inside the body and produce the corresponding tuple or object. If the loop performs no iteration, it returns the initialized result. The number of bindings never chooses the result shape implicitly.
+
+A nullable `for...of` source performs no iterations when absent, so the loop
+returns its initialized result state. This applies to both explicit and
+implicit-subject forms.
+
+Result bindings are initialized before the ordinary loop begins. Header
+expressions are evaluated once, but code should not use side effects to depend
+on their relative evaluation order; such dependencies make accumulator loops
+needlessly difficult to read and lower.
 
 Result headers belong only to `for`. `collect` and `select` produce values through `yield` and do not accept result declarations.
 

@@ -74,7 +74,7 @@ function nestedSubjects(groups: Group[]) {
 >groups : Group[]
 
     return collect (groups) {
->collect (groups) {        const groupName = _.name;        for (_.values) {            yield `${groupName}:${_}`;        }    } : string[]
+>collect (groups) {        const groupName = _.name;        for (_.values) {            yield `${groupName}:${_!}`;        }    } : string[]
 >groups : Group[]
 
         const groupName = _.name;
@@ -88,9 +88,10 @@ function nestedSubjects(groups: Group[]) {
 >_ : Group
 >values : (number | null)[]
 
-            yield `${groupName}:${_}`;
->`${groupName}:${_}` : string
+            yield `${groupName}:${_!}`;
+>`${groupName}:${_!}` : string
 >groupName : string
+>_! : number
 >_ : number | null
         }
     };

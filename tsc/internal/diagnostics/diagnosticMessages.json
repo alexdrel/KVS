@@ -8599,5 +8599,13 @@
     "KVS terminal '!' cannot determine a default value from an absence-only type.": {
         "category": "Error",
         "code": 100073
+    },
+    "KVS expression-valued 'for' must be at the head of a supported value expression.": {
+        "category": "Error",
+        "code": 100074
+    },
+    "KVS template interpolation does not accept nullable values; resolve absence explicitly.": {
+        "category": "Error",
+        "code": 100075
     }
 }

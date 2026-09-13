@@ -32,7 +32,7 @@ function nestedSubjects(groups: Group[]) {
     return collect (groups) {
         const groupName = _.name;
         for (_.values) {
-            yield `${groupName}:${_}`;
+            yield `${groupName}:${_!}`;
         }
     };
 }
@@ -82,7 +82,7 @@ function nestedSubjects(groups) {
         {
             var _b = _.values;
             for (const _ of _b) {
-                _a.push(`${groupName}:${_}`);
+                _a.push(`${groupName}:${_ ?? 0}`);
             }
         }
     }

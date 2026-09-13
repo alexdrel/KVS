@@ -1,0 +1,283 @@
+//// [tests/cases/conformance/kvs/kvsForExpression.ts] ////
+
+=== kvsForExpression.ts ===
+interface Entry {
+>Entry : Symbol(Entry, Decl(kvsForExpression.ts, 0, 0))
+
+    value: number;
+>value : Symbol(Entry.value, Decl(kvsForExpression.ts, 0, 17))
+
+    included: boolean;
+>included : Symbol(Entry.included, Decl(kvsForExpression.ts, 1, 18))
+}
+
+function explicitScalar(entries: Entry[]) {
+>explicitScalar : Symbol(explicitScalar, Decl(kvsForExpression.ts, 3, 1))
+>entries : Symbol(entries, Decl(kvsForExpression.ts, 5, 24))
+>Entry : Symbol(Entry, Decl(kvsForExpression.ts, 0, 0))
+
+    return for (const entry of entries; total = 0) {
+>entry : Symbol(entry, Decl(kvsForExpression.ts, 6, 21))
+>entries : Symbol(entries, Decl(kvsForExpression.ts, 5, 24))
+>total : Symbol(total, Decl(kvsForExpression.ts, 6, 39))
+
+        if (!entry.included) continue;
+>entry.included : Symbol(Entry.included, Decl(kvsForExpression.ts, 1, 18))
+>entry : Symbol(entry, Decl(kvsForExpression.ts, 6, 21))
+>included : Symbol(Entry.included, Decl(kvsForExpression.ts, 1, 18))
+
+        total += entry.value;
+>total : Symbol(total, Decl(kvsForExpression.ts, 6, 39))
+>entry.value : Symbol(Entry.value, Decl(kvsForExpression.ts, 0, 17))
+>entry : Symbol(entry, Decl(kvsForExpression.ts, 6, 21))
+>value : Symbol(Entry.value, Decl(kvsForExpression.ts, 0, 17))
+
+    };
+}
+
+function implicitScalar(entries: Entry[]) {
+>implicitScalar : Symbol(implicitScalar, Decl(kvsForExpression.ts, 10, 1))
+>entries : Symbol(entries, Decl(kvsForExpression.ts, 12, 24))
+>Entry : Symbol(Entry, Decl(kvsForExpression.ts, 0, 0))
+
+    const total = for (entries; total = 0) {
+>total : Symbol(total, Decl(kvsForExpression.ts, 13, 9))
+>entries : Symbol(entries, Decl(kvsForExpression.ts, 12, 24))
+>total : Symbol(total, Decl(kvsForExpression.ts, 13, 31))
+
+        total += _.value;
+>total : Symbol(total, Decl(kvsForExpression.ts, 13, 31))
+>_.value : Symbol(Entry.value, Decl(kvsForExpression.ts, 0, 17))
+>_ : Symbol(_, Decl(kvsForExpression.ts, 14, 16))
+>value : Symbol(Entry.value, Decl(kvsForExpression.ts, 0, 17))
+
+    };
+    return total;
+>total : Symbol(total, Decl(kvsForExpression.ts, 13, 9))
+}
+
+function cStyle(values: number[]) {
+>cStyle : Symbol(cStyle, Decl(kvsForExpression.ts, 17, 1))
+>values : Symbol(values, Decl(kvsForExpression.ts, 19, 16))
+
+    return for (let i = 0; i < values.length; i++; total = 0) {
+>i : Symbol(i, Decl(kvsForExpression.ts, 20, 19))
+>i : Symbol(i, Decl(kvsForExpression.ts, 20, 19))
+>values.length : Symbol(Array.length, Decl(lib.es5.d.ts, --, --))
+>values : Symbol(values, Decl(kvsForExpression.ts, 19, 16))
+>length : Symbol(Array.length, Decl(lib.es5.d.ts, --, --))
+>i : Symbol(i, Decl(kvsForExpression.ts, 20, 19))
+>total : Symbol(total, Decl(kvsForExpression.ts, 20, 50))
+
+        total += values[i];
+>total : Symbol(total, Decl(kvsForExpression.ts, 20, 50))
+>values : Symbol(values, Decl(kvsForExpression.ts, 19, 16))
+>i : Symbol(i, Decl(kvsForExpression.ts, 20, 19))
+
+    };
+}
+
+function tupleResult(entries: Entry[]) {
+>tupleResult : Symbol(tupleResult, Decl(kvsForExpression.ts, 23, 1))
+>entries : Symbol(entries, Decl(kvsForExpression.ts, 25, 21))
+>Entry : Symbol(Entry, Decl(kvsForExpression.ts, 0, 0))
+
+    return for (const entry of entries; [count = 0, total = 0]) {
+>entry : Symbol(entry, Decl(kvsForExpression.ts, 26, 21))
+>entries : Symbol(entries, Decl(kvsForExpression.ts, 25, 21))
+>count : Symbol(count, Decl(kvsForExpression.ts, 26, 41))
+>total : Symbol(total, Decl(kvsForExpression.ts, 26, 51))
+
+        if (!entry.included) continue;
+>entry.included : Symbol(Entry.included, Decl(kvsForExpression.ts, 1, 18))
+>entry : Symbol(entry, Decl(kvsForExpression.ts, 26, 21))
+>included : Symbol(Entry.included, Decl(kvsForExpression.ts, 1, 18))
+
+        count++;
+>count : Symbol(count, Decl(kvsForExpression.ts, 26, 41))
+
+        total += entry.value;
+>total : Symbol(total, Decl(kvsForExpression.ts, 26, 51))
+>entry.value : Symbol(Entry.value, Decl(kvsForExpression.ts, 0, 17))
+>entry : Symbol(entry, Decl(kvsForExpression.ts, 26, 21))
+>value : Symbol(Entry.value, Decl(kvsForExpression.ts, 0, 17))
+
+    };
+}
+
+function objectResult(entries: Entry[]) {
+>objectResult : Symbol(objectResult, Decl(kvsForExpression.ts, 31, 1))
+>entries : Symbol(entries, Decl(kvsForExpression.ts, 33, 22))
+>Entry : Symbol(Entry, Decl(kvsForExpression.ts, 0, 0))
+
+    return for (entries; {count = 0, total = 0}) {
+>entries : Symbol(entries, Decl(kvsForExpression.ts, 33, 22))
+>count : Symbol(count, Decl(kvsForExpression.ts, 34, 26))
+>total : Symbol(total, Decl(kvsForExpression.ts, 34, 36))
+
+        if (!_.included) continue;
+>_.included : Symbol(Entry.included, Decl(kvsForExpression.ts, 1, 18))
+>_ : Symbol(_, Decl(kvsForExpression.ts, 35, 13))
+>included : Symbol(Entry.included, Decl(kvsForExpression.ts, 1, 18))
+
+        count++;
+>count : Symbol(count, Decl(kvsForExpression.ts, 34, 26))
+
+        total += _.value;
+>total : Symbol(total, Decl(kvsForExpression.ts, 34, 36))
+>_.value : Symbol(Entry.value, Decl(kvsForExpression.ts, 0, 17))
+>_ : Symbol(_, Decl(kvsForExpression.ts, 35, 13))
+>value : Symbol(Entry.value, Decl(kvsForExpression.ts, 0, 17))
+
+    };
+}
+
+function stopEarly(entries: Entry[]) {
+>stopEarly : Symbol(stopEarly, Decl(kvsForExpression.ts, 39, 1))
+>entries : Symbol(entries, Decl(kvsForExpression.ts, 41, 19))
+>Entry : Symbol(Entry, Decl(kvsForExpression.ts, 0, 0))
+
+    return for (entries; total = 0) {
+>entries : Symbol(entries, Decl(kvsForExpression.ts, 41, 19))
+>total : Symbol(total, Decl(kvsForExpression.ts, 42, 24))
+
+        if (!_.included) break;
+>_.included : Symbol(Entry.included, Decl(kvsForExpression.ts, 1, 18))
+>_ : Symbol(_, Decl(kvsForExpression.ts, 43, 13))
+>included : Symbol(Entry.included, Decl(kvsForExpression.ts, 1, 18))
+
+        total += _.value;
+>total : Symbol(total, Decl(kvsForExpression.ts, 42, 24))
+>_.value : Symbol(Entry.value, Decl(kvsForExpression.ts, 0, 17))
+>_ : Symbol(_, Decl(kvsForExpression.ts, 43, 13))
+>value : Symbol(Entry.value, Decl(kvsForExpression.ts, 0, 17))
+
+    };
+}
+
+function containingReturn(entries: Entry[]) {
+>containingReturn : Symbol(containingReturn, Decl(kvsForExpression.ts, 46, 1))
+>entries : Symbol(entries, Decl(kvsForExpression.ts, 48, 26))
+>Entry : Symbol(Entry, Decl(kvsForExpression.ts, 0, 0))
+
+    const total = for (entries; total = 0) {
+>total : Symbol(total, Decl(kvsForExpression.ts, 49, 9))
+>entries : Symbol(entries, Decl(kvsForExpression.ts, 48, 26))
+>total : Symbol(total, Decl(kvsForExpression.ts, 49, 31))
+
+        if (_.value < 0) return "negative";
+>_.value : Symbol(Entry.value, Decl(kvsForExpression.ts, 0, 17))
+>_ : Symbol(_, Decl(kvsForExpression.ts, 50, 12))
+>value : Symbol(Entry.value, Decl(kvsForExpression.ts, 0, 17))
+
+        total += _.value;
+>total : Symbol(total, Decl(kvsForExpression.ts, 49, 31))
+>_.value : Symbol(Entry.value, Decl(kvsForExpression.ts, 0, 17))
+>_ : Symbol(_, Decl(kvsForExpression.ts, 50, 12))
+>value : Symbol(Entry.value, Decl(kvsForExpression.ts, 0, 17))
+
+    };
+    total;
+>total : Symbol(total, Decl(kvsForExpression.ts, 49, 9))
+
+    return "complete";
+}
+
+function propertyTail(entries: Entry[]) {
+>propertyTail : Symbol(propertyTail, Decl(kvsForExpression.ts, 55, 1))
+>entries : Symbol(entries, Decl(kvsForExpression.ts, 57, 22))
+>Entry : Symbol(Entry, Decl(kvsForExpression.ts, 0, 0))
+
+    return for (entries; [count = 0, total = 0]) {
+>entries : Symbol(entries, Decl(kvsForExpression.ts, 57, 22))
+>count : Symbol(count, Decl(kvsForExpression.ts, 58, 26))
+>total : Symbol(total, Decl(kvsForExpression.ts, 58, 36))
+
+        count++;
+>count : Symbol(count, Decl(kvsForExpression.ts, 58, 26))
+
+        total += _.value;
+>total : Symbol(total, Decl(kvsForExpression.ts, 58, 36))
+>_.value : Symbol(Entry.value, Decl(kvsForExpression.ts, 0, 17))
+>_ : Symbol(_, Decl(kvsForExpression.ts, 60, 16))
+>value : Symbol(Entry.value, Decl(kvsForExpression.ts, 0, 17))
+
+    }[1];
+>1 : Symbol(1)
+}
+
+function enumerate(input: Record<string, number>) {
+>enumerate : Symbol(enumerate, Decl(kvsForExpression.ts, 62, 1))
+>input : Symbol(input, Decl(kvsForExpression.ts, 64, 19))
+>Record : Symbol(Record, Decl(lib.es5.d.ts, --, --))
+
+    return for (const key in input; keys = "") {
+>key : Symbol(key, Decl(kvsForExpression.ts, 65, 21))
+>input : Symbol(input, Decl(kvsForExpression.ts, 64, 19))
+>keys : Symbol(keys, Decl(kvsForExpression.ts, 65, 35))
+
+        keys += key;
+>keys : Symbol(keys, Decl(kvsForExpression.ts, 65, 35))
+>key : Symbol(key, Decl(kvsForExpression.ts, 65, 21))
+
+    };
+}
+
+declare const nullableEntries: Entry[]?;
+>nullableEntries : Symbol(nullableEntries, Decl(kvsForExpression.ts, 70, 13))
+>Entry : Symbol(Entry, Decl(kvsForExpression.ts, 0, 0))
+
+const nullableSourceTotal = for (nullableEntries; total = 0) {
+>nullableSourceTotal : Symbol(nullableSourceTotal, Decl(kvsForExpression.ts, 71, 5))
+>nullableEntries : Symbol(nullableEntries, Decl(kvsForExpression.ts, 70, 13))
+>total : Symbol(total, Decl(kvsForExpression.ts, 71, 49))
+
+    total += _.value;
+>total : Symbol(total, Decl(kvsForExpression.ts, 71, 49))
+>_.value : Symbol(Entry.value, Decl(kvsForExpression.ts, 0, 17))
+>_ : Symbol(_, Decl(kvsForExpression.ts, 72, 12))
+>value : Symbol(Entry.value, Decl(kvsForExpression.ts, 0, 17))
+
+};
+
+function explicitNullableSource(entries: Entry[]?) {
+>explicitNullableSource : Symbol(explicitNullableSource, Decl(kvsForExpression.ts, 73, 2))
+>entries : Symbol(entries, Decl(kvsForExpression.ts, 75, 32))
+>Entry : Symbol(Entry, Decl(kvsForExpression.ts, 0, 0))
+
+    return for (const entry of entries; total = 0) {
+>entry : Symbol(entry, Decl(kvsForExpression.ts, 76, 21))
+>entries : Symbol(entries, Decl(kvsForExpression.ts, 75, 32))
+>total : Symbol(total, Decl(kvsForExpression.ts, 76, 39))
+
+        total += entry.value;
+>total : Symbol(total, Decl(kvsForExpression.ts, 76, 39))
+>entry.value : Symbol(Entry.value, Decl(kvsForExpression.ts, 0, 17))
+>entry : Symbol(entry, Decl(kvsForExpression.ts, 76, 21))
+>value : Symbol(Entry.value, Decl(kvsForExpression.ts, 0, 17))
+
+    };
+}
+
+const total = 100;
+>total : Symbol(total, Decl(kvsForExpression.ts, 81, 5))
+
+const shadowed = for (const entry of [] as Entry[]; total = 0) {
+>shadowed : Symbol(shadowed, Decl(kvsForExpression.ts, 82, 5))
+>entry : Symbol(entry, Decl(kvsForExpression.ts, 82, 27))
+>Entry : Symbol(Entry, Decl(kvsForExpression.ts, 0, 0))
+>total : Symbol(total, Decl(kvsForExpression.ts, 82, 51))
+
+    total += entry.value;
+>total : Symbol(total, Decl(kvsForExpression.ts, 82, 51))
+>entry.value : Symbol(Entry.value, Decl(kvsForExpression.ts, 0, 17))
+>entry : Symbol(entry, Decl(kvsForExpression.ts, 82, 27))
+>value : Symbol(Entry.value, Decl(kvsForExpression.ts, 0, 17))
+
+};
+total;
+>total : Symbol(total, Decl(kvsForExpression.ts, 81, 5))
+
+shadowed;
+>shadowed : Symbol(shadowed, Decl(kvsForExpression.ts, 82, 5))
+

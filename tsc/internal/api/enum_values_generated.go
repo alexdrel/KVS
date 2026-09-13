@@ -566,6 +566,7 @@ func main() {
 			"KvsCompactObjectExpression":                   toInt32(ast.KindKvsCompactObjectExpression),
 			"KvsCollectExpression":                         toInt32(ast.KindKvsCollectExpression),
 			"KvsSelectExpression":                          toInt32(ast.KindKvsSelectExpression),
+			"KvsForExpression":                             toInt32(ast.KindKvsForExpression),
 			"SpreadElement":                                toInt32(ast.KindSpreadElement),
 			"ClassExpression":                              toInt32(ast.KindClassExpression),
 			"OmittedExpression":                            toInt32(ast.KindOmittedExpression),

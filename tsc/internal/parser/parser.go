@@ -5821,6 +5821,9 @@ func (p *Parser) parsePrimaryExpression() *ast.Expression {
 	if p.token == ast.KindQuestionToken && p.lookAhead((*Parser).nextTokenIsContiguousOpenBrace) {
 		return p.parseKvsCompactObjectExpression()
 	}
+	if p.token == ast.KindForKeyword && p.lookAhead((*Parser).nextTokenIsOpenParen) {
+		return p.parseKvsForExpression()
+	}
 	switch p.token {
 	case ast.KindNoSubstitutionTemplateLiteral:
 		if p.scanner.TokenFlags()&ast.TokenFlagsIsInvalid != 0 {
@@ -5863,6 +5866,149 @@ func (p *Parser) parsePrimaryExpression() *ast.Expression {
 		return p.parsePrivateIdentifier()
 	}
 	return p.parseIdentifierWithDiagnostic(diagnostics.Expression_expected, nil)
+}
+
+func (p *Parser) parseKvsForExpression() *ast.Expression {
+	pos := p.nodePos()
+	p.parseExpected(ast.KindForKeyword)
+	p.parseExpected(ast.KindOpenParenToken)
+
+	var initializer *ast.ForInitializer
+	if p.token != ast.KindSemicolonToken {
+		if p.token == ast.KindVarKeyword || p.token == ast.KindLetKeyword || p.token == ast.KindConstKeyword {
+			initializer = p.parseVariableDeclarationList(true /*inForStatementInitializer*/)
+		} else {
+			initializer = doInContext(p, ast.NodeFlagsDisallowInContext, true, (*Parser).parseExpression)
+		}
+	}
+
+	var condition *ast.Expression
+	var incrementor *ast.Expression
+	var expression *ast.Expression
+	var result *ast.Node
+	var tupleResult bool
+	var objectResult bool
+	forIn := false
+	implicitSubject := false
+
+	if p.token == ast.KindOfKeyword || p.token == ast.KindInKeyword {
+		forIn = p.token == ast.KindInKeyword
+		p.nextToken()
+		expression = doInContext(p, ast.NodeFlagsDisallowInContext, false, (*Parser).parseAssignmentExpressionOrHigher)
+		p.parseExpected(ast.KindSemicolonToken)
+		result, tupleResult, objectResult = p.parseKvsForResult()
+	} else {
+		p.parseExpected(ast.KindSemicolonToken)
+		var second *ast.Expression
+		if p.token != ast.KindSemicolonToken && p.token != ast.KindCloseParenToken {
+			second = p.parseExpressionAllowIn()
+		}
+		if p.token == ast.KindCloseParenToken && initializer != nil && !ast.IsVariableDeclarationList(initializer) {
+			// Iterable-only `for (source; result)` is distinguishable from a
+			// C-style loop after its second slot has been parsed.
+			expression = initializer
+			result, tupleResult, objectResult = p.kvsForResultFromExpression(second)
+			implicitSubject = true
+		} else {
+			condition = second
+			p.parseExpected(ast.KindSemicolonToken)
+			if p.token != ast.KindSemicolonToken && p.token != ast.KindCloseParenToken {
+				incrementor = p.parseExpressionAllowIn()
+			}
+			p.parseExpected(ast.KindSemicolonToken)
+			result, tupleResult, objectResult = p.parseKvsForResult()
+		}
+	}
+
+	p.parseExpected(ast.KindCloseParenToken)
+	statement := p.parseStatement()
+	if implicitSubject {
+		initializer = p.newKvsImplicitSubjectInitializer(expression, statement)
+	}
+	node := p.factory.NewKvsForExpression(initializer, condition, incrementor, expression, result, tupleResult, objectResult, forIn, statement)
+	if implicitSubject {
+		node.Flags |= ast.NodeFlagsKvsImplicitSubject
+	}
+	return p.finishNode(node, pos)
+}
+
+func (p *Parser) parseKvsForResult() (*ast.Node, bool, bool) {
+	pos := p.nodePos()
+	tupleResult := p.token == ast.KindOpenBracketToken
+	objectResult := p.token == ast.KindOpenBraceToken
+	var declarations []*ast.Node
+	if tupleResult || objectResult {
+		closeToken := ast.KindCloseBracketToken
+		if objectResult {
+			closeToken = ast.KindCloseBraceToken
+		}
+		p.nextToken()
+		for p.token != closeToken && p.token != ast.KindEndOfFile {
+			declarations = append(declarations, p.parseKvsForResultDeclaration())
+			if !p.parseOptional(ast.KindCommaToken) {
+				break
+			}
+		}
+		p.parseExpected(closeToken)
+	} else {
+		declarations = append(declarations, p.parseKvsForResultDeclaration())
+	}
+	list := p.newNodeList(core.NewTextRange(pos, p.nodePos()), declarations)
+	result := p.finishNode(p.factory.NewVariableDeclarationList(list, ast.NodeFlagsLet), pos)
+	ast.SetParentInChildren(result)
+	return result, tupleResult, objectResult
+}
+
+func (p *Parser) parseKvsForResultDeclaration() *ast.Node {
+	pos := p.nodePos()
+	name := p.parseBindingIdentifier()
+	p.parseExpected(ast.KindEqualsToken)
+	initializer := p.parseAssignmentExpressionOrHigher()
+	return p.finishNode(p.factory.NewVariableDeclaration(name, nil, nil, initializer), pos)
+}
+
+func (p *Parser) kvsForResultFromExpression(expression *ast.Expression) (*ast.Node, bool, bool) {
+	pos := p.nodePos()
+	var declarations []*ast.Node
+	tupleResult := ast.IsArrayLiteralExpression(expression)
+	objectResult := ast.IsObjectLiteralExpression(expression)
+	var assignments []*ast.Node
+	if tupleResult {
+		assignments = expression.AsArrayLiteralExpression().Elements.Nodes
+	} else if objectResult {
+		assignments = expression.AsObjectLiteralExpression().Properties.Nodes
+	} else if expression != nil {
+		assignments = []*ast.Node{expression}
+	}
+	for _, assignment := range assignments {
+		var name *ast.Node
+		var initializer *ast.Node
+		if ast.IsBinaryExpression(assignment) && assignment.AsBinaryExpression().OperatorToken.Kind == ast.KindEqualsToken && ast.IsIdentifier(assignment.AsBinaryExpression().Left) {
+			name = assignment.AsBinaryExpression().Left
+			initializer = assignment.AsBinaryExpression().Right
+		} else if ast.IsShorthandPropertyAssignment(assignment) && assignment.AsShorthandPropertyAssignment().ObjectAssignmentInitializer != nil {
+			name = assignment.Name()
+			initializer = assignment.AsShorthandPropertyAssignment().ObjectAssignmentInitializer
+		}
+		if name == nil {
+			p.parseErrorAtRange(assignment.Loc, diagnostics.Variable_declaration_expected)
+			name = p.createMissingIdentifier()
+			initializer = p.createMissingIdentifier()
+		}
+		declaration := p.factory.NewVariableDeclaration(name, nil, nil, initializer)
+		declaration.Loc = assignment.Loc
+		declarations = append(declarations, declaration)
+	}
+	if len(declarations) == 0 {
+		p.parseErrorAtCurrentToken(diagnostics.Variable_declaration_expected)
+		declarations = append(declarations, p.factory.NewVariableDeclaration(
+			p.createMissingIdentifier(), nil, nil, p.createMissingIdentifier(),
+		))
+	}
+	list := p.newNodeList(core.NewTextRange(pos, p.nodePos()), declarations)
+	result := p.finishNode(p.factory.NewVariableDeclarationList(list, ast.NodeFlagsLet), pos)
+	ast.SetParentInChildren(result)
+	return result, tupleResult, objectResult
 }
 
 func (p *Parser) nextTokenIsContiguousOpenBracket() bool {
