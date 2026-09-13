@@ -1,0 +1,68 @@
+//// [tests/cases/conformance/kvs/kvsCompactArray.ts] ////
+
+=== kvsCompactArray.ts ===
+declare const nullableNumber: number?;
+>nullableNumber : number | null | undefined
+
+declare const presentNumber: number;
+>presentNumber : number
+
+declare const absent: null;
+>absent : null
+
+declare const nullableArray: (number?)[]?;
+>nullableArray : (number | null | undefined)[] | null | undefined
+
+declare const nullableIterable: Iterable<number?>?;
+>nullableIterable : Iterable<number | null | undefined> | null | undefined
+
+const compact = ?[nullableNumber, presentNumber, false, 0, "", absent];
+>compact : (string | number | boolean)[]
+>?[nullableNumber, presentNumber, false, 0, "", absent] : (string | number | boolean)[]
+>nullableNumber : number | null | undefined
+>presentNumber : number
+>false : false
+>0 : 0
+>"" : ""
+>absent : null
+
+const spreadArray = ?[...nullableArray];
+>spreadArray : number[]
+>?[...nullableArray] : number[]
+>...nullableArray : any
+>nullableArray : (number | null | undefined)[] | null | undefined
+
+const spreadIterable = ?[...nullableIterable];
+>spreadIterable : number[]
+>?[...nullableIterable] : number[]
+>...nullableIterable : any
+>nullableIterable : Iterable<number | null | undefined> | null | undefined
+
+const nested = ?[nullableNumber, ?[nullableNumber]];
+>nested : (number | number[])[]
+>?[nullableNumber, ?[nullableNumber]] : (number | number[])[]
+>nullableNumber : number | null | undefined
+>?[nullableNumber] : number[]
+>nullableNumber : number | null | undefined
+
+declare function first(): number?;
+>first : () => number?
+
+declare function second(): number?;
+>second : () => number?
+
+const ordered = ?[first(), second(), 0];
+>ordered : number[]
+>?[first(), second(), 0] : number[]
+>first() : number | null | undefined
+>first : () => number?
+>second() : number | null | undefined
+>second : () => number?
+>0 : 0
+
+const ordinary = [nullableNumber, absent];
+>ordinary : (number | null | undefined)[]
+>[nullableNumber, absent] : (number | null | undefined)[]
+>nullableNumber : number | null | undefined
+>absent : null
+

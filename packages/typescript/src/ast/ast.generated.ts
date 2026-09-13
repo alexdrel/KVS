@@ -640,6 +640,12 @@ export interface KvsNullingExpression extends ExpressionBase {
     readonly colonToken: ColonToken;
     readonly whenTrue: Expression;
 }
+export interface KvsCompactArrayExpression extends PrimaryExpressionBase {
+    readonly kind: SyntaxKind.KvsCompactArrayExpression;
+    readonly questionToken: QuestionToken;
+    readonly elements: NodeArray<Expression>;
+    readonly multiLine: boolean;
+}
 export interface KvsCollectExpression extends ExpressionBase {
     readonly kind: SyntaxKind.KvsCollectExpression;
     readonly initializer: ForInitializer;

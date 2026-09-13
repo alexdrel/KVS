@@ -5809,6 +5809,9 @@ func (p *Parser) parsePrimaryExpression() *ast.Expression {
 	if p.token == ast.KindIdentifier && (p.scanner.TokenValue() == "collect" || p.scanner.TokenValue() == "select") && p.lookAhead((*Parser).nextTokenIsOpenParen) {
 		return p.parseKvsProducerExpression()
 	}
+	if p.token == ast.KindQuestionToken && p.lookAhead((*Parser).nextTokenIsContiguousOpenBracket) {
+		return p.parseKvsCompactArrayExpression()
+	}
 	switch p.token {
 	case ast.KindNoSubstitutionTemplateLiteral:
 		if p.scanner.TokenFlags()&ast.TokenFlagsIsInvalid != 0 {
@@ -5851,6 +5854,11 @@ func (p *Parser) parsePrimaryExpression() *ast.Expression {
 		return p.parsePrivateIdentifier()
 	}
 	return p.parseIdentifierWithDiagnostic(diagnostics.Expression_expected, nil)
+}
+
+func (p *Parser) nextTokenIsContiguousOpenBracket() bool {
+	questionEnd := p.scanner.TokenEnd()
+	return p.nextToken() == ast.KindOpenBracketToken && p.scanner.TokenStart() == questionEnd
 }
 
 func (p *Parser) parseKvsProducerExpression() *ast.Expression {
@@ -5940,6 +5948,17 @@ func (p *Parser) parseArrayLiteralExpression() *ast.Expression {
 	elements := p.parseDelimitedList(PCArrayLiteralMembers, (*Parser).parseArgumentOrArrayLiteralElement)
 	p.parseExpectedMatchingBrackets(ast.KindOpenBracketToken, ast.KindCloseBracketToken, openBracketParsed, openBracketPosition)
 	return p.finishNode(p.factory.NewArrayLiteralExpression(elements, multiLine), pos)
+}
+
+func (p *Parser) parseKvsCompactArrayExpression() *ast.Expression {
+	pos := p.nodePos()
+	questionToken := p.parseExpectedToken(ast.KindQuestionToken)
+	openBracketPosition := p.scanner.TokenStart()
+	openBracketParsed := p.parseExpected(ast.KindOpenBracketToken)
+	multiLine := p.hasPrecedingLineBreak()
+	elements := p.parseDelimitedList(PCArrayLiteralMembers, (*Parser).parseArgumentOrArrayLiteralElement)
+	p.parseExpectedMatchingBrackets(ast.KindOpenBracketToken, ast.KindCloseBracketToken, openBracketParsed, openBracketPosition)
+	return p.finishNode(p.factory.NewKvsCompactArrayExpression(questionToken, elements, multiLine), pos)
 }
 
 func (p *Parser) parseObjectLiteralExpression() *ast.Expression {
@@ -6503,6 +6522,8 @@ func (p *Parser) isStartOfLeftHandSideExpression() bool {
 		return true
 	case ast.KindImportKeyword:
 		return p.isNextTokenOpenParenOrLessThanOrDot()
+	case ast.KindQuestionToken:
+		return p.lookAhead((*Parser).nextTokenIsContiguousOpenBracket)
 	}
 	return p.isIdentifier()
 }

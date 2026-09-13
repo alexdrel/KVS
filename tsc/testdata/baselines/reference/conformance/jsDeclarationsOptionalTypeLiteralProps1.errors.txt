@@ -1,8 +1,8 @@
-foo.js(12,16): error TS18048: 'b' is possibly 'undefined'.
-foo.js(12,20): error TS18048: 'c' is possibly 'undefined'.
+foo.js(12,5): error TS2322: Type 'number | null' is not assignable to type 'number'.
+  Type 'null' is not assignable to type 'number'.
 
 
-==== foo.js (2 errors) ====
+==== foo.js (1 errors) ====
     /**
      * foo
      *
@@ -15,9 +15,8 @@ foo.js(12,20): error TS18048: 'c' is possibly 'undefined'.
      */
     function foo({ a, b, c }) {
         return a + b + c;
-                   ~
-!!! error TS18048: 'b' is possibly 'undefined'.
-                       ~
-!!! error TS18048: 'c' is possibly 'undefined'.
+        ~~~~~~
+!!! error TS2322: Type 'number | null' is not assignable to type 'number'.
+!!! error TS2322:   Type 'null' is not assignable to type 'number'.
     }
     

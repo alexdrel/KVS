@@ -31,8 +31,8 @@ const grouped = (item as!).length;
 const impossible = null as!;
 >impossible : Symbol(impossible, Decl(kvsStaticNullability.ts, 8, 5))
 
-const rejectedAddition = nullableNumber + 2;
->rejectedAddition : Symbol(rejectedAddition, Decl(kvsStaticNullability.ts, 9, 5))
+const liftedAddition = nullableNumber + 2;
+>liftedAddition : Symbol(liftedAddition, Decl(kvsStaticNullability.ts, 9, 5))
 >nullableNumber : Symbol(nullableNumber, Decl(kvsStaticNullability.ts, 1, 13))
 
 const assertedAddition = nullableNumber as! + 2;

@@ -292,6 +292,7 @@
             "KvsExtantTestExpression",
             "KvsDefaultExpression",
             "KvsNullingExpression",
+            "KvsCompactArrayExpression",
             "KvsCollectExpression",
             "KvsSelectExpression",
             "SpreadElement",
@@ -1807,6 +1808,28 @@
                     }
                 ],
                 "arena": true
+            },
+            "KvsCompactArrayExpression": {
+                "generateSubtreeFacts": true,
+                "extends": [
+                    "PrimaryExpressionBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "QuestionToken",
+                        "type": "QuestionToken"
+                    },
+                    {
+                        "name": "Elements",
+                        "type": "Expression",
+                        "list": "NodeList"
+                    },
+                    {
+                        "name": "MultiLine",
+                        "type": "bool"
+                    }
+                ]
             },
             "KvsCollectExpression": {
                 "extends": [

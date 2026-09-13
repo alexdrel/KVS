@@ -1,0 +1,91 @@
+//// [tests/cases/conformance/kvs/kvsNullableOperators.ts] ////
+
+=== kvsNullableOperators.ts ===
+declare const nullableNumber: number?;
+>nullableNumber : Symbol(nullableNumber, Decl(kvsNullableOperators.ts, 0, 13))
+
+declare const nullableString: string?;
+>nullableString : Symbol(nullableString, Decl(kvsNullableOperators.ts, 1, 13))
+
+declare const nullableBigInt: bigint?;
+>nullableBigInt : Symbol(nullableBigInt, Decl(kvsNullableOperators.ts, 2, 13))
+
+declare const absent: null;
+>absent : Symbol(absent, Decl(kvsNullableOperators.ts, 3, 13))
+
+const add = nullableNumber + 1;
+>add : Symbol(add, Decl(kvsNullableOperators.ts, 5, 5))
+>nullableNumber : Symbol(nullableNumber, Decl(kvsNullableOperators.ts, 0, 13))
+
+const subtract = 10 - nullableNumber;
+>subtract : Symbol(subtract, Decl(kvsNullableOperators.ts, 6, 5))
+>nullableNumber : Symbol(nullableNumber, Decl(kvsNullableOperators.ts, 0, 13))
+
+const multiply = nullableNumber * 2;
+>multiply : Symbol(multiply, Decl(kvsNullableOperators.ts, 7, 5))
+>nullableNumber : Symbol(nullableNumber, Decl(kvsNullableOperators.ts, 0, 13))
+
+const divide = nullableNumber / 2;
+>divide : Symbol(divide, Decl(kvsNullableOperators.ts, 8, 5))
+>nullableNumber : Symbol(nullableNumber, Decl(kvsNullableOperators.ts, 0, 13))
+
+const remainder = nullableNumber % 2;
+>remainder : Symbol(remainder, Decl(kvsNullableOperators.ts, 9, 5))
+>nullableNumber : Symbol(nullableNumber, Decl(kvsNullableOperators.ts, 0, 13))
+
+const exponent = nullableNumber ** 2;
+>exponent : Symbol(exponent, Decl(kvsNullableOperators.ts, 10, 5))
+>nullableNumber : Symbol(nullableNumber, Decl(kvsNullableOperators.ts, 0, 13))
+
+const bigintAdd = nullableBigInt + 1n;
+>bigintAdd : Symbol(bigintAdd, Decl(kvsNullableOperators.ts, 11, 5))
+>nullableBigInt : Symbol(nullableBigInt, Decl(kvsNullableOperators.ts, 2, 13))
+
+// Arithmetic requires compatible present types and cannot infer a present
+// type from an operand known to be absent.
+const rejectMixedAddition = 10 + nullableString;
+>rejectMixedAddition : Symbol(rejectMixedAddition, Decl(kvsNullableOperators.ts, 15, 5))
+>nullableString : Symbol(nullableString, Decl(kvsNullableOperators.ts, 1, 13))
+
+const rejectNullableString = "value: " + nullableString;
+>rejectNullableString : Symbol(rejectNullableString, Decl(kvsNullableOperators.ts, 16, 5))
+>nullableString : Symbol(nullableString, Decl(kvsNullableOperators.ts, 1, 13))
+
+const rejectKnownAbsent = absent + 1;
+>rejectKnownAbsent : Symbol(rejectKnownAbsent, Decl(kvsNullableOperators.ts, 17, 5))
+>absent : Symbol(absent, Decl(kvsNullableOperators.ts, 3, 13))
+
+const rejectComparison = nullableNumber < 10;
+>rejectComparison : Symbol(rejectComparison, Decl(kvsNullableOperators.ts, 19, 5))
+>nullableNumber : Symbol(nullableNumber, Decl(kvsNullableOperators.ts, 0, 13))
+
+const ordinary = 1 + 2;
+>ordinary : Symbol(ordinary, Decl(kvsNullableOperators.ts, 21, 5))
+
+const exactIdentity = nullableNumber === null;
+>exactIdentity : Symbol(exactIdentity, Decl(kvsNullableOperators.ts, 22, 5))
+>nullableNumber : Symbol(nullableNumber, Decl(kvsNullableOperators.ts, 0, 13))
+
+declare function left(): number?;
+>left : Symbol(left, Decl(kvsNullableOperators.ts, 22, 46))
+
+declare function right(): number?;
+>right : Symbol(right, Decl(kvsNullableOperators.ts, 24, 33))
+
+const ordered = left() + right();
+>ordered : Symbol(ordered, Decl(kvsNullableOperators.ts, 26, 5))
+>left : Symbol(left, Decl(kvsNullableOperators.ts, 22, 46))
+>right : Symbol(right, Decl(kvsNullableOperators.ts, 24, 33))
+
+const nested = nullableNumber * 2 + 1;
+>nested : Symbol(nested, Decl(kvsNullableOperators.ts, 28, 5))
+>nullableNumber : Symbol(nullableNumber, Decl(kvsNullableOperators.ts, 0, 13))
+
+// Operators outside this slice retain their TypeScript checking and runtime behavior.
+const rejectBitwise = nullableNumber & 1;
+>rejectBitwise : Symbol(rejectBitwise, Decl(kvsNullableOperators.ts, 31, 5))
+>nullableNumber : Symbol(nullableNumber, Decl(kvsNullableOperators.ts, 0, 13))
+
+nullableNumber += 1;
+>nullableNumber : Symbol(nullableNumber, Decl(kvsNullableOperators.ts, 0, 13))
+

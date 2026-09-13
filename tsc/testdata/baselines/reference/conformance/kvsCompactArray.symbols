@@ -1,0 +1,54 @@
+//// [tests/cases/conformance/kvs/kvsCompactArray.ts] ////
+
+=== kvsCompactArray.ts ===
+declare const nullableNumber: number?;
+>nullableNumber : Symbol(nullableNumber, Decl(kvsCompactArray.ts, 0, 13))
+
+declare const presentNumber: number;
+>presentNumber : Symbol(presentNumber, Decl(kvsCompactArray.ts, 1, 13))
+
+declare const absent: null;
+>absent : Symbol(absent, Decl(kvsCompactArray.ts, 2, 13))
+
+declare const nullableArray: (number?)[]?;
+>nullableArray : Symbol(nullableArray, Decl(kvsCompactArray.ts, 3, 13))
+
+declare const nullableIterable: Iterable<number?>?;
+>nullableIterable : Symbol(nullableIterable, Decl(kvsCompactArray.ts, 4, 13))
+>Iterable : Symbol(Iterable, Decl(lib.es2015.iterable.d.ts, --, --))
+
+const compact = ?[nullableNumber, presentNumber, false, 0, "", absent];
+>compact : Symbol(compact, Decl(kvsCompactArray.ts, 6, 5))
+>nullableNumber : Symbol(nullableNumber, Decl(kvsCompactArray.ts, 0, 13))
+>presentNumber : Symbol(presentNumber, Decl(kvsCompactArray.ts, 1, 13))
+>absent : Symbol(absent, Decl(kvsCompactArray.ts, 2, 13))
+
+const spreadArray = ?[...nullableArray];
+>spreadArray : Symbol(spreadArray, Decl(kvsCompactArray.ts, 7, 5))
+>nullableArray : Symbol(nullableArray, Decl(kvsCompactArray.ts, 3, 13))
+
+const spreadIterable = ?[...nullableIterable];
+>spreadIterable : Symbol(spreadIterable, Decl(kvsCompactArray.ts, 8, 5))
+>nullableIterable : Symbol(nullableIterable, Decl(kvsCompactArray.ts, 4, 13))
+
+const nested = ?[nullableNumber, ?[nullableNumber]];
+>nested : Symbol(nested, Decl(kvsCompactArray.ts, 9, 5))
+>nullableNumber : Symbol(nullableNumber, Decl(kvsCompactArray.ts, 0, 13))
+>nullableNumber : Symbol(nullableNumber, Decl(kvsCompactArray.ts, 0, 13))
+
+declare function first(): number?;
+>first : Symbol(first, Decl(kvsCompactArray.ts, 9, 52))
+
+declare function second(): number?;
+>second : Symbol(second, Decl(kvsCompactArray.ts, 11, 34))
+
+const ordered = ?[first(), second(), 0];
+>ordered : Symbol(ordered, Decl(kvsCompactArray.ts, 13, 5))
+>first : Symbol(first, Decl(kvsCompactArray.ts, 9, 52))
+>second : Symbol(second, Decl(kvsCompactArray.ts, 11, 34))
+
+const ordinary = [nullableNumber, absent];
+>ordinary : Symbol(ordinary, Decl(kvsCompactArray.ts, 15, 5))
+>nullableNumber : Symbol(nullableNumber, Decl(kvsCompactArray.ts, 0, 13))
+>absent : Symbol(absent, Decl(kvsCompactArray.ts, 2, 13))
+

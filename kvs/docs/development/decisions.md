@@ -398,6 +398,29 @@ The emit resolver reports whether the checked source type is nullable. This
 keeps non-nullable loop output unchanged and avoids duplicating type analysis
 inside the transformer. Async `for await...of` remains outside this slice.
 
+## First compact-array slice
+
+Status: accepted.
+
+`?[...]` is represented by a dedicated `KvsCompactArrayExpression`. Direct
+elements that may be absent are evaluated once and conditionally spread as a
+zero-or-one-element array. One generated temporary is reused for direct
+elements within each compact literal; a nested compact literal owns its own
+temporary. Statically nonnullable direct elements remain ordinary array
+elements.
+
+Spread sources accept top-level absence and iterable members that may be
+absent. A nullable source is defaulted with `?? []`, then the iterable is
+materialized and filtered with a nullish presence test. This preserves falsy
+members and works for arbitrary synchronous iterables, while evaluating the
+source once. Evaluation remains left to right, though KVS discourages relying
+on optional paths as effect-order control.
+
+The resulting array element type removes `null` and `undefined`. Ordinary
+array literals retain their existing behavior. `?{...}`, conditional
+placement, async iterables, formatter support, and source-map validation remain
+outside this slice.
+
 ## First implicit-subject slice
 
 Status: accepted.
@@ -418,3 +441,32 @@ is evaluated into a temporary before the inner `const _` is introduced. This
 avoids JavaScript's self-shadowing temporal dead zone while adding no temporary
 to independent forms such as `for (items)`. The first slice does not include
 `collect*`, placeholder lambdas, or subject-form `when`.
+
+## First nullable-operator slice
+
+Status: accepted.
+
+Ordinary `+`, `-`, `*`, `**`, `/`, and `%` expressions lift over top-level
+absence when either operand is nullable. Operands must have compatible numeric
+present types. An operand known to be only `null` or `undefined` is an error;
+nullable string concatenation and mixed numeric and string addition are
+rejected. A nullable string can instead be resolved explicitly with postfix
+`!`, whose string default is `""`. The relational operators `<`, `>`, `<=`, and `>=` do not lift;
+nullable operands remain errors and must be resolved explicitly. The checker
+adds `null` to a lifted arithmetic result type;
+generated absence is specifically `null`, even when a source operand type also
+includes `undefined`.
+
+Lowering captures each required value that must survive evaluation of a later
+operand. Operands are evaluated once from left to right, and an absent operand
+stops evaluation before later operands. This order is a semantic guarantee,
+but KVS discourages using it to hide effects behind nullable paths because the
+resulting code is difficult to read. Effects should be sequenced explicitly.
+
+A relational comparison performs no KVS-specific narrowing. Strict identity
+remains ordinary JavaScript. Loose equality, member and indexed access, bitwise and
+shift operators, unary operators, compound assignments, and KVS truthiness are
+outside this slice.
+
+No new syntax node is needed: the checker owns the nullable result and reports
+to the KVS emitter whether an ordinary binary expression requires lifting.

@@ -10,7 +10,7 @@ const untouched = item;
 const nested = [item as!];
 const grouped = (item as!).length;
 const impossible = null as!;
-const rejectedAddition = nullableNumber + 2;
+const liftedAddition = nullableNumber + 2;
 const assertedAddition = nullableNumber as! + 2;
 
 const omittedTrailingTuple: [string, boolean?] = ["pending"];
@@ -43,13 +43,14 @@ const rejectSpacedExtantAssertion = item as !;
 
 //// [kvsStaticNullability.js]
 "use strict";
+var _a;
 const widened = "ready";
 const asserted = item;
 const untouched = item;
 const nested = [item];
 const grouped = (item).length;
 const impossible = null;
-const rejectedAddition = nullableNumber + 2;
+const liftedAddition = (_a = nullableNumber) != null ? _a + 2 : null;
 const assertedAddition = nullableNumber + 2;
 const omittedTrailingTuple = ["pending"];
 const omittedParenthesizedTrailingTuple = ["pending"];

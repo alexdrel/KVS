@@ -1120,6 +1120,8 @@ func (n *Node) ElementList() *NodeList {
 		return n.AsBindingPattern().Elements
 	case KindArrayLiteralExpression:
 		return n.AsArrayLiteralExpression().Elements
+	case KindKvsCompactArrayExpression:
+		return n.AsKvsCompactArrayExpression().Elements
 	case KindTupleType:
 		return n.AsTupleTypeNode().Elements
 	}
@@ -1547,7 +1549,7 @@ func accessKind(node *Node) AccessKind {
 			return AccessKindRead
 		}
 		return accessKind(parent.Parent)
-	case KindArrayLiteralExpression:
+	case KindArrayLiteralExpression, KindKvsCompactArrayExpression:
 		return accessKind(parent)
 	case KindForInStatement, KindForOfStatement:
 		if node == parent.AsForInOrOfStatement().Initializer {

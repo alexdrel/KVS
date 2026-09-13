@@ -362,6 +362,8 @@ const (
 	NodeCheckFlagsInCheckIdentifier                        NodeCheckFlags = 1 << 22
 	NodeCheckFlagsInitializerIsUndefined                   NodeCheckFlags = 1 << 24
 	NodeCheckFlagsInitializerIsUndefinedComputed           NodeCheckFlags = 1 << 25
+	NodeCheckFlagsKvsLiftedBinaryLeftNullable              NodeCheckFlags = 1 << 26
+	NodeCheckFlagsKvsLiftedBinaryRightNullable             NodeCheckFlags = 1 << 27
 )
 
 // Common links

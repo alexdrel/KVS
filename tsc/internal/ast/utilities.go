@@ -2014,7 +2014,7 @@ func getImportTypeNodeLiteral(node *Node) *Node {
 func IsExpressionNode(node *Node) bool {
 	switch node.Kind {
 	case KindSuperKeyword, KindNullKeyword, KindTrueKeyword, KindFalseKeyword, KindRegularExpressionLiteral,
-		KindArrayLiteralExpression, KindObjectLiteralExpression, KindPropertyAccessExpression, KindElementAccessExpression,
+		KindArrayLiteralExpression, KindKvsCompactArrayExpression, KindObjectLiteralExpression, KindPropertyAccessExpression, KindElementAccessExpression,
 		KindCallExpression, KindNewExpression, KindTaggedTemplateExpression, KindAsExpression, KindTypeAssertionExpression,
 		KindSatisfiesExpression, KindNonNullExpression, KindParenthesizedExpression, KindFunctionExpression,
 		KindClassExpression, KindArrowFunction, KindVoidExpression, KindDeleteExpression, KindTypeOfExpression,

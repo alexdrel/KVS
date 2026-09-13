@@ -58,7 +58,17 @@ const result = a + 4 == b + 5;
 
 lowers through nullable temporaries. If either addition lacks an operand, or either equality operand is absent, `result` is null.
 
+Lifted arithmetic requires compatible numeric present types. An operand known
+to be absent is rejected rather than assigned a present type. Nullable string
+concatenation and mixed numeric and string addition are rejected; postfix `!`
+provides an explicit empty-string choice where desired.
+
 `===` and `!==` lower directly and retain exact JavaScript semantics.
+
+Arithmetic lowering evaluates lifted operands once, from left to right, and does not
+evaluate a later operand after an earlier required operand is absent. The
+language guarantees that order for correctness, while discouraging programs
+from using nullable operands as implicit effect guards.
 
 ## Presence
 
@@ -133,6 +143,12 @@ const options = ?{ title, query, ...overrides };
 ```
 
 They can lower to ordinary array pushes and conditional property assignments. For `?{...source}`, the lowering enumerates the source's own enumerable properties and copies only present values. Every source expression and property access is evaluated once in JavaScript order.
+
+The implemented `?[...]` slice lowers each nullable direct element to a
+conditional spread, reusing one temporary for direct elements in that literal.
+A nullable spread source is first defaulted with `?? []`, because JavaScript
+throws when spreading `null` or `undefined`; its materialized members are then
+filtered by `value != null`. Nested compact arrays own separate temporaries.
 
 The nulling operator lowers directly:
 

@@ -279,3 +279,34 @@ Run it with:
 ```sh
 go -C ./tsc test -run='TestLocal/kvsDefault' ./internal/testrunner
 ```
+
+## Nullable-operator slice
+
+`kvsNullableOperators.ts` checks lifted number and bigint operations, including
+nested propagation. Its JavaScript baseline verifies
+left-to-right evaluation, once-only captures, early absence propagation, and
+unchanged emission for non-nullable arithmetic and strict identity. Nullable
+string concatenation, relational, bitwise, and compound-assignment cases fence
+the unsupported boundary.
+
+Run it with:
+
+```sh
+go -C ./tsc test -run='TestLocal/kvsNullableOperators' ./internal/testrunner
+```
+
+## Compact-array slice
+
+`kvsCompactArray.ts` checks omission of nullable and known-absent direct
+elements, preservation of falsy values, nullable array and arbitrary iterable
+spreads, nested compact arrays, source-order calls, and the unchanged behavior
+of ordinary arrays. Its type baseline verifies that compact element types
+exclude absence. Its JavaScript baseline records one reusable temporary per
+literal and the `?? []` guard required before filtering nullable spread
+sources.
+
+Run it with:
+
+```sh
+go -C ./tsc test -run='TestLocal/kvsCompactArray' ./internal/testrunner
+```

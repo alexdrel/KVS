@@ -185,6 +185,7 @@ import type {
     KeywordTypeNode,
     KeywordTypeSyntaxKind,
     KvsCollectExpression,
+    KvsCompactArrayExpression,
     KvsDefaultExpression,
     KvsExtantAssertionExpression,
     KvsExtantAssignmentExpression,
@@ -633,6 +634,15 @@ export declare namespace isKvsNullingExpression {
     function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsNullingExpression>;
 }
 isKvsNullingExpression.Handle = isKvsNullingExpression as any;
+
+export function isKvsCompactArrayExpression(node: Node): node is KvsCompactArrayExpression {
+    return node.kind === SyntaxKind.KvsCompactArrayExpression;
+}
+
+export declare namespace isKvsCompactArrayExpression {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsCompactArrayExpression>;
+}
+isKvsCompactArrayExpression.Handle = isKvsCompactArrayExpression as any;
 
 export function isKvsCollectExpression(node: Node): node is KvsCollectExpression {
     return node.kind === SyntaxKind.KvsCollectExpression;

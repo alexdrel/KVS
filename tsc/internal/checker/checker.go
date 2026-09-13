@@ -7989,6 +7989,8 @@ func (c *Checker) checkExpressionWorker(node *ast.Node, checkMode CheckMode) *Ty
 		return c.checkRegularExpressionLiteral(node)
 	case ast.KindArrayLiteralExpression:
 		return c.checkArrayLiteral(node, checkMode)
+	case ast.KindKvsCompactArrayExpression:
+		return c.checkKvsCompactArrayExpression(node, checkMode)
 	case ast.KindObjectLiteralExpression:
 		return c.checkObjectLiteral(node, checkMode)
 	case ast.KindPropertyAccessExpression:
@@ -8371,6 +8373,36 @@ func (c *Checker) checkArrayLiteral(node *ast.Node, checkMode CheckMode) *Type {
 		elementType = core.IfElse(c.strictNullChecks, c.implicitNeverType, c.undefinedWideningType)
 	}
 	return c.createArrayLiteralType(c.createArrayTypeEx(elementType, inConstContext))
+}
+
+func (c *Checker) checkKvsCompactArrayExpression(node *ast.Node, checkMode CheckMode) *Type {
+	elements := node.AsKvsCompactArrayExpression().Elements.Nodes
+	elementTypes := make([]*Type, 0, len(elements))
+	for _, element := range elements {
+		if ast.IsSpreadElement(element) {
+			sourceType := c.checkExpressionEx(element.Expression(), checkMode)
+			if isKvsKnownAbsentType(sourceType) {
+				continue
+			}
+			presentSourceType := c.GetNonNullableType(sourceType)
+			elementType := c.checkIteratedTypeOrElementType(IterationUseSpread, presentSourceType, c.undefinedType, element.Expression())
+			if elementType != nil {
+				elementTypes = append(elementTypes, c.GetNonNullableType(elementType))
+			}
+			continue
+		}
+		elementType := c.checkExpressionForMutableLocation(element, checkMode)
+		if !isKvsKnownAbsentType(elementType) {
+			elementTypes = append(elementTypes, c.GetNonNullableType(elementType))
+		}
+	}
+	var elementType *Type
+	if len(elementTypes) == 0 {
+		elementType = c.implicitNeverType
+	} else {
+		elementType = c.getUnionTypeEx(elementTypes, UnionReductionSubtype, nil, nil)
+	}
+	return c.createArrayLiteralType(c.createArrayTypeEx(elementType, c.isConstContext(node)))
 }
 
 func (c *Checker) createArrayLiteralType(t *Type) *Type {
@@ -12633,6 +12665,39 @@ func (c *Checker) checkBinaryExpression(node *ast.Node, checkMode CheckMode) *Ty
 	return c.checkBinaryLikeExpression(binary.Left, binary.OperatorToken, binary.Right, checkMode, node)
 }
 
+func isKvsLiftedBinaryOperator(operator ast.Kind) bool {
+	switch operator {
+	case ast.KindPlusToken, ast.KindMinusToken, ast.KindAsteriskToken, ast.KindAsteriskAsteriskToken,
+		ast.KindSlashToken, ast.KindPercentToken:
+		return true
+	}
+	return false
+}
+
+func isKvsLiftedArithmeticOperator(operator ast.Kind) bool {
+	switch operator {
+	case ast.KindPlusToken, ast.KindMinusToken, ast.KindAsteriskToken, ast.KindAsteriskAsteriskToken,
+		ast.KindSlashToken, ast.KindPercentToken:
+		return true
+	}
+	return false
+}
+
+func isKvsNullableType(t *Type) bool {
+	return someType(t, func(part *Type) bool { return part.flags&TypeFlagsNullable != 0 })
+}
+
+func isKvsKnownAbsentType(t *Type) bool {
+	return everyType(t, func(part *Type) bool { return part.flags&TypeFlagsNullable != 0 })
+}
+
+func (c *Checker) areKvsLiftedArithmeticTypes(left *Type, right *Type) bool {
+	return c.isTypeAssignableToKindEx(left, TypeFlagsNumberLike, true /*strict*/) &&
+		c.isTypeAssignableToKindEx(right, TypeFlagsNumberLike, true /*strict*/) ||
+		c.isTypeAssignableToKindEx(left, TypeFlagsBigIntLike, true /*strict*/) &&
+			c.isTypeAssignableToKindEx(right, TypeFlagsBigIntLike, true /*strict*/)
+}
+
 func (c *Checker) checkKvsExtantAssignmentExpression(node *ast.Node, checkMode CheckMode) *Type {
 	expression := node.AsKvsExtantAssignmentExpression()
 	rightType := c.checkExpressionEx(expression.Right, checkMode)
@@ -12653,6 +12718,34 @@ func (c *Checker) checkBinaryLikeExpression(left *ast.Node, operatorToken *ast.N
 	}
 	leftType := c.checkExpressionEx(left, checkMode)
 	rightType := c.checkExpressionEx(right, checkMode)
+	leftNullable := isKvsNullableType(leftType)
+	rightNullable := isKvsNullableType(rightType)
+	kvsLifted := isKvsLiftedBinaryOperator(operator) && (leftNullable || rightNullable)
+	if kvsLifted && isKvsLiftedArithmeticOperator(operator) {
+		leftPresentType := c.GetNonNullableType(leftType)
+		rightPresentType := c.GetNonNullableType(rightType)
+		kvsLifted = !isKvsKnownAbsentType(leftType) && !isKvsKnownAbsentType(rightType) &&
+			c.areKvsLiftedArithmeticTypes(leftPresentType, rightPresentType)
+	}
+	if kvsLifted {
+		if errorNode != nil && ast.IsBinaryExpression(errorNode) {
+			links := c.nodeLinks.Get(errorNode)
+			if leftNullable {
+				links.flags |= NodeCheckFlagsKvsLiftedBinaryLeftNullable
+			}
+			if rightNullable {
+				links.flags |= NodeCheckFlagsKvsLiftedBinaryRightNullable
+			}
+		}
+		leftType = c.GetNonNullableType(leftType)
+		rightType = c.GetNonNullableType(rightType)
+	}
+	withKvsNullability := func(t *Type) *Type {
+		if kvsLifted && t != c.silentNeverType && t != c.errorType {
+			return c.getNullableType(t, TypeFlagsNull)
+		}
+		return t
+	}
 	if ast.IsLogicalOrCoalescingBinaryOperator(operator) {
 		parent := left.Parent.Parent
 		for ast.IsParenthesizedExpression(parent) || ast.IsLogicalOrCoalescingBinaryExpression(parent) {
@@ -12723,10 +12816,18 @@ func (c *Checker) checkBinaryLikeExpression(left *ast.Node, operatorToken *ast.N
 				}
 			}
 		}
-		return resultType
+		return withKvsNullability(resultType)
 	case ast.KindPlusToken, ast.KindPlusEqualsToken:
 		if leftType == c.silentNeverType || rightType == c.silentNeverType {
 			return c.silentNeverType
+		}
+		if operator == ast.KindPlusToken && (leftNullable || rightNullable) && !kvsLifted {
+			leftPresentType := c.GetNonNullableType(leftType)
+			rightPresentType := c.GetNonNullableType(rightType)
+			if !isKvsKnownAbsentType(leftType) && !isKvsKnownAbsentType(rightType) {
+				c.reportOperatorError(leftPresentType, operator, rightPresentType, errorNode, nil)
+				return c.errorType
+			}
 		}
 		if !c.isTypeAssignableToKind(leftType, TypeFlagsStringLike) && !c.isTypeAssignableToKind(rightType, TypeFlagsStringLike) {
 			leftType = c.checkNonNullType(leftType, left)
@@ -12754,7 +12855,7 @@ func (c *Checker) checkBinaryLikeExpression(left *ast.Node, operatorToken *ast.N
 		}
 		// Symbols are not allowed at all in arithmetic expressions
 		if resultType != nil && !c.checkForDisallowedESSymbolOperand(left, right, leftType, rightType, operator) {
-			return resultType
+			return withKvsNullability(resultType)
 		}
 		if resultType == nil {
 			// Types that have a reasonably good chance of being a valid operand type.
@@ -12770,7 +12871,7 @@ func (c *Checker) checkBinaryLikeExpression(left *ast.Node, operatorToken *ast.N
 		if operator == ast.KindPlusEqualsToken {
 			c.checkAssignmentOperator(left, operator, right, leftType, resultType)
 		}
-		return resultType
+		return withKvsNullability(resultType)
 	case ast.KindLessThanToken, ast.KindGreaterThanToken, ast.KindLessThanEqualsToken, ast.KindGreaterThanEqualsToken:
 		if c.checkForDisallowedESSymbolOperand(left, right, leftType, rightType, operator) {
 			leftType = c.getBaseTypeOfLiteralTypeForComparison(c.checkNonNullType(leftType, left))
@@ -12784,7 +12885,7 @@ func (c *Checker) checkBinaryLikeExpression(left *ast.Node, operatorToken *ast.N
 				return leftAssignableToNumber && rightAssignableToNumber || !leftAssignableToNumber && !rightAssignableToNumber && c.areTypesComparable(left, right)
 			})
 		}
-		return c.booleanType
+		return withKvsNullability(c.booleanType)
 	case ast.KindEqualsEqualsToken, ast.KindExclamationEqualsToken, ast.KindEqualsEqualsEqualsToken, ast.KindExclamationEqualsEqualsToken:
 		// We suppress errors in CheckMode.TypeOnly (meaning the invocation came from getTypeOfExpression). During
 		// control flow analysis it is possible for operands to temporarily have narrower types, and those narrower
@@ -29970,7 +30071,7 @@ func (c *Checker) getContextualType(node *ast.Node, contextFlags ContextFlags) *
 		return c.getContextualTypeForObjectLiteralElement(parent, contextFlags)
 	case ast.KindSpreadAssignment:
 		return c.getContextualType(parent.Parent, contextFlags)
-	case ast.KindArrayLiteralExpression:
+	case ast.KindArrayLiteralExpression, ast.KindKvsCompactArrayExpression:
 		t := c.getApparentTypeOfContextualType(parent, contextFlags)
 		elementIndex := ast.IndexOfNode(parent.Elements(), node)
 		if elementIndex < 0 {
@@ -31498,7 +31599,7 @@ func (c *Checker) isContextSensitive(node *ast.Node) bool {
 		return c.isContextSensitiveFunctionLikeDeclaration(node)
 	case ast.KindObjectLiteralExpression:
 		return core.Some(node.Properties(), c.isContextSensitive)
-	case ast.KindArrayLiteralExpression:
+	case ast.KindArrayLiteralExpression, ast.KindKvsCompactArrayExpression:
 		return core.Some(node.Elements(), c.isContextSensitive)
 	case ast.KindConditionalExpression:
 		return c.isContextSensitive(node.AsConditionalExpression().WhenTrue) || c.isContextSensitive(node.AsConditionalExpression().WhenFalse)

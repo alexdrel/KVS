@@ -21,7 +21,7 @@ export function foo(matchResult: RegExpMatchArray, execResult: RegExpExecArray) 
 >length : number
 
     matchResult.index + 0;
->matchResult.index + 0 : number
+>matchResult.index + 0 : number | null
 >matchResult.index : number | undefined
 >matchResult : RegExpMatchArray
 >index : number | undefined

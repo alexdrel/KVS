@@ -27,9 +27,10 @@ export function foo(matchResult: RegExpMatchArray, execResult: RegExpExecArray) 
 
 //// [regexpExecAndMatchTypeUsages.js]
 export function foo(matchResult, execResult) {
+    var _a;
     matchResult[0].length;
     matchResult[999].length;
-    matchResult.index + 0;
+    (_a = matchResult.index) != null ? _a + 0 : null;
     matchResult.input.length;
     matchResult.groups["someVariable"].length;
     matchResult.groups = undefined;

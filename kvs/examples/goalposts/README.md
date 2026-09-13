@@ -5,13 +5,12 @@ unimplemented syntax; this index identifies those dependencies explicitly.
 
 ## Quadratic roots
 
-[quadratic.ts](quadratic.ts) is the compact target form of a real quadratic
-solver. It currently depends on nullable arithmetic, presence-aware array
-literals, and conditional bindings. Its nullable return type, nulling
-operators, and explicit `collect (const value of source)` loop are implemented.
+[quadratic.ts](quadratic.ts) uses implemented presence-aware arrays for its
+root calculation. Its final conditional binding still depends on KVS
+empty-array truthiness, which is not implemented yet.
 
-A more explicit [working version](../showcase/quadratic-v0.ts) solves the same
-problem using the current compiler.
+Runnable [v0](../showcase/quadratic-v0.ts) and
+[v1](../showcase/quadratic-v1.ts) versions remain in the showcase.
 
 ## Prime numbers
 

@@ -298,6 +298,7 @@ type (
 	KvsExtantTestExpressionNode        = Node
 	KvsDefaultExpressionNode           = Node
 	KvsNullingExpressionNode           = Node
+	KvsCompactArrayExpressionNode      = Node
 	KvsCollectExpressionNode           = Node
 	KvsSelectExpressionNode            = Node
 	LabeledStatementNode               = Node
@@ -2004,6 +2005,54 @@ func (node *KvsNullingExpression) Clone(f NodeFactoryCoercible) *Node {
 
 func IsKvsNullingExpression(node *Node) bool {
 	return node.Kind == KindKvsNullingExpression
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// KvsCompactArrayExpression
+// ──────────────────────────────────────────────────────────────────────
+
+type KvsCompactArrayExpression struct {
+	PrimaryExpressionBase
+	CompositeBase
+	QuestionToken *QuestionToken
+	Elements      *ElementList
+	MultiLine     bool
+}
+
+func (f *NodeFactory) NewKvsCompactArrayExpression(questionToken *QuestionToken, elements *ElementList, multiLine bool) *Node {
+	data := &KvsCompactArrayExpression{}
+	data.QuestionToken = questionToken
+	data.Elements = elements
+	data.MultiLine = multiLine
+	return f.newNode(KindKvsCompactArrayExpression, data)
+}
+
+func (f *NodeFactory) UpdateKvsCompactArrayExpression(node *KvsCompactArrayExpression, questionToken *QuestionToken, elements *ElementList, multiLine bool) *Node {
+	if questionToken != node.QuestionToken || elements != node.Elements || multiLine != node.MultiLine {
+		return updateNode(f.NewKvsCompactArrayExpression(questionToken, elements, multiLine), node.AsNode(), f.hooks)
+	}
+	return node.AsNode()
+}
+
+func (node *KvsCompactArrayExpression) ForEachChild(v Visitor) bool {
+	return visit(v, node.QuestionToken) || visitNodeList(v, node.Elements)
+}
+
+func (node *KvsCompactArrayExpression) VisitEachChild(v *NodeVisitor) *Node {
+	return v.Factory.UpdateKvsCompactArrayExpression(node, v.visitNode(node.QuestionToken), v.visitNodes(node.Elements), node.MultiLine)
+}
+
+func (node *KvsCompactArrayExpression) Clone(f NodeFactoryCoercible) *Node {
+	return cloneNode(f.AsNodeFactory().NewKvsCompactArrayExpression(node.QuestionToken, node.Elements, node.MultiLine), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func (node *KvsCompactArrayExpression) computeSubtreeFacts() SubtreeFacts {
+	return propagateSubtreeFacts(node.QuestionToken) |
+		propagateNodeListSubtreeFacts(node.Elements, propagateSubtreeFacts)
+}
+
+func IsKvsCompactArrayExpression(node *Node) bool {
+	return node.Kind == KindKvsCompactArrayExpression
 }
 
 // ──────────────────────────────────────────────────────────────────────
@@ -9407,6 +9456,8 @@ func (n *Node) ForEachChild(v Visitor) bool {
 		return n.data.(*KvsDefaultExpression).ForEachChild(v)
 	case KindKvsNullingExpression:
 		return n.data.(*KvsNullingExpression).ForEachChild(v)
+	case KindKvsCompactArrayExpression:
+		return n.data.(*KvsCompactArrayExpression).ForEachChild(v)
 	case KindKvsCollectExpression:
 		return n.data.(*KvsCollectExpression).ForEachChild(v)
 	case KindKvsSelectExpression:
@@ -9856,6 +9907,10 @@ func (n *Node) AsKvsDefaultExpression() *KvsDefaultExpression {
 
 func (n *Node) AsKvsNullingExpression() *KvsNullingExpression {
 	return n.data.(*KvsNullingExpression)
+}
+
+func (n *Node) AsKvsCompactArrayExpression() *KvsCompactArrayExpression {
+	return n.data.(*KvsCompactArrayExpression)
 }
 
 func (n *Node) AsKvsCollectExpression() *KvsCollectExpression {

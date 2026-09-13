@@ -39,9 +39,9 @@ const impossible = null as!;
 >impossible : never
 >null as! : never
 
-const rejectedAddition = nullableNumber + 2;
->rejectedAddition : number
->nullableNumber + 2 : number
+const liftedAddition = nullableNumber + 2;
+>liftedAddition : number | null
+>nullableNumber + 2 : number | null
 >nullableNumber : number | null | undefined
 >2 : 2
 

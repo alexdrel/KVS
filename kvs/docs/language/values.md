@@ -33,15 +33,14 @@ const city = user.profile.address.city;
 
 `city` is nullable. Evaluation stops at the first absent receiver.
 
-Most operators lift in the same way:
+Arithmetic operators lift in the same way:
 
 ```kvs
 const total = subtotal + tax;
 const area = metadata.width * metadata.height;
-const large = area > 1_000_000;
 ```
 
-If a required operand is absent, the operator result is null. For `==`, `!=`, `<`, `<=`, `>`, and `>=`, an absent operand likewise produces null. This includes value equality:
+If a required operand is absent, the operator result is null. For `==` and `!=`, an absent operand likewise produces null. This includes value equality:
 
 ```kvs
 a + 4 == b + 5
@@ -50,12 +49,31 @@ null == null
 
 Either expression is null when an operand is absent. Value equality does not claim two computations are equal merely because neither produced a value.
 
+Lifted arithmetic is numeric. Operands must belong to the same numeric family,
+and an operand whose type is known to be only `null` or `undefined` is an error
+because it has no present type to lift. Nullable string concatenation and mixed
+numeric and string addition are rejected. Resolve a nullable string explicitly;
+for example, `"Hello, " + name!` uses the string default `""` when `name` is
+absent.
+
+The relational operators `<`, `<=`, `>`, and `>=` do not lift. Nullable
+operands are errors and must be resolved explicitly before comparison. Their
+result remains ordinary binary `boolean`; KVS does not introduce a nullable
+third result for ordering. Use `!` or another explicit absence choice before
+comparing.
+
 `===` and `!==` retain their JavaScript identity semantics and always produce booleans:
 
 ```kvs
 null === null       // true
 undefined === null  // false
 ```
+
+Lifted operators evaluate required operands from left to right and stop at the
+first absent operand. This is a safety guarantee, not an effect-control idiom.
+Code should not rely on an optional path to suppress effects in a later
+operand: such expressions become difficult to read as soon as several values
+may be absent. Make effectful sequencing explicit with statements.
 
 ## Presence and truthiness
 

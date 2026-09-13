@@ -1,11 +1,10 @@
-contextuallyTypedIifeStrict.ts(14,10): error TS18048: 'j' is possibly 'undefined'.
 contextuallyTypedIifeStrict.ts(15,10): error TS18048: 'k' is possibly 'undefined'.
 contextuallyTypedIifeStrict.ts(16,17): error TS18048: 'o' is possibly 'undefined'.
 contextuallyTypedIifeStrict.ts(28,27): error TS7006: Parameter 'i' implicitly has an 'any' type.
 contextuallyTypedIifeStrict.ts(29,43): error TS7006: Parameter 'n' implicitly has an 'any' type.
 
 
-==== contextuallyTypedIifeStrict.ts (5 errors) ====
+==== contextuallyTypedIifeStrict.ts (4 errors) ====
     // arrow
     (jake => { })("build");
     // function expression
@@ -20,8 +19,6 @@ contextuallyTypedIifeStrict.ts(29,43): error TS7006: Parameter 'n' implicitly ha
     ((n = 10) => n + 1)();
     // optional parameters
     ((j?) => j + 1)(12);
-             ~
-!!! error TS18048: 'j' is possibly 'undefined'.
     ((k?) => k + 1)();
              ~
 !!! error TS18048: 'k' is possibly 'undefined'.

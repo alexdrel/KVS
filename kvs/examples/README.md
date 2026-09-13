@@ -15,5 +15,7 @@ compiler. When a goalpost is fully supported, move it to the showcase.
 - [Nulling operator](nulling.ts)
 - [Binding in an `if` condition](if-binding.ts)
 - [Implicit iteration subjects](implicit-subject.ts)
+- [Nullable operators](nullable-operators.ts)
+- [Presence-aware arrays](presence-aware-arrays.ts)
 - [Goalposts](goalposts/README.md)
 - [Working showcase](showcase/README.md)

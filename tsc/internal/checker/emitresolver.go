@@ -57,10 +57,70 @@ func (r *EmitResolver) GetKvsDefaultKind(node *ast.Node) ast.KvsDefaultKind {
 	return r.checker.getKvsDefaultKindForType(t)
 }
 
+func (r *EmitResolver) IsKvsLiftedBinaryExpression(node *ast.Node) bool {
+	r.checkerMu.Lock()
+	defer r.checkerMu.Unlock()
+	if !ast.IsBinaryExpression(node) || !isKvsLiftedBinaryOperator(node.AsBinaryExpression().OperatorToken.Kind) {
+		return false
+	}
+	// Emission can begin before this expression has been checked. Do not ask the
+	// checker to analyze malformed source during emit: that can create semantic
+	// diagnostics after the runner's pre-emit snapshot and disturb TypeScript's
+	// recovery output.
+	if !ast.IsParseTreeNode(node) || node.Flags&ast.NodeFlagsThisNodeOrAnySubNodesHasError != 0 {
+		return false
+	}
+	binary := node.AsBinaryExpression()
+	if isKvsLiftedArithmeticOperator(binary.OperatorToken.Kind) &&
+		(isSyntacticallyKvsAbsent(binary.Left) || isSyntacticallyKvsAbsent(binary.Right)) {
+		return false
+	}
+	leftType := r.checker.getTypeOfExpression(binary.Left)
+	rightType := r.checker.getTypeOfExpression(binary.Right)
+	if !isKvsNullableType(leftType) && !isKvsNullableType(rightType) {
+		return false
+	}
+	r.checker.getTypeOfExpression(node)
+	flags := r.checker.nodeLinks.Get(node).flags
+	return flags&(NodeCheckFlagsKvsLiftedBinaryLeftNullable|NodeCheckFlagsKvsLiftedBinaryRightNullable) != 0
+}
+
+func isSyntacticallyKvsAbsent(node *ast.Node) bool {
+	node = ast.SkipParentheses(node)
+	return node.Kind == ast.KindNullKeyword || node.Kind == ast.KindVoidExpression ||
+		ast.IsIdentifier(node) && node.Text() == "undefined"
+}
+
+func (r *EmitResolver) IsKvsLiftedBinaryLeftNullable(node *ast.Node) bool {
+	r.checkerMu.Lock()
+	defer r.checkerMu.Unlock()
+	return r.checker.nodeLinks.Get(node).flags&NodeCheckFlagsKvsLiftedBinaryLeftNullable != 0
+}
+
+func (r *EmitResolver) IsKvsLiftedBinaryRightNullable(node *ast.Node) bool {
+	r.checkerMu.Lock()
+	defer r.checkerMu.Unlock()
+	return r.checker.nodeLinks.Get(node).flags&NodeCheckFlagsKvsLiftedBinaryRightNullable != 0
+}
+
+func (r *EmitResolver) IsKvsNullableExpression(node *ast.Node) bool {
+	r.checkerMu.Lock()
+	defer r.checkerMu.Unlock()
+	return isKvsNullableType(r.checker.checkExpression(node))
+}
+
 func (r *EmitResolver) IsKvsNullableIterableSource(node *ast.Node) bool {
 	r.checkerMu.Lock()
 	defer r.checkerMu.Unlock()
 	return r.checker.maybeTypeOfKind(r.checker.checkExpression(node), TypeFlagsNullable)
+}
+
+func (r *EmitResolver) IsKvsNullableIterableElement(node *ast.Node) bool {
+	r.checkerMu.Lock()
+	defer r.checkerMu.Unlock()
+	sourceType := r.checker.GetNonNullableType(r.checker.checkExpression(node))
+	elementType := r.checker.getIteratedTypeOrElementType(IterationUseSpread, sourceType, r.checker.undefinedType, nil, false /*checkAssignability*/)
+	return elementType != nil && isKvsNullableType(elementType)
 }
 
 func (r *EmitResolver) GetJsxFactoryEntity(location *ast.Node) *ast.Node {

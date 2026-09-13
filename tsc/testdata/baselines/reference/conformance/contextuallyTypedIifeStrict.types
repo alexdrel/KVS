@@ -71,11 +71,11 @@
 
 // optional parameters
 ((j?) => j + 1)(12);
->((j?) => j + 1)(12) : number
->((j?) => j + 1) : (j?: number | undefined) => number
->(j?) => j + 1 : (j?: number | undefined) => number
+>((j?) => j + 1)(12) : number | null
+>((j?) => j + 1) : (j?: number | undefined) => number | null
+>(j?) => j + 1 : (j?: number | undefined) => number | null
 >j : number | undefined
->j + 1 : number
+>j + 1 : number | null
 >j : number | undefined
 >1 : 1
 >12 : 12

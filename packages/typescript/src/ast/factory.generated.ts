@@ -150,6 +150,7 @@ import type {
     KeywordTypeNode,
     KeywordTypeSyntaxKind,
     KvsCollectExpression,
+    KvsCompactArrayExpression,
     KvsDefaultExpression,
     KvsExtantAssertionExpression,
     KvsExtantAssignmentExpression,
@@ -851,6 +852,8 @@ function cloneNodeData(node: Node): any {
             return { expression: n.expression };
         case SyntaxKind.KvsNullingExpression:
             return { condition: n.condition, questionToken: n.questionToken, colonToken: n.colonToken, whenTrue: n.whenTrue };
+        case SyntaxKind.KvsCompactArrayExpression:
+            return { questionToken: n.questionToken, elements: n.elements, multiLine: n.multiLine };
         case SyntaxKind.KvsCollectExpression:
             return { initializer: n.initializer, expression: n.expression, statement: n.statement };
         case SyntaxKind.KvsSelectExpression:
@@ -1266,6 +1269,9 @@ const forEachChildTable: Record<number, ForEachChildFunction> = {
         visitNode(cbNode, data.questionToken) ||
         visitNode(cbNode, data.colonToken) ||
         visitNode(cbNode, data.whenTrue),
+    [SyntaxKind.KvsCompactArrayExpression]: (data, cbNode, cbNodes) =>
+        visitNode(cbNode, data.questionToken) ||
+        visitNodes(cbNode, cbNodes, data.elements),
     [SyntaxKind.KvsCollectExpression]: (data, cbNode, cbNodes) =>
         visitNode(cbNode, data.initializer) ||
         visitNode(cbNode, data.expression) ||
@@ -2003,6 +2009,14 @@ export function createKvsNullingExpression(condition: Expression, questionToken:
         colonToken,
         whenTrue,
     }) as unknown as KvsNullingExpression;
+}
+
+export function createKvsCompactArrayExpression(questionToken: QuestionToken, elements: readonly Expression[], multiLine?: boolean): KvsCompactArrayExpression {
+    return new NodeObject(SyntaxKind.KvsCompactArrayExpression, {
+        questionToken,
+        elements: createNodeArray(elements),
+        multiLine,
+    }) as unknown as KvsCompactArrayExpression;
 }
 
 export function createKvsCollectExpression(initializer: ForInitializer, expression: Expression, statement: Statement): KvsCollectExpression {
@@ -3457,6 +3471,10 @@ export function updateKvsDefaultExpression(node: KvsDefaultExpression, expressio
 
 export function updateKvsNullingExpression(node: KvsNullingExpression, condition: Expression, questionToken: QuestionToken, colonToken: ColonToken, whenTrue: Expression): KvsNullingExpression {
     return node.condition !== condition || node.questionToken !== questionToken || node.colonToken !== colonToken || node.whenTrue !== whenTrue ? createKvsNullingExpression(condition, questionToken, colonToken, whenTrue) : node;
+}
+
+export function updateKvsCompactArrayExpression(node: KvsCompactArrayExpression, questionToken: QuestionToken, elements: readonly Expression[]): KvsCompactArrayExpression {
+    return node.questionToken !== questionToken || node.elements !== elements ? createKvsCompactArrayExpression(questionToken, elements, node.multiLine) : node;
 }
 
 export function updateKvsCollectExpression(node: KvsCollectExpression, initializer: ForInitializer, expression: Expression, statement: Statement): KvsCollectExpression {

@@ -15,6 +15,7 @@ import type {
     JSDocParameterOrPropertyTag,
     JSDocTypeLiteral,
     JsxText,
+    KvsCompactArrayExpression,
     MetaProperty,
     ModuleDeclaration,
     Node,
@@ -58,6 +59,8 @@ export function getNodeDataType(kind: SyntaxKind): number {
 
 export function getNodeCommonData(node: Node): number {
     switch (node.kind) {
+        case SyntaxKind.KvsCompactArrayExpression:
+            return ((node as KvsCompactArrayExpression).multiLine ? 1 : 0) << 24;
         case SyntaxKind.Block:
             return ((node as Block).multiLine ? 1 : 0) << 24;
         case SyntaxKind.HeritageClause:

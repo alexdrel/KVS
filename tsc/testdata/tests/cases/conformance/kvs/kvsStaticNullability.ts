@@ -9,7 +9,7 @@ const untouched = item;
 const nested = [item as!];
 const grouped = (item as!).length;
 const impossible = null as!;
-const rejectedAddition = nullableNumber + 2;
+const liftedAddition = nullableNumber + 2;
 const assertedAddition = nullableNumber as! + 2;
 
 const omittedTrailingTuple: [string, boolean?] = ["pending"];

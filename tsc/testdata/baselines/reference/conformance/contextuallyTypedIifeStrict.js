@@ -50,7 +50,7 @@ let eleven = (o => o.a(11))({ a: function(n) { return n; } });
 ((m = 10) => m + 1)(12);
 ((n = 10) => n + 1)();
 // optional parameters
-((j) => j + 1)(12);
+((j) => { var _a; return (_a = j) != null ? _a + 1 : null; })(12);
 ((k) => k + 1)();
 ((l, o) => l + o)(12);
 // rest parameters

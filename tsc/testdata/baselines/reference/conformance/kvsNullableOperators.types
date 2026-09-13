@@ -1,0 +1,128 @@
+//// [tests/cases/conformance/kvs/kvsNullableOperators.ts] ////
+
+=== kvsNullableOperators.ts ===
+declare const nullableNumber: number?;
+>nullableNumber : number | null | undefined
+
+declare const nullableString: string?;
+>nullableString : string | null | undefined
+
+declare const nullableBigInt: bigint?;
+>nullableBigInt : bigint | null | undefined
+
+declare const absent: null;
+>absent : null
+
+const add = nullableNumber + 1;
+>add : number | null
+>nullableNumber + 1 : number | null
+>nullableNumber : number | null | undefined
+>1 : 1
+
+const subtract = 10 - nullableNumber;
+>subtract : number | null
+>10 - nullableNumber : number | null
+>10 : 10
+>nullableNumber : number | null | undefined
+
+const multiply = nullableNumber * 2;
+>multiply : number | null
+>nullableNumber * 2 : number | null
+>nullableNumber : number | null | undefined
+>2 : 2
+
+const divide = nullableNumber / 2;
+>divide : number | null
+>nullableNumber / 2 : number | null
+>nullableNumber : number | null | undefined
+>2 : 2
+
+const remainder = nullableNumber % 2;
+>remainder : number | null
+>nullableNumber % 2 : number | null
+>nullableNumber : number | null | undefined
+>2 : 2
+
+const exponent = nullableNumber ** 2;
+>exponent : number | null
+>nullableNumber ** 2 : number | null
+>nullableNumber : number | null | undefined
+>2 : 2
+
+const bigintAdd = nullableBigInt + 1n;
+>bigintAdd : bigint | null
+>nullableBigInt + 1n : bigint | null
+>nullableBigInt : bigint | null | undefined
+>1n : 1n
+
+// Arithmetic requires compatible present types and cannot infer a present
+// type from an operand known to be absent.
+const rejectMixedAddition = 10 + nullableString;
+>rejectMixedAddition : any
+>10 + nullableString : any
+>10 : 10
+>nullableString : string | null | undefined
+
+const rejectNullableString = "value: " + nullableString;
+>rejectNullableString : any
+>"value: " + nullableString : any
+>"value: " : "value: "
+>nullableString : string | null | undefined
+
+const rejectKnownAbsent = absent + 1;
+>rejectKnownAbsent : any
+>absent + 1 : any
+>absent : null
+>1 : 1
+
+const rejectComparison = nullableNumber < 10;
+>rejectComparison : boolean
+>nullableNumber < 10 : boolean
+>nullableNumber : number | null | undefined
+>10 : 10
+
+const ordinary = 1 + 2;
+>ordinary : number
+>1 + 2 : number
+>1 : 1
+>2 : 2
+
+const exactIdentity = nullableNumber === null;
+>exactIdentity : boolean
+>nullableNumber === null : boolean
+>nullableNumber : number | null | undefined
+
+declare function left(): number?;
+>left : () => number?
+
+declare function right(): number?;
+>right : () => number?
+
+const ordered = left() + right();
+>ordered : number | null
+>left() + right() : number | null
+>left() : number | null | undefined
+>left : () => number?
+>right() : number | null | undefined
+>right : () => number?
+
+const nested = nullableNumber * 2 + 1;
+>nested : number | null
+>nullableNumber * 2 + 1 : number | null
+>nullableNumber * 2 : number | null
+>nullableNumber : number | null | undefined
+>2 : 2
+>1 : 1
+
+// Operators outside this slice retain their TypeScript checking and runtime behavior.
+const rejectBitwise = nullableNumber & 1;
+>rejectBitwise : number
+>nullableNumber & 1 : number
+>nullableNumber : number | null | undefined
+>1 : 1
+
+nullableNumber += 1;
+>nullableNumber += 1 : any
+>nullableNumber : any
+>1 : 1
+

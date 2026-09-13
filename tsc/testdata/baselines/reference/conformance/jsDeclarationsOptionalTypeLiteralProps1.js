@@ -29,7 +29,8 @@ function foo({ a, b, c }) {
  * @returns {number}
  */
 function foo({ a, b, c }) {
-    return a + b + c;
+    var _a, _b, _c, _d;
+    return (_a = (_b = a, (_c = b) != null ? _b + _c : null)) != null ? (_d = c) != null ? _a + _d : null : null;
 }
 
 

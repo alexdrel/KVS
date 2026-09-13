@@ -29,7 +29,7 @@ class C1 {
     public C1M3(C1M3A1:number=0,C1M3A2:number=C1M3A1) {return C1M3A1 + C1M3A2; }
 
     // C1M4 contains a mix of optional and non-optional parameters
-    public C1M4(C1M4A1:number,C1M4A2?:number) { return C1M4A1 + C1M4A2; }
+    public C1M4(C1M4A1:number,C1M4A2?:number):number { return C1M4A1 + C1M4A2; }
 
     public C1M5(C1M5A1:number,C1M5A2:number=0,C1M5A3?:number) { return C1M5A1 + C1M5A2; }
 
@@ -138,7 +138,7 @@ class C1 {
     // C1M3 contains all optional parameters
     C1M3(C1M3A1 = 0, C1M3A2 = C1M3A1) { return C1M3A1 + C1M3A2; }
     // C1M4 contains a mix of optional and non-optional parameters
-    C1M4(C1M4A1, C1M4A2) { return C1M4A1 + C1M4A2; }
+    C1M4(C1M4A1, C1M4A2) { var _a, _b; return _a = C1M4A1, (_b = C1M4A2) != null ? _a + _b : null; }
     C1M5(C1M5A1, C1M5A2 = 0, C1M5A3) { return C1M5A1 + C1M5A2; }
     // Uninitialized parameter makes the initialized one required
     C1M5(C1M5A1, C1M5A2 = 0, C1M5A3) { return C1M5A1 + C1M5A2; }
@@ -151,11 +151,11 @@ class C2 extends C1 {
 function F1() { return 0; }
 function F2(F2A1) { return F2A1; }
 function F3(F3A1 = 0, F3A2 = F3A1) { return F3A1 + F3A2; }
-function F4(F4A1, F4A2) { return F4A1 + F4A2; }
+function F4(F4A1, F4A2) { var _a, _b; return _a = F4A1, (_b = F4A2) != null ? _a + _b : null; }
 var L1 = function () { return 0; };
 var L2 = function (L2A1) { return L2A1; };
 var L3 = function (L3A1 = 0, L3A2 = L3A1) { return L3A1 + L3A2; };
-var L4 = function (L4A1, L4A2) { return L4A1 + L4A2; };
+var L4 = function (L4A1, L4A2) { var _a, _b; return _a = L4A1, (_b = L4A2) != null ? _a + _b : null; };
 var c1o1 = new C1(5);
 var i1o1 = new C1(5);
 // Valid

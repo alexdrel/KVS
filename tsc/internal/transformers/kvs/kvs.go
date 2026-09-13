@@ -101,8 +101,14 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 		return tx.transformDefault(node.AsKvsDefaultExpression())
 	case ast.KindKvsNullingExpression:
 		return tx.transformNullingExpression(node.AsKvsNullingExpression())
+	case ast.KindKvsCompactArrayExpression:
+		return tx.transformCompactArrayExpression(node.AsKvsCompactArrayExpression())
 	case ast.KindKvsNullableAssertionExpression, ast.KindKvsExtantAssertionExpression:
 		return tx.Visitor().VisitNode(node.Expression())
+	case ast.KindBinaryExpression:
+		if tx.resolver.IsKvsLiftedBinaryExpression(node) {
+			return tx.transformLiftedBinaryExpression(node.AsBinaryExpression())
+		}
 	case ast.KindKvsCollectExpression, ast.KindKvsSelectExpression:
 		// Unsupported placements are diagnosed by the checker. Emit an empty
 		// recovery value instead of leaking KVS syntax into later transformers.
@@ -112,6 +118,84 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 		return tx.Factory().NewArrayLiteralExpression(nil, false)
 	}
 	return tx.Visitor().VisitEachChild(node)
+}
+
+func (tx *transformer) transformCompactArrayExpression(node *ast.KvsCompactArrayExpression) *ast.Node {
+	factory := tx.Factory()
+	var temp *ast.IdentifierNode
+	elements := make([]*ast.Node, 0, len(node.Elements.Nodes))
+	for _, element := range node.Elements.Nodes {
+		if ast.IsSpreadElement(element) {
+			source := element.Expression()
+			nullableSource := tx.resolver.IsKvsNullableIterableSource(source)
+			nullableElement := tx.resolver.IsKvsNullableIterableElement(source)
+			visitedSource := tx.Visitor().VisitNode(source)
+			if nullableSource {
+				visitedSource = factory.NewBinaryExpression(nil, visitedSource, nil, factory.NewToken(ast.KindQuestionQuestionToken), factory.NewArrayLiteralExpression(nil, false))
+			}
+			if nullableElement {
+				materialized := factory.NewArrayLiteralExpression(factory.NewNodeList([]*ast.Node{factory.NewSpreadElement(visitedSource)}), false)
+				parameter := factory.NewParameterDeclaration(nil, nil, factory.NewIdentifier("value"), nil, nil, nil)
+				present := factory.NewBinaryExpression(nil, factory.NewIdentifier("value"), nil, factory.NewToken(ast.KindExclamationEqualsToken), factory.NewKeywordExpression(ast.KindNullKeyword))
+				predicate := factory.NewArrowFunction(nil, nil, factory.NewNodeList([]*ast.Node{parameter}), nil, nil, factory.NewToken(ast.KindEqualsGreaterThanToken), present)
+				visitedSource = factory.NewCallExpression(
+					factory.NewPropertyAccessExpression(materialized, nil, factory.NewIdentifier("filter"), ast.NodeFlagsNone),
+					nil,
+					nil,
+					factory.NewNodeList([]*ast.Node{predicate}),
+					ast.NodeFlagsNone,
+				)
+			}
+			elements = append(elements, factory.NewSpreadElement(visitedSource))
+			continue
+		}
+		visited := tx.Visitor().VisitNode(element)
+		if !tx.resolver.IsKvsNullableExpression(element) {
+			elements = append(elements, visited)
+			continue
+		}
+		if temp == nil {
+			temp = factory.NewTempVariable()
+			tx.EmitContext().AddVariableDeclaration(temp)
+		}
+		assigned := factory.NewAssignmentExpression(temp, visited)
+		present := factory.NewBinaryExpression(nil, assigned, nil, factory.NewToken(ast.KindExclamationEqualsToken), factory.NewKeywordExpression(ast.KindNullKeyword))
+		one := factory.NewArrayLiteralExpression(factory.NewNodeList([]*ast.Node{temp}), false)
+		none := factory.NewArrayLiteralExpression(nil, false)
+		conditional := factory.NewConditionalExpression(present, factory.NewToken(ast.KindQuestionToken), one, factory.NewToken(ast.KindColonToken), none)
+		elements = append(elements, factory.NewSpreadElement(conditional))
+	}
+	return factory.NewArrayLiteralExpression(factory.NewNodeList(elements), node.MultiLine)
+}
+
+func (tx *transformer) transformLiftedBinaryExpression(node *ast.BinaryExpression) *ast.Node {
+	// Evaluate operands from left to right, stopping when a required operand is
+	// absent. Each operand is captured because either may have observable effects.
+	factory := tx.Factory()
+	leftTemp := factory.NewTempVariable()
+	tx.EmitContext().AddVariableDeclaration(leftTemp)
+
+	left := tx.Visitor().VisitNode(node.Left)
+	right := tx.Visitor().VisitNode(node.Right)
+	leftValue := factory.NewAssignmentExpression(leftTemp, left)
+	operationRight := right
+	rightResult := (*ast.Node)(nil)
+	if tx.resolver.IsKvsLiftedBinaryRightNullable(node.AsNode()) {
+		rightTemp := factory.NewTempVariable()
+		tx.EmitContext().AddVariableDeclaration(rightTemp)
+		rightValue := factory.NewAssignmentExpression(rightTemp, right)
+		rightPresent := factory.NewBinaryExpression(nil, rightValue, nil, factory.NewToken(ast.KindExclamationEqualsToken), factory.NewKeywordExpression(ast.KindNullKeyword))
+		operationRight = rightTemp
+		operation := factory.NewBinaryExpression(nil, leftTemp, nil, factory.NewToken(node.OperatorToken.Kind), operationRight)
+		rightResult = factory.NewConditionalExpression(rightPresent, factory.NewToken(ast.KindQuestionToken), operation, factory.NewToken(ast.KindColonToken), factory.NewKeywordExpression(ast.KindNullKeyword))
+	} else {
+		rightResult = factory.NewBinaryExpression(nil, leftTemp, nil, factory.NewToken(node.OperatorToken.Kind), operationRight)
+	}
+	if !tx.resolver.IsKvsLiftedBinaryLeftNullable(node.AsNode()) {
+		return factory.NewCommaExpression(leftValue, rightResult)
+	}
+	leftPresent := factory.NewBinaryExpression(nil, leftValue, nil, factory.NewToken(ast.KindExclamationEqualsToken), factory.NewKeywordExpression(ast.KindNullKeyword))
+	return factory.NewConditionalExpression(leftPresent, factory.NewToken(ast.KindQuestionToken), rightResult, factory.NewToken(ast.KindColonToken), factory.NewKeywordExpression(ast.KindNullKeyword))
 }
 
 func (tx *transformer) transformForOfStatement(node *ast.ForInOrOfStatement) *ast.Node {

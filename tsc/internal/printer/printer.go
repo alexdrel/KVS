@@ -3342,6 +3342,8 @@ func (p *Printer) emitExpression(node *ast.Expression, precedence ast.OperatorPr
 		p.emitKvsExtantTestExpression(node.AsKvsExtantTestExpression())
 	case ast.KindKvsDefaultExpression:
 		p.emitKvsDefaultExpression(node.AsKvsDefaultExpression())
+	case ast.KindKvsCompactArrayExpression:
+		p.emitKvsCompactArrayExpression(node.AsKvsCompactArrayExpression())
 	case ast.KindKvsCollectExpression:
 		p.emitKvsCollectExpression(node.AsKvsCollectExpression())
 	case ast.KindKvsSelectExpression:
@@ -3765,6 +3767,13 @@ func (p *Printer) emitKvsNullingExpression(node *ast.KvsNullingExpression) {
 	p.emitPunctuationNode(node.ColonToken)
 	p.writeSpace()
 	p.emitExpression(node.WhenTrue, ast.OperatorPrecedenceAssignment)
+	p.exitNode(node.AsNode(), state)
+}
+
+func (p *Printer) emitKvsCompactArrayExpression(node *ast.KvsCompactArrayExpression) {
+	state := p.enterNode(node.AsNode())
+	p.emitPunctuationNode(node.QuestionToken)
+	p.emitList((*Printer).emitArrayLiteralExpressionElement, node.AsNode(), node.Elements, LFArrayLiteralExpressionElements|core.IfElse(node.MultiLine, LFPreferNewLine, LFNone))
 	p.exitNode(node.AsNode(), state)
 }
 

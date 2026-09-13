@@ -28,6 +28,8 @@ Implemented vertical slices:
   arrays: postfix `value!`.
 - Nullable sources for synchronous `for...of`, eager `collect`, and `select`.
 - Implicit subjects for synchronous `for`, eager `collect`, and `select`.
+- Arithmetic operators lifted over absence.
+- Presence-aware array literals: `?[...]`.
 
 Known semantic debts:
 
@@ -54,6 +56,8 @@ Focused conformance inputs:
 - `tsc/testdata/tests/cases/conformance/kvs/kvsNullabilityTypes.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsIfBinding.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsExtantTest.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsNullableOperators.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsCompactArray.ts`
 
 Run all implemented KVS slices together:
 
@@ -102,16 +106,16 @@ them; generated example `.js` files are intentionally ignored.
 - [x] Postfix `value?`
 - [x] Flow narrowing after `value?`
 - [ ] Nullable boolean condition: only `true` enters branch
-- [ ] Successful lifted comparisons narrow required operands
+- [x] Relational comparisons require resolved operands
 
 ### Nullable dataflow
 
 - [ ] Member access propagates absence
 - [ ] Indexed access propagates absence
-- [ ] Arithmetic operators lift over absence
-- [ ] Relational operators lift over absence
+- [x] Arithmetic operators lift over absence
+- [x] Relational operators reject nullable operands
 - [ ] `==` / `!=` lift over absence
-- [ ] `===` / `!==` retain JavaScript semantics
+- [x] `===` / `!==` retain JavaScript semantics
 
 ### KVS truthiness
 
@@ -313,13 +317,13 @@ them; generated example `.js` files are intentionally ignored.
 
 ### Compact literals
 
-- [ ] `?[...]`
+- [x] `?[...]`
 - [ ] `?{...}`
-- [ ] Omit absent direct values
-- [ ] Omit absent spread values
-- [ ] Nullable array spread contributes zero elements
+- [x] Omit absent direct values
+- [x] Omit absent spread values
+- [x] Nullable array spread contributes zero elements
 - [ ] Nullable object spread
-- [ ] Result element type inference
+- [x] Result element type inference
 - [ ] Result property type inference
 
 ### Nulling operator `?:`

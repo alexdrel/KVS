@@ -106,6 +106,7 @@ import type {
     JsxSelfClosingElement,
     JsxSpreadAttribute,
     KvsCollectExpression,
+    KvsCompactArrayExpression,
     KvsDefaultExpression,
     KvsExtantAssertionExpression,
     KvsExtantAssignmentExpression,
@@ -295,6 +296,7 @@ import {
     updateJsxSelfClosingElement,
     updateJsxSpreadAttribute,
     updateKvsCollectExpression,
+    updateKvsCompactArrayExpression,
     updateKvsDefaultExpression,
     updateKvsExtantAssertionExpression,
     updateKvsExtantAssignmentExpression,
@@ -676,6 +678,11 @@ const visitEachChildTable: Record<number, VisitEachChildFunction> = {
         const _colonToken = visitNode(node.colonToken, visitor, isColonToken);
         const _whenTrue = visitNode(node.whenTrue, visitor, isExpression);
         return updateKvsNullingExpression(node, _condition, _questionToken, _colonToken, _whenTrue);
+    },
+    [SyntaxKind.KvsCompactArrayExpression]: (node: KvsCompactArrayExpression, visitor: Visitor): KvsCompactArrayExpression => {
+        const _questionToken = visitNode(node.questionToken, visitor, isQuestionToken);
+        const _elements = visitNodes(node.elements, visitor);
+        return updateKvsCompactArrayExpression(node, _questionToken, _elements);
     },
     [SyntaxKind.KvsCollectExpression]: (node: KvsCollectExpression, visitor: Visitor): KvsCollectExpression => {
         const _initializer = visitNode(node.initializer, visitor, isForInitializer);

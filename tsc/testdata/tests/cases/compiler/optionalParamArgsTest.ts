@@ -27,7 +27,7 @@ class C1 {
     public C1M3(C1M3A1:number=0,C1M3A2:number=C1M3A1) {return C1M3A1 + C1M3A2; }
 
     // C1M4 contains a mix of optional and non-optional parameters
-    public C1M4(C1M4A1:number,C1M4A2?:number) { return C1M4A1 + C1M4A2; }
+    public C1M4(C1M4A1:number,C1M4A2?:number):number { return C1M4A1 + C1M4A2; }
 
     public C1M5(C1M5A1:number,C1M5A2:number=0,C1M5A3?:number) { return C1M5A1 + C1M5A2; }
 

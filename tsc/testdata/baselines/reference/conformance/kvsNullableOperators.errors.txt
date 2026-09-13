@@ -1,0 +1,55 @@
+kvsNullableOperators.ts(16,29): error TS2365: Operator '+' cannot be applied to types '10' and 'string'.
+kvsNullableOperators.ts(17,30): error TS2365: Operator '+' cannot be applied to types '"value: "' and 'string'.
+kvsNullableOperators.ts(18,27): error TS18047: 'absent' is possibly 'null'.
+kvsNullableOperators.ts(20,26): error TS18049: 'nullableNumber' is possibly 'null' or 'undefined'.
+kvsNullableOperators.ts(32,23): error TS18049: 'nullableNumber' is possibly 'null' or 'undefined'.
+kvsNullableOperators.ts(33,1): error TS2588: Cannot assign to 'nullableNumber' because it is a constant.
+
+
+==== kvsNullableOperators.ts (6 errors) ====
+    declare const nullableNumber: number?;
+    declare const nullableString: string?;
+    declare const nullableBigInt: bigint?;
+    declare const absent: null;
+    
+    const add = nullableNumber + 1;
+    const subtract = 10 - nullableNumber;
+    const multiply = nullableNumber * 2;
+    const divide = nullableNumber / 2;
+    const remainder = nullableNumber % 2;
+    const exponent = nullableNumber ** 2;
+    const bigintAdd = nullableBigInt + 1n;
+    
+    // Arithmetic requires compatible present types and cannot infer a present
+    // type from an operand known to be absent.
+    const rejectMixedAddition = 10 + nullableString;
+                                ~~~~~~~~~~~~~~~~~~~
+!!! error TS2365: Operator '+' cannot be applied to types '10' and 'string'.
+    const rejectNullableString = "value: " + nullableString;
+                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+!!! error TS2365: Operator '+' cannot be applied to types '"value: "' and 'string'.
+    const rejectKnownAbsent = absent + 1;
+                              ~~~~~~
+!!! error TS18047: 'absent' is possibly 'null'.
+    
+    const rejectComparison = nullableNumber < 10;
+                             ~~~~~~~~~~~~~~
+!!! error TS18049: 'nullableNumber' is possibly 'null' or 'undefined'.
+    
+    const ordinary = 1 + 2;
+    const exactIdentity = nullableNumber === null;
+    
+    declare function left(): number?;
+    declare function right(): number?;
+    const ordered = left() + right();
+    
+    const nested = nullableNumber * 2 + 1;
+    
+    // Operators outside this slice retain their TypeScript checking and runtime behavior.
+    const rejectBitwise = nullableNumber & 1;
+                          ~~~~~~~~~~~~~~
+!!! error TS18049: 'nullableNumber' is possibly 'null' or 'undefined'.
+    nullableNumber += 1;
+    ~~~~~~~~~~~~~~
+!!! error TS2588: Cannot assign to 'nullableNumber' because it is a constant.
+    
