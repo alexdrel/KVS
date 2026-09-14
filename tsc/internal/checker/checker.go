@@ -7732,6 +7732,9 @@ func (c *Checker) checkExpressionWithContextualType(node *ast.Node, contextualTy
 }
 
 func (c *Checker) getContextNode(node *ast.Node) *ast.Node {
+	if node.Kind == ast.KindKvsPlaceholderLambdaExpression {
+		return node.AsKvsPlaceholderLambdaExpression().Arrow
+	}
 	if ast.IsJsxAttributes(node) && !ast.IsJsxSelfClosingElement(node.Parent) {
 		// Needs to be the root JsxElement, so it encompasses the attributes _and_ the children (which are essentially part of the attributes)
 		return node.Parent.Parent
@@ -8070,6 +8073,8 @@ func (c *Checker) checkExpressionWorker(node *ast.Node, checkMode CheckMode) *Ty
 		return c.checkKvsDefaultExpression(node, checkMode)
 	case ast.KindKvsNullingSieveExpression, ast.KindKvsSieveBindingInitializer:
 		return c.checkKvsNullingSieveExpression(node, checkMode)
+	case ast.KindKvsPlaceholderLambdaExpression:
+		return c.checkKvsPlaceholderLambdaExpression(node.AsKvsPlaceholderLambdaExpression(), checkMode)
 	case ast.KindKvsCatchSplitExpression:
 		return c.checkKvsCatchSplitExpression(node.AsKvsCatchSplitExpression(), checkMode)
 	case ast.KindKvsCatchSplitAssignmentExpression:
@@ -9944,7 +9949,21 @@ func (c *Checker) inferTypeArguments(node *ast.Node, signature *Signature, args 
 		if arg.Kind != ast.KindOmittedExpression {
 			paramType := c.getTypeAtPosition(signature, i)
 			if c.couldContainTypeVariables(paramType) {
+				if arg.Kind == ast.KindKvsPlaceholderLambdaExpression {
+					paramType = c.instantiateType(paramType, context.nonFixingMapper)
+				}
 				argType := c.checkExpressionWithContextualType(arg, paramType, context, checkMode)
+				if arg.Kind == ast.KindKvsPlaceholderLambdaExpression {
+					originalSignatures := c.getSignaturesOfType(c.getTypeAtPosition(signature, i), SignatureKindCall)
+					if len(originalSignatures) == 1 {
+						arrow := arg.AsKvsPlaceholderLambdaExpression().Arrow
+						arrowSignature := c.getSignatureFromDeclaration(arrow)
+						arrowSignature.resolvedReturnType = nil
+						c.clearKvsPlaceholderBodyTypes(arrow.AsArrowFunction().Body)
+						bodyType := c.getReturnTypeFromBody(arrow, checkMode&^CheckModeSkipContextSensitive)
+						c.inferTypes(context.inferences, bodyType, c.getReturnTypeOfSignature(originalSignatures[0]), InferencePriorityNone, false)
+					}
+				}
 				c.inferTypes(context.inferences, argType, paramType, InferencePriorityNone, false)
 			}
 		}
@@ -9954,6 +9973,17 @@ func (c *Checker) inferTypeArguments(node *ast.Node, signature *Signature, args 
 		c.inferTypes(context.inferences, spreadType, restType, InferencePriorityNone, false)
 	}
 	return c.getInferredTypes(context)
+}
+
+func (c *Checker) clearKvsPlaceholderBodyTypes(node *ast.Node) {
+	if node == nil {
+		return
+	}
+	c.typeNodeLinks.Get(node).resolvedType = nil
+	node.ForEachChild(func(child *ast.Node) bool {
+		c.clearKvsPlaceholderBodyTypes(child)
+		return false
+	})
 }
 
 // No signature was applicable. We have already reported the errors for the invalid signature.
@@ -11515,6 +11545,27 @@ func (c *Checker) checkSyntheticExpression(node *ast.Node) *Type {
 }
 
 func (c *Checker) checkIdentifier(node *ast.Node, checkMode CheckMode) *Type {
+	if node.AsIdentifier().Text == "__kvsPlaceholder" {
+		insidePlaceholder := false
+		insideNestedPlaceholder := false
+		for parent := node.Parent; parent != nil; parent = parent.Parent {
+			if parent.Kind == ast.KindKvsPlaceholderLambdaExpression {
+				insidePlaceholder = true
+				links := c.nodeLinks.Get(parent)
+				if links.flags&NodeCheckFlagsKvsPlaceholderBoundary != 0 {
+					if insideNestedPlaceholder {
+						return links.kvsPlaceholderType
+					}
+					insidePlaceholder = false
+					break
+				}
+				insideNestedPlaceholder = true
+			}
+		}
+		if insidePlaceholder {
+			return c.anyType
+		}
+	}
 	if ast.IsThisInTypeQuery(node) {
 		return c.checkThisExpression(node)
 	}
@@ -11672,6 +11723,63 @@ func (c *Checker) checkIdentifier(node *ast.Node, checkMode CheckMode) *Type {
 		return c.getBaseTypeOfLiteralType(flowType)
 	}
 	return flowType
+}
+
+func (c *Checker) checkKvsPlaceholderLambdaExpression(node *ast.KvsPlaceholderLambdaExpression, checkMode CheckMode) *Type {
+	contextualType := c.getApparentTypeOfContextualType(node.Arrow, ContextFlagsSignature)
+	var signatures []*Signature
+	if contextualType != nil {
+		signatures = c.getSignaturesOfType(contextualType, SignatureKindCall)
+	}
+	var result *Type
+	if len(signatures) == 0 && c.findKvsPlaceholderBoundary(node.AsNode()) != nil {
+		result = c.checkExpressionEx(node.Arrow.AsArrowFunction().Body, checkMode)
+	}
+	if len(signatures) == 0 && result == nil {
+		bodyType := c.checkExpressionEx(node.Arrow.AsArrowFunction().Body, checkMode)
+		if c.containsKvsPlaceholderBoundary(node.Arrow.AsArrowFunction().Body) {
+			result = bodyType
+		}
+	}
+
+	if result == nil {
+		parameterType := c.anyType
+		if len(signatures) != 0 && len(signatures[0].parameters) != 0 {
+			parameterType = c.getTypeAtPosition(signatures[0], 0)
+		}
+		links := c.nodeLinks.Get(node.AsNode())
+		links.flags |= NodeCheckFlagsKvsPlaceholderBoundary
+		links.kvsPlaceholderType = parameterType
+		result = c.checkExpressionEx(node.Arrow, checkMode&^CheckModeSkipContextSensitive)
+	}
+	return result
+}
+
+func (c *Checker) findKvsPlaceholderBoundary(node *ast.Node) *NodeLinks {
+	for parent := node.Parent; parent != nil; parent = parent.Parent {
+		if parent.Kind == ast.KindKvsPlaceholderLambdaExpression {
+			links := c.nodeLinks.Get(parent)
+			if links.flags&NodeCheckFlagsKvsPlaceholderBoundary != 0 {
+				return links
+			}
+		}
+	}
+	return nil
+}
+
+func (c *Checker) containsKvsPlaceholderBoundary(node *ast.Node) bool {
+	if node == nil {
+		return false
+	}
+	if node.Kind == ast.KindKvsPlaceholderLambdaExpression && c.nodeLinks.Get(node).flags&NodeCheckFlagsKvsPlaceholderBoundary != 0 {
+		return true
+	}
+	result := false
+	node.ForEachChild(func(child *ast.Node) bool {
+		result = c.containsKvsPlaceholderBoundary(child)
+		return result
+	})
+	return result
 }
 
 func (c *Checker) isSameScopedBindingElement(node *ast.Node, declaration *ast.Node) bool {
@@ -30386,6 +30494,8 @@ func (c *Checker) getContextualType(node *ast.Node, contextFlags ContextFlags) *
 		return c.getContextualTypeForSubstitutionExpression(parent.Parent, node)
 	case ast.KindParenthesizedExpression:
 		return c.getContextualType(parent, contextFlags)
+	case ast.KindKvsPlaceholderLambdaExpression:
+		return c.getContextualType(parent, contextFlags)
 	case ast.KindNonNullExpression, ast.KindKvsExtantAssertionExpression:
 		return c.getContextualType(parent, contextFlags)
 	case ast.KindSatisfiesExpression:
@@ -31893,6 +32003,8 @@ func (c *Checker) isContextSensitive(node *ast.Node) bool {
 	switch node.Kind {
 	case ast.KindFunctionExpression, ast.KindArrowFunction, ast.KindMethodDeclaration, ast.KindFunctionDeclaration:
 		return c.isContextSensitiveFunctionLikeDeclaration(node)
+	case ast.KindKvsPlaceholderLambdaExpression:
+		return true
 	case ast.KindObjectLiteralExpression:
 		return core.Some(node.Properties(), c.isContextSensitive)
 	case ast.KindArrayLiteralExpression, ast.KindKvsCompactArrayExpression:

@@ -1,0 +1,19 @@
+kvsPlaceholderLambdaClosure.ts(12,17): error TS2304: Cannot find name '%'.
+
+
+==== kvsPlaceholderLambdaClosure.ts (1 errors) ====
+    interface Item {
+        price: number;
+    }
+    
+    declare const items: Item[];
+    
+    const closures = items.map({
+        immediate: %.price,
+        delayed: () => %.price,
+    });
+    
+    items.map(() => %.price);
+                    ~
+!!! error TS2304: Cannot find name '%'.
+    

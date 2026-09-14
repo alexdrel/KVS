@@ -130,6 +130,7 @@ import type {
     KvsNullableType,
     KvsNullingExpression,
     KvsNullingSieveExpression,
+    KvsPlaceholderLambdaExpression,
     KvsSelectExpression,
     KvsSieveAssignmentExpression,
     KvsSieveBindingInitializer,
@@ -333,6 +334,7 @@ import {
     updateKvsNullableType,
     updateKvsNullingExpression,
     updateKvsNullingSieveExpression,
+    updateKvsPlaceholderLambdaExpression,
     updateKvsSelectExpression,
     updateKvsSieveAssignmentExpression,
     updateKvsSieveBindingInitializer,
@@ -407,6 +409,7 @@ import {
     updateYieldExpression,
 } from "./factory.generated.ts";
 import {
+    isArrowFunction,
     isAssertsKeyword,
     isAsteriskToken,
     isAwaitKeyword,
@@ -704,6 +707,10 @@ const visitEachChildTable: Record<number, VisitEachChildFunction> = {
         const _secondTildeToken = visitNode(node.secondTildeToken, visitor, isTildeToken);
         const _expression = visitNode(node.expression, visitor, isExpression);
         return updateKvsNullingSieveExpression(node, _firstTildeToken, _secondTildeToken, _expression);
+    },
+    [SyntaxKind.KvsPlaceholderLambdaExpression]: (node: KvsPlaceholderLambdaExpression, visitor: Visitor): KvsPlaceholderLambdaExpression => {
+        const _arrow = visitNode(node.arrow, visitor, isArrowFunction);
+        return updateKvsPlaceholderLambdaExpression(node, _arrow);
     },
     [SyntaxKind.KvsSieveBindingInitializer]: (node: KvsSieveBindingInitializer, visitor: Visitor): KvsSieveBindingInitializer => {
         const _tildeToken = visitNode(node.tildeToken, visitor, isTildeToken);

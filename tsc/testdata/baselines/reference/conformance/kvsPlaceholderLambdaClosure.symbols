@@ -1,0 +1,39 @@
+//// [tests/cases/conformance/kvs/kvsPlaceholderLambdaClosure.ts] ////
+
+=== kvsPlaceholderLambdaClosure.ts ===
+interface Item {
+>Item : Symbol(Item, Decl(kvsPlaceholderLambdaClosure.ts, 0, 0))
+
+    price: number;
+>price : Symbol(Item.price, Decl(kvsPlaceholderLambdaClosure.ts, 0, 16))
+}
+
+declare const items: Item[];
+>items : Symbol(items, Decl(kvsPlaceholderLambdaClosure.ts, 4, 13))
+>Item : Symbol(Item, Decl(kvsPlaceholderLambdaClosure.ts, 0, 0))
+
+const closures = items.map({
+>closures : Symbol(closures, Decl(kvsPlaceholderLambdaClosure.ts, 6, 5))
+>items.map : Symbol(Array.map, Decl(lib.es5.d.ts, --, --))
+>items : Symbol(items, Decl(kvsPlaceholderLambdaClosure.ts, 4, 13))
+>map : Symbol(Array.map, Decl(lib.es5.d.ts, --, --))
+
+    immediate: %.price,
+>immediate : Symbol(immediate, Decl(kvsPlaceholderLambdaClosure.ts, 6, 28))
+>%.price : Symbol(Item.price, Decl(kvsPlaceholderLambdaClosure.ts, 0, 16))
+>% : Symbol(%, Decl(kvsPlaceholderLambdaClosure.ts, 7, 14))
+>price : Symbol(Item.price, Decl(kvsPlaceholderLambdaClosure.ts, 0, 16))
+
+    delayed: () => %.price,
+>delayed : Symbol(delayed, Decl(kvsPlaceholderLambdaClosure.ts, 7, 23))
+>%.price : Symbol(Item.price, Decl(kvsPlaceholderLambdaClosure.ts, 0, 16))
+>% : Symbol(%, Decl(kvsPlaceholderLambdaClosure.ts, 7, 14))
+>price : Symbol(Item.price, Decl(kvsPlaceholderLambdaClosure.ts, 0, 16))
+
+});
+
+items.map(() => %.price);
+>items.map : Symbol(Array.map, Decl(lib.es5.d.ts, --, --))
+>items : Symbol(items, Decl(kvsPlaceholderLambdaClosure.ts, 4, 13))
+>map : Symbol(Array.map, Decl(lib.es5.d.ts, --, --))
+

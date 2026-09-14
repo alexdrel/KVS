@@ -293,6 +293,7 @@
             "KvsExtantTestExpression",
             "KvsDefaultExpression",
             "KvsNullingSieveExpression",
+            "KvsPlaceholderLambdaExpression",
             "KvsSieveBindingInitializer",
             "KvsSieveAssignmentExpression",
             "KvsFailureDemotionExpression",
@@ -1815,6 +1816,19 @@
                     {
                         "name": "Expression",
                         "type": "Expression"
+                    }
+                ],
+                "arena": true
+            },
+            "KvsPlaceholderLambdaExpression": {
+                "extends": [
+                    "ExpressionBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "Arrow",
+                        "type": "ArrowFunction"
                     }
                 ],
                 "arena": true

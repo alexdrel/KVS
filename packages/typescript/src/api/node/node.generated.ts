@@ -619,6 +619,9 @@ export class RemoteNode extends RemoteNodeBase implements Node {
     get arguments(): RemoteNodeList | undefined {
         return this.getNamedChild("arguments") as RemoteNodeList;
     }
+    get arrow(): RemoteNode | undefined {
+        return this.getNamedChild("arrow") as RemoteNode;
+    }
     get assertsModifier(): RemoteNode | undefined {
         return this.getNamedChild("assertsModifier") as RemoteNode;
     }

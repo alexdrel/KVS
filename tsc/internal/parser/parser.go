@@ -5962,7 +5962,47 @@ func (p *Parser) parseArgumentList() *ast.NodeList {
 }
 
 func (p *Parser) parseArgumentExpression() *ast.Expression {
-	return doInContext(p, ast.NodeFlagsDisallowInContext|ast.NodeFlagsDecoratorContext, false, (*Parser).parseArgumentOrArrayLiteralElement)
+	expression := doInContext(p, ast.NodeFlagsDisallowInContext|ast.NodeFlagsDecoratorContext, false, (*Parser).parseArgumentOrArrayLiteralElement)
+	placeholder := findKvsPlaceholder(expression)
+	if placeholder == nil {
+		return expression
+	}
+
+	name := p.factory.NewIdentifier("__kvsPlaceholder")
+	name.Loc = placeholder.Loc
+	name.Flags |= ast.NodeFlagsSynthesized
+	parameter := p.factory.NewParameterDeclaration(nil, nil, name, nil, nil, nil)
+	parameter.Loc = placeholder.Loc
+	parameter.Flags |= ast.NodeFlagsSynthesized
+	p.overrideParentInImmediateChildren(parameter)
+	parameters := p.newNodeList(placeholder.Loc, []*ast.Node{parameter})
+	arrowToken := p.factory.NewToken(ast.KindEqualsGreaterThanToken)
+	arrowToken.Loc = placeholder.Loc
+	arrow := p.factory.NewArrowFunction(nil, nil, parameters, nil, nil, arrowToken, expression)
+	arrow.Loc = expression.Loc
+	p.overrideParentInImmediateChildren(arrow)
+	return p.finishNodeWithEnd(p.factory.NewKvsPlaceholderLambdaExpression(arrow), expression.Pos(), expression.End())
+}
+
+func findKvsPlaceholder(node *ast.Node) *ast.Node {
+	if node == nil {
+		return nil
+	}
+	if node.Kind == ast.KindKvsPlaceholderLambdaExpression {
+		return findKvsPlaceholder(node.AsKvsPlaceholderLambdaExpression().Arrow.AsArrowFunction().Body)
+	}
+	if ast.IsFunctionLike(node) {
+		return nil
+	}
+	if ast.IsIdentifier(node) && node.AsIdentifier().Text == "__kvsPlaceholder" {
+		return node
+	}
+	var result *ast.Node
+	node.ForEachChild(func(child *ast.Node) bool {
+		result = findKvsPlaceholder(child)
+		return result != nil
+	})
+	return result
 }
 
 func (p *Parser) parseArgumentOrArrayLiteralElement() *ast.Expression {
@@ -6033,6 +6073,11 @@ func (p *Parser) parsePrimaryExpression() *ast.Expression {
 		return p.parseKvsForExpression()
 	}
 	switch p.token {
+	case ast.KindPercentToken:
+		pos := p.nodePos()
+		p.nextToken()
+		placeholder := p.newIdentifier("__kvsPlaceholder")
+		return p.finishNode(placeholder, pos)
 	case ast.KindNoSubstitutionTemplateLiteral:
 		if p.scanner.TokenFlags()&ast.TokenFlagsIsInvalid != 0 {
 			p.reScanTemplateToken(false /*isTaggedTemplate*/)

@@ -1,0 +1,45 @@
+//// [tests/cases/conformance/kvs/kvsPlaceholderLambdaClosure.ts] ////
+
+=== kvsPlaceholderLambdaClosure.ts ===
+interface Item {
+    price: number;
+>price : number
+}
+
+declare const items: Item[];
+>items : Item[]
+
+const closures = items.map({
+>closures : { immediate: number; delayed: () => number; }[]
+>items.map({    immediate: %.price,    delayed: () => %.price,}) : { immediate: number; delayed: () => number; }[]
+>items.map : <U>(callbackfn: (value: Item, index: number, array: Item[]) => U, thisArg?: any) => U[]
+>items : Item[]
+>map : <U>(callbackfn: (value: Item, index: number, array: Item[]) => U, thisArg?: any) => U[]
+>{    immediate: %.price,    delayed: () => %.price,} : (__kvsPlaceholder: Item) => { immediate: number; delayed: () => number; }
+>{    immediate: %.price,    delayed: () => %.price,} : { immediate: number; delayed: () => number; }
+
+    immediate: %.price,
+>immediate : number
+>%.price : number
+>% : Item
+>price : number
+
+    delayed: () => %.price,
+>delayed : () => number
+>() => %.price : () => number
+>%.price : number
+>% : Item
+>price : number
+
+});
+
+items.map(() => %.price);
+>items.map(() => %.price) : any[]
+>items.map : <U>(callbackfn: (value: Item, index: number, array: Item[]) => U, thisArg?: any) => U[]
+>items : Item[]
+>map : <U>(callbackfn: (value: Item, index: number, array: Item[]) => U, thisArg?: any) => U[]
+>() => %.price : () => any
+>%.price : any
+>% : any
+>price : any
+

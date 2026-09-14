@@ -1,0 +1,191 @@
+//// [tests/cases/conformance/kvs/kvsPlaceholderLambda.ts] ////
+
+=== kvsPlaceholderLambda.ts ===
+interface Item {
+>Item : Symbol(Item, Decl(kvsPlaceholderLambda.ts, 0, 0))
+
+    price: number;
+>price : Symbol(Item.price, Decl(kvsPlaceholderLambda.ts, 0, 16))
+
+    enabled: boolean;
+>enabled : Symbol(Item.enabled, Decl(kvsPlaceholderLambda.ts, 1, 18))
+}
+
+declare const items: Item[];
+>items : Symbol(items, Decl(kvsPlaceholderLambda.ts, 5, 13))
+>Item : Symbol(Item, Decl(kvsPlaceholderLambda.ts, 0, 0))
+
+declare function map<T, U>(values: readonly T[], callback: (value: T) => U): U[];
+>map : Symbol(map, Decl(kvsPlaceholderLambda.ts, 5, 28))
+>T : Symbol(T, Decl(kvsPlaceholderLambda.ts, 6, 21))
+>U : Symbol(U, Decl(kvsPlaceholderLambda.ts, 6, 23))
+>values : Symbol(values, Decl(kvsPlaceholderLambda.ts, 6, 27))
+>T : Symbol(T, Decl(kvsPlaceholderLambda.ts, 6, 21))
+>callback : Symbol(callback, Decl(kvsPlaceholderLambda.ts, 6, 48))
+>value : Symbol(value, Decl(kvsPlaceholderLambda.ts, 6, 60))
+>T : Symbol(T, Decl(kvsPlaceholderLambda.ts, 6, 21))
+>U : Symbol(U, Decl(kvsPlaceholderLambda.ts, 6, 23))
+>U : Symbol(U, Decl(kvsPlaceholderLambda.ts, 6, 23))
+
+declare function filter<T>(values: readonly T[], callback: (value: T) => boolean): T[];
+>filter : Symbol(filter, Decl(kvsPlaceholderLambda.ts, 6, 81))
+>T : Symbol(T, Decl(kvsPlaceholderLambda.ts, 7, 24))
+>values : Symbol(values, Decl(kvsPlaceholderLambda.ts, 7, 27))
+>T : Symbol(T, Decl(kvsPlaceholderLambda.ts, 7, 24))
+>callback : Symbol(callback, Decl(kvsPlaceholderLambda.ts, 7, 48))
+>value : Symbol(value, Decl(kvsPlaceholderLambda.ts, 7, 60))
+>T : Symbol(T, Decl(kvsPlaceholderLambda.ts, 7, 24))
+>T : Symbol(T, Decl(kvsPlaceholderLambda.ts, 7, 24))
+
+declare function combine(left: number, right: number): number;
+>combine : Symbol(combine, Decl(kvsPlaceholderLambda.ts, 7, 87))
+>left : Symbol(left, Decl(kvsPlaceholderLambda.ts, 8, 25))
+>right : Symbol(right, Decl(kvsPlaceholderLambda.ts, 8, 38))
+
+const prices = map(items, %.price);
+>prices : Symbol(prices, Decl(kvsPlaceholderLambda.ts, 10, 5))
+>map : Symbol(map, Decl(kvsPlaceholderLambda.ts, 5, 28))
+>items : Symbol(items, Decl(kvsPlaceholderLambda.ts, 5, 13))
+>%.price : Symbol(Item.price, Decl(kvsPlaceholderLambda.ts, 0, 16))
+>% : Symbol(%, Decl(kvsPlaceholderLambda.ts, 10, 25))
+>price : Symbol(Item.price, Decl(kvsPlaceholderLambda.ts, 0, 16))
+
+const enabled = filter(items, %.enabled);
+>enabled : Symbol(enabled, Decl(kvsPlaceholderLambda.ts, 11, 5))
+>filter : Symbol(filter, Decl(kvsPlaceholderLambda.ts, 6, 81))
+>items : Symbol(items, Decl(kvsPlaceholderLambda.ts, 5, 13))
+>%.enabled : Symbol(Item.enabled, Decl(kvsPlaceholderLambda.ts, 1, 18))
+>% : Symbol(%, Decl(kvsPlaceholderLambda.ts, 11, 29))
+>enabled : Symbol(Item.enabled, Decl(kvsPlaceholderLambda.ts, 1, 18))
+
+const combined = map(items, combine(%.price, %.price + 1));
+>combined : Symbol(combined, Decl(kvsPlaceholderLambda.ts, 12, 5))
+>map : Symbol(map, Decl(kvsPlaceholderLambda.ts, 5, 28))
+>items : Symbol(items, Decl(kvsPlaceholderLambda.ts, 5, 13))
+>combine : Symbol(combine, Decl(kvsPlaceholderLambda.ts, 7, 87))
+>%.price : Symbol(Item.price, Decl(kvsPlaceholderLambda.ts, 0, 16))
+>% : Symbol(%, Decl(kvsPlaceholderLambda.ts, 12, 36))
+>price : Symbol(Item.price, Decl(kvsPlaceholderLambda.ts, 0, 16))
+>%.price : Symbol(Item.price, Decl(kvsPlaceholderLambda.ts, 0, 16))
+>% : Symbol(%, Decl(kvsPlaceholderLambda.ts, 12, 44))
+>price : Symbol(Item.price, Decl(kvsPlaceholderLambda.ts, 0, 16))
+
+console.log(map(items, %.price));
+>console.log : Symbol(Console.log, Decl(lib.dom.d.ts, --, --))
+>console : Symbol(console, Decl(lib.dom.d.ts, --, --))
+>log : Symbol(Console.log, Decl(lib.dom.d.ts, --, --))
+>map : Symbol(map, Decl(kvsPlaceholderLambda.ts, 5, 28))
+>items : Symbol(items, Decl(kvsPlaceholderLambda.ts, 5, 13))
+>%.price : Symbol(Item.price, Decl(kvsPlaceholderLambda.ts, 0, 16))
+>% : Symbol(%, Decl(kvsPlaceholderLambda.ts, 13, 22))
+>price : Symbol(Item.price, Decl(kvsPlaceholderLambda.ts, 0, 16))
+
+declare function outer(callback: (value: Item) => number): void;
+>outer : Symbol(outer, Decl(kvsPlaceholderLambda.ts, 13, 33))
+>callback : Symbol(callback, Decl(kvsPlaceholderLambda.ts, 14, 23))
+>value : Symbol(value, Decl(kvsPlaceholderLambda.ts, 14, 34))
+>Item : Symbol(Item, Decl(kvsPlaceholderLambda.ts, 0, 0))
+
+declare function apply(value: number, callback: (nested: number) => number): number;
+>apply : Symbol(apply, Decl(kvsPlaceholderLambda.ts, 14, 64))
+>value : Symbol(value, Decl(kvsPlaceholderLambda.ts, 15, 23))
+>callback : Symbol(callback, Decl(kvsPlaceholderLambda.ts, 15, 37))
+>nested : Symbol(nested, Decl(kvsPlaceholderLambda.ts, 15, 49))
+
+outer(apply(%.price, % + 1));
+>outer : Symbol(outer, Decl(kvsPlaceholderLambda.ts, 13, 33))
+>apply : Symbol(apply, Decl(kvsPlaceholderLambda.ts, 14, 64))
+>%.price : Symbol(Item.price, Decl(kvsPlaceholderLambda.ts, 0, 16))
+>% : Symbol(%, Decl(kvsPlaceholderLambda.ts, 16, 12))
+>price : Symbol(Item.price, Decl(kvsPlaceholderLambda.ts, 0, 16))
+>% : Symbol(%, Decl(kvsPlaceholderLambda.ts, 16, 20))
+
+const offset = 2;
+>offset : Symbol(offset, Decl(kvsPlaceholderLambda.ts, 18, 5))
+
+declare function retain(callback: (value: number) => number): (value: number) => number;
+>retain : Symbol(retain, Decl(kvsPlaceholderLambda.ts, 18, 17))
+>callback : Symbol(callback, Decl(kvsPlaceholderLambda.ts, 19, 24))
+>value : Symbol(value, Decl(kvsPlaceholderLambda.ts, 19, 35))
+>value : Symbol(value, Decl(kvsPlaceholderLambda.ts, 19, 63))
+
+const escaped = retain(% + offset);
+>escaped : Symbol(escaped, Decl(kvsPlaceholderLambda.ts, 20, 5))
+>retain : Symbol(retain, Decl(kvsPlaceholderLambda.ts, 18, 17))
+>% : Symbol(%, Decl(kvsPlaceholderLambda.ts, 20, 23))
+>offset : Symbol(offset, Decl(kvsPlaceholderLambda.ts, 18, 5))
+
+for ([10]) {
+    map([1, 2], % + _);
+>map : Symbol(map, Decl(kvsPlaceholderLambda.ts, 5, 28))
+>% : Symbol(%, Decl(kvsPlaceholderLambda.ts, 23, 15))
+>_ : Symbol(_, Decl(kvsPlaceholderLambda.ts, 23, 19))
+}
+
+const remainder = 7 % 3;
+>remainder : Symbol(remainder, Decl(kvsPlaceholderLambda.ts, 26, 5))
+
+declare function takesNumber(value: number): void;
+>takesNumber : Symbol(takesNumber, Decl(kvsPlaceholderLambda.ts, 26, 24))
+>value : Symbol(value, Decl(kvsPlaceholderLambda.ts, 28, 29))
+
+takesNumber(% + 1);
+>takesNumber : Symbol(takesNumber, Decl(kvsPlaceholderLambda.ts, 26, 24))
+>% : Symbol(%, Decl(kvsPlaceholderLambda.ts, 29, 12))
+
+declare function takesZero(callback: () => number): void;
+>takesZero : Symbol(takesZero, Decl(kvsPlaceholderLambda.ts, 29, 19))
+>callback : Symbol(callback, Decl(kvsPlaceholderLambda.ts, 31, 27))
+
+takesZero(%);
+>takesZero : Symbol(takesZero, Decl(kvsPlaceholderLambda.ts, 29, 19))
+>% : Symbol(%, Decl(kvsPlaceholderLambda.ts, 32, 10))
+
+declare function takesTwo(callback: (left: number, right: number) => number): void;
+>takesTwo : Symbol(takesTwo, Decl(kvsPlaceholderLambda.ts, 32, 13))
+>callback : Symbol(callback, Decl(kvsPlaceholderLambda.ts, 34, 26))
+>left : Symbol(left, Decl(kvsPlaceholderLambda.ts, 34, 37))
+>right : Symbol(right, Decl(kvsPlaceholderLambda.ts, 34, 50))
+
+takesTwo(%);
+>takesTwo : Symbol(takesTwo, Decl(kvsPlaceholderLambda.ts, 32, 13))
+>% : Symbol(%, Decl(kvsPlaceholderLambda.ts, 35, 9))
+
+declare function takesGeneric(callback: <T>(value: T) => T): void;
+>takesGeneric : Symbol(takesGeneric, Decl(kvsPlaceholderLambda.ts, 35, 12))
+>callback : Symbol(callback, Decl(kvsPlaceholderLambda.ts, 37, 30))
+>T : Symbol(T, Decl(kvsPlaceholderLambda.ts, 37, 41))
+>value : Symbol(value, Decl(kvsPlaceholderLambda.ts, 37, 44))
+>T : Symbol(T, Decl(kvsPlaceholderLambda.ts, 37, 41))
+>T : Symbol(T, Decl(kvsPlaceholderLambda.ts, 37, 41))
+
+takesGeneric(%);
+>takesGeneric : Symbol(takesGeneric, Decl(kvsPlaceholderLambda.ts, 35, 12))
+>% : Symbol(%, Decl(kvsPlaceholderLambda.ts, 38, 13))
+
+declare function needsString(callback: (value: number) => string): void;
+>needsString : Symbol(needsString, Decl(kvsPlaceholderLambda.ts, 38, 16))
+>callback : Symbol(callback, Decl(kvsPlaceholderLambda.ts, 40, 29))
+>value : Symbol(value, Decl(kvsPlaceholderLambda.ts, 40, 40))
+
+needsString(% + 1);
+>needsString : Symbol(needsString, Decl(kvsPlaceholderLambda.ts, 38, 16))
+>% : Symbol(%, Decl(kvsPlaceholderLambda.ts, 41, 12))
+
+declare function ambiguous(callback: (value: number) => number): number;
+>ambiguous : Symbol(ambiguous, Decl(kvsPlaceholderLambda.ts, 41, 19), Decl(kvsPlaceholderLambda.ts, 43, 72))
+>callback : Symbol(callback, Decl(kvsPlaceholderLambda.ts, 43, 27))
+>value : Symbol(value, Decl(kvsPlaceholderLambda.ts, 43, 38))
+
+declare function ambiguous(callback: (value: string) => string): string;
+>ambiguous : Symbol(ambiguous, Decl(kvsPlaceholderLambda.ts, 41, 19), Decl(kvsPlaceholderLambda.ts, 43, 72))
+>callback : Symbol(callback, Decl(kvsPlaceholderLambda.ts, 44, 27))
+>value : Symbol(value, Decl(kvsPlaceholderLambda.ts, 44, 38))
+
+ambiguous(%);
+>ambiguous : Symbol(ambiguous, Decl(kvsPlaceholderLambda.ts, 41, 19), Decl(kvsPlaceholderLambda.ts, 43, 72))
+>% : Symbol(%, Decl(kvsPlaceholderLambda.ts, 45, 10))
+
+const standalone = % + 1;
+>standalone : Symbol(standalone, Decl(kvsPlaceholderLambda.ts, 47, 5))
+

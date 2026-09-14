@@ -64,6 +64,7 @@ type NodeFactory struct {
 	kvsNullableTypeArena                     core.Arena[KvsNullableType]
 	kvsNullingExpressionArena                core.Arena[KvsNullingExpression]
 	kvsNullingSieveExpressionArena           core.Arena[KvsNullingSieveExpression]
+	kvsPlaceholderLambdaExpressionArena      core.Arena[KvsPlaceholderLambdaExpression]
 	kvsSelectExpressionArena                 core.Arena[KvsSelectExpression]
 	kvsSieveAssignmentExpressionArena        core.Arena[KvsSieveAssignmentExpression]
 	kvsSieveBindingInitializerArena          core.Arena[KvsSieveBindingInitializer]
@@ -308,6 +309,7 @@ type (
 	KvsExtantTestExpressionNode             = Node
 	KvsDefaultExpressionNode                = Node
 	KvsNullingSieveExpressionNode           = Node
+	KvsPlaceholderLambdaExpressionNode      = Node
 	KvsSieveBindingInitializerNode          = Node
 	KvsSieveAssignmentExpressionNode        = Node
 	KvsFailureDemotionExpressionNode        = Node
@@ -2023,6 +2025,45 @@ func (node *KvsNullingSieveExpression) Clone(f NodeFactoryCoercible) *Node {
 
 func IsKvsNullingSieveExpression(node *Node) bool {
 	return node.Kind == KindKvsNullingSieveExpression
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// KvsPlaceholderLambdaExpression
+// ──────────────────────────────────────────────────────────────────────
+
+type KvsPlaceholderLambdaExpression struct {
+	ExpressionBase
+	CompositeBase
+	Arrow *ArrowFunctionNode
+}
+
+func (f *NodeFactory) NewKvsPlaceholderLambdaExpression(arrow *ArrowFunctionNode) *Node {
+	data := f.kvsPlaceholderLambdaExpressionArena.New()
+	data.Arrow = arrow
+	return f.newNode(KindKvsPlaceholderLambdaExpression, data)
+}
+
+func (f *NodeFactory) UpdateKvsPlaceholderLambdaExpression(node *KvsPlaceholderLambdaExpression, arrow *ArrowFunctionNode) *Node {
+	if arrow != node.Arrow {
+		return updateNode(f.NewKvsPlaceholderLambdaExpression(arrow), node.AsNode(), f.hooks)
+	}
+	return node.AsNode()
+}
+
+func (node *KvsPlaceholderLambdaExpression) ForEachChild(v Visitor) bool {
+	return visit(v, node.Arrow)
+}
+
+func (node *KvsPlaceholderLambdaExpression) VisitEachChild(v *NodeVisitor) *Node {
+	return v.Factory.UpdateKvsPlaceholderLambdaExpression(node, v.visitNode(node.Arrow))
+}
+
+func (node *KvsPlaceholderLambdaExpression) Clone(f NodeFactoryCoercible) *Node {
+	return cloneNode(f.AsNodeFactory().NewKvsPlaceholderLambdaExpression(node.Arrow), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func IsKvsPlaceholderLambdaExpression(node *Node) bool {
+	return node.Kind == KindKvsPlaceholderLambdaExpression
 }
 
 // ──────────────────────────────────────────────────────────────────────
@@ -10058,6 +10099,8 @@ func (n *Node) ForEachChild(v Visitor) bool {
 		return n.data.(*KvsDefaultExpression).ForEachChild(v)
 	case KindKvsNullingSieveExpression:
 		return n.data.(*KvsNullingSieveExpression).ForEachChild(v)
+	case KindKvsPlaceholderLambdaExpression:
+		return n.data.(*KvsPlaceholderLambdaExpression).ForEachChild(v)
 	case KindKvsSieveBindingInitializer:
 		return n.data.(*KvsSieveBindingInitializer).ForEachChild(v)
 	case KindKvsSieveAssignmentExpression:
@@ -10533,6 +10576,10 @@ func (n *Node) AsKvsDefaultExpression() *KvsDefaultExpression {
 
 func (n *Node) AsKvsNullingSieveExpression() *KvsNullingSieveExpression {
 	return n.data.(*KvsNullingSieveExpression)
+}
+
+func (n *Node) AsKvsPlaceholderLambdaExpression() *KvsPlaceholderLambdaExpression {
+	return n.data.(*KvsPlaceholderLambdaExpression)
 }
 
 func (n *Node) AsKvsSieveBindingInitializer() *KvsSieveBindingInitializer {

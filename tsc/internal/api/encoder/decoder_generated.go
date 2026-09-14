@@ -337,6 +337,8 @@ func (d *astDecoder) createChildrenNode(kind ast.Kind, data uint32, childIndices
 		secondTildeToken := d.nodeAt(it.nextIf(mask, 1))
 		expression := d.nodeAt(it.nextIf(mask, 2))
 		return d.factory.NewKvsNullingSieveExpression(firstTildeToken, secondTildeToken, expression), nil
+	case ast.KindKvsPlaceholderLambdaExpression:
+		return d.factory.NewKvsPlaceholderLambdaExpression(d.singleChild(childIndices)), nil
 	case ast.KindKvsSieveBindingInitializer:
 		it := newChildIter(childIndices)
 		tildeToken := d.nodeAt(it.nextIf(mask, 0))

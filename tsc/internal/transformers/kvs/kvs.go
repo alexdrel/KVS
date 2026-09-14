@@ -21,6 +21,7 @@ type transformer struct {
 	// original effect node is then replaced by its generated result temporary
 	// while the rest of that value is visited.
 	headReplacements map[*ast.Node]*ast.Node
+	placeholderNames []*ast.IdentifierNode
 }
 
 func NewTransformer(opts *transformers.TransformOptions) *transformers.Transformer {
@@ -33,6 +34,13 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 		return replacement
 	}
 	switch node.Kind {
+	case ast.KindIdentifier:
+		if node.AsIdentifier().Text == "__kvsPlaceholder" {
+			if len(tx.placeholderNames) != 0 {
+				return tx.placeholderNames[len(tx.placeholderNames)-1]
+			}
+			return tx.Factory().NewIdentifier("undefined")
+		}
 	case ast.KindSourceFile:
 		return tx.Visitor().VisitEachChild(node)
 	case ast.KindForOfStatement:
@@ -117,6 +125,12 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 		return tx.transformDefault(node.AsKvsDefaultExpression())
 	case ast.KindKvsNullingSieveExpression:
 		return tx.transformNullingSieve(node.AsKvsNullingSieveExpression().Expression)
+	case ast.KindKvsPlaceholderLambdaExpression:
+		placeholder := node.AsKvsPlaceholderLambdaExpression()
+		if tx.resolver.IsKvsPlaceholderBoundary(node) {
+			return tx.transformPlaceholderLambda(placeholder)
+		}
+		return tx.Visitor().VisitNode(placeholder.Arrow.AsArrowFunction().Body)
 	case ast.KindKvsSieveBindingInitializer:
 		return tx.transformNullingSieve(node.AsKvsSieveBindingInitializer().Expression)
 	case ast.KindKvsSieveAssignmentExpression:
@@ -163,6 +177,20 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 		return tx.Factory().NewArrayLiteralExpression(nil, false)
 	}
 	return tx.Visitor().VisitEachChild(node)
+}
+
+func (tx *transformer) transformPlaceholderLambda(node *ast.KvsPlaceholderLambdaExpression) *ast.Node {
+	factory := tx.Factory()
+	arrow := node.Arrow.AsArrowFunction()
+	name := factory.NewUniqueName("_arg")
+	originalParameter := arrow.Parameters.Nodes[0].AsParameterDeclaration()
+	parameter := factory.UpdateParameterDeclaration(originalParameter, originalParameter.Modifiers(), originalParameter.DotDotDotToken, name, originalParameter.QuestionToken, originalParameter.Type, originalParameter.Initializer)
+	parameters := factory.NewNodeList([]*ast.Node{parameter})
+	tx.placeholderNames = append(tx.placeholderNames, name)
+	body := tx.Visitor().VisitNode(arrow.Body)
+	tx.placeholderNames = tx.placeholderNames[:len(tx.placeholderNames)-1]
+
+	return factory.UpdateArrowFunction(arrow, arrow.Modifiers(), arrow.TypeParameters, parameters, arrow.Type, arrow.FullSignature, arrow.EqualsGreaterThanToken, body)
 }
 
 func (tx *transformer) transformComparisonAlternatives(node *ast.KvsComparisonAlternativesExpression) *ast.Node {

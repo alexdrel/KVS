@@ -305,6 +305,12 @@ func (walker *typeWriterWalker) visitNode(node *ast.Node, isSymbolWalk bool) []*
 	nodes := forEachASTNode(node)
 	var results []*typeWriterResult
 	for _, n := range nodes {
+		if n.Kind == ast.KindIdentifier && n.Flags&ast.NodeFlagsSynthesized != 0 && n.Text() == "__kvsPlaceholder" && n.Parent != nil && n.Parent.Kind == ast.KindParameter {
+			// The placeholder parameter is parser-created binding scaffolding. Its
+			// source range points at the first authored `%`, but it is not itself
+			// an authored declaration to include in source-ordered baselines.
+			continue
+		}
 		if n.Kind == ast.KindIdentifier && n.Flags&ast.NodeFlagsSynthesized != 0 && n.Parent != nil && n.Parent.Kind == ast.KindVariableDeclaration && n.Parent.Parent != nil && n.Parent.Parent.Flags&ast.NodeFlagsSynthesized != 0 {
 			// Parser-created semantic bindings, such as the hidden `_` in a KVS
 			// implicit-subject header, have no source text to annotate.

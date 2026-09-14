@@ -1226,7 +1226,11 @@ func (p *Printer) emitComputedPropertyName(node *ast.ComputedPropertyName) {
 func (p *Printer) emitEntityName(node *ast.EntityName) {
 	switch node.Kind {
 	case ast.KindIdentifier:
-		p.emitIdentifierReference(node.AsIdentifier())
+		if node.AsIdentifier().Text == "__kvsPlaceholder" {
+			p.writePunctuation("%")
+		} else {
+			p.emitIdentifierReference(node.AsIdentifier())
+		}
 	case ast.KindQualifiedName:
 		p.emitQualifiedName(node.AsQualifiedName())
 	case ast.KindPropertyAccessExpression:
@@ -3394,6 +3398,8 @@ func (p *Printer) emitExpression(node *ast.Expression, precedence ast.OperatorPr
 		p.emitKvsDefaultExpression(node.AsKvsDefaultExpression())
 	case ast.KindKvsNullingSieveExpression:
 		p.emitKvsNullingSieveExpression(node.AsKvsNullingSieveExpression())
+	case ast.KindKvsPlaceholderLambdaExpression:
+		p.emitExpression(node.AsKvsPlaceholderLambdaExpression().Arrow.AsArrowFunction().Body, ast.OperatorPrecedenceLowest)
 	case ast.KindKvsSieveBindingInitializer:
 		p.emitKvsSieveBindingInitializer(node.AsKvsSieveBindingInitializer())
 	case ast.KindKvsSieveAssignmentExpression:

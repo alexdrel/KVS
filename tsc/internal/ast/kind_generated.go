@@ -264,6 +264,7 @@ const (
 	KindKvsExtantTestExpression
 	KindKvsDefaultExpression
 	KindKvsNullingSieveExpression
+	KindKvsPlaceholderLambdaExpression
 	KindKvsSieveBindingInitializer
 	KindKvsSieveAssignmentExpression
 	KindKvsFailureDemotionExpression

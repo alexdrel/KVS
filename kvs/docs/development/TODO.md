@@ -3,7 +3,7 @@
 This is a working implementation aid, not a language specification or feature
 order. The language documents remain authoritative for accepted semantics.
 
-Progress: **181 of 358 items complete (50.6%)**; **177 remain open**.
+Progress: **189 of 357 items complete (52.9%)**; **168 remain open**.
 
 - `[x]` means implemented with focused compiler evidence.
 - `[ ]` means unimplemented, incomplete, or not yet deliberately validated.
@@ -45,6 +45,7 @@ Implemented vertical slices:
   exception types.
 - Failure promotion: `expression ~~ error`, including non-nullable results and
   caught-cause preservation.
+- Placeholder lambdas in contextual callback arguments: `%`.
 
 Known semantic debts:
 
@@ -85,6 +86,8 @@ Focused conformance inputs:
 - `tsc/testdata/tests/cases/conformance/kvs/kvsCatchAndSplit.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsFailureDemotion.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsFailurePromotion.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsPlaceholderLambda.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsPlaceholderLambdaClosure.ts`
 
 Run all implemented KVS slices together:
 
@@ -481,16 +484,15 @@ them; generated example `.js` files are intentionally ignored.
 
 ### Placeholder lambda `%`
 
-- [ ] Simple property callback
-- [ ] Arbitrary unary expression
-- [ ] Expected unary callable context only
-- [ ] Multiple `%` share one parameter
-- [ ] Standalone `%` rejected
-- [ ] Nested placeholder boundaries
-- [ ] Overload ambiguity rejected
-- [ ] Use as computed operation
-- [ ] Ordinary closure semantics
-- [ ] Context-aware callback interaction
+- [x] Simple property callback
+- [x] Arbitrary unary expression
+- [x] Direct call argument with an expected callback type
+- [x] Multiple `%` share one parameter
+- [x] Nested placeholder boundaries
+- [x] Overload resolution follows ordinary arrow rules
+- [ ] Use as a computed/fluent operation
+- [x] Ordinary closure semantics
+- [x] Context-aware callback interaction
 
 ## 6. Failure policy
 

@@ -365,14 +365,16 @@ const (
 	NodeCheckFlagsInitializerIsUndefinedComputed           NodeCheckFlags = 1 << 25
 	NodeCheckFlagsKvsLiftedBinaryLeftNullable              NodeCheckFlags = 1 << 26
 	NodeCheckFlagsKvsLiftedBinaryRightNullable             NodeCheckFlags = 1 << 27
+	NodeCheckFlagsKvsPlaceholderBoundary                   NodeCheckFlags = 1 << 28
 )
 
 // Common links
 
 type NodeLinks struct {
 	flags                                NodeCheckFlags // Set of flags specific to Node
-	declarationRequiresScopeChange       core.Tristate  // Set by `useOuterVariableScopeInParameter` in checker when downlevel emit would change the name resolution scope inside of a parameter.
-	hasReportedStatementInAmbientContext bool           // Cache boolean if we report statements in ambient context
+	kvsPlaceholderType                   *Type
+	declarationRequiresScopeChange       core.Tristate // Set by `useOuterVariableScopeInParameter` in checker when downlevel emit would change the name resolution scope inside of a parameter.
+	hasReportedStatementInAmbientContext bool          // Cache boolean if we report statements in ambient context
 }
 
 type SymbolNodeLinks struct {

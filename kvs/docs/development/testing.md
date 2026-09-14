@@ -27,6 +27,11 @@ checks its stdout against the corresponding file under
 Goalposts are deliberately outside this runnable set. These checks complement
 the normal compiler baseline suite; they do not replace it.
 
+Every runnable example should be readable on its own: add short comments that
+identify the language behavior being demonstrated, log the meaningful result,
+and show the expected output in nearby comments. The matching `.stdout` file
+remains the executable assertion; the inline output is the reader-facing form.
+
 ## Native compiler tests
 
 The compiler's end-to-end baseline inputs live in:
@@ -81,6 +86,33 @@ enumerated list.
 After inspecting generated local results, `npx hereby baseline-accept` copies
 local baselines into the reference tree. Do not accept a baseline merely to
 make a test green; first verify that it expresses the agreed behavior.
+
+## Placeholder-lambda slice
+
+`kvsPlaceholderLambda.ts` checks `%` as a direct callback argument, including
+property access, computation with repeated placeholders, generic call
+inference, and access to an outer implicit subject. Nested calls cover both
+boundary outcomes: an actual callback argument receives its own `%`, while
+ordinary nested arguments retain the outer `%`.
+
+`kvsPlaceholderLambdaClosure.ts` distinguishes closure from formation in a
+multiline body: a nested arrow may capture a `%` already established by its
+containing placeholder body, while an explicit callback containing the only
+`%` does not establish one. Its type and symbol baselines also guard the
+source-order handling of the parser-created placeholder binding.
+
+The same case compares contextual behavior with ordinary arrows: callbacks may
+declare additional ignored parameters, generic callbacks and overloads use
+normal inference, and an incompatible callback result is rejected as the wrong
+lambda type. It also checks a non-callback argument, a zero-parameter callback,
+and standalone `%`. Its JavaScript baseline verifies fresh ordinary arrow
+parameters and preserves ordinary infix remainder.
+
+Run it with:
+
+```sh
+go -C ./tsc test -run='TestLocal/kvsPlaceholderLambda' ./internal/testrunner
+```
 
 ## TDD starting point
 

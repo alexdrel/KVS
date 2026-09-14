@@ -1,0 +1,231 @@
+//// [tests/cases/conformance/kvs/kvsPlaceholderLambda.ts] ////
+
+=== kvsPlaceholderLambda.ts ===
+interface Item {
+    price: number;
+>price : number
+
+    enabled: boolean;
+>enabled : boolean
+}
+
+declare const items: Item[];
+>items : Item[]
+
+declare function map<T, U>(values: readonly T[], callback: (value: T) => U): U[];
+>map : <T, U>(values: readonly T[], callback: (value: T) => U) => U[]
+>values : readonly T[]
+>callback : (value: T) => U
+>value : T
+
+declare function filter<T>(values: readonly T[], callback: (value: T) => boolean): T[];
+>filter : <T>(values: readonly T[], callback: (value: T) => boolean) => T[]
+>values : readonly T[]
+>callback : (value: T) => boolean
+>value : T
+
+declare function combine(left: number, right: number): number;
+>combine : (left: number, right: number) => number
+>left : number
+>right : number
+
+const prices = map(items, %.price);
+>prices : number[]
+>map(items, %.price) : number[]
+>map : <T, U>(values: readonly T[], callback: (value: T) => U) => U[]
+>items : Item[]
+>%.price : (__kvsPlaceholder: Item) => number
+>%.price : number
+>% : Item
+>price : number
+
+const enabled = filter(items, %.enabled);
+>enabled : Item[]
+>filter(items, %.enabled) : Item[]
+>filter : <T>(values: readonly T[], callback: (value: T) => boolean) => T[]
+>items : Item[]
+>%.enabled : (__kvsPlaceholder: Item) => boolean
+>%.enabled : boolean
+>% : Item
+>enabled : boolean
+
+const combined = map(items, combine(%.price, %.price + 1));
+>combined : number[]
+>map(items, combine(%.price, %.price + 1)) : number[]
+>map : <T, U>(values: readonly T[], callback: (value: T) => U) => U[]
+>items : Item[]
+>combine(%.price, %.price + 1) : (__kvsPlaceholder: Item) => number
+>combine(%.price, %.price + 1) : number
+>combine : (left: number, right: number) => number
+>%.price : (__kvsPlaceholder: any) => number
+>%.price : number
+>% : Item
+>price : number
+>%.price + 1 : (__kvsPlaceholder: any) => number
+>%.price + 1 : number
+>%.price : number
+>% : Item
+>price : number
+>1 : 1
+
+console.log(map(items, %.price));
+>console.log(map(items, %.price)) : void
+>console.log : (...data: any[]) => void
+>console : Console
+>log : (...data: any[]) => void
+>map(items, %.price) : (__kvsPlaceholder: any) => number[]
+>map(items, %.price) : number[]
+>map : <T, U>(values: readonly T[], callback: (value: T) => U) => U[]
+>items : Item[]
+>%.price : (__kvsPlaceholder: Item) => number
+>%.price : number
+>% : Item
+>price : number
+
+declare function outer(callback: (value: Item) => number): void;
+>outer : (callback: (value: Item) => number) => void
+>callback : (value: Item) => number
+>value : Item
+
+declare function apply(value: number, callback: (nested: number) => number): number;
+>apply : (value: number, callback: (nested: number) => number) => number
+>value : number
+>callback : (nested: number) => number
+>nested : number
+
+outer(apply(%.price, % + 1));
+>outer(apply(%.price, % + 1)) : void
+>outer : (callback: (value: Item) => number) => void
+>apply(%.price, % + 1) : (__kvsPlaceholder: Item) => number
+>apply(%.price, % + 1) : number
+>apply : (value: number, callback: (nested: number) => number) => number
+>%.price : (__kvsPlaceholder: any) => number
+>%.price : number
+>% : Item
+>price : number
+>% + 1 : (__kvsPlaceholder: number) => number
+>% + 1 : number
+>% : number
+>1 : 1
+
+const offset = 2;
+>offset : 2
+>2 : 2
+
+declare function retain(callback: (value: number) => number): (value: number) => number;
+>retain : (callback: (value: number) => number) => (value: number) => number
+>callback : (value: number) => number
+>value : number
+>value : number
+
+const escaped = retain(% + offset);
+>escaped : (value: number) => number
+>retain(% + offset) : (value: number) => number
+>retain : (callback: (value: number) => number) => (value: number) => number
+>% + offset : (__kvsPlaceholder: number) => number
+>% + offset : number
+>% : number
+>offset : 2
+
+for ([10]) {
+>[10] : number[]
+>10 : 10
+
+    map([1, 2], % + _);
+>map([1, 2], % + _) : number[]
+>map : <T, U>(values: readonly T[], callback: (value: T) => U) => U[]
+>[1, 2] : number[]
+>1 : 1
+>2 : 2
+>% + _ : (__kvsPlaceholder: number) => number
+>% + _ : number
+>% : number
+>_ : number
+}
+
+const remainder = 7 % 3;
+>remainder : number
+>7 % 3 : number
+>7 : 7
+>3 : 3
+
+declare function takesNumber(value: number): void;
+>takesNumber : (value: number) => void
+>value : number
+
+takesNumber(% + 1);
+>takesNumber(% + 1) : void
+>takesNumber : (value: number) => void
+>% + 1 : (__kvsPlaceholder: any) => any
+>% + 1 : any
+>% : any
+>1 : 1
+
+declare function takesZero(callback: () => number): void;
+>takesZero : (callback: () => number) => void
+>callback : () => number
+
+takesZero(%);
+>takesZero(%) : void
+>takesZero : (callback: () => number) => void
+>% : (__kvsPlaceholder: any) => any
+>% : any
+
+declare function takesTwo(callback: (left: number, right: number) => number): void;
+>takesTwo : (callback: (left: number, right: number) => number) => void
+>callback : (left: number, right: number) => number
+>left : number
+>right : number
+
+takesTwo(%);
+>takesTwo(%) : void
+>takesTwo : (callback: (left: number, right: number) => number) => void
+>% : (__kvsPlaceholder: number) => number
+>% : number
+
+declare function takesGeneric(callback: <T>(value: T) => T): void;
+>takesGeneric : (callback: <T>(value: T) => T) => void
+>callback : <T>(value: T) => T
+>value : T
+
+takesGeneric(%);
+>takesGeneric(%) : void
+>takesGeneric : (callback: <T>(value: T) => T) => void
+>% : <T>(__kvsPlaceholder: T) => T
+>% : T
+
+declare function needsString(callback: (value: number) => string): void;
+>needsString : (callback: (value: number) => string) => void
+>callback : (value: number) => string
+>value : number
+
+needsString(% + 1);
+>needsString(% + 1) : void
+>needsString : (callback: (value: number) => string) => void
+>% + 1 : (__kvsPlaceholder: number) => number
+>% + 1 : number
+>% : number
+>1 : 1
+
+declare function ambiguous(callback: (value: number) => number): number;
+>ambiguous : { (callback: (value: number) => number): number; (callback: (value: string) => string): string; }
+>callback : (value: number) => number
+>value : number
+
+declare function ambiguous(callback: (value: string) => string): string;
+>ambiguous : { (callback: (value: number) => number): number; (callback: (value: string) => string): string; }
+>callback : (value: string) => string
+>value : string
+
+ambiguous(%);
+>ambiguous(%) : number
+>ambiguous : { (callback: (value: number) => number): number; (callback: (value: string) => string): string; }
+>% : (__kvsPlaceholder: number) => number
+>% : number
+
+const standalone = % + 1;
+>standalone : any
+>% + 1 : any
+>% : any
+>1 : 1
+

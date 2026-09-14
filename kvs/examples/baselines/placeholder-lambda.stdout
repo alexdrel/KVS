@@ -1,0 +1,22 @@
+roof, garage, garden
+roof, garden
+21.1
+[
+  {
+    "station": "roof",
+    "rounded": [
+      18,
+      20,
+      21
+    ],
+    "spread": 3
+  },
+  {
+    "station": "garden",
+    "rounded": [
+      18,
+      20
+    ],
+    "spread": 2
+  }
+]

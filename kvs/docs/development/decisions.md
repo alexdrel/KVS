@@ -672,3 +672,33 @@ initializers, including their first-evaluated member/call
 continuations. Nested argument, array-element, and conditional-branch placement
 is diagnosed. The inherited ordering debts for assignment targets and object
 fields remain accepted rather than being expanded in this slice.
+
+## Placeholder lambda
+
+Status: implemented for direct call arguments.
+
+Prefix `%` forms a one-parameter placeholder lambda in a direct call argument
+whose contextual type accepts a callback. Every `%` in that argument refers to
+the same first callback parameter. Additional parameters in the expected
+callback type do not reject the shorthand: the generated arrow simply ignores
+them, exactly like an authored one-parameter arrow. A nested direct call
+argument starts a new placeholder lambda only when that argument is itself a
+callback position; otherwise its `%` occurrences continue to refer to the outer
+parameter. Explicit function expressions and arrow functions remain ordinary
+lexical scopes: they may close over an already-established placeholder
+parameter, but an explicit function containing the only `%` does not itself
+establish a placeholder lambda.
+
+The checker, rather than the parser, owns the contextual boundary. The parser
+records candidate argument wrappers, and the checker marks the wrapper selected
+by ordinary contextual typing. Callback arity, generic signatures, overload
+selection, parameter compatibility, and return compatibility follow the same
+checker rules as an authored arrow. A `%` candidate in an incompatible position
+is still checked as a lambda and receives the normal type error rather than
+being ignored or reinterpreted. Standalone `%` is not a placeholder expression.
+Ordinary infix remainder is unchanged.
+
+Lowering emits an ordinary single-parameter arrow. The generated parameter is
+fresh, multiple placeholders share it, outer implicit subject `_` remains
+lexically visible, and a nested accepted callback receives its own fresh
+parameter.

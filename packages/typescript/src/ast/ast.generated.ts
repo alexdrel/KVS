@@ -639,6 +639,10 @@ export interface KvsNullingSieveExpression extends ExpressionBase {
     readonly secondTildeToken: TildeToken;
     readonly expression: Expression;
 }
+export interface KvsPlaceholderLambdaExpression extends ExpressionBase {
+    readonly kind: SyntaxKind.KvsPlaceholderLambdaExpression;
+    readonly arrow: ArrowFunction;
+}
 export interface KvsSieveBindingInitializer extends ExpressionBase {
     readonly kind: SyntaxKind.KvsSieveBindingInitializer;
     readonly tildeToken: TildeToken;
