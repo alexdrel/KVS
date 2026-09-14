@@ -1,0 +1,24 @@
+//// [tests/cases/conformance/kvs/kvsDefaultConstructorImports.ts] ////
+
+=== model.ts ===
+export class Session {
+>Session : Session
+
+    constructor(public name = "") {}
+>name : string
+>"" : ""
+}
+
+=== main.ts ===
+import { Session as LocalSession } from "./model";
+>Session : typeof LocalSession
+>LocalSession : typeof LocalSession
+
+declare const maybeSession: LocalSession?;
+>maybeSession : LocalSession | null | undefined
+
+export const session = maybeSession!;
+>session : LocalSession
+>maybeSession! : LocalSession
+>maybeSession : LocalSession | null | undefined
+

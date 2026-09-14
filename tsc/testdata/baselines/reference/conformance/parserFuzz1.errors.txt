@@ -1,26 +1,29 @@
 parserFuzz1.ts(1,1): error TS2304: Cannot find name 'cla'.
 parserFuzz1.ts(1,6): error TS2304: Cannot find name 'ss'.
-parserFuzz1.ts(1,9): error TS1005: ';' expected.
-parserFuzz1.ts(2,3): error TS1434: Unexpected keyword or identifier.
-parserFuzz1.ts(2,3): error TS2304: Cannot find name '_'.
-parserFuzz1.ts(2,5): error TS1128: Declaration or statement expected.
-parserFuzz1.ts(2,15): error TS1005: '{' expected.
+parserFuzz1.ts(1,6): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+parserFuzz1.ts(2,3): error TS2353: Object literal may only specify known properties, and '_' does not exist in type 'ss'.
+parserFuzz1.ts(2,3): error TS18004: No value exists in scope for the shorthand property '_'. Either declare one or provide an initializer.
+parserFuzz1.ts(2,5): error TS1005: ',' expected.
+parserFuzz1.ts(2,12): error TS2353: Object literal may only specify known properties, and 'try' does not exist in type 'ss'.
+parserFuzz1.ts(2,15): error TS1005: ':' expected.
 
 
-==== parserFuzz1.ts (7 errors) ====
+==== parserFuzz1.ts (8 errors) ====
     cla <ss {
     ~~~
 !!! error TS2304: Cannot find name 'cla'.
          ~~
 !!! error TS2304: Cannot find name 'ss'.
-            ~
-!!! error TS1005: ';' expected.
+         ~~
+!!! error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
       _ static try
       ~
-!!! error TS1434: Unexpected keyword or identifier.
+!!! error TS2353: Object literal may only specify known properties, and '_' does not exist in type 'ss'.
       ~
-!!! error TS2304: Cannot find name '_'.
+!!! error TS18004: No value exists in scope for the shorthand property '_'. Either declare one or provide an initializer.
         ~~~~~~
-!!! error TS1128: Declaration or statement expected.
+!!! error TS1005: ',' expected.
+               ~~~
+!!! error TS2353: Object literal may only specify known properties, and 'try' does not exist in type 'ss'.
                   
-!!! error TS1005: '{' expected.
+!!! error TS1005: ':' expected.

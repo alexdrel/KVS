@@ -1,6 +1,6 @@
 // === documentHighlights ===
 // === /getOccurrencesTryCatchFinallyBroken.ts ===
-// t /*HIGHLIGHTS*/ry {
+// t /*HIGHLIGHTS*/[|ry|] {
 //     try {
 //     }
 //     ctch (x) {

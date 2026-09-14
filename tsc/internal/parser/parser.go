@@ -5746,7 +5746,7 @@ func (p *Parser) canFollowTypeArgumentsInExpression() bool {
 	// foo<x>(
 	// foo<T> `...`
 	// foo<T> `...${100}...`
-	case ast.KindOpenParenToken, ast.KindNoSubstitutionTemplateLiteral, ast.KindTemplateHead:
+	case ast.KindOpenParenToken, ast.KindOpenBraceToken, ast.KindNoSubstitutionTemplateLiteral, ast.KindTemplateHead:
 		return true
 	// A type argument list followed by `<` never makes sense, and a type argument list followed
 	// by `>` is ambiguous with a (re-scanned) `>>` operator, so we disqualify both. Also, in
@@ -5843,6 +5843,10 @@ func (p *Parser) parseMemberExpressionRest(pos int, expression *ast.Expression, 
 			continue
 		}
 		if questionDotToken == nil {
+			if p.token == ast.KindOpenBraceToken && !p.hasPrecedingLineBreak() && p.parsingContexts&(1<<PCHeritageClauseElement) == 0 && isValidKvsTypedObjectTypeExpression(expression) {
+				expression = p.parseKvsTypedObjectExpression(pos, expression, nil)
+				continue
+			}
 			if p.token == ast.KindExclamationToken && !p.hasPrecedingLineBreak() {
 				p.nextToken()
 				expression = p.checkJSSyntax(p.finishNode(p.factory.NewKvsDefaultExpression(expression), pos))
@@ -5850,12 +5854,44 @@ func (p *Parser) parseMemberExpressionRest(pos int, expression *ast.Expression, 
 			}
 			typeArguments := p.tryParseTypeArgumentsInExpression()
 			if typeArguments != nil {
-				expression = p.finishNode(p.factory.NewExpressionWithTypeArguments(expression, typeArguments), pos)
+				if p.token == ast.KindOpenBraceToken && !p.hasPrecedingLineBreak() && p.parsingContexts&(1<<PCHeritageClauseElement) == 0 && isValidKvsTypedObjectTypeExpression(expression) {
+					expression = p.parseKvsTypedObjectExpression(pos, expression, typeArguments)
+				} else {
+					expression = p.finishNode(p.factory.NewExpressionWithTypeArguments(expression, typeArguments), pos)
+				}
 				continue
 			}
 		}
 		return expression
 	}
+}
+
+func isValidKvsTypedObjectTypeExpression(node *ast.Node) bool {
+	if ast.IsIdentifier(node) {
+		return ast.NodeIsPresent(node) && scanner.StringToToken(node.Text()) == ast.KindUnknown
+	}
+	return ast.IsPropertyAccessExpression(node) &&
+		!ast.IsOptionalChain(node) &&
+		ast.NodeIsPresent(node.Name()) &&
+		scanner.StringToToken(node.Name().Text()) == ast.KindUnknown &&
+		isValidKvsTypedObjectTypeExpression(node.Expression())
+}
+
+func (p *Parser) parseKvsTypedObjectExpression(pos int, expression *ast.Node, typeArguments *ast.NodeList) *ast.Expression {
+	typeName := p.convertEntityNameExpressionToEntityName(expression)
+	typeNode := p.factory.NewTypeReferenceNode(typeName, typeArguments)
+	typeEnd := expression.End()
+	if typeArguments != nil {
+		typeEnd = typeArguments.End()
+	}
+	typeNode.Loc = core.NewTextRange(expression.Pos(), typeEnd)
+	p.overrideParentInImmediateChildren(typeNode)
+	openBracePosition := p.scanner.TokenStart()
+	openBraceParsed := p.parseExpected(ast.KindOpenBraceToken)
+	multiLine := p.hasPrecedingLineBreak()
+	properties := p.parseDelimitedList(PCObjectLiteralMembers, (*Parser).parseObjectLiteralElement)
+	p.parseExpectedMatchingBrackets(ast.KindOpenBraceToken, ast.KindCloseBraceToken, openBraceParsed, openBracePosition)
+	return p.finishNode(p.factory.NewKvsTypedObjectExpression(typeNode, properties, multiLine), pos)
 }
 
 func (p *Parser) isStartOfOptionalPropertyOrElementAccessChain() bool {

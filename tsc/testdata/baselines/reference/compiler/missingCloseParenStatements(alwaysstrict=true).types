@@ -40,23 +40,26 @@ if ( a1 && (a2 + a3 > 0) {
 >i : any
 
             with ((a2 + a3 > 0) && a1 {
->(a2 + a3 > 0) && a1 : any
+>(a2 + a3 > 0) && a1 {                console.log(x);              } : any
 >(a2 + a3 > 0) : boolean
 >a2 + a3 > 0 : boolean
 >a2 + a3 : any
 >a2 : any
 >a3 : number
 >0 : 0
->a1 : any
+>a1 {                console.log(x);              } : a1
 
                 console.log(x);
->console.log(x) : any
->console.log : any
->console : any
+>console : Console
+> : any
+>.log(x) : any
+>.log : any
+> : any
 >log : any
 >x : any
               }
         } while (i < 5 && (a1 > 5);
+> : any
 >i < 5 && (a1 > 5) : boolean
 >i < 5 : boolean
 >i : any

@@ -1,0 +1,261 @@
+//// [tests/cases/conformance/kvs/kvsTypedConstruction.ts] ////
+
+=== kvsTypedConstruction.ts ===
+interface Entity {
+    id: string;
+>id : string
+}
+
+class Clock {
+>Clock : Clock
+
+    constructor(public zone = "UTC") {}
+>zone : string
+>"UTC" : "UTC"
+}
+
+interface Settings {
+    retries: number;
+>retries : number
+
+    labels: string[];
+>labels : string[]
+
+    aliases: Map<string, string>;
+>aliases : Map<string, string>
+
+    visited: Set<string>;
+>visited : Set<string>
+
+    created: Date;
+>created : Date
+
+    clock: Clock;
+>clock : Clock
+}
+
+interface Profile extends Entity {
+    enabled: boolean;
+>enabled : boolean
+
+    tags: string[];
+>tags : string[]
+
+    settings: Settings;
+>settings : Settings
+
+    note?: string;
+>note : string | undefined
+
+    theme: string?;
+>theme : string | null | undefined
+
+	format: ((value: number) => string)?;
+>format : ((value: number) => string) | null | undefined
+>value : number
+
+	"display-name": string;
+>"display-name" : string
+}
+
+type Alias = {
+>Alias : Alias
+
+    count: number;
+>count : number
+
+};
+
+type Pair<T> = {
+>Pair : Pair<T>
+
+	left: T;
+>left : T
+
+	right: T[];
+>right : T[]
+
+};
+
+interface Box<T> {
+    value: T;
+>value : T
+
+    values: T[];
+>values : T[]
+}
+
+interface Link {
+    label: string;
+>label : string
+
+    next: Link?;
+>next : Link | null | undefined
+}
+
+declare const maybeName: string?;
+>maybeName : string | null | undefined
+
+declare const maybeTheme: string?;
+>maybeTheme : string | null | undefined
+
+declare const note: string?;
+>note : string | null | undefined
+
+const empty = Profile{};
+>empty : Profile
+>Profile{} : Profile
+
+const spaced = Profile { enabled: true };
+>spaced : Profile
+>Profile { enabled: true } : Profile
+>enabled : boolean
+>true : true
+
+const written = Profile{
+>written : Profile
+>Profile{    id: "alex",    enabled: true,} : Profile
+
+    id: "alex",
+>id : string
+>"alex" : "alex"
+
+    enabled: true,
+>enabled : boolean
+>true : true
+
+};
+const conditional = Profile{
+>conditional : Profile
+>Profile{    id?: maybeName,    theme: maybeTheme,	?: note,} : Profile
+
+    id?: maybeName,
+>id : string | null | undefined
+>maybeName : string | null | undefined
+
+    theme: maybeTheme,
+>theme : string | null | undefined
+>maybeTheme : string | null | undefined
+
+	?: note,
+>note : string | null | undefined
+
+};
+const contextual = Profile{ format: value => value.toFixed() };
+>contextual : Profile
+>Profile{ format: value => value.toFixed() } : Profile
+>format : (value: number) => string
+>value => value.toFixed() : (value: number) => string
+>value : number
+>value.toFixed() : string
+>value.toFixed : (fractionDigits?: number) => string
+>value : number
+>toFixed : (fractionDigits?: number) => string
+
+const alias = Alias{};
+>alias : Alias
+>Alias{} : Alias
+
+const box = Box<string>{};
+>box : Box<string>
+>Box<string>{} : Box<string>
+
+const spacedBox = Box<string> {};
+>spacedBox : Box<string>
+>Box<string> {} : Box<string>
+
+const pair = Pair<number>{};
+>pair : Pair<number>
+>Pair<number>{} : Pair<number>
+
+const fresh = [Profile{}, Profile{}];
+>fresh : Profile[]
+>[Profile{}, Profile{}] : Profile[]
+>Profile{} : Profile
+>Profile{} : Profile
+
+const link = Link{};
+>link : Link
+>Link{} : Link
+
+Profile{ id: maybeName };
+>Profile{ id: maybeName } : Profile
+>id : string | null | undefined
+>maybeName : string | null | undefined
+
+Profile{ unknown: 1 };
+>Profile{ unknown: 1 } : Profile
+>unknown : number
+>1 : 1
+
+class Model {
+>Model : Model
+
+    value = 1;
+>value : number
+>1 : 1
+}
+Model{};
+>Model{} : Model
+
+type Primitive = string;
+>Primitive : string
+
+Primitive{};
+>Primitive{} : string
+
+interface Invalid {
+    callback: () => void;
+>callback : () => void
+}
+Invalid{};
+>Invalid{} : Invalid
+
+interface InvalidState {
+    state: "waiting" | "finished";
+>state : "finished" | "waiting"
+}
+InvalidState{};
+>InvalidState{} : InvalidState
+
+class Connection {
+>Connection : Connection
+
+    constructor(url: string) {}
+>url : string
+}
+
+interface Service {
+    connection: Connection;
+>connection : Connection
+}
+
+Service{};
+>Service{} : Service
+
+declare const maybeService: Service?;
+>maybeService : Service | null | undefined
+
+maybeService!;
+>maybeService! : Service
+>maybeService : Service | null | undefined
+
+interface RequiredRecursive {
+    next: RequiredRecursive;
+>next : RequiredRecursive
+}
+RequiredRecursive{};
+>RequiredRecursive{} : RequiredRecursive
+
+function open<T>() {
+>open : { (url?: string | URL, target?: string, features?: string): WindowProxy | null; <T>(): Box<T>; }
+
+    return Box<T>{};
+>Box<T>{} : Box<T>
+}
+
+Profile
+>Profile : any
+
+{};
+

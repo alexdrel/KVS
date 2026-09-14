@@ -702,3 +702,52 @@ Lowering emits an ordinary single-parameter arrow. The generated parameter is
 fresh, multiple placeholders share it, outer implicit subject `_` remains
 lexically visible, and a nested accepted callback receives its own fresh
 parameter.
+
+## Typed construction
+
+Status: implemented for concrete defaultable structural object types.
+
+`Type{...}` constructs the complete resolved shape of an interface or object
+type alias. Required primitive, array, and nested POD fields receive inline
+defaults; optional and nullable fields are omitted. Inherited fields participate
+in the shape, closed generic instantiations such as `Box<string>{}` use their
+substituted field types, and every evaluation allocates fresh mutable defaults.
+Classes, non-object types, open generic shapes, index signatures, callable or
+constructable objects, required recursion, and other non-defaultable required
+fields are rejected.
+
+The typed body uses its target as contextual type. Written direct fields follow
+ordinary assignment rules, including explicit absence only where the target
+field accepts it. Unknown fields are diagnosed. Existing conditional fields
+retain generated defaults when their values are absent.
+
+The parser represents construction as `KvsTypedObjectExpression`. Horizontal
+whitespace before `{` is accepted; a preceding line break does not form the
+construct, preserving the ordinary statement boundary. This deliberately takes
+over the same-line malformed TypeScript recovery shape `Type { ... }`. The
+checker resolves and records the recursive default plan, and the KVS transformer
+emits a fresh ordinary object literal with those defaults inlined before the
+authored fields. Typed spread and terminal materialization remain separate
+slices.
+
+Terminal `!` reuses the same resolved default plan. A present value passes
+through unchanged; absence produces a fresh inline structural default or calls
+an accessible runtime constructor that accepts zero arguments. Structural
+construction retains its narrower boundary: concrete interfaces and object type
+aliases, including closed generic instantiations, but not anonymous objects,
+classes, open generics, or non-defaultable required fields.
+
+Constructor-backed defaults use the resolved value symbol, preserving local,
+aliased, namespaced, and imported references. Abstract classes, inaccessible
+constructors, and constructors requiring arguments are rejected. The built-in
+`Map`, `ReadonlyMap`, `Set`, and `ReadonlySet` interfaces bridge to their global
+mutable runtime constructors; symbol identity prevents unrelated user-defined
+types with the same names from receiving that behavior. Constructor-backed and
+structural defaults use the same recursive plan for POD fields.
+
+Flow analysis decides whether replacement can occur, but does not choose the
+fallback. If the operand is flow-proven present, `!` is an unrestricted no-op
+and retains that narrowed type. Otherwise the fallback and result type come from
+the operand's unnarrowed declared/static type. Thus an explicitly annotated
+`const value: Profile? = null` defaults to `Profile{}`, while an inferred
+`const value = null` is rejected because it names no present default type.

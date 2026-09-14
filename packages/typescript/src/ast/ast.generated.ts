@@ -718,6 +718,12 @@ export interface KvsCompactObjectExpression extends PrimaryExpressionBase, Decla
     readonly properties: NodeArray<ObjectLiteralElementLike>;
     readonly multiLine: boolean;
 }
+export interface KvsTypedObjectExpression extends PrimaryExpressionBase, DeclarationBase {
+    readonly kind: SyntaxKind.KvsTypedObjectExpression;
+    readonly type: TypeNode;
+    readonly properties: NodeArray<ObjectLiteralElementLike>;
+    readonly multiLine: boolean;
+}
 export interface KvsCollectExpression extends ExpressionBase {
     readonly kind: SyntaxKind.KvsCollectExpression;
     readonly initializer: ForInitializer;

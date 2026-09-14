@@ -35,9 +35,10 @@ function hasTypeGuardTypeInsideTypeGuardType(x): x is x is A {
 >hasTypeGuardTypeInsideTypeGuardType : (x: any) => x is x
 >x : any
 >is : undefined
->A : typeof A
+>A {    return true;} : A
 
     return true;
+>return : boolean
 >true : true
 }
 
@@ -236,9 +237,10 @@ function b2(a: b is A) {};
 function b3(): A | b is A {
 >b3 : () => A | b
 >is : any
->A : typeof A
+>A {    return true;} : A
 
     return true;
+>return : boolean
 >true : true
 
 };

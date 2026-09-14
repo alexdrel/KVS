@@ -178,6 +178,7 @@ import type {
     KvsSelectExpression,
     KvsSieveAssignmentExpression,
     KvsSieveBindingInitializer,
+    KvsTypedObjectExpression,
     KvsYieldStatement,
     LabeledStatement,
     LeftHandSideExpression,
@@ -944,6 +945,8 @@ function cloneNodeData(node: Node): any {
             return { questionToken: n.questionToken, colonToken: n.colonToken, expression: n.expression };
         case SyntaxKind.KvsCompactObjectExpression:
             return { questionToken: n.questionToken, properties: n.properties, multiLine: n.multiLine };
+        case SyntaxKind.KvsTypedObjectExpression:
+            return { type: n.type, properties: n.properties, multiLine: n.multiLine };
         case SyntaxKind.KvsCollectExpression:
             return { initializer: n.initializer, expression: n.expression, statement: n.statement };
         case SyntaxKind.KvsSelectExpression:
@@ -1410,6 +1413,9 @@ const forEachChildTable: Record<number, ForEachChildFunction> = {
         visitNode(cbNode, data.expression),
     [SyntaxKind.KvsCompactObjectExpression]: (data, cbNode, cbNodes) =>
         visitNode(cbNode, data.questionToken) ||
+        visitNodes(cbNode, cbNodes, data.properties),
+    [SyntaxKind.KvsTypedObjectExpression]: (data, cbNode, cbNodes) =>
+        visitNode(cbNode, data.type) ||
         visitNodes(cbNode, cbNodes, data.properties),
     [SyntaxKind.KvsCollectExpression]: (data, cbNode, cbNodes) =>
         visitNode(cbNode, data.initializer) ||
@@ -2260,6 +2266,14 @@ export function createKvsCompactObjectExpression(questionToken: QuestionToken, p
         properties: createNodeArray(properties),
         multiLine,
     }) as unknown as KvsCompactObjectExpression;
+}
+
+export function createKvsTypedObjectExpression(type: TypeNode, properties: readonly ObjectLiteralElementLike[], multiLine?: boolean): KvsTypedObjectExpression {
+    return new NodeObject(SyntaxKind.KvsTypedObjectExpression, {
+        type,
+        properties: createNodeArray(properties),
+        multiLine,
+    }) as unknown as KvsTypedObjectExpression;
 }
 
 export function createKvsCollectExpression(initializer: ForInitializer, expression: Expression, statement: Statement): KvsCollectExpression {
@@ -3786,6 +3800,10 @@ export function updateKvsConditionalElement(node: KvsConditionalElement, questio
 
 export function updateKvsCompactObjectExpression(node: KvsCompactObjectExpression, questionToken: QuestionToken, properties: readonly ObjectLiteralElementLike[]): KvsCompactObjectExpression {
     return node.questionToken !== questionToken || node.properties !== properties ? createKvsCompactObjectExpression(questionToken, properties, node.multiLine) : node;
+}
+
+export function updateKvsTypedObjectExpression(node: KvsTypedObjectExpression, type: TypeNode, properties: readonly ObjectLiteralElementLike[]): KvsTypedObjectExpression {
+    return node.type !== type || node.properties !== properties ? createKvsTypedObjectExpression(type, properties, node.multiLine) : node;
 }
 
 export function updateKvsCollectExpression(node: KvsCollectExpression, initializer: ForInitializer, expression: Expression, statement: Statement): KvsCollectExpression {

@@ -6,9 +6,6 @@ cla <ss {
 
 //// [parserFuzz1.js]
 "use strict";
-cla < ss;
-{
-    _;
-    try { }
-    finally { }
-}
+cla < {
+    _, try: 
+};

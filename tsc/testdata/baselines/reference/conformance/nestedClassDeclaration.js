@@ -32,5 +32,5 @@ function foo() {
     }
 }
 var x = {
-    class: C4
-}, {};
+    class: {}
+};

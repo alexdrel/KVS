@@ -213,6 +213,7 @@ import type {
     KvsSelectExpression,
     KvsSieveAssignmentExpression,
     KvsSieveBindingInitializer,
+    KvsTypedObjectExpression,
     KvsYieldStatement,
     LabeledStatement,
     LiteralExpression,
@@ -766,6 +767,15 @@ export declare namespace isKvsCompactObjectExpression {
     function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsCompactObjectExpression>;
 }
 isKvsCompactObjectExpression.Handle = isKvsCompactObjectExpression as any;
+
+export function isKvsTypedObjectExpression(node: Node): node is KvsTypedObjectExpression {
+    return node.kind === SyntaxKind.KvsTypedObjectExpression;
+}
+
+export declare namespace isKvsTypedObjectExpression {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsTypedObjectExpression>;
+}
+isKvsTypedObjectExpression.Handle = isKvsTypedObjectExpression as any;
 
 export function isKvsCollectExpression(node: Node): node is KvsCollectExpression {
     return node.kind === SyntaxKind.KvsCollectExpression;

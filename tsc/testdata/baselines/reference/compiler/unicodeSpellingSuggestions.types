@@ -4,14 +4,14 @@
 // https://github.com/microsoft/TypeScript/tsc/issues/4223
 
 classAé {
->classAé : any
+>classAé {} : classAé
 }
 
 classAéé {
->classAéé : any
+>classAéé {} : classAéé
 }
 
 classAééé {
->classAééé : any
+>classAééé {} : classAééé
 }
 

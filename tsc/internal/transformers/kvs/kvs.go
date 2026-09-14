@@ -4,7 +4,9 @@ import (
 	"slices"
 
 	"github.com/microsoft/TypeScript/tsc/internal/ast"
+	"github.com/microsoft/TypeScript/tsc/internal/core"
 	"github.com/microsoft/TypeScript/tsc/internal/printer"
+	"github.com/microsoft/TypeScript/tsc/internal/scanner"
 	"github.com/microsoft/TypeScript/tsc/internal/transformers"
 )
 
@@ -159,6 +161,8 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 		return tx.transformObjectExpression(node.AsObjectLiteralExpression().AsNode(), node.Properties(), node.AsObjectLiteralExpression().MultiLine, false)
 	case ast.KindKvsCompactObjectExpression:
 		return tx.transformObjectExpression(node, node.Properties(), node.AsKvsCompactObjectExpression().MultiLine, true)
+	case ast.KindKvsTypedObjectExpression:
+		return tx.transformTypedObjectExpression(node.AsKvsTypedObjectExpression())
 	case ast.KindKvsNullableAssertionExpression, ast.KindKvsExtantAssertionExpression:
 		return tx.Visitor().VisitNode(node.Expression())
 	case ast.KindBinaryExpression:
@@ -458,7 +462,7 @@ func (tx *transformer) transformArrayElements(sourceElements []*ast.Node, multiL
 
 func (tx *transformer) transformObjectExpression(node *ast.Node, sourceProperties []*ast.Node, multiLine bool, compact bool) *ast.Node {
 	factory := tx.Factory()
-	if !compact {
+	if !compact && node.Kind != ast.KindKvsTypedObjectExpression {
 		hasConditional := slices.ContainsFunc(sourceProperties, ast.IsKvsConditionalObjectProperty)
 		if !hasConditional {
 			return tx.Visitor().VisitEachChild(node)
@@ -516,6 +520,61 @@ func (tx *transformer) transformObjectExpression(node *ast.Node, sourcePropertie
 		properties = append(properties, factory.NewSpreadAssignment(choice))
 	}
 	return factory.NewObjectLiteralExpression(factory.NewNodeList(properties), multiLine)
+}
+
+func (tx *transformer) transformTypedObjectExpression(node *ast.KvsTypedObjectExpression) *ast.Node {
+	factory := tx.Factory()
+	written := make(map[string]bool)
+	for _, property := range node.Properties.Nodes {
+		if (ast.IsPropertyAssignment(property) || ast.IsShorthandPropertyAssignment(property)) && !ast.IsKvsConditionalObjectProperty(property) && property.Name() != nil && !ast.IsComputedPropertyName(property.Name()) {
+			written[property.Name().Text()] = true
+		}
+	}
+	properties := make([]*ast.Node, 0)
+	for _, item := range tx.resolver.GetKvsTypedObjectDefaults(node.AsNode()) {
+		if written[item.Name] {
+			continue
+		}
+		properties = append(properties, factory.NewPropertyAssignment(nil, tx.makeTypedObjectPropertyName(item.Name), nil, nil, tx.makeTypedObjectDefault(item)))
+	}
+	properties = append(properties, node.Properties.Nodes...)
+	return tx.transformObjectExpression(node.AsNode(), properties, node.MultiLine, false)
+}
+
+func (tx *transformer) makeTypedObjectDefault(item printer.KvsTypedObjectDefault) *ast.Node {
+	factory := tx.Factory()
+	switch item.Kind {
+	case ast.KvsDefaultKindString:
+		return factory.NewStringLiteral("", ast.TokenFlagsNone)
+	case ast.KvsDefaultKindNumber:
+		return factory.NewNumericLiteral("0", ast.TokenFlagsNone)
+	case ast.KvsDefaultKindBoolean:
+		return factory.NewKeywordExpression(ast.KindFalseKeyword)
+	case ast.KvsDefaultKindBigInt:
+		return factory.NewBigIntLiteral("0n", ast.TokenFlagsNone)
+	case ast.KvsDefaultKindArray:
+		return factory.NewArrayLiteralExpression(factory.NewNodeList(nil), false)
+	case ast.KvsDefaultKindConstructor:
+		return tx.makeDefaultConstructor(item.ConstructorSymbol, nil)
+	default:
+		properties := make([]*ast.Node, 0, len(item.Properties))
+		for _, child := range item.Properties {
+			properties = append(properties, factory.NewPropertyAssignment(nil, tx.makeTypedObjectPropertyName(child.Name), nil, nil, tx.makeTypedObjectDefault(child)))
+		}
+		return factory.NewObjectLiteralExpression(factory.NewNodeList(properties), false)
+	}
+}
+
+func (tx *transformer) makeDefaultConstructor(symbol *ast.Symbol, node *ast.Node) *ast.Node {
+	constructor := tx.resolver.CreateKvsDefaultConstructor(tx.EmitContext(), node, symbol)
+	return tx.Factory().NewNewExpression(constructor, nil, tx.Factory().NewNodeList(nil))
+}
+
+func (tx *transformer) makeTypedObjectPropertyName(name string) *ast.Node {
+	if scanner.IsIdentifierText(name, core.LanguageVariantStandard) {
+		return tx.Factory().NewIdentifier(name)
+	}
+	return tx.Factory().NewStringLiteral(name, ast.TokenFlagsNone)
 }
 
 func (tx *transformer) compactObjectSpread(source *ast.Node) *ast.Node {
@@ -647,10 +706,22 @@ func (tx *transformer) transformDefault(node *ast.KvsDefaultExpression) *ast.Nod
 		fallback = factory.NewBigIntLiteral("0n", ast.TokenFlagsNone)
 	case ast.KvsDefaultKindArray:
 		fallback = factory.NewArrayLiteralExpression(nil, false)
+	case ast.KvsDefaultKindConstructor:
+		fallback = tx.makeDefaultConstructor(nil, node.AsNode())
+	case ast.KvsDefaultKindObject:
+		fallback = tx.makeTypedObjectDefaults(tx.resolver.GetKvsTypedObjectDefaults(node.AsNode()))
 	default:
 		return value
 	}
 	return factory.NewBinaryExpression(nil, value, nil, factory.NewToken(ast.KindQuestionQuestionToken), fallback)
+}
+
+func (tx *transformer) makeTypedObjectDefaults(items []printer.KvsTypedObjectDefault) *ast.Node {
+	properties := make([]*ast.Node, 0, len(items))
+	for _, item := range items {
+		properties = append(properties, tx.Factory().NewPropertyAssignment(nil, tx.makeTypedObjectPropertyName(item.Name), nil, nil, tx.makeTypedObjectDefault(item)))
+	}
+	return tx.Factory().NewObjectLiteralExpression(tx.Factory().NewNodeList(properties), false)
 }
 
 func (tx *transformer) transformExtantTest(node *ast.KvsExtantTestExpression) *ast.Node {

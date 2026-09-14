@@ -412,6 +412,12 @@ func (d *astDecoder) createChildrenNode(kind ast.Kind, data uint32, childIndices
 		questionToken := d.nodeAt(it.nextIf(mask, 0))
 		properties := d.nodeListAt(it.nextIf(mask, 1))
 		return d.factory.NewKvsCompactObjectExpression(questionToken, properties, multiLine), nil
+	case ast.KindKvsTypedObjectExpression:
+		multiLine := commonData&1 != 0
+		it := newChildIter(childIndices)
+		typeNode := d.nodeAt(it.nextIf(mask, 0))
+		properties := d.nodeListAt(it.nextIf(mask, 1))
+		return d.factory.NewKvsTypedObjectExpression(typeNode, properties, multiLine), nil
 	case ast.KindKvsCollectExpression:
 		it := newChildIter(childIndices)
 		initializer := d.nodeAt(it.nextIf(mask, 0))

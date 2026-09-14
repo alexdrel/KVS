@@ -461,7 +461,7 @@ func isExpressionKind(kind Kind) bool {
 		KindKvsDefaultExpression,
 		KindKvsNullingExpression,
 		KindKvsConditionalElement,
-		KindKvsCompactObjectExpression,
+		KindKvsCompactObjectExpression, KindKvsTypedObjectExpression,
 		KindKvsCollectExpression,
 		KindKvsSelectExpression,
 		KindKvsForExpression,
@@ -2033,7 +2033,7 @@ func getImportTypeNodeLiteral(node *Node) *Node {
 func IsExpressionNode(node *Node) bool {
 	switch node.Kind {
 	case KindSuperKeyword, KindNullKeyword, KindTrueKeyword, KindFalseKeyword, KindRegularExpressionLiteral,
-		KindArrayLiteralExpression, KindKvsCompactArrayExpression, KindObjectLiteralExpression, KindKvsCompactObjectExpression, KindPropertyAccessExpression, KindElementAccessExpression,
+		KindArrayLiteralExpression, KindKvsCompactArrayExpression, KindObjectLiteralExpression, KindKvsCompactObjectExpression, KindKvsTypedObjectExpression, KindPropertyAccessExpression, KindElementAccessExpression,
 		KindCallExpression, KindNewExpression, KindTaggedTemplateExpression, KindAsExpression, KindTypeAssertionExpression,
 		KindSatisfiesExpression, KindNonNullExpression, KindParenthesizedExpression, KindFunctionExpression,
 		KindClassExpression, KindArrowFunction, KindVoidExpression, KindDeleteExpression, KindTypeOfExpression,

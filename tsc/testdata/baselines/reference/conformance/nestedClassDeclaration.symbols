@@ -27,6 +27,7 @@ var x = {
 
     class C4 {
 >class : Symbol(class, Decl(nestedClassDeclaration.ts, 13, 9))
+>C4 : Symbol(C4)
     }
 }
 

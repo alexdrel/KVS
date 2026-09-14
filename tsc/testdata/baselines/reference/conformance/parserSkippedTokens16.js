@@ -13,8 +13,7 @@ var x       =
 //// [parserSkippedTokens16.js]
 "use strict";
 foo();
-Bar;
-{ }
+({});
 function Foo() { }
 { }
 4 + ;

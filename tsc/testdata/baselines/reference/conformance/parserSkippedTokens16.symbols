@@ -2,6 +2,8 @@
 
 === parserSkippedTokens16.ts ===
 foo(): Bar { }
+>Bar : Symbol(Bar)
+
 function Foo      () ¬   { }
 >Foo : Symbol(Foo, Decl(parserSkippedTokens16.ts, 0, 14))
 

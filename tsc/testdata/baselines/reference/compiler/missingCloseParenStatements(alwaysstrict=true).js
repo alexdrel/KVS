@@ -23,9 +23,10 @@ if (a1 && (a2 + a3 > 0)) {
         do {
             var i = i + 1;
             a1 = a1 + i;
-            with ((a2 + a3 > 0) && a1) {
-                console.log(x);
-            }
+            with ((a2 + a3 > 0) && {
+                console, : .log(x)
+            })
+                ;
         } while (i < 5 && (a1 > 5));
     }
 }

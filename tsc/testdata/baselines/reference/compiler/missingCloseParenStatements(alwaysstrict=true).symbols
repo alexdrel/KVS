@@ -28,9 +28,11 @@ if ( a1 && (a2 + a3 > 0) {
             with ((a2 + a3 > 0) && a1 {
 >a2 : Symbol(a2, Decl(missingCloseParenStatements.ts, 0, 7))
 >a3 : Symbol(a3, Decl(missingCloseParenStatements.ts, 0, 11))
->a1 : Symbol(a1, Decl(missingCloseParenStatements.ts, 0, 3))
+>a1 : Symbol(a1)
 
                 console.log(x);
+>console : Symbol(console, Decl(missingCloseParenStatements.ts, 7, 39))
+> : Symbol((Missing), Decl(missingCloseParenStatements.ts, 8, 23))
               }
         } while (i < 5 && (a1 > 5);
 >i : Symbol(i, Decl(missingCloseParenStatements.ts, 5, 15))

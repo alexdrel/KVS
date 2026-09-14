@@ -1,0 +1,152 @@
+kvsTypedConstruction.ts(70,10): error TS2322: Type 'string | null | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+kvsTypedConstruction.ts(71,10): error TS2353: Object literal may only specify known properties, and 'unknown' does not exist in type 'Profile'.
+kvsTypedConstruction.ts(76,1): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+kvsTypedConstruction.ts(79,1): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+kvsTypedConstruction.ts(84,1): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+kvsTypedConstruction.ts(89,1): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+kvsTypedConstruction.ts(99,1): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+kvsTypedConstruction.ts(101,1): error TS100072: KVS terminal '!' requires a defaultable type.
+kvsTypedConstruction.ts(106,1): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+kvsTypedConstruction.ts(109,12): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+kvsTypedConstruction.ts(112,1): error TS2693: 'Profile' only refers to a type, but is being used as a value here.
+
+
+==== kvsTypedConstruction.ts (11 errors) ====
+    interface Entity {
+        id: string;
+    }
+    
+    class Clock {
+        constructor(public zone = "UTC") {}
+    }
+    
+    interface Settings {
+        retries: number;
+        labels: string[];
+        aliases: Map<string, string>;
+        visited: Set<string>;
+        created: Date;
+        clock: Clock;
+    }
+    
+    interface Profile extends Entity {
+        enabled: boolean;
+        tags: string[];
+        settings: Settings;
+        note?: string;
+        theme: string?;
+    	format: ((value: number) => string)?;
+    	"display-name": string;
+    }
+    
+    type Alias = {
+        count: number;
+    };
+    
+    type Pair<T> = {
+    	left: T;
+    	right: T[];
+    };
+    
+    interface Box<T> {
+        value: T;
+        values: T[];
+    }
+    
+    interface Link {
+        label: string;
+        next: Link?;
+    }
+    
+    declare const maybeName: string?;
+    declare const maybeTheme: string?;
+    declare const note: string?;
+    
+    const empty = Profile{};
+    const spaced = Profile { enabled: true };
+    const written = Profile{
+        id: "alex",
+        enabled: true,
+    };
+    const conditional = Profile{
+        id?: maybeName,
+        theme: maybeTheme,
+    	?: note,
+    };
+    const contextual = Profile{ format: value => value.toFixed() };
+    const alias = Alias{};
+    const box = Box<string>{};
+    const spacedBox = Box<string> {};
+    const pair = Pair<number>{};
+    const fresh = [Profile{}, Profile{}];
+    const link = Link{};
+    
+    Profile{ id: maybeName };
+             ~~~~~~~~~~~~~
+!!! error TS2322: Type 'string | null | undefined' is not assignable to type 'string'.
+!!! error TS2322:   Type 'undefined' is not assignable to type 'string'.
+    Profile{ unknown: 1 };
+             ~~~~~~~
+!!! error TS2353: Object literal may only specify known properties, and 'unknown' does not exist in type 'Profile'.
+    
+    class Model {
+        value = 1;
+    }
+    Model{};
+    ~~~~~
+!!! error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+    
+    type Primitive = string;
+    Primitive{};
+    ~~~~~~~~~
+!!! error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+    
+    interface Invalid {
+        callback: () => void;
+    }
+    Invalid{};
+    ~~~~~~~
+!!! error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+    
+    interface InvalidState {
+        state: "waiting" | "finished";
+    }
+    InvalidState{};
+    ~~~~~~~~~~~~
+!!! error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+    
+    class Connection {
+        constructor(url: string) {}
+    }
+    
+    interface Service {
+        connection: Connection;
+    }
+    
+    Service{};
+    ~~~~~~~
+!!! error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+    declare const maybeService: Service?;
+    maybeService!;
+    ~~~~~~~~~~~~~
+!!! error TS100072: KVS terminal '!' requires a defaultable type.
+    
+    interface RequiredRecursive {
+        next: RequiredRecursive;
+    }
+    RequiredRecursive{};
+    ~~~~~~~~~~~~~~~~~
+!!! error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+    
+    function open<T>() {
+        return Box<T>{};
+               ~~~~~
+!!! error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+    }
+    
+    Profile
+    ~~~~~~~
+!!! error TS2693: 'Profile' only refers to a type, but is being used as a value here.
+    {};
+    

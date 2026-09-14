@@ -22,71 +22,400 @@ declare const maybeReadonlyNumbers: readonly number[] | undefined;
 declare const maybeArrayFamily: string[] | readonly number[] | null;
 >maybeArrayFamily : Symbol(maybeArrayFamily, Decl(kvsDefault.ts, 6, 13))
 
+declare const maybeMap: Map<string, number>?;
+>maybeMap : Symbol(maybeMap, Decl(kvsDefault.ts, 7, 13))
+>Map : Symbol(Map, Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.iterable.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --))
+
+declare const maybeReadonlyMap: ReadonlyMap<string, number>?;
+>maybeReadonlyMap : Symbol(maybeReadonlyMap, Decl(kvsDefault.ts, 8, 13))
+>ReadonlyMap : Symbol(ReadonlyMap, Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.iterable.d.ts, --, --))
+
+declare const maybeSet: Set<string>?;
+>maybeSet : Symbol(maybeSet, Decl(kvsDefault.ts, 9, 13))
+>Set : Symbol(Set, Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.iterable.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --))
+
+declare const maybeReadonlySet: ReadonlySet<string>?;
+>maybeReadonlySet : Symbol(maybeReadonlySet, Decl(kvsDefault.ts, 10, 13))
+>ReadonlySet : Symbol(ReadonlySet, Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.iterable.d.ts, --, --))
+
+type StringSet = Set<string>;
+>StringSet : Symbol(StringSet, Decl(kvsDefault.ts, 10, 53))
+>Set : Symbol(Set, Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.iterable.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --))
+
+declare const maybeStringSet: StringSet?;
+>maybeStringSet : Symbol(maybeStringSet, Decl(kvsDefault.ts, 12, 13))
+>StringSet : Symbol(StringSet, Decl(kvsDefault.ts, 10, 53))
+
+interface Identified {
+>Identified : Symbol(Identified, Decl(kvsDefault.ts, 12, 41))
+
+    id: string;
+>id : Symbol(Identified.id, Decl(kvsDefault.ts, 14, 22))
+}
+
+interface Profile extends Identified {
+>Profile : Symbol(Profile, Decl(kvsDefault.ts, 16, 1))
+>Identified : Symbol(Identified, Decl(kvsDefault.ts, 12, 41))
+
+    enabled: boolean;
+>enabled : Symbol(Profile.enabled, Decl(kvsDefault.ts, 18, 38))
+
+    tags: string[];
+>tags : Symbol(Profile.tags, Decl(kvsDefault.ts, 19, 21))
+
+    settings: {
+>settings : Symbol(Profile.settings, Decl(kvsDefault.ts, 20, 19))
+
+        retries: number;
+>retries : Symbol(retries, Decl(kvsDefault.ts, 21, 15))
+
+        aliases: Map<string, string>;
+>aliases : Symbol(aliases, Decl(kvsDefault.ts, 22, 24))
+>Map : Symbol(Map, Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.iterable.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --))
+
+        visited: Set<string>;
+>visited : Symbol(visited, Decl(kvsDefault.ts, 23, 37))
+>Set : Symbol(Set, Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.iterable.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --))
+
+    };
+    note: string?;
+>note : Symbol(Profile.note, Decl(kvsDefault.ts, 25, 6))
+}
+
+interface Box<T> {
+>Box : Symbol(Box, Decl(kvsDefault.ts, 27, 1))
+>T : Symbol(T, Decl(kvsDefault.ts, 29, 14))
+
+    value: T;
+>value : Symbol(Box.value, Decl(kvsDefault.ts, 29, 18))
+>T : Symbol(T, Decl(kvsDefault.ts, 29, 14))
+
+    values: T[];
+>values : Symbol(Box.values, Decl(kvsDefault.ts, 30, 13))
+>T : Symbol(T, Decl(kvsDefault.ts, 29, 14))
+}
+
+type Alias = {
+>Alias : Symbol(Alias, Decl(kvsDefault.ts, 32, 1))
+
+    count: number;
+>count : Symbol(count, Decl(kvsDefault.ts, 34, 14))
+
+};
+
+interface Empty {
+>Empty : Symbol(Empty, Decl(kvsDefault.ts, 36, 2))
+
+    note?: string;
+>note : Symbol(Empty.note, Decl(kvsDefault.ts, 38, 17))
+}
+
+declare const maybeProfile: Profile?;
+>maybeProfile : Symbol(maybeProfile, Decl(kvsDefault.ts, 42, 13))
+>Profile : Symbol(Profile, Decl(kvsDefault.ts, 16, 1))
+
+declare const maybeBox: Box<string>?;
+>maybeBox : Symbol(maybeBox, Decl(kvsDefault.ts, 43, 13))
+>Box : Symbol(Box, Decl(kvsDefault.ts, 27, 1))
+
+declare const maybeAlias: Alias?;
+>maybeAlias : Symbol(maybeAlias, Decl(kvsDefault.ts, 44, 13))
+>Alias : Symbol(Alias, Decl(kvsDefault.ts, 32, 1))
+
+declare const maybeEmpty: Empty?;
+>maybeEmpty : Symbol(maybeEmpty, Decl(kvsDefault.ts, 45, 13))
+>Empty : Symbol(Empty, Decl(kvsDefault.ts, 36, 2))
+
+const absentConst: Profile? = null;
+>absentConst : Symbol(absentConst, Decl(kvsDefault.ts, 46, 5))
+>Profile : Symbol(Profile, Decl(kvsDefault.ts, 16, 1))
+
+let absentLet: Profile? = null;
+>absentLet : Symbol(absentLet, Decl(kvsDefault.ts, 47, 3))
+>Profile : Symbol(Profile, Decl(kvsDefault.ts, 16, 1))
+
+const inferredNull = null;
+>inferredNull : Symbol(inferredNull, Decl(kvsDefault.ts, 48, 5))
+
 const stringValue = maybeString!;
->stringValue : Symbol(stringValue, Decl(kvsDefault.ts, 8, 5))
+>stringValue : Symbol(stringValue, Decl(kvsDefault.ts, 50, 5))
 >maybeString : Symbol(maybeString, Decl(kvsDefault.ts, 0, 13))
 
 const numberValue = maybeNumber!;
->numberValue : Symbol(numberValue, Decl(kvsDefault.ts, 9, 5))
+>numberValue : Symbol(numberValue, Decl(kvsDefault.ts, 51, 5))
 >maybeNumber : Symbol(maybeNumber, Decl(kvsDefault.ts, 1, 13))
 
 const booleanValue = maybeBoolean!;
->booleanValue : Symbol(booleanValue, Decl(kvsDefault.ts, 10, 5))
+>booleanValue : Symbol(booleanValue, Decl(kvsDefault.ts, 52, 5))
 >maybeBoolean : Symbol(maybeBoolean, Decl(kvsDefault.ts, 2, 13))
 
 const bigintValue = maybeBigInt!;
->bigintValue : Symbol(bigintValue, Decl(kvsDefault.ts, 11, 5))
+>bigintValue : Symbol(bigintValue, Decl(kvsDefault.ts, 53, 5))
 >maybeBigInt : Symbol(maybeBigInt, Decl(kvsDefault.ts, 3, 13))
 
 const strings = maybeStrings!;
->strings : Symbol(strings, Decl(kvsDefault.ts, 12, 5))
+>strings : Symbol(strings, Decl(kvsDefault.ts, 54, 5))
 >maybeStrings : Symbol(maybeStrings, Decl(kvsDefault.ts, 4, 13))
 
 const readonlyNumbers = maybeReadonlyNumbers!;
->readonlyNumbers : Symbol(readonlyNumbers, Decl(kvsDefault.ts, 13, 5))
+>readonlyNumbers : Symbol(readonlyNumbers, Decl(kvsDefault.ts, 55, 5))
 >maybeReadonlyNumbers : Symbol(maybeReadonlyNumbers, Decl(kvsDefault.ts, 5, 13))
 
 const arrayFamily = maybeArrayFamily!;
->arrayFamily : Symbol(arrayFamily, Decl(kvsDefault.ts, 14, 5))
+>arrayFamily : Symbol(arrayFamily, Decl(kvsDefault.ts, 56, 5))
 >maybeArrayFamily : Symbol(maybeArrayFamily, Decl(kvsDefault.ts, 6, 13))
 
+const map = maybeMap!;
+>map : Symbol(map, Decl(kvsDefault.ts, 57, 5))
+>maybeMap : Symbol(maybeMap, Decl(kvsDefault.ts, 7, 13))
+
+const readonlyMap = maybeReadonlyMap!;
+>readonlyMap : Symbol(readonlyMap, Decl(kvsDefault.ts, 58, 5))
+>maybeReadonlyMap : Symbol(maybeReadonlyMap, Decl(kvsDefault.ts, 8, 13))
+
+const set = maybeSet!;
+>set : Symbol(set, Decl(kvsDefault.ts, 59, 5))
+>maybeSet : Symbol(maybeSet, Decl(kvsDefault.ts, 9, 13))
+
+const readonlySet = maybeReadonlySet!;
+>readonlySet : Symbol(readonlySet, Decl(kvsDefault.ts, 60, 5))
+>maybeReadonlySet : Symbol(maybeReadonlySet, Decl(kvsDefault.ts, 10, 13))
+
+const stringSet = maybeStringSet!;
+>stringSet : Symbol(stringSet, Decl(kvsDefault.ts, 61, 5))
+>maybeStringSet : Symbol(maybeStringSet, Decl(kvsDefault.ts, 12, 13))
+
 const stringLength = maybeString!.length;
->stringLength : Symbol(stringLength, Decl(kvsDefault.ts, 15, 5))
+>stringLength : Symbol(stringLength, Decl(kvsDefault.ts, 62, 5))
 >maybeString!.length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
 >maybeString : Symbol(maybeString, Decl(kvsDefault.ts, 0, 13))
 >length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
 
 const incremented = maybeNumber! + 1;
->incremented : Symbol(incremented, Decl(kvsDefault.ts, 16, 5))
+>incremented : Symbol(incremented, Decl(kvsDefault.ts, 63, 5))
 >maybeNumber : Symbol(maybeNumber, Decl(kvsDefault.ts, 1, 13))
 
+const profile = maybeProfile!;
+>profile : Symbol(profile, Decl(kvsDefault.ts, 64, 5))
+>maybeProfile : Symbol(maybeProfile, Decl(kvsDefault.ts, 42, 13))
+
+const box = maybeBox!;
+>box : Symbol(box, Decl(kvsDefault.ts, 65, 5))
+>maybeBox : Symbol(maybeBox, Decl(kvsDefault.ts, 43, 13))
+
+const alias = maybeAlias!;
+>alias : Symbol(alias, Decl(kvsDefault.ts, 66, 5))
+>maybeAlias : Symbol(maybeAlias, Decl(kvsDefault.ts, 44, 13))
+
+const empty = maybeEmpty!;
+>empty : Symbol(empty, Decl(kvsDefault.ts, 67, 5))
+>maybeEmpty : Symbol(maybeEmpty, Decl(kvsDefault.ts, 45, 13))
+
+const freshProfiles = [maybeProfile!, maybeProfile!];
+>freshProfiles : Symbol(freshProfiles, Decl(kvsDefault.ts, 68, 5))
+>maybeProfile : Symbol(maybeProfile, Decl(kvsDefault.ts, 42, 13))
+>maybeProfile : Symbol(maybeProfile, Decl(kvsDefault.ts, 42, 13))
+
+const constProfile = absentConst!;
+>constProfile : Symbol(constProfile, Decl(kvsDefault.ts, 69, 5))
+>absentConst : Symbol(absentConst, Decl(kvsDefault.ts, 46, 5))
+
+const letProfile = absentLet!;
+>letProfile : Symbol(letProfile, Decl(kvsDefault.ts, 70, 5))
+>absentLet : Symbol(absentLet, Decl(kvsDefault.ts, 47, 3))
+
+inferredNull!;
+>inferredNull : Symbol(inferredNull, Decl(kvsDefault.ts, 48, 5))
+
 declare const stringLiteral: "left" | "right" | null;
->stringLiteral : Symbol(stringLiteral, Decl(kvsDefault.ts, 18, 13))
+>stringLiteral : Symbol(stringLiteral, Decl(kvsDefault.ts, 73, 13))
 
 const literalValue = stringLiteral!;
->literalValue : Symbol(literalValue, Decl(kvsDefault.ts, 19, 5))
->stringLiteral : Symbol(stringLiteral, Decl(kvsDefault.ts, 18, 13))
+>literalValue : Symbol(literalValue, Decl(kvsDefault.ts, 74, 5))
+>stringLiteral : Symbol(stringLiteral, Decl(kvsDefault.ts, 73, 13))
 
 declare const mixed: string | number | null;
->mixed : Symbol(mixed, Decl(kvsDefault.ts, 21, 13))
+>mixed : Symbol(mixed, Decl(kvsDefault.ts, 76, 13))
 
 mixed!;
->mixed : Symbol(mixed, Decl(kvsDefault.ts, 21, 13))
+>mixed : Symbol(mixed, Decl(kvsDefault.ts, 76, 13))
 
 declare const tuple: [string, number] | null;
->tuple : Symbol(tuple, Decl(kvsDefault.ts, 24, 13))
+>tuple : Symbol(tuple, Decl(kvsDefault.ts, 79, 13))
 
 tuple!;
->tuple : Symbol(tuple, Decl(kvsDefault.ts, 24, 13))
+>tuple : Symbol(tuple, Decl(kvsDefault.ts, 79, 13))
 
 declare const object: { value: string } | null;
->object : Symbol(object, Decl(kvsDefault.ts, 27, 13))
->value : Symbol(value, Decl(kvsDefault.ts, 27, 23))
+>object : Symbol(object, Decl(kvsDefault.ts, 82, 13))
+>value : Symbol(value, Decl(kvsDefault.ts, 82, 23))
 
 object!;
->object : Symbol(object, Decl(kvsDefault.ts, 27, 13))
+>object : Symbol(object, Decl(kvsDefault.ts, 82, 13))
+
+class Model {
+>Model : Symbol(Model, Decl(kvsDefault.ts, 83, 8))
+
+    value = 1;
+>value : Symbol(Model.value, Decl(kvsDefault.ts, 85, 13))
+
+    constructor(value: number) {}
+>value : Symbol(value, Decl(kvsDefault.ts, 87, 16))
+}
+declare const maybeModel: Model?;
+>maybeModel : Symbol(maybeModel, Decl(kvsDefault.ts, 89, 13))
+>Model : Symbol(Model, Decl(kvsDefault.ts, 83, 8))
+
+maybeModel!;
+>maybeModel : Symbol(maybeModel, Decl(kvsDefault.ts, 89, 13))
+
+if (maybeModel !== null && maybeModel !== undefined) {
+>maybeModel : Symbol(maybeModel, Decl(kvsDefault.ts, 89, 13))
+>maybeModel : Symbol(maybeModel, Decl(kvsDefault.ts, 89, 13))
+>undefined : Symbol(undefined)
+
+    maybeModel!;
+>maybeModel : Symbol(maybeModel, Decl(kvsDefault.ts, 89, 13))
+}
+
+class Session {
+>Session : Symbol(Session, Decl(kvsDefault.ts, 93, 1))
+
+    constructor(public name = "") {}
+>name : Symbol(Session.name, Decl(kvsDefault.ts, 96, 16))
+}
+class ImplicitSession {}
+>ImplicitSession : Symbol(ImplicitSession, Decl(kvsDefault.ts, 97, 1))
+
+type SessionAlias = Session;
+>SessionAlias : Symbol(SessionAlias, Decl(kvsDefault.ts, 98, 24))
+>Session : Symbol(Session, Decl(kvsDefault.ts, 93, 1))
+
+declare const maybeSession: Session?;
+>maybeSession : Symbol(maybeSession, Decl(kvsDefault.ts, 100, 13))
+>Session : Symbol(Session, Decl(kvsDefault.ts, 93, 1))
+
+declare const maybeImplicitSession: ImplicitSession?;
+>maybeImplicitSession : Symbol(maybeImplicitSession, Decl(kvsDefault.ts, 101, 13))
+>ImplicitSession : Symbol(ImplicitSession, Decl(kvsDefault.ts, 97, 1))
+
+declare const maybeSessionAlias: SessionAlias?;
+>maybeSessionAlias : Symbol(maybeSessionAlias, Decl(kvsDefault.ts, 102, 13))
+>SessionAlias : Symbol(SessionAlias, Decl(kvsDefault.ts, 98, 24))
+
+declare const maybeDate: Date?;
+>maybeDate : Symbol(maybeDate, Decl(kvsDefault.ts, 103, 13))
+>Date : Symbol(Date, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --), Decl(lib.scripthost.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --) ... and 1 more)
+
+const session = maybeSession!;
+>session : Symbol(session, Decl(kvsDefault.ts, 104, 5))
+>maybeSession : Symbol(maybeSession, Decl(kvsDefault.ts, 100, 13))
+
+const implicitSession = maybeImplicitSession!;
+>implicitSession : Symbol(implicitSession, Decl(kvsDefault.ts, 105, 5))
+>maybeImplicitSession : Symbol(maybeImplicitSession, Decl(kvsDefault.ts, 101, 13))
+
+const sessionAlias = maybeSessionAlias!;
+>sessionAlias : Symbol(sessionAlias, Decl(kvsDefault.ts, 106, 5))
+>maybeSessionAlias : Symbol(maybeSessionAlias, Decl(kvsDefault.ts, 102, 13))
+
+const date = maybeDate!;
+>date : Symbol(date, Decl(kvsDefault.ts, 107, 5))
+>maybeDate : Symbol(maybeDate, Decl(kvsDefault.ts, 103, 13))
+
+namespace Models {
+>Models : Symbol(Models, Decl(kvsDefault.ts, 107, 24))
+
+    export class Token {
+>Token : Symbol(Token, Decl(kvsDefault.ts, 109, 18))
+
+        constructor(public value?: string) {}
+>value : Symbol(Token.value, Decl(kvsDefault.ts, 111, 20))
+    }
+}
+declare const maybeToken: Models.Token?;
+>maybeToken : Symbol(maybeToken, Decl(kvsDefault.ts, 114, 13))
+>Models : Symbol(Models, Decl(kvsDefault.ts, 107, 24))
+>Token : Symbol(Models.Token, Decl(kvsDefault.ts, 109, 18))
+
+const token = maybeToken!;
+>token : Symbol(token, Decl(kvsDefault.ts, 115, 5))
+>maybeToken : Symbol(maybeToken, Decl(kvsDefault.ts, 114, 13))
+
+class RequiredConstructor {
+>RequiredConstructor : Symbol(RequiredConstructor, Decl(kvsDefault.ts, 115, 26))
+
+    constructor(value: string) {}
+>value : Symbol(value, Decl(kvsDefault.ts, 118, 16))
+}
+declare const maybeRequiredConstructor: RequiredConstructor?;
+>maybeRequiredConstructor : Symbol(maybeRequiredConstructor, Decl(kvsDefault.ts, 120, 13))
+>RequiredConstructor : Symbol(RequiredConstructor, Decl(kvsDefault.ts, 115, 26))
+
+maybeRequiredConstructor!;
+>maybeRequiredConstructor : Symbol(maybeRequiredConstructor, Decl(kvsDefault.ts, 120, 13))
+
+class PrivateConstructor {
+>PrivateConstructor : Symbol(PrivateConstructor, Decl(kvsDefault.ts, 121, 26))
+
+    private constructor() {}
+}
+declare const maybePrivateConstructor: PrivateConstructor?;
+>maybePrivateConstructor : Symbol(maybePrivateConstructor, Decl(kvsDefault.ts, 126, 13))
+>PrivateConstructor : Symbol(PrivateConstructor, Decl(kvsDefault.ts, 121, 26))
+
+maybePrivateConstructor!;
+>maybePrivateConstructor : Symbol(maybePrivateConstructor, Decl(kvsDefault.ts, 126, 13))
+
+abstract class AbstractModel {}
+>AbstractModel : Symbol(AbstractModel, Decl(kvsDefault.ts, 127, 25))
+
+declare const maybeAbstractModel: AbstractModel?;
+>maybeAbstractModel : Symbol(maybeAbstractModel, Decl(kvsDefault.ts, 130, 13))
+>AbstractModel : Symbol(AbstractModel, Decl(kvsDefault.ts, 127, 25))
+
+maybeAbstractModel!;
+>maybeAbstractModel : Symbol(maybeAbstractModel, Decl(kvsDefault.ts, 130, 13))
+
+function open<T>(value: Box<T>?) {
+>open : Symbol(open, Decl(lib.dom.d.ts, --, --), Decl(kvsDefault.ts, 131, 20))
+>T : Symbol(T, Decl(kvsDefault.ts, 133, 14))
+>value : Symbol(value, Decl(kvsDefault.ts, 133, 17))
+>Box : Symbol(Box, Decl(kvsDefault.ts, 27, 1))
+>T : Symbol(T, Decl(kvsDefault.ts, 133, 14))
+
+    return value!;
+>value : Symbol(value, Decl(kvsDefault.ts, 133, 17))
+}
 
 null!;
 undefined!;
 >undefined : Symbol(undefined)
+
+namespace Shadowed {
+>Shadowed : Symbol(Shadowed, Decl(kvsDefault.ts, 138, 11))
+
+    export interface Map<K, V> {
+>Map : Symbol(Map, Decl(kvsDefault.ts, 140, 20))
+>K : Symbol(K, Decl(kvsDefault.ts, 141, 25))
+>V : Symbol(V, Decl(kvsDefault.ts, 141, 27))
+
+        key: K;
+>key : Symbol(Map.key, Decl(kvsDefault.ts, 141, 32))
+>K : Symbol(K, Decl(kvsDefault.ts, 141, 25))
+
+        value: V;
+>value : Symbol(Map.value, Decl(kvsDefault.ts, 142, 15))
+>V : Symbol(V, Decl(kvsDefault.ts, 141, 27))
+
+        callback: () => void;
+>callback : Symbol(Map.callback, Decl(kvsDefault.ts, 143, 17))
+    }
+    declare const maybeMap: Map<string, number>?;
+>maybeMap : Symbol(maybeMap, Decl(kvsDefault.ts, 146, 17))
+>Map : Symbol(Map, Decl(kvsDefault.ts, 140, 20))
+
+    maybeMap!;
+>maybeMap : Symbol(maybeMap, Decl(kvsDefault.ts, 146, 17))
+}
 

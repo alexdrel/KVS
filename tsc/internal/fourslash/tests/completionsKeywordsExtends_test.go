@@ -18,7 +18,7 @@ class C e/*c*/ {}`
 	f, done := fourslash.NewFourslash(t, nil /*capabilities*/, content)
 	defer done()
 	f.VerifyCompletions(t, "a", nil)
-	f.VerifyCompletions(t, []string{"b", "c"}, &fourslash.CompletionsExpectedList{
+	f.VerifyCompletions(t, "b", &fourslash.CompletionsExpectedList{
 		IsIncomplete: false,
 		ItemDefaults: &fourslash.CompletionsExpectedItemDefaults{
 			CommitCharacters: &DefaultCommitCharacters,
@@ -31,6 +31,16 @@ class C e/*c*/ {}`
 					SortText: new(string(ls.SortTextGlobalsOrKeywords)),
 				},
 			},
+		},
+	})
+	f.VerifyCompletions(t, "c", &fourslash.CompletionsExpectedList{
+		IsIncomplete: false,
+		ItemDefaults: &fourslash.CompletionsExpectedItemDefaults{
+			CommitCharacters: &DefaultCommitCharacters,
+			EditRange:        Ignored,
+		},
+		Items: &fourslash.CompletionsExpectedItems{
+			Excludes: []string{"extends"},
 		},
 	})
 }

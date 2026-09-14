@@ -7999,6 +7999,8 @@ func (c *Checker) checkExpressionWorker(node *ast.Node, checkMode CheckMode) *Ty
 		return c.GetNonNullableType(c.checkExpressionForMutableLocation(node.Expression(), checkMode))
 	case ast.KindObjectLiteralExpression, ast.KindKvsCompactObjectExpression:
 		return c.checkObjectLiteral(node, checkMode)
+	case ast.KindKvsTypedObjectExpression:
+		return c.checkKvsTypedObjectExpression(node.AsKvsTypedObjectExpression(), checkMode)
 	case ast.KindPropertyAccessExpression:
 		return c.checkPropertyAccessExpression(node, checkMode, false /*writeOnly*/)
 	case ast.KindQualifiedName:
@@ -8225,14 +8227,192 @@ func (c *Checker) checkKvsCatchSplitAssignmentExpression(node *ast.KvsCatchSplit
 }
 
 func (c *Checker) checkKvsDefaultExpression(node *ast.Node, checkMode CheckMode) *Type {
-	operandType := c.checkExpressionEx(node.Expression(), checkMode)
-	presentType := c.GetNonNullableType(operandType)
-	if presentType.flags&TypeFlagsNever != 0 && operandType.flags&TypeFlagsNullable != 0 {
+	flowType := c.checkExpressionEx(node.Expression(), checkMode)
+	presentType, needsDefault := c.getKvsDefaultType(node.Expression(), flowType)
+	if !needsDefault {
+		return presentType
+	}
+	if presentType.flags&TypeFlagsNever != 0 {
 		c.error(node, diagnostics.KVS_terminal_cannot_determine_a_default_value_from_an_absence_only_type)
 	} else if c.getKvsDefaultKindForType(presentType) == ast.KvsDefaultKindUnsupported {
-		c.error(node, diagnostics.KVS_terminal_requires_string_number_boolean_bigint_or_a_non_tuple_array)
+		if constructor := c.getKvsDefaultConstructorSymbol(presentType, node); constructor != nil {
+			c.nodeLinks.Get(node).kvsDefaultConstructorSymbol = constructor
+			return presentType
+		}
+		defaults, ok := c.getKvsTypedObjectDefaults(presentType, make(map[*Type]bool))
+		ok = ok && c.isKvsNamedStructuralObjectType(presentType)
+		if !ok {
+			c.error(node, diagnostics.KVS_terminal_requires_a_defaultable_type)
+		} else {
+			c.nodeLinks.Get(node).kvsTypedObjectDefaults = defaults
+		}
 	}
 	return presentType
+}
+
+func (c *Checker) getKvsDefaultType(expression *ast.Node, flowType *Type) (*Type, bool) {
+	if !isKvsNullableType(flowType) {
+		return flowType, false
+	}
+
+	staticType := flowType
+	expression = ast.SkipParentheses(expression)
+	var symbol *ast.Symbol
+	if ast.IsIdentifier(expression) {
+		symbol = c.getResolvedSymbol(expression)
+	} else if ast.IsAccessExpression(expression) {
+		symbol = c.getResolvedSymbolOrNil(expression)
+	}
+	if symbol != nil && symbol != c.unknownSymbol {
+		if symbol.Flags&ast.SymbolFlagsAlias != 0 {
+			symbol = c.resolveAlias(symbol)
+		}
+		staticType = c.getTypeOfSymbol(symbol)
+	}
+	return c.GetNonNullableType(staticType), true
+}
+
+func (c *Checker) checkKvsTypedObjectExpression(node *ast.KvsTypedObjectExpression, checkMode CheckMode) *Type {
+	target := c.getTypeFromTypeNode(node.Type)
+	links := c.nodeLinks.Get(node.AsNode())
+	links.kvsTypedObjectType = target
+	defaults, ok := c.getKvsTypedObjectDefaults(target, make(map[*Type]bool))
+	if !ok {
+		c.error(node.Type, diagnostics.KVS_typed_construction_requires_a_concrete_defaultable_interface_or_object_type_alias)
+	}
+	links.kvsTypedObjectDefaults = defaults
+
+	c.pushContextualType(node.AsNode(), target, false /*isCache*/)
+	bodyType := c.checkObjectLiteral(node.AsNode(), checkMode)
+	c.popContextualType()
+	for _, member := range node.Properties.Nodes {
+		if !ast.IsPropertyAssignment(member) && !ast.IsShorthandPropertyAssignment(member) {
+			continue
+		}
+		symbol := c.getSymbolOfDeclaration(member)
+		property := c.getPropertyOfType(target, symbol.Name)
+		if property == nil {
+			c.error(member.Name(), diagnostics.Object_literal_may_only_specify_known_properties_and_0_does_not_exist_in_type_1, c.symbolToString(symbol), c.TypeToString(target))
+			continue
+		}
+		source := c.getTypeOfPropertyOfType(bodyType, symbol.Name)
+		if source != nil {
+			c.checkTypeAssignableTo(source, c.getTypeOfSymbol(property), member, nil)
+		}
+	}
+	return target
+}
+
+func (c *Checker) getKvsTypedObjectDefaults(t *Type, visiting map[*Type]bool) ([]kvsTypedObjectDefault, bool) {
+	t = c.getReducedType(t)
+	if t.flags&TypeFlagsObject == 0 || t.objectFlags&ObjectFlagsClass != 0 || len(c.getIndexInfosOfType(t)) != 0 || len(c.getSignaturesOfType(t, SignatureKindCall)) != 0 || len(c.getSignaturesOfType(t, SignatureKindConstruct)) != 0 {
+		return nil, false
+	}
+	if t.symbol == nil && t.alias == nil {
+		return nil, false
+	}
+	if visiting[t] {
+		return nil, false
+	}
+	visiting[t] = true
+	defer delete(visiting, t)
+	defaults := make([]kvsTypedObjectDefault, 0)
+	for _, property := range c.getPropertiesOfType(t) {
+		propertyType := c.getTypeOfSymbol(property)
+		if property.Flags&ast.SymbolFlagsOptional != 0 || isKvsNullableType(propertyType) {
+			continue
+		}
+		item := kvsTypedObjectDefault{name: property.Name, kind: c.getKvsDefaultKindForType(propertyType)}
+		if item.kind == ast.KvsDefaultKindUnsupported {
+			if constructor := c.getKvsDefaultConstructorSymbol(propertyType, property.ValueDeclaration); constructor != nil {
+				item.kind = ast.KvsDefaultKindConstructor
+				item.constructorSymbol = constructor
+				defaults = append(defaults, item)
+				continue
+			}
+			children, ok := c.getKvsTypedObjectDefaults(propertyType, visiting)
+			if !ok {
+				return nil, false
+			}
+			item.properties = children
+		} else if !c.isKvsPrimitiveDefaultAssignable(item.kind, propertyType) {
+			return nil, false
+		}
+		defaults = append(defaults, item)
+	}
+	return defaults, true
+}
+
+func (c *Checker) getKvsDefaultConstructorSymbol(t *Type, location *ast.Node) *ast.Symbol {
+	t = c.getReducedType(t)
+	if t.flags&TypeFlagsObject == 0 || t.symbol == nil {
+		return nil
+	}
+	symbol := t.symbol
+	if symbol.Name == "ReadonlyMap" || symbol.Name == "ReadonlySet" {
+		globalSymbol := c.globals[symbol.Name]
+		if globalSymbol != nil && c.getSymbolIfSameReference(symbol, globalSymbol) != nil {
+			symbol = c.globals[core.IfElse(symbol.Name == "ReadonlyMap", "Map", "Set")]
+		}
+	}
+	if symbol == nil {
+		return nil
+	}
+	constructorType := c.getTypeOfSymbol(symbol)
+	zeroArgumentSignatures := core.Filter(c.getSignaturesOfType(constructorType, SignatureKindConstruct), func(signature *Signature) bool {
+		return c.getMinArgumentCount(signature) == 0 && signature.flags&SignatureFlagsAbstract == 0
+	})
+	if len(zeroArgumentSignatures) == 0 || c.getConstructorAccessibilityError(location, zeroArgumentSignatures, ast.ModifierFlagsNonPublicAccessibilityModifier) != nil {
+		return nil
+	}
+	if declaration := ast.GetClassLikeDeclarationOfSymbol(symbol); declaration != nil && ast.HasModifier(declaration, ast.ModifierFlagsAbstract) {
+		return nil
+	}
+	if c.IsSymbolAccessible(symbol, location, ast.SymbolFlagsValue, true).Accessibility != printer.SymbolAccessibilityAccessible {
+		return nil
+	}
+	for _, accessible := range c.getAccessibleSymbolChain(symbol, location, ast.SymbolFlagsValue, false) {
+		if accessible.Flags&ast.SymbolFlagsAlias != 0 {
+			c.markAliasSymbolAsReferenced(accessible)
+		}
+	}
+	return symbol
+}
+
+func (c *Checker) isKvsNamedStructuralObjectType(t *Type) bool {
+	if t.alias != nil {
+		return true
+	}
+	if t.symbol == nil {
+		return false
+	}
+	for _, declaration := range t.symbol.Declarations {
+		if declaration.Kind == ast.KindInterfaceDeclaration {
+			return true
+		}
+	}
+	return false
+}
+
+func (c *Checker) isKvsPrimitiveDefaultAssignable(kind ast.KvsDefaultKind, target *Type) bool {
+	var value *Type
+	switch kind {
+	case ast.KvsDefaultKindString:
+		value = c.emptyStringType
+	case ast.KvsDefaultKindNumber:
+		value = c.zeroType
+	case ast.KvsDefaultKindBoolean:
+		value = c.falseType
+	case ast.KvsDefaultKindBigInt:
+		value = c.zeroBigIntType
+	case ast.KvsDefaultKindArray:
+		return true
+	case ast.KvsDefaultKindConstructor:
+		return true
+	default:
+		return false
+	}
+	return c.isTypeAssignableTo(value, target)
 }
 
 func (c *Checker) getKvsDefaultKindForType(t *Type) ast.KvsDefaultKind {
@@ -14003,6 +14183,11 @@ func (c *Checker) checkObjectLiteral(node *ast.Node, checkMode CheckMode) *Type 
 				c.error(memberDecl, diagnostics.Spread_types_may_only_be_created_from_object_types)
 				spread = c.errorType
 			}
+			continue
+		} else if node.Kind == ast.KindKvsTypedObjectExpression {
+			// The KVS spelling overlaps malformed TypeScript such as `Name { class C {} }`.
+			// Keep checking resilient when object-member recovery produces another node kind.
+			c.checkNodeDeferred(memberDecl)
 			continue
 		} else {
 			// TypeScript 1.0 spec (April 2014)
@@ -32005,7 +32190,7 @@ func (c *Checker) isContextSensitive(node *ast.Node) bool {
 		return c.isContextSensitiveFunctionLikeDeclaration(node)
 	case ast.KindKvsPlaceholderLambdaExpression:
 		return true
-	case ast.KindObjectLiteralExpression:
+	case ast.KindObjectLiteralExpression, ast.KindKvsCompactObjectExpression, ast.KindKvsTypedObjectExpression:
 		return core.Some(node.Properties(), c.isContextSensitive)
 	case ast.KindArrayLiteralExpression, ast.KindKvsCompactArrayExpression:
 		return core.Some(node.Elements(), c.isContextSensitive)

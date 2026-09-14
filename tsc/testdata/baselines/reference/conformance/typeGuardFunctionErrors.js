@@ -181,10 +181,9 @@ function hasANonBooleanReturnStatement(x) {
     return '';
 }
 is;
-A;
-{
-    return true;
-}
+({
+    return: true
+});
 function hasMissingIsKeyword() {
     return true;
 }
@@ -239,11 +238,9 @@ var b1, is, A;
 function b2(a, is, A) { }
 ;
 is;
-A;
-{
-    return true;
-}
-;
+({
+    return: true
+});
 // Non-compatiable type predicate positions for signature declarations
 class D {
     constructor(p1) {

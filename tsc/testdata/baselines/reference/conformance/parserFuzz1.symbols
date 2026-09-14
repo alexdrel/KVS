@@ -1,6 +1,10 @@
 //// [tests/cases/conformance/parser/ecmascript5/ErrorRecovery/parserFuzz1.ts] ////
 
 === parserFuzz1.ts ===
-
 cla <ss {
+>ss : Symbol(ss)
+
   _ static try
+>_ : Symbol(_, Decl(parserFuzz1.ts, 0, 9))
+>try : Symbol(try, Decl(parserFuzz1.ts, 1, 3))
+

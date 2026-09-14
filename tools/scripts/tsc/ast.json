@@ -306,6 +306,7 @@
             "KvsConditionalElement",
             "KvsCompactArrayExpression",
             "KvsCompactObjectExpression",
+            "KvsTypedObjectExpression",
             "KvsCollectExpression",
             "KvsSelectExpression",
             "KvsForExpression",
@@ -2094,6 +2095,29 @@
                     {
                         "name": "QuestionToken",
                         "type": "QuestionToken"
+                    },
+                    {
+                        "name": "Properties",
+                        "type": "ObjectLiteralElementLike",
+                        "list": "NodeList"
+                    },
+                    {
+                        "name": "MultiLine",
+                        "type": "bool"
+                    }
+                ]
+            },
+            "KvsTypedObjectExpression": {
+                "generateSubtreeFacts": true,
+                "extends": [
+                    "PrimaryExpressionBase",
+                    "DeclarationBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "Type",
+                        "type": "TypeNode"
                     },
                     {
                         "name": "Properties",

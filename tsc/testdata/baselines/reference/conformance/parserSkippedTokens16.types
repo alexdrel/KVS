@@ -4,7 +4,7 @@
 foo(): Bar { }
 >foo() : any
 >foo : any
->Bar : any
+>Bar { } : Bar
 
 function Foo      () ¬   { }
 >Foo : () => any

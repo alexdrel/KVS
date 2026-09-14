@@ -1,6 +1,14 @@
-parserUnterminatedGeneric2.ts(2,5): error TS1435: Unknown keyword or identifier. Did you mean 'interface ICompiledExpression'?
 parserUnterminatedGeneric2.ts(2,5): error TS2304: Cannot find name 'interfaceICompiledExpression'.
-parserUnterminatedGeneric2.ts(3,42): error TS1005: '=>' expected.
+parserUnterminatedGeneric2.ts(2,5): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+parserUnterminatedGeneric2.ts(3,9): error TS1136: Property assignment expected.
+parserUnterminatedGeneric2.ts(3,10): error TS2304: Cannot find name 'context'.
+parserUnterminatedGeneric2.ts(3,17): error TS1005: ',' expected.
+parserUnterminatedGeneric2.ts(3,19): error TS2693: 'any' only refers to a type, but is being used as a value here.
+parserUnterminatedGeneric2.ts(3,24): error TS2304: Cannot find name 'locals'.
+parserUnterminatedGeneric2.ts(3,31): error TS1109: Expression expected.
+parserUnterminatedGeneric2.ts(3,33): error TS2693: 'any' only refers to a type, but is being used as a value here.
+parserUnterminatedGeneric2.ts(3,37): error TS1005: ';' expected.
+parserUnterminatedGeneric2.ts(3,39): error TS2693: 'any' only refers to a type, but is being used as a value here.
 parserUnterminatedGeneric2.ts(4,9): error TS2304: Cannot find name 'assign'.
 parserUnterminatedGeneric2.ts(4,16): error TS2304: Cannot find name 'context'.
 parserUnterminatedGeneric2.ts(4,23): error TS1005: ',' expected.
@@ -15,16 +23,32 @@ parserUnterminatedGeneric2.ts(8,45): error TS2552: Cannot find name 'IPromise'. 
 parserUnterminatedGeneric2.ts(8,54): error TS1005: '>' expected.
 
 
-==== parserUnterminatedGeneric2.ts (15 errors) ====
+==== parserUnterminatedGeneric2.ts (23 errors) ====
     declare namespace ng {
         interfaceICompiledExpression {
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-!!! error TS1435: Unknown keyword or identifier. Did you mean 'interface ICompiledExpression'?
-        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !!! error TS2304: Cannot find name 'interfaceICompiledExpression'.
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+!!! error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
             (context: any, locals?: any): any;
-                                             ~
-!!! error TS1005: '=>' expected.
+            ~
+!!! error TS1136: Property assignment expected.
+             ~~~~~~~
+!!! error TS2304: Cannot find name 'context'.
+                    ~
+!!! error TS1005: ',' expected.
+                      ~~~
+!!! error TS2693: 'any' only refers to a type, but is being used as a value here.
+                           ~~~~~~
+!!! error TS2304: Cannot find name 'locals'.
+                                  ~
+!!! error TS1109: Expression expected.
+                                    ~~~
+!!! error TS2693: 'any' only refers to a type, but is being used as a value here.
+                                        ~
+!!! error TS1005: ';' expected.
+                                          ~~~
+!!! error TS2693: 'any' only refers to a type, but is being used as a value here.
             assign(context: any, value: any): any;
             ~~~~~~
 !!! error TS2304: Cannot find name 'assign'.

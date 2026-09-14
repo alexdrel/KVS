@@ -6,12 +6,12 @@ commonMissingSemicolons.ts(8,23): error TS2304: Cannot find name 'asyncd'.
 commonMissingSemicolons.ts(8,33): error TS1005: ';' expected.
 commonMissingSemicolons.ts(11,1): error TS1435: Unknown keyword or identifier. Did you mean 'class'?
 commonMissingSemicolons.ts(11,1): error TS2304: Cannot find name 'clasd'.
-commonMissingSemicolons.ts(11,7): error TS1434: Unexpected keyword or identifier.
 commonMissingSemicolons.ts(11,7): error TS2552: Cannot find name 'MyClass2'. Did you mean 'MyClass1'?
+commonMissingSemicolons.ts(11,7): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
 commonMissingSemicolons.ts(12,1): error TS1435: Unknown keyword or identifier. Did you mean 'class'?
 commonMissingSemicolons.ts(12,1): error TS2304: Cannot find name 'classs'.
-commonMissingSemicolons.ts(12,8): error TS1434: Unexpected keyword or identifier.
 commonMissingSemicolons.ts(12,8): error TS2552: Cannot find name 'MyClass3'. Did you mean 'MyClass1'?
+commonMissingSemicolons.ts(12,8): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
 commonMissingSemicolons.ts(15,1): error TS1435: Unknown keyword or identifier. Did you mean 'const'?
 commonMissingSemicolons.ts(15,1): error TS2304: Cannot find name 'consd'.
 commonMissingSemicolons.ts(15,7): error TS2552: Cannot find name 'myConst2'. Did you mean 'myConst1'?
@@ -39,14 +39,14 @@ commonMissingSemicolons.ts(26,18): error TS1003: Identifier expected.
 commonMissingSemicolons.ts(27,1): error TS2304: Cannot find name 'functionMyFunction'.
 commonMissingSemicolons.ts(30,1): error TS1435: Unknown keyword or identifier. Did you mean 'interface'?
 commonMissingSemicolons.ts(30,1): error TS2304: Cannot find name 'interfaced'.
-commonMissingSemicolons.ts(30,12): error TS1435: Unknown keyword or identifier. Did you mean 'interface'?
-commonMissingSemicolons.ts(30,12): error TS2304: Cannot find name 'myInterface2'.
+commonMissingSemicolons.ts(30,12): error TS2552: Cannot find name 'myInterface2'. Did you mean 'myInterface1'?
+commonMissingSemicolons.ts(30,12): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
 commonMissingSemicolons.ts(32,1): error TS2693: 'interface' only refers to a type, but is being used as a value here.
 commonMissingSemicolons.ts(32,11): error TS1438: Interface must be given a name.
 commonMissingSemicolons.ts(33,1): error TS2693: 'interface' only refers to a type, but is being used as a value here.
 commonMissingSemicolons.ts(33,11): error TS2427: Interface name cannot be 'void'.
-commonMissingSemicolons.ts(34,1): error TS1435: Unknown keyword or identifier. Did you mean 'interface MyInterface'?
 commonMissingSemicolons.ts(34,1): error TS2304: Cannot find name 'interfaceMyInterface'.
+commonMissingSemicolons.ts(34,1): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
 commonMissingSemicolons.ts(38,1): error TS1435: Unknown keyword or identifier. Did you mean 'let'?
 commonMissingSemicolons.ts(38,1): error TS2552: Cannot find name 'letd'. Did you mean 'let'?
 commonMissingSemicolons.ts(38,6): error TS2552: Cannot find name 'let2'. Did you mean 'let'?
@@ -105,20 +105,20 @@ commonMissingSemicolons.ts(78,1): error TS1128: Declaration or statement expecte
     ~~~~~
 !!! error TS2304: Cannot find name 'clasd'.
           ~~~~~~~~
-!!! error TS1434: Unexpected keyword or identifier.
-          ~~~~~~~~
 !!! error TS2552: Cannot find name 'MyClass2'. Did you mean 'MyClass1'?
 !!! related TS2728 commonMissingSemicolons.ts:10:7: 'MyClass1' is declared here.
+          ~~~~~~~~
+!!! error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
     classs MyClass3 {}
     ~~~~~~
 !!! error TS1435: Unknown keyword or identifier. Did you mean 'class'?
     ~~~~~~
 !!! error TS2304: Cannot find name 'classs'.
            ~~~~~~~~
-!!! error TS1434: Unexpected keyword or identifier.
-           ~~~~~~~~
 !!! error TS2552: Cannot find name 'MyClass3'. Did you mean 'MyClass1'?
 !!! related TS2728 commonMissingSemicolons.ts:10:7: 'MyClass1' is declared here.
+           ~~~~~~~~
+!!! error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
     
     const myConst1 = 1;
     consd myConst2 = 1;
@@ -198,9 +198,9 @@ commonMissingSemicolons.ts(78,1): error TS1128: Declaration or statement expecte
     ~~~~~~~~~~
 !!! error TS2304: Cannot find name 'interfaced'.
                ~~~~~~~~~~~~
-!!! error TS1435: Unknown keyword or identifier. Did you mean 'interface'?
+!!! error TS2552: Cannot find name 'myInterface2'. Did you mean 'myInterface1'?
                ~~~~~~~~~~~~
-!!! error TS2304: Cannot find name 'myInterface2'.
+!!! error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
     interface interface { }
     interface { }
     ~~~~~~~~~
@@ -214,9 +214,9 @@ commonMissingSemicolons.ts(78,1): error TS1128: Declaration or statement expecte
 !!! error TS2427: Interface name cannot be 'void'.
     interfaceMyInterface { }
     ~~~~~~~~~~~~~~~~~~~~
-!!! error TS1435: Unknown keyword or identifier. Did you mean 'interface MyInterface'?
-    ~~~~~~~~~~~~~~~~~~~~
 !!! error TS2304: Cannot find name 'interfaceMyInterface'.
+    ~~~~~~~~~~~~~~~~~~~~
+!!! error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
     
     let let = 1;
     let let1 = 1;

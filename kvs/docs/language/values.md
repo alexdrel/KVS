@@ -306,13 +306,21 @@ A rest binding is absent when its source is absent. Pattern default initializers
 
 Some types have a default value that can be supplied when absence is explicitly resolved. For primitive types this is their JavaScript falsy value; for collections it is their empty KVS-falsy value:
 
-number         0
-boolean        false
-string         ""
-array          []
-map            {}
+number                       0
+boolean                      false
+string                       ""
+array                        []
+constructible T              new T()
+Map / ReadonlyMap            new Map()
+Set / ReadonlySet            new Set()
 
 Structural PODs derive their default recursively from their required fields, while nullable fields remain absent.
+
+A constructor-backed type is defaultable when its runtime constructor is
+accessible and accepts zero arguments, whether implicitly, through optional
+parameters, or through parameter defaults. Abstract classes, inaccessible
+constructors, and constructors requiring arguments are not defaultable.
+Constructor effects and exceptions occur only when absence selects the default.
 
 These defaults provide a predictable initial state. They do not imply that the resulting value satisfies application-specific invariants.
 

@@ -3,7 +3,7 @@
 This is a working implementation aid, not a language specification or feature
 order. The language documents remain authoritative for accepted semantics.
 
-Progress: **189 of 357 items complete (52.9%)**; **168 remain open**.
+Progress: **212 of 357 items complete (59.4%)**; **145 remain open**.
 
 - `[x]` means implemented with focused compiler evidence.
 - `[ ]` means unimplemented, incomplete, or not yet deliberately validated.
@@ -46,6 +46,9 @@ Implemented vertical slices:
 - Failure promotion: `expression ~~ error`, including non-nullable results and
   caught-cause preservation.
 - Placeholder lambdas in contextual callback arguments: `%`.
+- Typed construction for concrete defaultable interfaces and object type aliases,
+  including inherited fields and closed generic instantiations.
+- Terminal structural defaults for the same concrete POD types: `maybeProfile!`.
 
 Known semantic debts:
 
@@ -78,6 +81,7 @@ Focused conformance inputs:
 - `tsc/testdata/tests/cases/conformance/kvs/kvsNullingSieve.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsNullingSieveImportHelpers.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsNullingSieveNoEmitHelpers.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsTypedConstruction.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsCompactArray.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsConditionalPlacement.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsCompactObject.ts`
@@ -173,8 +177,15 @@ them; generated example `.js` files are intentionally ignored.
 - [x] `string` default is `""`
 - [x] `bigint` default is `0n`
 - [x] Array default is `[]`
-- [ ] Map/set defaults
-- [ ] Structural/POD defaults
+- [x] Map/set defaults
+- [x] Structural/POD defaults
+- [x] Constructor-backed defaults
+- [x] Explicit zero-argument constructor
+- [x] Implicit zero-argument constructor
+- [x] Reject abstract classes
+- [x] Reject constructors requiring arguments
+- [x] Constructor effects occur only on defaulting/materialization
+- [x] Constructor exceptions propagate normally
 - [x] Fresh mutable array defaults
 - [x] Reject non-defaultable types in the implemented slice
 - [x] Terminal `value!`
@@ -387,23 +398,23 @@ them; generated example `.js` files are intentionally ignored.
 
 ### POD eligibility/defaultability
 
-- [ ] Identify concrete finite structural POD
-- [ ] Required fields must be defaultable
-- [ ] Nullable fields need no default
-- [ ] Recursive nullable links allowed
-- [ ] Required recursive values rejected
-- [ ] Non-defaultable function fields rejected
-- [ ] Non-defaultable literal unions handled
+- [x] Identify concrete finite structural POD
+- [x] Required fields must be defaultable
+- [x] Nullable fields need no default
+- [x] Recursive nullable links allowed
+- [x] Required recursive values rejected
+- [x] Non-defaultable function fields rejected
+- [x] Non-defaultable literal unions handled
 
 ### Typed construction
 
-- [ ] `Profile{}`
-- [ ] `Profile{ field: value }`
-- [ ] Contextual field checking
-- [ ] Unknown written field diagnostic
-- [ ] Absent direct value cannot replace required field default/current value
-- [ ] Nullable direct field accepts explicit absence
-- [ ] Conditional fields inside typed construction
+- [x] `Profile{}`
+- [x] `Profile{ field: value }`
+- [x] Contextual field checking
+- [x] Unknown written field diagnostic
+- [x] Direct fields use ordinary assignment rules
+- [x] Nullable direct field accepts explicit absence
+- [x] Conditional fields inside typed construction
 
 ### Typed spread / projection
 
@@ -440,16 +451,6 @@ them; generated example `.js` files are intentionally ignored.
 - [ ] Writable-reference requirement
 - [ ] Getter-only rejection
 - [ ] Terminal `!` vs intermediate `!`
-
-### Class defaults
-
-- [ ] Zero-argument class defaulting
-- [ ] Explicit zero-argument constructor
-- [ ] Implicit zero-argument constructor
-- [ ] Reject abstract classes
-- [ ] Reject constructors requiring arguments
-- [ ] Constructor effects occur only on defaulting/materialization
-- [ ] Constructor exceptions propagate normally
 
 ## 5. Calls, composition, and callbacks
 

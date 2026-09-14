@@ -4432,7 +4432,7 @@ var KVS_select_must_be_at_the_head_of_a_supported_value_expression = &Message{co
 
 var A_KVS_nullable_binding_requires_an_inferred_let_declaration_with_an_initializer = &Message{code: 100071, category: CategoryError, key: "A_KVS_nullable_binding_requires_an_inferred_let_declaration_with_an_initializer_100071", text: "A KVS nullable binding requires an inferred 'let' declaration with an initializer."}
 
-var KVS_terminal_requires_string_number_boolean_bigint_or_a_non_tuple_array = &Message{code: 100072, category: CategoryError, key: "KVS_terminal_requires_string_number_boolean_bigint_or_a_non_tuple_array_100072", text: "KVS terminal '!' requires string, number, boolean, bigint, or a non-tuple array."}
+var KVS_terminal_requires_a_defaultable_type = &Message{code: 100072, category: CategoryError, key: "KVS_terminal_requires_a_defaultable_type_100072", text: "KVS terminal '!' requires a defaultable type."}
 
 var KVS_terminal_cannot_determine_a_default_value_from_an_absence_only_type = &Message{code: 100073, category: CategoryError, key: "KVS_terminal_cannot_determine_a_default_value_from_an_absence_only_type_100073", text: "KVS terminal '!' cannot determine a default value from an absence-only type."}
 
@@ -4449,6 +4449,8 @@ var KVS_runtime_comparison_alternatives_must_be_an_array = &Message{code: 100078
 var KVS_infix_must_be_at_the_head_of_a_supported_value_expression = &Message{code: 100079, category: CategoryError, key: "KVS_infix_must_be_at_the_head_of_a_supported_value_expression_100079", text: "KVS infix '~~' must be at the head of a supported value expression."}
 
 var KVS_infix_replacement_must_produce_an_Error = &Message{code: 100080, category: CategoryError, key: "KVS_infix_replacement_must_produce_an_Error_100080", text: "KVS infix '~~' replacement must produce an Error."}
+
+var KVS_typed_construction_requires_a_concrete_defaultable_interface_or_object_type_alias = &Message{code: 100081, category: CategoryError, key: "KVS_typed_construction_requires_a_concrete_defaultable_interface_or_object_type_alias_100081", text: "KVS typed construction requires a concrete defaultable interface or object type alias."}
 
 func keyToMessage(key Key) *Message {
 	switch key {
@@ -8882,8 +8884,8 @@ func keyToMessage(key Key) *Message {
 		return KVS_select_must_be_at_the_head_of_a_supported_value_expression
 	case "A_KVS_nullable_binding_requires_an_inferred_let_declaration_with_an_initializer_100071":
 		return A_KVS_nullable_binding_requires_an_inferred_let_declaration_with_an_initializer
-	case "KVS_terminal_requires_string_number_boolean_bigint_or_a_non_tuple_array_100072":
-		return KVS_terminal_requires_string_number_boolean_bigint_or_a_non_tuple_array
+	case "KVS_terminal_requires_a_defaultable_type_100072":
+		return KVS_terminal_requires_a_defaultable_type
 	case "KVS_terminal_cannot_determine_a_default_value_from_an_absence_only_type_100073":
 		return KVS_terminal_cannot_determine_a_default_value_from_an_absence_only_type
 	case "KVS_expression_valued_for_must_be_at_the_head_of_a_supported_value_expression_100074":
@@ -8900,6 +8902,8 @@ func keyToMessage(key Key) *Message {
 		return KVS_infix_must_be_at_the_head_of_a_supported_value_expression
 	case "KVS_infix_replacement_must_produce_an_Error_100080":
 		return KVS_infix_replacement_must_produce_an_Error
+	case "KVS_typed_construction_requires_a_concrete_defaultable_interface_or_object_type_alias_100081":
+		return KVS_typed_construction_requires_a_concrete_defaultable_interface_or_object_type_alias
 	default:
 		return nil
 	}

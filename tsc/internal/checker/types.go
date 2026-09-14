@@ -373,8 +373,18 @@ const (
 type NodeLinks struct {
 	flags                                NodeCheckFlags // Set of flags specific to Node
 	kvsPlaceholderType                   *Type
+	kvsTypedObjectType                   *Type
+	kvsTypedObjectDefaults               []kvsTypedObjectDefault
+	kvsDefaultConstructorSymbol          *ast.Symbol
 	declarationRequiresScopeChange       core.Tristate // Set by `useOuterVariableScopeInParameter` in checker when downlevel emit would change the name resolution scope inside of a parameter.
 	hasReportedStatementInAmbientContext bool          // Cache boolean if we report statements in ambient context
+}
+
+type kvsTypedObjectDefault struct {
+	name              string
+	kind              ast.KvsDefaultKind
+	properties        []kvsTypedObjectDefault
+	constructorSymbol *ast.Symbol
 }
 
 type SymbolNodeLinks struct {

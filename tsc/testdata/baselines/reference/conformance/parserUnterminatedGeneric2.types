@@ -5,13 +5,17 @@ declare namespace ng {
 >ng : typeof ng
 
     interfaceICompiledExpression {
->interfaceICompiledExpression : any
+>interfaceICompiledExpression {        (context: any, locals?: any) : any
+>interfaceICompiledExpression { : interfaceICompiledExpression
 
         (context: any, locals?: any): any;
->(context: any, locals?: any): any : (context: any, locals?: any) => any
 >context : any
+>any : any
+>locals?: any : any
 >locals : any
 > : any
+>any : any
+>any : any
 
         assign(context: any, value: any): any;
 >assign(context: any, value: any) : any

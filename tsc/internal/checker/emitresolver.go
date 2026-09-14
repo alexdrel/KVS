@@ -53,8 +53,67 @@ func newEmitResolver(checker *Checker) *EmitResolver {
 func (r *EmitResolver) GetKvsDefaultKind(node *ast.Node) ast.KvsDefaultKind {
 	r.checkerMu.Lock()
 	defer r.checkerMu.Unlock()
-	t := r.checker.GetNonNullableType(r.checker.checkExpression(node.Expression()))
-	return r.checker.getKvsDefaultKindForType(t)
+	flowType := r.checker.checkExpression(node.Expression())
+	t, needsDefault := r.checker.getKvsDefaultType(node.Expression(), flowType)
+	if !needsDefault {
+		return ast.KvsDefaultKindUnsupported
+	}
+	kind := r.checker.getKvsDefaultKindForType(t)
+	if kind == ast.KvsDefaultKindUnsupported {
+		if constructor := r.checker.getKvsDefaultConstructorSymbol(t, node); constructor != nil {
+			r.checker.nodeLinks.Get(node).kvsDefaultConstructorSymbol = constructor
+			return ast.KvsDefaultKindConstructor
+		}
+		if _, ok := r.checker.getKvsTypedObjectDefaults(t, make(map[*Type]bool)); ok && r.checker.isKvsNamedStructuralObjectType(t) {
+			return ast.KvsDefaultKindObject
+		}
+	}
+	return kind
+}
+
+func (r *EmitResolver) GetKvsTypedObjectDefaults(node *ast.Node) []printer.KvsTypedObjectDefault {
+	r.checkerMu.Lock()
+	defer r.checkerMu.Unlock()
+	r.checker.checkExpression(node)
+	defaults := r.checker.nodeLinks.Get(node).kvsTypedObjectDefaults
+	var convert func([]kvsTypedObjectDefault) []printer.KvsTypedObjectDefault
+	convert = func(items []kvsTypedObjectDefault) []printer.KvsTypedObjectDefault {
+		result := make([]printer.KvsTypedObjectDefault, 0, len(items))
+		for _, item := range items {
+			result = append(result, printer.KvsTypedObjectDefault{Name: item.name, Kind: item.kind, Properties: convert(item.properties), ConstructorSymbol: item.constructorSymbol})
+		}
+		return result
+	}
+	return convert(defaults)
+}
+
+func (r *EmitResolver) CreateKvsDefaultConstructor(emitContext *printer.EmitContext, node *ast.Node, symbol *ast.Symbol) *ast.Node {
+	r.checkerMu.Lock()
+	defer r.checkerMu.Unlock()
+	if symbol == nil {
+		r.checker.checkExpression(node)
+		symbol = r.checker.nodeLinks.Get(node).kvsDefaultConstructorSymbol
+	}
+	if symbol == nil {
+		return nil
+	}
+	requestNodeBuilder := NewNodeBuilder(r.checker, emitContext)
+	expression := requestNodeBuilder.SymbolToExpression(symbol, ast.SymbolFlagsValue, node, nodebuilder.FlagsNone, nodebuilder.InternalFlagsNone, nil)
+	if expression == nil {
+		return nil
+	}
+	firstIdentifier := ast.GetFirstIdentifier(expression)
+	for _, accessible := range r.checker.getAccessibleSymbolChain(symbol, node, ast.SymbolFlagsValue, false) {
+		if accessible.Flags&ast.SymbolFlagsAlias == 0 {
+			continue
+		}
+		declaration := r.checker.getDeclarationOfAliasSymbol(accessible)
+		if ast.IsImportClause(declaration) || ast.IsImportSpecifier(declaration) || ast.IsNamespaceImport(declaration) {
+			r.jsxLinks.Get(firstIdentifier).importRef = declaration
+			break
+		}
+	}
+	return expression
 }
 
 func (r *EmitResolver) IsKvsLiftedBinaryExpression(node *ast.Node) bool {

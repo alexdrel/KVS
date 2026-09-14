@@ -76,6 +76,8 @@ const (
 type EmitResolver interface {
 	binder.ReferenceResolver
 	GetKvsDefaultKind(node *ast.Node) ast.KvsDefaultKind
+	GetKvsTypedObjectDefaults(node *ast.Node) []KvsTypedObjectDefault
+	CreateKvsDefaultConstructor(emitContext *EmitContext, node *ast.Node, symbol *ast.Symbol) *ast.Node
 	IsKvsLiftedBinaryExpression(node *ast.Node) bool
 	IsKvsPlaceholderBoundary(node *ast.Node) bool
 	IsKvsLiftedBinaryLeftNullable(node *ast.Node) bool
@@ -134,6 +136,13 @@ type EmitResolver interface {
 	CreateTypeOfExpression(emitContext *EmitContext, expression *ast.Node, enclosingDeclaration *ast.Node, flags nodebuilder.Flags, internalFlags nodebuilder.InternalFlags, tracker nodebuilder.SymbolTracker) *ast.Node
 	CreateLateBoundIndexSignatures(emitContext *EmitContext, container *ast.Node, enclosingDeclaration *ast.Node, flags nodebuilder.Flags, internalFlags nodebuilder.InternalFlags, tracker nodebuilder.SymbolTracker) []*ast.Node
 	TryJSTypeNodeToTypeNode(emitContext *EmitContext, typeNode *ast.Node, enclosingDeclaration *ast.Node, flags nodebuilder.Flags, internalFlags nodebuilder.InternalFlags, tracker nodebuilder.SymbolTracker) *ast.Node
+}
+
+type KvsTypedObjectDefault struct {
+	Name              string
+	Kind              ast.KvsDefaultKind
+	Properties        []KvsTypedObjectDefault
+	ConstructorSymbol *ast.Symbol
 }
 
 type KvsNullingSieveKind uint8

@@ -8592,7 +8592,7 @@
         "category": "Error",
         "code": 100071
     },
-    "KVS terminal '!' requires string, number, boolean, bigint, or a non-tuple array.": {
+    "KVS terminal '!' requires a defaultable type.": {
         "category": "Error",
         "code": 100072
     },
@@ -8627,5 +8627,9 @@
     "KVS infix '~~' replacement must produce an Error.": {
         "category": "Error",
         "code": 100080
+    },
+    "KVS typed construction requires a concrete defaultable interface or object type alias.": {
+        "category": "Error",
+        "code": 100081
     }
 }

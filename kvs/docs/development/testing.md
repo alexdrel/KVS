@@ -32,6 +32,48 @@ identify the language behavior being demonstrated, log the meaningful result,
 and show the expected output in nearby comments. The matching `.stdout` file
 remains the executable assertion; the inline output is the reader-facing form.
 
+### Generated CRLF and baseline whitespace
+
+Some generated TypeScript files use CRLF, and accepted diagnostic baselines
+contain significant trailing spaces in source excerpts and underline markers.
+Consequently, a repository-wide `git diff --check` may report trailing
+whitespace for correctly generated or accepted changes. This is expected; do
+not normalize those files or edit their line endings by hand.
+
+Run the formatter and generators normally and inspect the generated/baseline
+diff. Tell Git that CRLF carriage returns are valid, while excluding accepted
+baselines whose source excerpts and underline markers contain significant
+trailing spaces:
+
+```sh
+git -c core.whitespace=cr-at-eol diff --check -- . \
+  ':(exclude)tsc/testdata/baselines/reference/**'
+```
+
+Unlike `--ignore-space-at-eol`, `cr-at-eol` still reports accidental ordinary
+trailing whitespace in authored and generated source files.
+
+## Cleaning Go cache and temporary files
+
+The configured `GOCACHE` and `GOTMPDIR` directories must continue to exist.
+Clean their contents, not the directories themselves; otherwise the next Go
+command fails while trying to create its work directory.
+
+For this repository's configured paths:
+
+```sh
+find /tmp/go-build-cache -mindepth 1 -delete
+find /tmp/go-tmp -mindepth 1 -delete
+test -d /tmp/go-build-cache && test -d /tmp/go-tmp
+```
+
+Check the active configuration and size before cleaning:
+
+```sh
+go env GOCACHE GOTMPDIR
+du -sh /tmp/go-build-cache /tmp/go-tmp
+```
+
 ## Native compiler tests
 
 The compiler's end-to-end baseline inputs live in:
@@ -112,6 +154,26 @@ Run it with:
 
 ```sh
 go -C ./tsc test -run='TestLocal/kvsPlaceholderLambda' ./internal/testrunner
+```
+
+## Typed-construction slice
+
+`kvsTypedConstruction.ts` checks default construction and written fields for
+concrete interfaces and object type aliases. It covers inherited and nested
+required fields, fresh mutable defaults, closed generic instantiations,
+contextual field checking, both conditional-field spellings, explicit absence
+for nullable fields, and quoted property names.
+
+The same case rejects unknown fields, nullable values assigned directly to
+required fields, classes, non-object aliases, required functions, literal
+unions without their generated primitive default, required recursion, and open
+generic shapes. A line break before `{}` also remains an ordinary TypeScript
+statement boundary rather than forming typed construction.
+
+Run it with:
+
+```sh
+go -C ./tsc test -run='TestLocal/kvsTypedConstruction' ./internal/testrunner
 ```
 
 ## TDD starting point
@@ -328,11 +390,27 @@ go -C ./tsc test -run='TestLocal/kvsNullabilityTypes' ./internal/testrunner
 ## Terminal-default slice
 
 `kvsDefault.ts` checks string, number, boolean, bigint, mutable and readonly
-array defaults, preservation of the present result type, primitive literal
-unions, and rejection of mixed primitive families, tuples, and structural
-objects. It separately rejects `null!` and `undefined!` because an absence-only
-type has no present type from which to determine a default. Its JavaScript
-baseline verifies the type-directed `??` fallback and fresh array literals.
+array defaults, constructor-backed defaults, built-in mutable and readonly
+Map/Set defaults, aliases, namespaced values, Date, preservation of the present
+result type, and primitive literal unions. It rejects abstract classes,
+inaccessible and required-argument constructors, and a non-defaultable
+user-defined `Map`, proving collection recognition is based on the resolved
+global symbol rather than its name. The case checks
+recursive structural defaults for concrete interfaces,
+inherited fields, closed generic instantiations, omitted nullable fields, and
+fresh mutable fields. Explicitly annotated `const` and `let` values retain their
+declared default type when flow narrows them to absence, while inferred `null`
+is rejected. A flow-proven-present value accepts `!` as an unrestricted no-op.
+Mixed primitive families, tuples, anonymous object types, classes, and open
+generic PODs are rejected when defaulting is required. It separately rejects
+bare `null!` and `undefined!` because an absence-only type names no present
+default type. Its JavaScript baseline verifies type-directed `??` fallbacks and
+fresh mutable literals.
+
+`kvsTypedConstruction.ts` additionally checks that Map/Set, Date, and ordinary
+constructor defaults participate recursively in POD fields and emit fresh
+construction inline. `kvsDefaultConstructorImports.ts` verifies that an aliased
+import retains its runtime module reference.
 
 Run it with:
 

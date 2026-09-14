@@ -37,12 +37,7 @@ export class ParseThemeData {
         [
           `, font - size);
             var ;
-            (--button - size - $);
-            {
-                fontType;
-            }
-            -fontSize;
-            `,
+            (--button - size - { fontType } - fontSize) `,
           `;
             height: var foo;
             `,

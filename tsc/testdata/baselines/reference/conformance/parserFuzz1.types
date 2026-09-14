@@ -2,10 +2,12 @@
 
 === parserFuzz1.ts ===
 cla <ss {
->cla <ss : boolean
+>cla <ss {  _ static try : boolean
 >cla : any
->ss : any
+>ss {  _ static try : ss
 
   _ static try
 >_ : any
+>try : any
+> : any
 

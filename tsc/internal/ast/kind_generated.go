@@ -277,6 +277,7 @@ const (
 	KindKvsConditionalElement
 	KindKvsCompactArrayExpression
 	KindKvsCompactObjectExpression
+	KindKvsTypedObjectExpression
 	KindKvsCollectExpression
 	KindKvsSelectExpression
 	KindKvsForExpression

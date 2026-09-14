@@ -132,6 +132,8 @@ Profile{}
 Profile{ id: userId }
 ```
 
+Horizontal whitespace may separate the type and `{`; a line break may not.
+
 Choosing `Profile{...}` chooses a construction policy: create the POD from the default values of its fields, then apply the supplied fields.
 
 Required fields are initialized from their types' defaults; nullable fields remain absent. Thus a required `id: string` initially contains `""`, while `tags: string[]` initially contains `[]`. This produces a complete structural value without claiming that it is ready for every application operation.
@@ -143,6 +145,12 @@ maybeProfile! // absence -> default state Profile
 Profile{}     // construct default state Profile
 user.profile!.theme = dark // materialize a missing Profile, then update it
 ```
+
+Flow analysis determines whether terminal `!` can replace the operand, while
+the operand's declared/static type determines the default. A flow-proven-present
+operand passes through unchanged. An annotated `const profile: Profile? = null`
+still defaults to `Profile{}`; an inferred `const profile = null` cannot name a
+default type and is rejected.
 
 `Profile{}` approximately produces:
 
@@ -254,11 +262,10 @@ user.profile.theme = dark
 
 [Extant assignment](flow.md#extant-assignment) controls the write from the other side: `target ?= value` leaves the target unchanged when the right-hand value is absent. It composes with the same writable-path rules, including staged `!` materialization.
 
-## Class defaults
+## Constructor-backed defaults
 
-The current proposal includes the following class-defaulting rule. Its adoption remains a deferred design review.
-
-Classes use their own construction semantics instead. A class with an accessible zero-argument constructor is defaultable:
+Types with runtime constructors use their own construction semantics. A type
+with an accessible constructor that accepts zero arguments is defaultable:
 
 ```kvs
 class Session {
@@ -269,7 +276,13 @@ new Session()   // ordinary class construction
 maybeSession!   // existing session, or new Session() when absent
 ```
 
-An implicit or explicit zero-argument constructor qualifies. Abstract classes and classes whose constructors require arguments are not defaultable. Constructor effects and exceptions occur only when `!` encounters absence. Intermediate materialization additionally requires a writable path because the new instance must be stored back; terminal defaulting has no such requirement.
+An implicit or explicit zero-argument constructor qualifies, as does a
+constructor whose parameters are optional or have defaults. Abstract classes,
+inaccessible constructors, and constructors requiring arguments are not
+defaultable. Constructor effects and exceptions occur only when `!` encounters
+absence. Intermediate materialization additionally requires a writable path
+because the new instance must be stored back; terminal defaulting has no such
+requirement.
 
 ## Typed spread
 
@@ -325,7 +338,7 @@ const profile = Profile{
 };
 ```
 
-The POD type contextually checks the body. A direct field's present type must be assignable to the declared field. An absent direct value cannot replace a required field's current/default value; a nullable field may receive explicit null or undefined. Spread sources follow the [typed spread rules](#typed-spread), skipping absent values and discarding extra fields.
+The POD type contextually checks the body. A direct field follows ordinary assignment rules: its full value type must be assignable to the declared field. A nullable value is therefore rejected for a required non-nullable field, while a nullable field may receive explicit null or undefined. To omit an absent value and retain the generated default, use a conditional field. Spread sources follow the [typed spread rules](#typed-spread), skipping absent values and discarding extra fields.
 
 An explicitly written unknown field is a compile-time error:
 

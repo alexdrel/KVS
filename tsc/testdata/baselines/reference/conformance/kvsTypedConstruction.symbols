@@ -1,0 +1,285 @@
+//// [tests/cases/conformance/kvs/kvsTypedConstruction.ts] ////
+
+=== kvsTypedConstruction.ts ===
+interface Entity {
+>Entity : Symbol(Entity, Decl(kvsTypedConstruction.ts, 0, 0))
+
+    id: string;
+>id : Symbol(Entity.id, Decl(kvsTypedConstruction.ts, 0, 18))
+}
+
+class Clock {
+>Clock : Symbol(Clock, Decl(kvsTypedConstruction.ts, 2, 1))
+
+    constructor(public zone = "UTC") {}
+>zone : Symbol(Clock.zone, Decl(kvsTypedConstruction.ts, 5, 16))
+}
+
+interface Settings {
+>Settings : Symbol(Settings, Decl(kvsTypedConstruction.ts, 6, 1))
+
+    retries: number;
+>retries : Symbol(Settings.retries, Decl(kvsTypedConstruction.ts, 8, 20))
+
+    labels: string[];
+>labels : Symbol(Settings.labels, Decl(kvsTypedConstruction.ts, 9, 20))
+
+    aliases: Map<string, string>;
+>aliases : Symbol(Settings.aliases, Decl(kvsTypedConstruction.ts, 10, 21))
+>Map : Symbol(Map, Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.iterable.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --))
+
+    visited: Set<string>;
+>visited : Symbol(Settings.visited, Decl(kvsTypedConstruction.ts, 11, 33))
+>Set : Symbol(Set, Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.iterable.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --))
+
+    created: Date;
+>created : Symbol(Settings.created, Decl(kvsTypedConstruction.ts, 12, 25))
+>Date : Symbol(Date, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --), Decl(lib.scripthost.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --) ... and 1 more)
+
+    clock: Clock;
+>clock : Symbol(Settings.clock, Decl(kvsTypedConstruction.ts, 13, 18))
+>Clock : Symbol(Clock, Decl(kvsTypedConstruction.ts, 2, 1))
+}
+
+interface Profile extends Entity {
+>Profile : Symbol(Profile, Decl(kvsTypedConstruction.ts, 15, 1))
+>Entity : Symbol(Entity, Decl(kvsTypedConstruction.ts, 0, 0))
+
+    enabled: boolean;
+>enabled : Symbol(Profile.enabled, Decl(kvsTypedConstruction.ts, 17, 34))
+
+    tags: string[];
+>tags : Symbol(Profile.tags, Decl(kvsTypedConstruction.ts, 18, 21))
+
+    settings: Settings;
+>settings : Symbol(Profile.settings, Decl(kvsTypedConstruction.ts, 19, 19))
+>Settings : Symbol(Settings, Decl(kvsTypedConstruction.ts, 6, 1))
+
+    note?: string;
+>note : Symbol(Profile.note, Decl(kvsTypedConstruction.ts, 20, 23))
+
+    theme: string?;
+>theme : Symbol(Profile.theme, Decl(kvsTypedConstruction.ts, 21, 18))
+
+	format: ((value: number) => string)?;
+>format : Symbol(Profile.format, Decl(kvsTypedConstruction.ts, 22, 19))
+>value : Symbol(value, Decl(kvsTypedConstruction.ts, 23, 11))
+
+	"display-name": string;
+>"display-name" : Symbol(Profile["display-name"], Decl(kvsTypedConstruction.ts, 23, 38))
+}
+
+type Alias = {
+>Alias : Symbol(Alias, Decl(kvsTypedConstruction.ts, 25, 1))
+
+    count: number;
+>count : Symbol(count, Decl(kvsTypedConstruction.ts, 27, 14))
+
+};
+
+type Pair<T> = {
+>Pair : Symbol(Pair, Decl(kvsTypedConstruction.ts, 29, 2))
+>T : Symbol(T, Decl(kvsTypedConstruction.ts, 31, 10))
+
+	left: T;
+>left : Symbol(left, Decl(kvsTypedConstruction.ts, 31, 16))
+>T : Symbol(T, Decl(kvsTypedConstruction.ts, 31, 10))
+
+	right: T[];
+>right : Symbol(right, Decl(kvsTypedConstruction.ts, 32, 9))
+>T : Symbol(T, Decl(kvsTypedConstruction.ts, 31, 10))
+
+};
+
+interface Box<T> {
+>Box : Symbol(Box, Decl(kvsTypedConstruction.ts, 34, 2))
+>T : Symbol(T, Decl(kvsTypedConstruction.ts, 36, 14))
+
+    value: T;
+>value : Symbol(Box.value, Decl(kvsTypedConstruction.ts, 36, 18))
+>T : Symbol(T, Decl(kvsTypedConstruction.ts, 36, 14))
+
+    values: T[];
+>values : Symbol(Box.values, Decl(kvsTypedConstruction.ts, 37, 13))
+>T : Symbol(T, Decl(kvsTypedConstruction.ts, 36, 14))
+}
+
+interface Link {
+>Link : Symbol(Link, Decl(kvsTypedConstruction.ts, 39, 1))
+
+    label: string;
+>label : Symbol(Link.label, Decl(kvsTypedConstruction.ts, 41, 16))
+
+    next: Link?;
+>next : Symbol(Link.next, Decl(kvsTypedConstruction.ts, 42, 18))
+>Link : Symbol(Link, Decl(kvsTypedConstruction.ts, 39, 1))
+}
+
+declare const maybeName: string?;
+>maybeName : Symbol(maybeName, Decl(kvsTypedConstruction.ts, 46, 13))
+
+declare const maybeTheme: string?;
+>maybeTheme : Symbol(maybeTheme, Decl(kvsTypedConstruction.ts, 47, 13))
+
+declare const note: string?;
+>note : Symbol(note, Decl(kvsTypedConstruction.ts, 48, 13))
+
+const empty = Profile{};
+>empty : Symbol(empty, Decl(kvsTypedConstruction.ts, 50, 5))
+>Profile : Symbol(Profile, Decl(kvsTypedConstruction.ts, 15, 1))
+
+const spaced = Profile { enabled: true };
+>spaced : Symbol(spaced, Decl(kvsTypedConstruction.ts, 51, 5))
+>Profile : Symbol(Profile, Decl(kvsTypedConstruction.ts, 15, 1))
+>enabled : Symbol(enabled, Decl(kvsTypedConstruction.ts, 51, 24))
+
+const written = Profile{
+>written : Symbol(written, Decl(kvsTypedConstruction.ts, 52, 5))
+>Profile : Symbol(Profile, Decl(kvsTypedConstruction.ts, 15, 1))
+
+    id: "alex",
+>id : Symbol(id, Decl(kvsTypedConstruction.ts, 52, 24))
+
+    enabled: true,
+>enabled : Symbol(enabled, Decl(kvsTypedConstruction.ts, 53, 15))
+
+};
+const conditional = Profile{
+>conditional : Symbol(conditional, Decl(kvsTypedConstruction.ts, 56, 5))
+>Profile : Symbol(Profile, Decl(kvsTypedConstruction.ts, 15, 1))
+
+    id?: maybeName,
+>id : Symbol(id, Decl(kvsTypedConstruction.ts, 56, 28))
+>maybeName : Symbol(maybeName, Decl(kvsTypedConstruction.ts, 46, 13))
+
+    theme: maybeTheme,
+>theme : Symbol(theme, Decl(kvsTypedConstruction.ts, 57, 19))
+>maybeTheme : Symbol(maybeTheme, Decl(kvsTypedConstruction.ts, 47, 13))
+
+	?: note,
+>note : Symbol(note, Decl(kvsTypedConstruction.ts, 58, 22))
+
+};
+const contextual = Profile{ format: value => value.toFixed() };
+>contextual : Symbol(contextual, Decl(kvsTypedConstruction.ts, 61, 5))
+>Profile : Symbol(Profile, Decl(kvsTypedConstruction.ts, 15, 1))
+>format : Symbol(format, Decl(kvsTypedConstruction.ts, 61, 27))
+>value : Symbol(value, Decl(kvsTypedConstruction.ts, 61, 35))
+>value.toFixed : Symbol(Number.toFixed, Decl(lib.es5.d.ts, --, --))
+>value : Symbol(value, Decl(kvsTypedConstruction.ts, 61, 35))
+>toFixed : Symbol(Number.toFixed, Decl(lib.es5.d.ts, --, --))
+
+const alias = Alias{};
+>alias : Symbol(alias, Decl(kvsTypedConstruction.ts, 62, 5))
+>Alias : Symbol(Alias, Decl(kvsTypedConstruction.ts, 25, 1))
+
+const box = Box<string>{};
+>box : Symbol(box, Decl(kvsTypedConstruction.ts, 63, 5))
+>Box : Symbol(Box, Decl(kvsTypedConstruction.ts, 34, 2))
+
+const spacedBox = Box<string> {};
+>spacedBox : Symbol(spacedBox, Decl(kvsTypedConstruction.ts, 64, 5))
+>Box : Symbol(Box, Decl(kvsTypedConstruction.ts, 34, 2))
+
+const pair = Pair<number>{};
+>pair : Symbol(pair, Decl(kvsTypedConstruction.ts, 65, 5))
+>Pair : Symbol(Pair, Decl(kvsTypedConstruction.ts, 29, 2))
+
+const fresh = [Profile{}, Profile{}];
+>fresh : Symbol(fresh, Decl(kvsTypedConstruction.ts, 66, 5))
+>Profile : Symbol(Profile, Decl(kvsTypedConstruction.ts, 15, 1))
+>Profile : Symbol(Profile, Decl(kvsTypedConstruction.ts, 15, 1))
+
+const link = Link{};
+>link : Symbol(link, Decl(kvsTypedConstruction.ts, 67, 5))
+>Link : Symbol(Link, Decl(kvsTypedConstruction.ts, 39, 1))
+
+Profile{ id: maybeName };
+>Profile : Symbol(Profile, Decl(kvsTypedConstruction.ts, 15, 1))
+>id : Symbol(id, Decl(kvsTypedConstruction.ts, 69, 8))
+>maybeName : Symbol(maybeName, Decl(kvsTypedConstruction.ts, 46, 13))
+
+Profile{ unknown: 1 };
+>Profile : Symbol(Profile, Decl(kvsTypedConstruction.ts, 15, 1))
+>unknown : Symbol(unknown, Decl(kvsTypedConstruction.ts, 70, 8))
+
+class Model {
+>Model : Symbol(Model, Decl(kvsTypedConstruction.ts, 70, 22))
+
+    value = 1;
+>value : Symbol(Model.value, Decl(kvsTypedConstruction.ts, 72, 13))
+}
+Model{};
+>Model : Symbol(Model, Decl(kvsTypedConstruction.ts, 70, 22))
+
+type Primitive = string;
+>Primitive : Symbol(Primitive, Decl(kvsTypedConstruction.ts, 75, 8))
+
+Primitive{};
+>Primitive : Symbol(Primitive, Decl(kvsTypedConstruction.ts, 75, 8))
+
+interface Invalid {
+>Invalid : Symbol(Invalid, Decl(kvsTypedConstruction.ts, 78, 12))
+
+    callback: () => void;
+>callback : Symbol(Invalid.callback, Decl(kvsTypedConstruction.ts, 80, 19))
+}
+Invalid{};
+>Invalid : Symbol(Invalid, Decl(kvsTypedConstruction.ts, 78, 12))
+
+interface InvalidState {
+>InvalidState : Symbol(InvalidState, Decl(kvsTypedConstruction.ts, 83, 10))
+
+    state: "waiting" | "finished";
+>state : Symbol(InvalidState.state, Decl(kvsTypedConstruction.ts, 85, 24))
+}
+InvalidState{};
+>InvalidState : Symbol(InvalidState, Decl(kvsTypedConstruction.ts, 83, 10))
+
+class Connection {
+>Connection : Symbol(Connection, Decl(kvsTypedConstruction.ts, 88, 15))
+
+    constructor(url: string) {}
+>url : Symbol(url, Decl(kvsTypedConstruction.ts, 91, 16))
+}
+
+interface Service {
+>Service : Symbol(Service, Decl(kvsTypedConstruction.ts, 92, 1))
+
+    connection: Connection;
+>connection : Symbol(Service.connection, Decl(kvsTypedConstruction.ts, 94, 19))
+>Connection : Symbol(Connection, Decl(kvsTypedConstruction.ts, 88, 15))
+}
+
+Service{};
+>Service : Symbol(Service, Decl(kvsTypedConstruction.ts, 92, 1))
+
+declare const maybeService: Service?;
+>maybeService : Symbol(maybeService, Decl(kvsTypedConstruction.ts, 99, 13))
+>Service : Symbol(Service, Decl(kvsTypedConstruction.ts, 92, 1))
+
+maybeService!;
+>maybeService : Symbol(maybeService, Decl(kvsTypedConstruction.ts, 99, 13))
+
+interface RequiredRecursive {
+>RequiredRecursive : Symbol(RequiredRecursive, Decl(kvsTypedConstruction.ts, 100, 14))
+
+    next: RequiredRecursive;
+>next : Symbol(RequiredRecursive.next, Decl(kvsTypedConstruction.ts, 102, 29))
+>RequiredRecursive : Symbol(RequiredRecursive, Decl(kvsTypedConstruction.ts, 100, 14))
+}
+RequiredRecursive{};
+>RequiredRecursive : Symbol(RequiredRecursive, Decl(kvsTypedConstruction.ts, 100, 14))
+
+function open<T>() {
+>open : Symbol(open, Decl(lib.dom.d.ts, --, --), Decl(kvsTypedConstruction.ts, 105, 20))
+>T : Symbol(T, Decl(kvsTypedConstruction.ts, 107, 14))
+
+    return Box<T>{};
+>Box : Symbol(Box, Decl(kvsTypedConstruction.ts, 34, 2))
+>T : Symbol(T, Decl(kvsTypedConstruction.ts, 107, 14))
+}
+
+Profile
+{};
+

@@ -22,6 +22,95 @@ declare const maybeReadonlyNumbers: readonly number[] | undefined;
 declare const maybeArrayFamily: string[] | readonly number[] | null;
 >maybeArrayFamily : string[] | readonly number[] | null
 
+declare const maybeMap: Map<string, number>?;
+>maybeMap : Map<string, number> | null | undefined
+
+declare const maybeReadonlyMap: ReadonlyMap<string, number>?;
+>maybeReadonlyMap : ReadonlyMap<string, number> | null | undefined
+
+declare const maybeSet: Set<string>?;
+>maybeSet : Set<string> | null | undefined
+
+declare const maybeReadonlySet: ReadonlySet<string>?;
+>maybeReadonlySet : ReadonlySet<string> | null | undefined
+
+type StringSet = Set<string>;
+>StringSet : StringSet
+
+declare const maybeStringSet: StringSet?;
+>maybeStringSet : StringSet | null | undefined
+
+interface Identified {
+    id: string;
+>id : string
+}
+
+interface Profile extends Identified {
+    enabled: boolean;
+>enabled : boolean
+
+    tags: string[];
+>tags : string[]
+
+    settings: {
+>settings : { retries: number; aliases: Map<string, string>; visited: Set<string>; }
+
+        retries: number;
+>retries : number
+
+        aliases: Map<string, string>;
+>aliases : Map<string, string>
+
+        visited: Set<string>;
+>visited : Set<string>
+
+    };
+    note: string?;
+>note : string | null | undefined
+}
+
+interface Box<T> {
+    value: T;
+>value : T
+
+    values: T[];
+>values : T[]
+}
+
+type Alias = {
+>Alias : Alias
+
+    count: number;
+>count : number
+
+};
+
+interface Empty {
+    note?: string;
+>note : string | undefined
+}
+
+declare const maybeProfile: Profile?;
+>maybeProfile : Profile | null | undefined
+
+declare const maybeBox: Box<string>?;
+>maybeBox : Box<string> | null | undefined
+
+declare const maybeAlias: Alias?;
+>maybeAlias : Alias | null | undefined
+
+declare const maybeEmpty: Empty?;
+>maybeEmpty : Empty | null | undefined
+
+const absentConst: Profile? = null;
+>absentConst : Profile | null | undefined
+
+let absentLet: Profile? = null;
+>absentLet : Profile | null | undefined
+
+const inferredNull = null;
+>inferredNull : null
+
 const stringValue = maybeString!;
 >stringValue : string
 >maybeString! : string
@@ -57,6 +146,31 @@ const arrayFamily = maybeArrayFamily!;
 >maybeArrayFamily! : string[] | readonly number[]
 >maybeArrayFamily : string[] | readonly number[] | null
 
+const map = maybeMap!;
+>map : Map<string, number>
+>maybeMap! : Map<string, number>
+>maybeMap : Map<string, number> | null | undefined
+
+const readonlyMap = maybeReadonlyMap!;
+>readonlyMap : ReadonlyMap<string, number>
+>maybeReadonlyMap! : ReadonlyMap<string, number>
+>maybeReadonlyMap : ReadonlyMap<string, number> | null | undefined
+
+const set = maybeSet!;
+>set : Set<string>
+>maybeSet! : Set<string>
+>maybeSet : Set<string> | null | undefined
+
+const readonlySet = maybeReadonlySet!;
+>readonlySet : ReadonlySet<string>
+>maybeReadonlySet! : ReadonlySet<string>
+>maybeReadonlySet : ReadonlySet<string> | null | undefined
+
+const stringSet = maybeStringSet!;
+>stringSet : StringSet
+>maybeStringSet! : StringSet
+>maybeStringSet : StringSet | null | undefined
+
 const stringLength = maybeString!.length;
 >stringLength : number
 >maybeString!.length : number
@@ -70,6 +184,48 @@ const incremented = maybeNumber! + 1;
 >maybeNumber! : number
 >maybeNumber : number | null
 >1 : 1
+
+const profile = maybeProfile!;
+>profile : Profile
+>maybeProfile! : Profile
+>maybeProfile : Profile | null | undefined
+
+const box = maybeBox!;
+>box : Box<string>
+>maybeBox! : Box<string>
+>maybeBox : Box<string> | null | undefined
+
+const alias = maybeAlias!;
+>alias : Alias
+>maybeAlias! : Alias
+>maybeAlias : Alias | null | undefined
+
+const empty = maybeEmpty!;
+>empty : Empty
+>maybeEmpty! : Empty
+>maybeEmpty : Empty | null | undefined
+
+const freshProfiles = [maybeProfile!, maybeProfile!];
+>freshProfiles : Profile[]
+>[maybeProfile!, maybeProfile!] : Profile[]
+>maybeProfile! : Profile
+>maybeProfile : Profile | null | undefined
+>maybeProfile! : Profile
+>maybeProfile : Profile | null | undefined
+
+const constProfile = absentConst!;
+>constProfile : Profile
+>absentConst! : Profile
+>absentConst : null
+
+const letProfile = absentLet!;
+>letProfile : Profile
+>absentLet! : Profile
+>absentLet : null
+
+inferredNull!;
+>inferredNull! : never
+>inferredNull : null
 
 declare const stringLiteral: "left" | "right" | null;
 >stringLiteral : "left" | "right" | null
@@ -101,10 +257,169 @@ object!;
 >object! : { value: string; }
 >object : { value: string; } | null
 
+class Model {
+>Model : Model
+
+    value = 1;
+>value : number
+>1 : 1
+
+    constructor(value: number) {}
+>value : number
+}
+declare const maybeModel: Model?;
+>maybeModel : Model | null | undefined
+
+maybeModel!;
+>maybeModel! : Model
+>maybeModel : Model | null | undefined
+
+if (maybeModel !== null && maybeModel !== undefined) {
+>maybeModel !== null && maybeModel !== undefined : boolean
+>maybeModel !== null : boolean
+>maybeModel : Model | null | undefined
+>maybeModel !== undefined : boolean
+>maybeModel : Model | undefined
+>undefined : undefined
+
+    maybeModel!;
+>maybeModel! : Model
+>maybeModel : Model
+}
+
+class Session {
+>Session : Session
+
+    constructor(public name = "") {}
+>name : string
+>"" : ""
+}
+class ImplicitSession {}
+>ImplicitSession : ImplicitSession
+
+type SessionAlias = Session;
+>SessionAlias : Session
+
+declare const maybeSession: Session?;
+>maybeSession : Session | null | undefined
+
+declare const maybeImplicitSession: ImplicitSession?;
+>maybeImplicitSession : ImplicitSession | null | undefined
+
+declare const maybeSessionAlias: SessionAlias?;
+>maybeSessionAlias : Session | null | undefined
+
+declare const maybeDate: Date?;
+>maybeDate : Date | null | undefined
+
+const session = maybeSession!;
+>session : Session
+>maybeSession! : Session
+>maybeSession : Session | null | undefined
+
+const implicitSession = maybeImplicitSession!;
+>implicitSession : ImplicitSession
+>maybeImplicitSession! : ImplicitSession
+>maybeImplicitSession : ImplicitSession | null | undefined
+
+const sessionAlias = maybeSessionAlias!;
+>sessionAlias : Session
+>maybeSessionAlias! : Session
+>maybeSessionAlias : Session | null | undefined
+
+const date = maybeDate!;
+>date : Date
+>maybeDate! : Date
+>maybeDate : Date | null | undefined
+
+namespace Models {
+>Models : typeof Models
+
+    export class Token {
+>Token : Token
+
+        constructor(public value?: string) {}
+>value : string | undefined
+    }
+}
+declare const maybeToken: Models.Token?;
+>maybeToken : Models.Token | null | undefined
+>Models : any
+
+const token = maybeToken!;
+>token : Models.Token
+>maybeToken! : Models.Token
+>maybeToken : Models.Token | null | undefined
+
+class RequiredConstructor {
+>RequiredConstructor : RequiredConstructor
+
+    constructor(value: string) {}
+>value : string
+}
+declare const maybeRequiredConstructor: RequiredConstructor?;
+>maybeRequiredConstructor : RequiredConstructor | null | undefined
+
+maybeRequiredConstructor!;
+>maybeRequiredConstructor! : RequiredConstructor
+>maybeRequiredConstructor : RequiredConstructor | null | undefined
+
+class PrivateConstructor {
+>PrivateConstructor : PrivateConstructor
+
+    private constructor() {}
+}
+declare const maybePrivateConstructor: PrivateConstructor?;
+>maybePrivateConstructor : PrivateConstructor | null | undefined
+
+maybePrivateConstructor!;
+>maybePrivateConstructor! : PrivateConstructor
+>maybePrivateConstructor : PrivateConstructor | null | undefined
+
+abstract class AbstractModel {}
+>AbstractModel : AbstractModel
+
+declare const maybeAbstractModel: AbstractModel?;
+>maybeAbstractModel : AbstractModel | null | undefined
+
+maybeAbstractModel!;
+>maybeAbstractModel! : AbstractModel
+>maybeAbstractModel : AbstractModel | null | undefined
+
+function open<T>(value: Box<T>?) {
+>open : { (url?: string | URL, target?: string, features?: string): WindowProxy | null; <T>(value: Box<T>?): Box<T>; }
+>value : Box<T> | null | undefined
+
+    return value!;
+>value! : Box<T>
+>value : Box<T> | null | undefined
+}
+
 null!;
 >null! : never
 
 undefined!;
 >undefined! : never
 >undefined : undefined
+
+namespace Shadowed {
+>Shadowed : typeof Shadowed
+
+    export interface Map<K, V> {
+        key: K;
+>key : K
+
+        value: V;
+>value : V
+
+        callback: () => void;
+>callback : () => void
+    }
+    declare const maybeMap: Map<string, number>?;
+>maybeMap : Map<string, number> | null | undefined
+
+    maybeMap!;
+>maybeMap! : Map<string, number>
+>maybeMap : Map<string, number> | null | undefined
+}
 

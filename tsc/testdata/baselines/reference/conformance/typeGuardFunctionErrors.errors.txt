@@ -7,7 +7,10 @@ typeGuardFunctionErrors.ts(14,5): error TS2322: Type 'string' is not assignable 
 typeGuardFunctionErrors.ts(17,46): error TS7006: Parameter 'x' implicitly has an 'any' type.
 typeGuardFunctionErrors.ts(17,55): error TS2749: 'x' refers to a value, but is being used as a type here. Did you mean 'typeof x'?
 typeGuardFunctionErrors.ts(17,57): error TS1144: '{' or ';' expected.
-typeGuardFunctionErrors.ts(17,60): error TS1434: Unexpected keyword or identifier.
+typeGuardFunctionErrors.ts(17,60): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+typeGuardFunctionErrors.ts(18,5): error TS2353: Object literal may only specify known properties, and 'return' does not exist in type 'A'.
+typeGuardFunctionErrors.ts(18,12): error TS1005: ':' expected.
+typeGuardFunctionErrors.ts(18,16): error TS1005: ',' expected.
 typeGuardFunctionErrors.ts(21,33): error TS2749: 'x' refers to a value, but is being used as a type here. Did you mean 'typeof x'?
 typeGuardFunctionErrors.ts(25,33): error TS1225: Cannot find parameter 'x'.
 typeGuardFunctionErrors.ts(29,10): error TS2391: Function implementation is missing or not immediately following the declaration.
@@ -61,7 +64,10 @@ typeGuardFunctionErrors.ts(96,21): error TS1005: ',' expected.
 typeGuardFunctionErrors.ts(96,21): error TS7006: Parameter 'A' implicitly has an 'any' type.
 typeGuardFunctionErrors.ts(97,20): error TS2749: 'b' refers to a value, but is being used as a type here. Did you mean 'typeof b'?
 typeGuardFunctionErrors.ts(97,22): error TS1144: '{' or ';' expected.
-typeGuardFunctionErrors.ts(97,25): error TS1434: Unexpected keyword or identifier.
+typeGuardFunctionErrors.ts(97,25): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+typeGuardFunctionErrors.ts(98,5): error TS2353: Object literal may only specify known properties, and 'return' does not exist in type 'A'.
+typeGuardFunctionErrors.ts(98,12): error TS1005: ':' expected.
+typeGuardFunctionErrors.ts(98,16): error TS1005: ',' expected.
 typeGuardFunctionErrors.ts(103,25): error TS1228: A type predicate is only allowed in return type position for functions and methods.
 typeGuardFunctionErrors.ts(104,9): error TS2322: Type 'boolean' is not assignable to type 'D'.
 typeGuardFunctionErrors.ts(104,9): error TS2409: Return type of constructor signature must be assignable to the instance type of the class.
@@ -110,7 +116,7 @@ typeGuardFunctionErrors.ts(166,45): error TS2677: A type predicate's type must b
 typeGuardFunctionErrors.ts(166,54): error TS2344: Type 'number' does not satisfy the constraint 'Foo'.
 
 
-==== typeGuardFunctionErrors.ts (93 errors) ====
+==== typeGuardFunctionErrors.ts (99 errors) ====
     class A {
           ~
 !!! error TS2300: Duplicate identifier 'A'.
@@ -147,8 +153,14 @@ typeGuardFunctionErrors.ts(166,54): error TS2344: Type 'number' does not satisfy
                                                             ~~
 !!! error TS1144: '{' or ';' expected.
                                                                ~
-!!! error TS1434: Unexpected keyword or identifier.
+!!! error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
         return true;
+        ~~~~~~
+!!! error TS2353: Object literal may only specify known properties, and 'return' does not exist in type 'A'.
+               ~~~~
+!!! error TS1005: ':' expected.
+                   ~
+!!! error TS1005: ',' expected.
     }
     
     function hasMissingIsKeyword(): x {
@@ -331,8 +343,14 @@ typeGuardFunctionErrors.ts(166,54): error TS2344: Type 'number' does not satisfy
                          ~~
 !!! error TS1144: '{' or ';' expected.
                             ~
-!!! error TS1434: Unexpected keyword or identifier.
+!!! error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
         return true;
+        ~~~~~~
+!!! error TS2353: Object literal may only specify known properties, and 'return' does not exist in type 'A'.
+               ~~~~
+!!! error TS1005: ':' expected.
+                   ~
+!!! error TS1005: ',' expected.
     };
     
     // Non-compatiable type predicate positions for signature declarations

@@ -41,6 +41,7 @@ function hasTypeGuardTypeInsideTypeGuardType(x): x is x is A {
 >A : Symbol(A, Decl(typeGuardFunctionErrors.ts, 0, 0))
 
     return true;
+>return : Symbol(return, Decl(typeGuardFunctionErrors.ts, 16, 62))
 }
 
 function hasMissingIsKeyword(): x {
@@ -248,6 +249,8 @@ function b3(): A | b is A {
 >A : Symbol(A, Decl(typeGuardFunctionErrors.ts, 0, 0))
 
     return true;
+>return : Symbol(return, Decl(typeGuardFunctionErrors.ts, 96, 27))
+
 };
 
 // Non-compatiable type predicate positions for signature declarations

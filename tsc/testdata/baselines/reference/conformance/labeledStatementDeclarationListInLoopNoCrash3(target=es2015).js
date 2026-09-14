@@ -40,20 +40,10 @@ export class ParseThemeData {
         [
           `, font - size);
             var ;
-            (--button - size - $);
-            {
-                fontType;
-            }
-            -fontSize;
-            `,
+            (--button - size - { fontType } - fontSize) `,
           `;
             height: var ;
-            (--button - size - $);
-            {
-                fontType;
-            }
-            -height;
-            `,
+            (--button - size - { fontType } - height) `,
         ].join(';')
       );
     }

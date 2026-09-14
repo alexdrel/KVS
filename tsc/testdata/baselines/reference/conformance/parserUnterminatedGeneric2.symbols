@@ -5,10 +5,9 @@ declare namespace ng {
 >ng : Symbol(ng, Decl(parserUnterminatedGeneric2.ts, 0, 0))
 
     interfaceICompiledExpression {
-        (context: any, locals?: any): any;
->context : Symbol(context, Decl(parserUnterminatedGeneric2.ts, 2, 9))
->locals : Symbol(locals, Decl(parserUnterminatedGeneric2.ts, 2, 22))
+>interfaceICompiledExpression : Symbol(interfaceICompiledExpression)
 
+        (context: any, locals?: any): any;
         assign(context: any, value: any): any;
     }
 

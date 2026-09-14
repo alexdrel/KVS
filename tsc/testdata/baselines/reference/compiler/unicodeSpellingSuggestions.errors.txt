@@ -1,9 +1,9 @@
-unicodeSpellingSuggestions.ts(3,1): error TS1435: Unknown keyword or identifier. Did you mean 'class'?
 unicodeSpellingSuggestions.ts(3,1): error TS2304: Cannot find name 'classAé'.
-unicodeSpellingSuggestions.ts(6,1): error TS1435: Unknown keyword or identifier. Did you mean 'class Aéé'?
+unicodeSpellingSuggestions.ts(3,1): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
 unicodeSpellingSuggestions.ts(6,1): error TS2304: Cannot find name 'classAéé'.
-unicodeSpellingSuggestions.ts(9,1): error TS1435: Unknown keyword or identifier. Did you mean 'class Aééé'?
+unicodeSpellingSuggestions.ts(6,1): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
 unicodeSpellingSuggestions.ts(9,1): error TS2304: Cannot find name 'classAééé'.
+unicodeSpellingSuggestions.ts(9,1): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
 
 
 ==== unicodeSpellingSuggestions.ts (6 errors) ====
@@ -11,22 +11,22 @@ unicodeSpellingSuggestions.ts(9,1): error TS2304: Cannot find name 'classAééé
     
     classAé {
     ~~~~~~~
-!!! error TS1435: Unknown keyword or identifier. Did you mean 'class'?
-    ~~~~~~~
 !!! error TS2304: Cannot find name 'classAé'.
+    ~~~~~~~
+!!! error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
     }
     
     classAéé {
     ~~~~~~~~
-!!! error TS1435: Unknown keyword or identifier. Did you mean 'class Aéé'?
-    ~~~~~~~~
 !!! error TS2304: Cannot find name 'classAéé'.
+    ~~~~~~~~
+!!! error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
     }
     
     classAééé {
     ~~~~~~~~~
-!!! error TS1435: Unknown keyword or identifier. Did you mean 'class Aééé'?
-    ~~~~~~~~~
 !!! error TS2304: Cannot find name 'classAééé'.
+    ~~~~~~~~~
+!!! error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
     }
     

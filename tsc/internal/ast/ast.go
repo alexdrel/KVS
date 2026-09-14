@@ -195,6 +195,8 @@ const (
 	KvsDefaultKindBoolean
 	KvsDefaultKindBigInt
 	KvsDefaultKindArray
+	KvsDefaultKindConstructor
+	KvsDefaultKindObject
 )
 
 // Node accessors. Some accessors are implemented as methods on NodeData, others are implemented though
@@ -1118,6 +1120,8 @@ func (n *Node) PropertyList() *NodeList {
 		return n.AsObjectLiteralExpression().Properties
 	case KindKvsCompactObjectExpression:
 		return n.AsKvsCompactObjectExpression().Properties
+	case KindKvsTypedObjectExpression:
+		return n.AsKvsTypedObjectExpression().Properties
 	case KindJsxAttributes:
 		return n.AsJsxAttributes().Properties
 	}

@@ -3,11 +3,10 @@ nestedClassDeclaration.ts(5,5): error TS1068: Unexpected token. A constructor, m
 nestedClassDeclaration.ts(7,1): error TS1128: Declaration or statement expected.
 nestedClassDeclaration.ts(15,11): error TS1005: ':' expected.
 nestedClassDeclaration.ts(15,11): error TS2304: Cannot find name 'C4'.
-nestedClassDeclaration.ts(15,14): error TS1005: ',' expected.
-nestedClassDeclaration.ts(17,1): error TS1128: Declaration or statement expected.
+nestedClassDeclaration.ts(15,11): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
 
 
-==== nestedClassDeclaration.ts (7 errors) ====
+==== nestedClassDeclaration.ts (6 errors) ====
     // nested classes are not allowed
     
     class C {
@@ -33,10 +32,8 @@ nestedClassDeclaration.ts(17,1): error TS1128: Declaration or statement expected
 !!! error TS1005: ':' expected.
               ~~
 !!! error TS2304: Cannot find name 'C4'.
-                 ~
-!!! error TS1005: ',' expected.
+              ~~
+!!! error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
         }
     }
-    ~
-!!! error TS1128: Declaration or statement expected.
     

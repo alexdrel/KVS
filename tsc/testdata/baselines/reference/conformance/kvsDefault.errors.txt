@@ -1,11 +1,18 @@
-kvsDefault.ts(23,1): error TS100072: KVS terminal '!' requires string, number, boolean, bigint, or a non-tuple array.
-kvsDefault.ts(26,1): error TS100072: KVS terminal '!' requires string, number, boolean, bigint, or a non-tuple array.
-kvsDefault.ts(29,1): error TS100072: KVS terminal '!' requires string, number, boolean, bigint, or a non-tuple array.
-kvsDefault.ts(31,1): error TS100073: KVS terminal '!' cannot determine a default value from an absence-only type.
-kvsDefault.ts(32,1): error TS100073: KVS terminal '!' cannot determine a default value from an absence-only type.
+kvsDefault.ts(72,1): error TS100073: KVS terminal '!' cannot determine a default value from an absence-only type.
+kvsDefault.ts(78,1): error TS100072: KVS terminal '!' requires a defaultable type.
+kvsDefault.ts(81,1): error TS100072: KVS terminal '!' requires a defaultable type.
+kvsDefault.ts(84,1): error TS100072: KVS terminal '!' requires a defaultable type.
+kvsDefault.ts(91,1): error TS100072: KVS terminal '!' requires a defaultable type.
+kvsDefault.ts(122,1): error TS100072: KVS terminal '!' requires a defaultable type.
+kvsDefault.ts(128,1): error TS100072: KVS terminal '!' requires a defaultable type.
+kvsDefault.ts(132,1): error TS100072: KVS terminal '!' requires a defaultable type.
+kvsDefault.ts(135,12): error TS100072: KVS terminal '!' requires a defaultable type.
+kvsDefault.ts(138,1): error TS100073: KVS terminal '!' cannot determine a default value from an absence-only type.
+kvsDefault.ts(139,1): error TS100073: KVS terminal '!' cannot determine a default value from an absence-only type.
+kvsDefault.ts(148,5): error TS100072: KVS terminal '!' requires a defaultable type.
 
 
-==== kvsDefault.ts (5 errors) ====
+==== kvsDefault.ts (12 errors) ====
     declare const maybeString: string | null | undefined;
     declare const maybeNumber: number | null;
     declare const maybeBoolean: boolean | undefined;
@@ -13,6 +20,48 @@ kvsDefault.ts(32,1): error TS100073: KVS terminal '!' cannot determine a default
     declare const maybeStrings: string[] | null;
     declare const maybeReadonlyNumbers: readonly number[] | undefined;
     declare const maybeArrayFamily: string[] | readonly number[] | null;
+    declare const maybeMap: Map<string, number>?;
+    declare const maybeReadonlyMap: ReadonlyMap<string, number>?;
+    declare const maybeSet: Set<string>?;
+    declare const maybeReadonlySet: ReadonlySet<string>?;
+    type StringSet = Set<string>;
+    declare const maybeStringSet: StringSet?;
+    
+    interface Identified {
+        id: string;
+    }
+    
+    interface Profile extends Identified {
+        enabled: boolean;
+        tags: string[];
+        settings: {
+            retries: number;
+            aliases: Map<string, string>;
+            visited: Set<string>;
+        };
+        note: string?;
+    }
+    
+    interface Box<T> {
+        value: T;
+        values: T[];
+    }
+    
+    type Alias = {
+        count: number;
+    };
+    
+    interface Empty {
+        note?: string;
+    }
+    
+    declare const maybeProfile: Profile?;
+    declare const maybeBox: Box<string>?;
+    declare const maybeAlias: Alias?;
+    declare const maybeEmpty: Empty?;
+    const absentConst: Profile? = null;
+    let absentLet: Profile? = null;
+    const inferredNull = null;
     
     const stringValue = maybeString!;
     const numberValue = maybeNumber!;
@@ -21,8 +70,23 @@ kvsDefault.ts(32,1): error TS100073: KVS terminal '!' cannot determine a default
     const strings = maybeStrings!;
     const readonlyNumbers = maybeReadonlyNumbers!;
     const arrayFamily = maybeArrayFamily!;
+    const map = maybeMap!;
+    const readonlyMap = maybeReadonlyMap!;
+    const set = maybeSet!;
+    const readonlySet = maybeReadonlySet!;
+    const stringSet = maybeStringSet!;
     const stringLength = maybeString!.length;
     const incremented = maybeNumber! + 1;
+    const profile = maybeProfile!;
+    const box = maybeBox!;
+    const alias = maybeAlias!;
+    const empty = maybeEmpty!;
+    const freshProfiles = [maybeProfile!, maybeProfile!];
+    const constProfile = absentConst!;
+    const letProfile = absentLet!;
+    inferredNull!;
+    ~~~~~~~~~~~~~
+!!! error TS100073: KVS terminal '!' cannot determine a default value from an absence-only type.
     
     declare const stringLiteral: "left" | "right" | null;
     const literalValue = stringLiteral!;
@@ -30,17 +94,79 @@ kvsDefault.ts(32,1): error TS100073: KVS terminal '!' cannot determine a default
     declare const mixed: string | number | null;
     mixed!;
     ~~~~~~
-!!! error TS100072: KVS terminal '!' requires string, number, boolean, bigint, or a non-tuple array.
+!!! error TS100072: KVS terminal '!' requires a defaultable type.
     
     declare const tuple: [string, number] | null;
     tuple!;
     ~~~~~~
-!!! error TS100072: KVS terminal '!' requires string, number, boolean, bigint, or a non-tuple array.
+!!! error TS100072: KVS terminal '!' requires a defaultable type.
     
     declare const object: { value: string } | null;
     object!;
     ~~~~~~~
-!!! error TS100072: KVS terminal '!' requires string, number, boolean, bigint, or a non-tuple array.
+!!! error TS100072: KVS terminal '!' requires a defaultable type.
+    
+    class Model {
+        value = 1;
+        constructor(value: number) {}
+    }
+    declare const maybeModel: Model?;
+    maybeModel!;
+    ~~~~~~~~~~~
+!!! error TS100072: KVS terminal '!' requires a defaultable type.
+    if (maybeModel !== null && maybeModel !== undefined) {
+        maybeModel!;
+    }
+    
+    class Session {
+        constructor(public name = "") {}
+    }
+    class ImplicitSession {}
+    type SessionAlias = Session;
+    declare const maybeSession: Session?;
+    declare const maybeImplicitSession: ImplicitSession?;
+    declare const maybeSessionAlias: SessionAlias?;
+    declare const maybeDate: Date?;
+    const session = maybeSession!;
+    const implicitSession = maybeImplicitSession!;
+    const sessionAlias = maybeSessionAlias!;
+    const date = maybeDate!;
+    
+    namespace Models {
+        export class Token {
+            constructor(public value?: string) {}
+        }
+    }
+    declare const maybeToken: Models.Token?;
+    const token = maybeToken!;
+    
+    class RequiredConstructor {
+        constructor(value: string) {}
+    }
+    declare const maybeRequiredConstructor: RequiredConstructor?;
+    maybeRequiredConstructor!;
+    ~~~~~~~~~~~~~~~~~~~~~~~~~
+!!! error TS100072: KVS terminal '!' requires a defaultable type.
+    
+    class PrivateConstructor {
+        private constructor() {}
+    }
+    declare const maybePrivateConstructor: PrivateConstructor?;
+    maybePrivateConstructor!;
+    ~~~~~~~~~~~~~~~~~~~~~~~~
+!!! error TS100072: KVS terminal '!' requires a defaultable type.
+    
+    abstract class AbstractModel {}
+    declare const maybeAbstractModel: AbstractModel?;
+    maybeAbstractModel!;
+    ~~~~~~~~~~~~~~~~~~~
+!!! error TS100072: KVS terminal '!' requires a defaultable type.
+    
+    function open<T>(value: Box<T>?) {
+        return value!;
+               ~~~~~~
+!!! error TS100072: KVS terminal '!' requires a defaultable type.
+    }
     
     null!;
     ~~~~~
@@ -48,4 +174,16 @@ kvsDefault.ts(32,1): error TS100073: KVS terminal '!' cannot determine a default
     undefined!;
     ~~~~~~~~~~
 !!! error TS100073: KVS terminal '!' cannot determine a default value from an absence-only type.
+    
+    namespace Shadowed {
+        export interface Map<K, V> {
+            key: K;
+            value: V;
+            callback: () => void;
+        }
+        declare const maybeMap: Map<string, number>?;
+        maybeMap!;
+        ~~~~~~~~~
+!!! error TS100072: KVS terminal '!' requires a defaultable type.
+    }
     

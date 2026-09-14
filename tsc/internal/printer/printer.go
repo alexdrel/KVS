@@ -2570,6 +2570,21 @@ func (p *Printer) emitKvsCompactObjectExpression(node *ast.KvsCompactObjectExpre
 	p.exitNode(node.AsNode(), state)
 }
 
+func (p *Printer) emitKvsTypedObjectExpression(node *ast.KvsTypedObjectExpression) {
+	state := p.enterNode(node.AsNode())
+	p.emitTypeNodeOutsideExtends(node.Type)
+	indented := p.shouldEmitIndented(node.AsNode())
+	p.increaseIndentIf(indented)
+	p.pushNameGenerationScope(node.AsNode())
+	p.generateAllMemberNames(node.Properties)
+	p.emitList((*Printer).emitObjectLiteralElement, node.AsNode(), node.Properties, LFObjectLiteralExpressionProperties|
+		core.IfElse(node.MultiLine, LFPreferNewLine, LFNone)|
+		core.IfElse(p.shouldAllowTrailingComma(node.AsNode(), node.Properties), LFAllowTrailingComma, LFNone))
+	p.popNameGenerationScope(node.AsNode())
+	p.decreaseIndentIf(indented)
+	p.exitNode(node.AsNode(), state)
+}
+
 // 1..toString is a valid property access, emit a dot after the literal
 // Also emit a dot if expression is a integer const enum value - it will appear in generated code as numeric literal
 func (p *Printer) mayNeedDotDotForPropertyAccess(expression *ast.Expression) bool {
@@ -3420,6 +3435,8 @@ func (p *Printer) emitExpression(node *ast.Expression, precedence ast.OperatorPr
 		p.emitKvsCompactArrayExpression(node.AsKvsCompactArrayExpression())
 	case ast.KindKvsCompactObjectExpression:
 		p.emitKvsCompactObjectExpression(node.AsKvsCompactObjectExpression())
+	case ast.KindKvsTypedObjectExpression:
+		p.emitKvsTypedObjectExpression(node.AsKvsTypedObjectExpression())
 	case ast.KindKvsCollectExpression:
 		p.emitKvsCollectExpression(node.AsKvsCollectExpression())
 	case ast.KindKvsSelectExpression:

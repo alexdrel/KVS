@@ -1,15 +1,17 @@
 //// [tests/cases/compiler/unicodeSpellingSuggestions.ts] ////
 
 === unicodeSpellingSuggestions.ts ===
-
 // https://github.com/microsoft/TypeScript/tsc/issues/4223
 
 classAé {
+>classAé : Symbol(classAé)
 }
 
 classAéé {
+>classAéé : Symbol(classAéé)
 }
 
 classAééé {
+>classAééé : Symbol(classAééé)
 }
 

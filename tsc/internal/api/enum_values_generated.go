@@ -575,6 +575,7 @@ func main() {
 			"KvsConditionalElement":                        toInt32(ast.KindKvsConditionalElement),
 			"KvsCompactArrayExpression":                    toInt32(ast.KindKvsCompactArrayExpression),
 			"KvsCompactObjectExpression":                   toInt32(ast.KindKvsCompactObjectExpression),
+			"KvsTypedObjectExpression":                     toInt32(ast.KindKvsTypedObjectExpression),
 			"KvsCollectExpression":                         toInt32(ast.KindKvsCollectExpression),
 			"KvsSelectExpression":                          toInt32(ast.KindKvsSelectExpression),
 			"KvsForExpression":                             toInt32(ast.KindKvsForExpression),
