@@ -13,12 +13,13 @@ var ResultIsNumber2 = ~ENUM1["A"];
 var ResultIsNumber3 = ~(ENUM1.A + ENUM1["B"]);
 
 // multiple ~ operators
-var ResultIsNumber4 = ~~~(ENUM1["A"] + ENUM1.B);
+var ResultIsNumber4 = ~ ~ ~(ENUM1["A"] + ENUM1.B);
 
 // miss assignment operators
 ~ENUM1;
 ~ENUM1["A"];
 ~ENUM1.A, ~ENUM1["B"];
+
 
 //// [bitwiseNotOperatorWithEnumType.js]
 "use strict";

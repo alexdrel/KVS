@@ -23,7 +23,7 @@ const equations = [
 ];
 
 const solved = collect (const eq of equations) {
-    if (const roots = realRoots(eq.a, eq.b, eq.c)) yield roots;
+    if (const roots ~= realRoots(eq.a, eq.b, eq.c)) yield roots;
 };
 
 console.log(solved);

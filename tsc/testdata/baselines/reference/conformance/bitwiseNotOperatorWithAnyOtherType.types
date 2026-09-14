@@ -175,16 +175,16 @@ var ResultIsNumber18 = ~(undefined + undefined);
 >undefined : undefined
 
 // multiple ~ operators
-var ResultIsNumber19 = ~~ANY;
+var ResultIsNumber19 = ~ ~ANY;
 >ResultIsNumber19 : number
->~~ANY : number
+>~ ~ANY : number
 >~ANY : number
 >ANY : any
 
-var ResultIsNumber20 = ~~~(ANY + ANY1);
+var ResultIsNumber20 = ~ ~ ~(ANY + ANY1);
 >ResultIsNumber20 : number
->~~~(ANY + ANY1) : number
->~~(ANY + ANY1) : number
+>~ ~ ~(ANY + ANY1) : number
+>~ ~(ANY + ANY1) : number
 >~(ANY + ANY1) : number
 >(ANY + ANY1) : any
 >ANY + ANY1 : any
@@ -230,8 +230,8 @@ var ResultIsNumber20 = ~~~(ANY + ANY1);
 >M : typeof M
 >n : any
 
-~~obj1.x;
->~~obj1.x : number
+~ ~obj1.x;
+>~ ~obj1.x : number
 >~obj1.x : number
 >obj1.x : ""
 >obj1 : { x: ""; y: () => {}; }

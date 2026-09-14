@@ -1682,6 +1682,13 @@ func (p *Parser) parseVariableDeclarationWorker(allowExclamation bool) *ast.Node
 	jsdoc := p.jsdocScannerInfo()
 	nameEnd := p.scanner.TokenEnd()
 	name := p.parseIdentifierOrPatternWithDiagnostic(diagnostics.Private_identifiers_are_not_allowed_in_variable_declarations)
+	var filteredInitializer *ast.Node
+	if name.Kind == ast.KindIdentifier && p.isKvsSieveBindingInitializer() {
+		tildeToken := p.parseTokenNode()
+		equalsToken := p.parseTokenNode()
+		expression := p.parseAssignmentExpressionOrHigher()
+		filteredInitializer = p.finishNode(p.factory.NewKvsSieveBindingInitializer(tildeToken, equalsToken, expression), tildeToken.Pos())
+	}
 	var kvsBindingFlags ast.NodeFlags
 	var exclamationToken *ast.Node
 	if allowExclamation && name.Kind == ast.KindIdentifier && p.token == ast.KindExclamationToken && !p.hasPrecedingLineBreak() {
@@ -1696,7 +1703,9 @@ func (p *Parser) parseVariableDeclarationWorker(allowExclamation bool) *ast.Node
 	}
 	typeNode := p.parseTypeAnnotation()
 	var initializer *ast.Expression
-	if p.token != ast.KindInKeyword && p.token != ast.KindOfKeyword {
+	if filteredInitializer != nil {
+		initializer = filteredInitializer
+	} else if p.token != ast.KindInKeyword && p.token != ast.KindOfKeyword {
 		initializer = p.parseInitializer()
 	}
 	result := p.finishNode(p.factory.NewVariableDeclaration(name, exclamationToken, typeNode, initializer), pos)
@@ -1707,6 +1716,16 @@ func (p *Parser) parseVariableDeclarationWorker(allowExclamation bool) *ast.Node
 	p.withJSDoc(result, jsdoc)
 	p.checkJSSyntax(result)
 	return result
+}
+
+func (p *Parser) isKvsSieveBindingInitializer() bool {
+	if p.token != ast.KindTildeToken {
+		return false
+	}
+	tildeEnd := p.scanner.TokenEnd()
+	return p.lookAhead(func(p *Parser) bool {
+		return p.nextToken() == ast.KindEqualsToken && p.scanner.TokenStart() == tildeEnd
+	})
 }
 
 func (p *Parser) parseIdentifierOrPattern() *ast.Node {
@@ -5355,8 +5374,20 @@ func (p *Parser) parseSimpleUnaryExpression() *ast.Expression {
 func (p *Parser) parsePrefixUnaryExpression() *ast.Node {
 	pos := p.nodePos()
 	operator := p.token
+	if operator == ast.KindTildeToken && p.isKvsNullingSieve() {
+		firstTildeToken := p.parseTokenNode()
+		secondTildeToken := p.parseTokenNode()
+		return p.finishNode(p.factory.NewKvsNullingSieveExpression(firstTildeToken, secondTildeToken, p.parseSimpleUnaryExpression()), pos)
+	}
 	p.nextToken()
 	return p.finishNode(p.factory.NewPrefixUnaryExpression(operator, p.parseSimpleUnaryExpression()), pos)
+}
+
+func (p *Parser) isKvsNullingSieve() bool {
+	firstTildeEnd := p.scanner.TokenEnd()
+	return p.lookAhead(func(p *Parser) bool {
+		return p.nextToken() == ast.KindTildeToken && p.scanner.TokenStart() == firstTildeEnd
+	})
 }
 
 func (p *Parser) parseDeleteExpression() *ast.Node {

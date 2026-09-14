@@ -1,6 +1,6 @@
 bitwiseNotOperatorWithBooleanType.ts(7,12): error TS2564: Property 'a' has no initializer and is not definitely assigned in the constructor.
 bitwiseNotOperatorWithBooleanType.ts(17,24): error TS2454: Variable 'BOOLEAN' is used before being assigned.
-bitwiseNotOperatorWithBooleanType.ts(30,25): error TS2454: Variable 'BOOLEAN' is used before being assigned.
+bitwiseNotOperatorWithBooleanType.ts(30,26): error TS2454: Variable 'BOOLEAN' is used before being assigned.
 bitwiseNotOperatorWithBooleanType.ts(34,2): error TS2454: Variable 'BOOLEAN' is used before being assigned.
 
 
@@ -38,8 +38,8 @@ bitwiseNotOperatorWithBooleanType.ts(34,2): error TS2454: Variable 'BOOLEAN' is 
     var ResultIsNumber7 = ~A.foo();
     
     // multiple ~ operators
-    var ResultIsNumber8 = ~~BOOLEAN;
-                            ~~~~~~~
+    var ResultIsNumber8 = ~ ~BOOLEAN;
+                             ~~~~~~~
 !!! error TS2454: Variable 'BOOLEAN' is used before being assigned.
     
     // miss assignment operators
@@ -51,3 +51,4 @@ bitwiseNotOperatorWithBooleanType.ts(34,2): error TS2454: Variable 'BOOLEAN' is 
     ~true, false;
     ~objA.a;
     ~M.n;
+    

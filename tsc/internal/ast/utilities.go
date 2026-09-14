@@ -2022,7 +2022,7 @@ func IsExpressionNode(node *Node) bool {
 		KindCallExpression, KindNewExpression, KindTaggedTemplateExpression, KindAsExpression, KindTypeAssertionExpression,
 		KindSatisfiesExpression, KindNonNullExpression, KindParenthesizedExpression, KindFunctionExpression,
 		KindClassExpression, KindArrowFunction, KindVoidExpression, KindDeleteExpression, KindTypeOfExpression,
-		KindPrefixUnaryExpression, KindPostfixUnaryExpression, KindBinaryExpression, KindConditionalExpression, KindKvsExtantTestExpression, KindKvsDefaultExpression, KindKvsNullingExpression, KindKvsConditionalElement,
+		KindPrefixUnaryExpression, KindPostfixUnaryExpression, KindBinaryExpression, KindConditionalExpression, KindKvsExtantTestExpression, KindKvsDefaultExpression, KindKvsNullingSieveExpression, KindKvsSieveBindingInitializer, KindKvsNullingExpression, KindKvsConditionalElement,
 		KindSpreadElement, KindTemplateExpression, KindOmittedExpression, KindJsxElement, KindJsxSelfClosingElement,
 		KindJsxFragment, KindYieldExpression, KindKvsNullableAssertionExpression, KindKvsExtantAssertionExpression, KindKvsExtantAssignmentExpression, KindKvsCollectExpression, KindKvsSelectExpression, KindKvsForExpression, KindAwaitExpression:
 		return true

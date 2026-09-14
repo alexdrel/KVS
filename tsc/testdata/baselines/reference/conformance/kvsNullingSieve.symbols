@@ -1,0 +1,223 @@
+//// [tests/cases/conformance/kvs/kvsNullingSieve.ts] ////
+
+=== kvsNullingSieve.ts ===
+declare const nullableItems: number[]?;
+>nullableItems : Symbol(nullableItems, Decl(kvsNullingSieve.ts, 0, 13))
+
+declare const items: number[];
+>items : Symbol(items, Decl(kvsNullingSieve.ts, 1, 13))
+
+declare const dynamic: unknown;
+>dynamic : Symbol(dynamic, Decl(kvsNullingSieve.ts, 2, 13))
+
+if ([]) {
+    console.log("ordinary array truthiness");
+>console.log : Symbol(Console.log, Decl(lib.dom.d.ts, --, --))
+>console : Symbol(console, Decl(lib.dom.d.ts, --, --))
+>log : Symbol(Console.log, Decl(lib.dom.d.ts, --, --))
+}
+
+if ({}) {
+    console.log("ordinary object truthiness");
+>console.log : Symbol(Console.log, Decl(lib.dom.d.ts, --, --))
+>console : Symbol(console, Decl(lib.dom.d.ts, --, --))
+>log : Symbol(Console.log, Decl(lib.dom.d.ts, --, --))
+}
+
+const sameEmptyArray = (items || []) === items;
+>sameEmptyArray : Symbol(sameEmptyArray, Decl(kvsNullingSieve.ts, 12, 5))
+>items : Symbol(items, Decl(kvsNullingSieve.ts, 1, 13))
+>items : Symbol(items, Decl(kvsNullingSieve.ts, 1, 13))
+
+const absent = ~~null;
+>absent : Symbol(absent, Decl(kvsNullingSieve.ts, 14, 5))
+
+const undefinedValue = ~~undefined;
+>undefinedValue : Symbol(undefinedValue, Decl(kvsNullingSieve.ts, 15, 5))
+>undefined : Symbol(undefined)
+
+const falseValue = ~~false;
+>falseValue : Symbol(falseValue, Decl(kvsNullingSieve.ts, 16, 5))
+
+const zero = ~~0;
+>zero : Symbol(zero, Decl(kvsNullingSieve.ts, 17, 5))
+
+const notANumber = ~~NaN;
+>notANumber : Symbol(notANumber, Decl(kvsNullingSieve.ts, 18, 5))
+>NaN : Symbol(NaN, Decl(lib.es5.d.ts, --, --))
+
+const emptyString = ~~"";
+>emptyString : Symbol(emptyString, Decl(kvsNullingSieve.ts, 19, 5))
+
+const emptyArray = ~~[];
+>emptyArray : Symbol(emptyArray, Decl(kvsNullingSieve.ts, 20, 5))
+
+const emptyRecord = ~~{};
+>emptyRecord : Symbol(emptyRecord, Decl(kvsNullingSieve.ts, 21, 5))
+
+const decimal = ~~3.7;
+>decimal : Symbol(decimal, Decl(kvsNullingSieve.ts, 22, 5))
+
+const text = ~~"x";
+>text : Symbol(text, Decl(kvsNullingSieve.ts, 23, 5))
+
+const maybeItems = ~~nullableItems;
+>maybeItems : Symbol(maybeItems, Decl(kvsNullingSieve.ts, 24, 5))
+>nullableItems : Symbol(nullableItems, Decl(kvsNullingSieve.ts, 0, 13))
+
+const dynamicValue = ~~dynamic;
+>dynamicValue : Symbol(dynamicValue, Decl(kvsNullingSieve.ts, 25, 5))
+>dynamic : Symbol(dynamic, Decl(kvsNullingSieve.ts, 2, 13))
+
+function filterArray<T extends readonly unknown[]>(value: T?) {
+>filterArray : Symbol(filterArray, Decl(kvsNullingSieve.ts, 25, 31))
+>T : Symbol(T, Decl(kvsNullingSieve.ts, 27, 21))
+>value : Symbol(value, Decl(kvsNullingSieve.ts, 27, 51))
+>T : Symbol(T, Decl(kvsNullingSieve.ts, 27, 21))
+
+    return ~~value;
+>value : Symbol(value, Decl(kvsNullingSieve.ts, 27, 51))
+}
+
+declare const maybeText: string?;
+>maybeText : Symbol(maybeText, Decl(kvsNullingSieve.ts, 31, 13))
+
+if (~~maybeText) {
+>maybeText : Symbol(maybeText, Decl(kvsNullingSieve.ts, 31, 13))
+
+    const narrowedText: string = maybeText;
+>narrowedText : Symbol(narrowedText, Decl(kvsNullingSieve.ts, 33, 9))
+>maybeText : Symbol(maybeText, Decl(kvsNullingSieve.ts, 31, 13))
+}
+
+const array = [1];
+>array : Symbol(array, Decl(kvsNullingSieve.ts, 36, 5))
+
+const sameArray = ~~array === array;
+>sameArray : Symbol(sameArray, Decl(kvsNullingSieve.ts, 37, 5))
+>array : Symbol(array, Decl(kvsNullingSieve.ts, 36, 5))
+>array : Symbol(array, Decl(kvsNullingSieve.ts, 36, 5))
+
+const record = { x: null };
+>record : Symbol(record, Decl(kvsNullingSieve.ts, 39, 5))
+>x : Symbol(x, Decl(kvsNullingSieve.ts, 39, 16))
+
+const sameRecord = ~~record === record;
+>sameRecord : Symbol(sameRecord, Decl(kvsNullingSieve.ts, 40, 5))
+>record : Symbol(record, Decl(kvsNullingSieve.ts, 39, 5))
+>record : Symbol(record, Decl(kvsNullingSieve.ts, 39, 5))
+
+const emptyBytes = ~~new Uint8Array(0);
+>emptyBytes : Symbol(emptyBytes, Decl(kvsNullingSieve.ts, 42, 5))
+>Uint8Array : Symbol(Uint8Array, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --), Decl(lib.es2015.core.d.ts, --, --), Decl(lib.es2015.iterable.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --) ... and 1 more)
+
+const bytes = new Uint8Array([1]);
+>bytes : Symbol(bytes, Decl(kvsNullingSieve.ts, 43, 5))
+>Uint8Array : Symbol(Uint8Array, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --), Decl(lib.es2015.core.d.ts, --, --), Decl(lib.es2015.iterable.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --) ... and 1 more)
+
+const sameBytes = ~~bytes === bytes;
+>sameBytes : Symbol(sameBytes, Decl(kvsNullingSieve.ts, 44, 5))
+>bytes : Symbol(bytes, Decl(kvsNullingSieve.ts, 43, 5))
+>bytes : Symbol(bytes, Decl(kvsNullingSieve.ts, 43, 5))
+
+const emptyMap = ~~new Map();
+>emptyMap : Symbol(emptyMap, Decl(kvsNullingSieve.ts, 46, 5))
+>Map : Symbol(Map, Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.iterable.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --))
+
+const map = new Map([["x", 1]]);
+>map : Symbol(map, Decl(kvsNullingSieve.ts, 47, 5))
+>Map : Symbol(Map, Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.iterable.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --))
+
+const sameMap = ~~map === map;
+>sameMap : Symbol(sameMap, Decl(kvsNullingSieve.ts, 48, 5))
+>map : Symbol(map, Decl(kvsNullingSieve.ts, 47, 5))
+>map : Symbol(map, Decl(kvsNullingSieve.ts, 47, 5))
+
+const emptySet = ~~new Set();
+>emptySet : Symbol(emptySet, Decl(kvsNullingSieve.ts, 50, 5))
+>Set : Symbol(Set, Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.iterable.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --))
+
+const set = new Set([1]);
+>set : Symbol(set, Decl(kvsNullingSieve.ts, 51, 5))
+>Set : Symbol(Set, Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.iterable.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --))
+
+const sameSet = ~~set === set;
+>sameSet : Symbol(sameSet, Decl(kvsNullingSieve.ts, 52, 5))
+>set : Symbol(set, Decl(kvsNullingSieve.ts, 51, 5))
+>set : Symbol(set, Decl(kvsNullingSieve.ts, 51, 5))
+
+class EmptyClass {}
+>EmptyClass : Symbol(EmptyClass, Decl(kvsNullingSieve.ts, 52, 30))
+
+const instance = new EmptyClass();
+>instance : Symbol(instance, Decl(kvsNullingSieve.ts, 55, 5))
+>EmptyClass : Symbol(EmptyClass, Decl(kvsNullingSieve.ts, 52, 30))
+
+const sameInstance = ~~instance === instance;
+>sameInstance : Symbol(sameInstance, Decl(kvsNullingSieve.ts, 56, 5))
+>instance : Symbol(instance, Decl(kvsNullingSieve.ts, 55, 5))
+>instance : Symbol(instance, Decl(kvsNullingSieve.ts, 55, 5))
+
+let evaluations = 0;
+>evaluations : Symbol(evaluations, Decl(kvsNullingSieve.ts, 58, 3))
+
+function readOnce() {
+>readOnce : Symbol(readOnce, Decl(kvsNullingSieve.ts, 58, 20))
+
+    evaluations++;
+>evaluations : Symbol(evaluations, Decl(kvsNullingSieve.ts, 58, 3))
+
+    return [1];
+}
+const once = ~~readOnce();
+>once : Symbol(once, Decl(kvsNullingSieve.ts, 63, 5))
+>readOnce : Symbol(readOnce, Decl(kvsNullingSieve.ts, 58, 20))
+
+function throws(): never {
+>throws : Symbol(throws, Decl(kvsNullingSieve.ts, 63, 26))
+
+    throw new Error("expected");
+>Error : Symbol(Error, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --))
+}
+const propagated = ~~throws();
+>propagated : Symbol(propagated, Decl(kvsNullingSieve.ts, 68, 5))
+>throws : Symbol(throws, Decl(kvsNullingSieve.ts, 63, 26))
+
+const compact ~= nullableItems;
+>compact : Symbol(compact, Decl(kvsNullingSieve.ts, 70, 5))
+>nullableItems : Symbol(nullableItems, Decl(kvsNullingSieve.ts, 0, 13))
+
+let mutable ~= items;
+>mutable : Symbol(mutable, Decl(kvsNullingSieve.ts, 71, 3))
+>items : Symbol(items, Decl(kvsNullingSieve.ts, 1, 13))
+
+if (const rejected ~= []) {
+>rejected : Symbol(rejected, Decl(kvsNullingSieve.ts, 73, 9))
+
+    rejected;
+>rejected : Symbol(rejected, Decl(kvsNullingSieve.ts, 73, 9))
+}
+
+if (const accepted ~= array) {
+>accepted : Symbol(accepted, Decl(kvsNullingSieve.ts, 77, 9))
+>array : Symbol(array, Decl(kvsNullingSieve.ts, 36, 5))
+
+    accepted;
+>accepted : Symbol(accepted, Decl(kvsNullingSieve.ts, 77, 9))
+
+    accepted === array;
+>accepted : Symbol(accepted, Decl(kvsNullingSieve.ts, 77, 9))
+>array : Symbol(array, Decl(kvsNullingSieve.ts, 36, 5))
+}
+
+const javascriptDoubleNot = ~ ~3.7;
+>javascriptDoubleNot : Symbol(javascriptDoubleNot, Decl(kvsNullingSieve.ts, 82, 5))
+
+var rejectedVar ~= items;
+>rejectedVar : Symbol(rejectedVar, Decl(kvsNullingSieve.ts, 83, 3))
+>items : Symbol(items, Decl(kvsNullingSieve.ts, 1, 13))
+
+const rejectedSpaced ~ = items;
+>rejectedSpaced : Symbol(rejectedSpaced, Decl(kvsNullingSieve.ts, 84, 5))
+>items : Symbol(items, Decl(kvsNullingSieve.ts, 1, 13))
+

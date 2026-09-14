@@ -29,7 +29,7 @@ var ResultIsNumber3 = ~(ENUM1.A + ENUM1["B"]);
 >"B" : Symbol(ENUM1.B, Decl(bitwiseNotOperatorWithEnumType.ts, 2, 15))
 
 // multiple ~ operators
-var ResultIsNumber4 = ~~~(ENUM1["A"] + ENUM1.B);
+var ResultIsNumber4 = ~ ~ ~(ENUM1["A"] + ENUM1.B);
 >ResultIsNumber4 : Symbol(ResultIsNumber4, Decl(bitwiseNotOperatorWithEnumType.ts, 12, 3))
 >ENUM1 : Symbol(ENUM1, Decl(bitwiseNotOperatorWithEnumType.ts, 0, 0))
 >"A" : Symbol(ENUM1.A, Decl(bitwiseNotOperatorWithEnumType.ts, 2, 12))

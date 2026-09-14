@@ -431,11 +431,35 @@ if (const user = users.find(%.id == requestedId)) {
 }
 ```
 
-The initializer is evaluated once, and its value is tested using ordinary KVS truthiness. **The successful condition narrows the binding's type:** although the lookup can produce absence, `user` has type `User` inside the body, so it can be passed directly to a function requiring a non-nullable `User`.
+The initializer is evaluated once, and its value is tested using ordinary
+JavaScript/TypeScript truthiness. **The successful condition narrows the
+binding's type:** although the lookup can produce absence, `user` has type
+`User` inside the body, so it can be passed directly to a function requiring a
+non-nullable `User`.
 
 The binding exists only in the successful branch, where it is narrowed to its truthy type. It is not in scope in `else` or after the `if` statement.
 
-This keeps the lookup, test, and use together. As with a loop-header binding, the surrounding scope does not need a variable whose only purpose is to support this operation. The declaration does not change the condition into a presence-only test: false, zero, and empty values still fail an ordinary truthiness condition.
+This keeps the lookup, test, and use together. As with a loop-header binding,
+the surrounding scope does not need a variable whose only purpose is to
+support this operation. The declaration does not change the condition into a
+presence-only test: primitive falsy values fail, while empty collections remain
+truthy as they are in JavaScript.
+
+A **sieve binding** applies the nulling sieve to the initializer before binding
+it:
+
+```kvs
+if (const items ~= getItems()) {
+    // items is present and passed the explicit nulling sieve
+    process(items);
+}
+```
+
+`const value ~= expression` and `let value ~= expression` mean the same as
+binding `~~expression`. The right-hand expression is evaluated once, and the
+binding receives either the original value or null. This is declaration syntax,
+not a general compound assignment and not `?=`: `~=` always binds its filtered
+result, including null.
 
 ### Nulling operator `?:`
 
@@ -452,7 +476,8 @@ It is equivalent to:
 const footer = showFooter ? renderFooter(data) : null;
 ```
 
-The condition uses KVS truthiness. The right operand is evaluated only when the condition succeeds.
+The condition uses ordinary JavaScript/TypeScript truthiness. The right operand
+is evaluated only when the condition succeeds.
 
 ### Extant assignment
 

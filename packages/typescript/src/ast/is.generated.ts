@@ -201,7 +201,9 @@ import type {
     KvsNullableAssertionExpression,
     KvsNullableType,
     KvsNullingExpression,
+    KvsNullingSieveExpression,
     KvsSelectExpression,
+    KvsSieveBindingInitializer,
     KvsYieldStatement,
     LabeledStatement,
     LiteralExpression,
@@ -320,6 +322,7 @@ import type {
     ThisExpression,
     ThisTypeNode,
     ThrowStatement,
+    TildeToken,
     Token,
     TriviaSyntaxKind,
     TrueLiteral,
@@ -628,6 +631,24 @@ export declare namespace isKvsDefaultExpression {
     function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsDefaultExpression>;
 }
 isKvsDefaultExpression.Handle = isKvsDefaultExpression as any;
+
+export function isKvsNullingSieveExpression(node: Node): node is KvsNullingSieveExpression {
+    return node.kind === SyntaxKind.KvsNullingSieveExpression;
+}
+
+export declare namespace isKvsNullingSieveExpression {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsNullingSieveExpression>;
+}
+isKvsNullingSieveExpression.Handle = isKvsNullingSieveExpression as any;
+
+export function isKvsSieveBindingInitializer(node: Node): node is KvsSieveBindingInitializer {
+    return node.kind === SyntaxKind.KvsSieveBindingInitializer;
+}
+
+export declare namespace isKvsSieveBindingInitializer {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsSieveBindingInitializer>;
+}
+isKvsSieveBindingInitializer.Handle = isKvsSieveBindingInitializer as any;
 
 export function isKvsNullingExpression(node: Node): node is KvsNullingExpression {
     return node.kind === SyntaxKind.KvsNullingExpression;
@@ -3172,6 +3193,16 @@ export declare namespace isExclamationToken {
 }
 
 isExclamationToken.Handle = isExclamationToken as any;
+
+export function isTildeToken(node: Node): node is TildeToken {
+    return node.kind === SyntaxKind.TildeToken;
+}
+
+export declare namespace isTildeToken {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, TildeToken>;
+}
+
+isTildeToken.Handle = isTildeToken as any;
 
 export function isColonToken(node: Node): node is ColonToken {
     return node.kind === SyntaxKind.ColonToken;

@@ -3368,6 +3368,10 @@ func (p *Printer) emitExpression(node *ast.Expression, precedence ast.OperatorPr
 		p.emitKvsExtantTestExpression(node.AsKvsExtantTestExpression())
 	case ast.KindKvsDefaultExpression:
 		p.emitKvsDefaultExpression(node.AsKvsDefaultExpression())
+	case ast.KindKvsNullingSieveExpression:
+		p.emitKvsNullingSieveExpression(node.AsKvsNullingSieveExpression())
+	case ast.KindKvsSieveBindingInitializer:
+		p.emitKvsSieveBindingInitializer(node.AsKvsSieveBindingInitializer())
 	case ast.KindKvsCompactArrayExpression:
 		p.emitKvsCompactArrayExpression(node.AsKvsCompactArrayExpression())
 	case ast.KindKvsCompactObjectExpression:
@@ -3789,6 +3793,23 @@ func (p *Printer) emitKvsDefaultExpression(node *ast.KvsDefaultExpression) {
 	p.exitNode(node.AsNode(), state)
 }
 
+func (p *Printer) emitKvsNullingSieveExpression(node *ast.KvsNullingSieveExpression) {
+	state := p.enterNode(node.AsNode())
+	p.emitPunctuationNode(node.FirstTildeToken)
+	p.emitPunctuationNode(node.SecondTildeToken)
+	p.emitExpression(node.Expression, ast.OperatorPrecedenceUnary)
+	p.exitNode(node.AsNode(), state)
+}
+
+func (p *Printer) emitKvsSieveBindingInitializer(node *ast.KvsSieveBindingInitializer) {
+	state := p.enterNode(node.AsNode())
+	p.emitPunctuationNode(node.TildeToken)
+	p.emitPunctuationNode(node.EqualsToken)
+	p.writeSpace()
+	p.emitExpression(node.Expression, ast.OperatorPrecedenceAssignment)
+	p.exitNode(node.AsNode(), state)
+}
+
 func (p *Printer) emitKvsNullingExpression(node *ast.KvsNullingExpression) {
 	state := p.enterNode(node.AsNode())
 	p.emitExpression(node.Condition, ast.OperatorPrecedenceConditional)
@@ -3986,7 +4007,12 @@ func (p *Printer) emitVariableDeclaration(node *ast.VariableDeclaration) {
 	}
 	p.emitPunctuationNode(node.ExclamationToken)
 	p.emitTypeAnnotation(node.Type)
-	p.emitInitializer(node.Initializer, greatestEnd(node.Name().End(), node.Type, p.emitContext.GetTypeNode(node.Name())), node.AsNode())
+	if node.Initializer != nil && node.Initializer.Kind == ast.KindKvsSieveBindingInitializer {
+		p.writeSpace()
+		p.emitKvsSieveBindingInitializer(node.Initializer.AsKvsSieveBindingInitializer())
+	} else {
+		p.emitInitializer(node.Initializer, greatestEnd(node.Name().End(), node.Type, p.emitContext.GetTypeNode(node.Name())), node.AsNode())
+	}
 	p.exitNode(node.AsNode(), state)
 }
 

@@ -1,0 +1,11 @@
+//// [tests/cases/conformance/kvs/kvsNullingSieveNoEmitHelpers.ts] ////
+
+=== kvsNullingSieveNoEmitHelpers.ts ===
+declare const dynamic: unknown;
+>dynamic : unknown
+
+const filtered = ~~dynamic;
+>filtered : {} | null
+>~~dynamic : {} | null
+>dynamic : unknown
+

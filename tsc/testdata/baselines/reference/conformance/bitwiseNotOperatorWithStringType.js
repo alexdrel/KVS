@@ -36,14 +36,15 @@ var ResultIsNumber11 = ~(STRING + STRING);
 var ResultIsNumber12 = ~STRING.charAt(0);
 
 // multiple ~ operators
-var ResultIsNumber13 = ~~STRING;
-var ResultIsNumber14 = ~~~(STRING + STRING);
+var ResultIsNumber13 = ~ ~STRING;
+var ResultIsNumber14 = ~ ~ ~(STRING + STRING);
 
 //miss assignment operators
 ~STRING;
 ~STRING1;
 ~foo();
 ~objA.a,M.n;
+
 
 //// [bitwiseNotOperatorWithStringType.js]
 "use strict";

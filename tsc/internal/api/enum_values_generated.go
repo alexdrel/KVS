@@ -560,6 +560,8 @@ func main() {
 			"KvsExtantAssignmentExpression":                toInt32(ast.KindKvsExtantAssignmentExpression),
 			"KvsExtantTestExpression":                      toInt32(ast.KindKvsExtantTestExpression),
 			"KvsDefaultExpression":                         toInt32(ast.KindKvsDefaultExpression),
+			"KvsNullingSieveExpression":                    toInt32(ast.KindKvsNullingSieveExpression),
+			"KvsSieveBindingInitializer":                   toInt32(ast.KindKvsSieveBindingInitializer),
 			"KvsNullingExpression":                         toInt32(ast.KindKvsNullingExpression),
 			"KvsConditionalElement":                        toInt32(ast.KindKvsConditionalElement),
 			"KvsCompactArrayExpression":                    toInt32(ast.KindKvsCompactArrayExpression),

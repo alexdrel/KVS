@@ -52,8 +52,8 @@ var ResultIsNumber17 = ~(null + null);
 var ResultIsNumber18 = ~(undefined + undefined);
 
 // multiple ~ operators
-var ResultIsNumber19 = ~~ANY;
-var ResultIsNumber20 = ~~~(ANY + ANY1);
+var ResultIsNumber19 = ~ ~ANY;
+var ResultIsNumber20 = ~ ~ ~(ANY + ANY1);
 
 //miss assignment operators
 ~ANY;
@@ -63,4 +63,4 @@ var ResultIsNumber20 = ~~~(ANY + ANY1);
 ~obj1.y;
 ~objA.a;
 ~M.n;
-~~obj1.x;
+~ ~obj1.x;

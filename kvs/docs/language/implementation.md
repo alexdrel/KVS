@@ -107,15 +107,30 @@ const items = response?.items ?? [];
 
 Structural defaults may require emitted POD factories. Mutable defaults must be freshly allocated.
 
-## Truthiness and presence-aware construction
+## Explicit value filtering and presence-aware construction
 
-Conditions and `||` require KVS truthiness rather than JavaScript's built-in object truthiness. A compiler may inline checks for statically known collection types or call a small runtime helper. The helper tests array and typed-array length, map and set size, and own enumerable property count for record-like objects. It does not inspect nested values or change ordinary class-instance truthiness.
+Ordinary conditions, boolean operators, and `||` retain JavaScript/TypeScript
+truthiness and require no special lowering. Empty arrays, maps, sets, typed
+arrays, and records therefore remain truthy in ordinary expressions.
+
+Prefix `~~expression` evaluates its operand once and returns either the original
+value or null. It rejects absence and primitive falsy values, tests arrays and
+typed arrays through `length`, maps and sets through `size`, and record-like
+objects through `Object.keys(value).length`. Ordinary class instances pass
+through unchanged. The compiler inlines a statically known test and uses its
+runtime-dispatch helper only when the checked type does not determine one
+strategy, such as `unknown` or a mixed union.
 
 ```kvs
-const query = readQuery() || null;
+const items = ~~readItems();
+if (const usable ~= readItems()) process(usable);
 ```
 
-The lowering evaluates the left operand once and preserves the original value when it is truthy.
+Every lowering evaluates the operand once, preserves the identity of an
+accepted value, normalizes a rejected value to null, and lets exceptions
+propagate. Declaration `~=` lowers through the same operation. No non-empty
+array or record type is introduced; normal successful-condition narrowing only
+removes absence from the filtered result.
 
 Conditional placement likewise evaluates once, in order:
 

@@ -80,9 +80,9 @@ Patterns use type-appropriate exact matching. Literals and distinguished constan
 
 An error-type pattern matches a thrown instance of that type, including subclasses. Unmatched returned values remain values, and unmatched thrown values propagate unchanged. The transpiler's emitted checks are an implementation detail.
 
-## Promoting absence or failure: `~~`
+## Infix promotion of absence or failure
 
-`~~` requires a usable value:
+Infix `~~` requires a usable value:
 
 ```kvs
 const user = find_user(id) ~~ UserNotFound(id);
@@ -109,6 +109,10 @@ const config = parse_config(text)
 ```
 
 The replacement expression is evaluated only after absence or a thrown value. KVS preserves whether it is handling absence or a catch even when the caught value itself is null.
+
+This infix failure-policy operation is distinct from
+[prefix `~~value`](values.md#filtering-truthy-and-non-empty-values), which
+converts primitive falsy and empty values to null and does not catch exceptions.
 
 The two forms are complementary:
 

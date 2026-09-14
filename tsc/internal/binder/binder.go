@@ -2847,7 +2847,7 @@ func isNarrowingExpression(expr *ast.Node) bool {
 		return containsNarrowableReference(expr)
 	case ast.KindCallExpression:
 		return hasNarrowableArgument(expr)
-	case ast.KindParenthesizedExpression, ast.KindNonNullExpression, ast.KindKvsExtantAssertionExpression, ast.KindTypeOfExpression, ast.KindKvsExtantTestExpression:
+	case ast.KindParenthesizedExpression, ast.KindNonNullExpression, ast.KindKvsExtantAssertionExpression, ast.KindTypeOfExpression, ast.KindKvsExtantTestExpression, ast.KindKvsNullingSieveExpression:
 		return isNarrowingExpression(expr.Expression())
 	case ast.KindBinaryExpression:
 		return isNarrowingBinaryExpression(expr.AsBinaryExpression())

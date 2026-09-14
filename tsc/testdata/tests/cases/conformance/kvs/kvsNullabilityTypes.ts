@@ -36,6 +36,14 @@ function incrementPresent(candidate: number?): number {
     return 0;
 }
 
+function nullableBooleanCondition(condition: boolean?): true | null {
+    if (condition) {
+        const narrowed: true = condition;
+        return narrowed;
+    }
+    return null;
+}
+
 function realSqrt(x: number): number? {
     return x >= 0 ?: Math.sqrt(x);
 }

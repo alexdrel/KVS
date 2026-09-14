@@ -33,6 +33,8 @@ Implemented vertical slices:
 - Presence-aware array literals: `?[...]`.
 - Conditional placement in array and object literals.
 - Presence-aware object literals: `?{...}`.
+- Nulling sieve: prefix `~~value`.
+- Filtered declaration bindings: `const`/`let value ~= expression`.
 
 Known semantic debts:
 
@@ -41,10 +43,6 @@ Known semantic debts:
   earlier property values, computed names, and spreads may therefore run late.
 - Extant assignment is currently RHS-first and skips target evaluation when
   the RHS is absent.
-- The nulling operator currently lowers through JavaScript truthiness; KVS
-  truthiness is not implemented.
-- Conditional binding currently tests with JavaScript truthiness; KVS
-  truthiness is not implemented.
 - Lazy `collect*` and asynchronous iteration are not implemented.
 - Implicit-subject `for...in` is postponed until KVS decides whether it should
   preserve JavaScript's inherited-enumerable-property behavior or iterate only
@@ -63,6 +61,7 @@ Focused conformance inputs:
 - `tsc/testdata/tests/cases/conformance/kvs/kvsIfBinding.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsExtantTest.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsNullableOperators.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsNullingSieve.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsCompactArray.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsConditionalPlacement.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsCompactObject.ts`
@@ -113,7 +112,7 @@ them; generated example `.js` files are intentionally ignored.
 
 - [x] Postfix `value?`
 - [x] Flow narrowing after `value?`
-- [ ] Nullable boolean condition: only `true` enters branch
+- [x] Nullable boolean condition: only `true` enters branch
 - [x] Relational comparisons require resolved operands
 
 ### Nullable dataflow
@@ -127,16 +126,21 @@ them; generated example `.js` files are intentionally ignored.
 - [ ] `==` / `!=` lift over absence
 - [x] `===` / `!==` retain JavaScript semantics
 
-### KVS truthiness
+### Nulling sieve
 
-- [ ] Primitive truthiness
-- [ ] Empty arrays are false
-- [ ] Empty typed arrays are false
-- [ ] Empty maps are false
-- [ ] Empty sets are false
-- [ ] Empty record-like objects are false
-- [ ] Class instances retain ordinary truthiness
-- [ ] `||` uses KVS truthiness
+- [x] Prefix `~~value`
+- [x] Primitive falsy values become null
+- [x] Absence normalizes to null
+- [x] Empty arrays and typed arrays become null via `length`
+- [x] Empty maps and sets become null via `size`
+- [x] Empty record-like objects become null via `Object.keys`
+- [x] Ordinary class instances pass through
+- [x] Accepted values preserve identity
+- [x] Operand evaluated once
+- [x] Exceptions propagate
+- [x] Result adds absence without a non-empty collection type
+- [ ] Coexists with infix require/promote `~~`
+- [x] Numeric prefix `~~` has KVS filtering semantics without a normal warning
 
 ### Default values
 
@@ -170,7 +174,13 @@ them; generated example `.js` files are intentionally ignored.
 - [x] Initializer evaluated once
 - [x] Binding scoped only to the successful branch
 - [x] Successful branch narrows the binding to its truthy type
-- [ ] Ordinary KVS truthiness determines the selected branch
+- [x] Ordinary JavaScript/TypeScript truthiness determines the selected branch
+- [x] `const value ~= expression`
+- [x] `let value ~= expression`
+- [x] Filtered RHS evaluated once
+- [x] Binding receives the original accepted value or null
+- [x] Successful branch removes absence
+- [x] No general `target ~= expression` assignment
 
 ### Range expressions
 
@@ -344,7 +354,7 @@ them; generated example `.js` files are intentionally ignored.
 
 - [x] `condition ?: expression`
 - [x] False/null branch -> `null`
-- [ ] KVS truthiness
+- [x] Ordinary JavaScript/TypeScript truthiness
 - [x] Lazy RHS
 
 ## 4. Structural data and PODs
@@ -482,7 +492,7 @@ them; generated example `.js` files are intentionally ignored.
 - [ ] `NaN` matching
 - [ ] Error subclass matching
 
-### Require/promote `~~`
+### Infix require/promote `~~`
 
 - [ ] Extant value passes through
 - [ ] Absence throws replacement

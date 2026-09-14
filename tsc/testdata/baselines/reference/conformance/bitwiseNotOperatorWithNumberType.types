@@ -119,16 +119,16 @@ var ResultIsNumber11 = ~(NUMBER + NUMBER);
 >NUMBER : number
 
 // multiple ~ operators
-var ResultIsNumber12 = ~~NUMBER;
+var ResultIsNumber12 = ~ ~NUMBER;
 >ResultIsNumber12 : number
->~~NUMBER : number
+>~ ~NUMBER : number
 >~NUMBER : number
 >NUMBER : number
 
-var ResultIsNumber13 = ~~~(NUMBER + NUMBER);
+var ResultIsNumber13 = ~ ~ ~(NUMBER + NUMBER);
 >ResultIsNumber13 : number
->~~~(NUMBER + NUMBER) : number
->~~(NUMBER + NUMBER) : number
+>~ ~ ~(NUMBER + NUMBER) : number
+>~ ~(NUMBER + NUMBER) : number
 >~(NUMBER + NUMBER) : number
 >(NUMBER + NUMBER) : number
 >NUMBER + NUMBER : number

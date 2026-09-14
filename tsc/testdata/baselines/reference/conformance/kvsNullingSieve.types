@@ -1,0 +1,310 @@
+//// [tests/cases/conformance/kvs/kvsNullingSieve.ts] ////
+
+=== kvsNullingSieve.ts ===
+declare const nullableItems: number[]?;
+>nullableItems : number[] | null | undefined
+
+declare const items: number[];
+>items : number[]
+
+declare const dynamic: unknown;
+>dynamic : unknown
+
+if ([]) {
+>[] : never[]
+
+    console.log("ordinary array truthiness");
+>console.log("ordinary array truthiness") : void
+>console.log : (...data: any[]) => void
+>console : Console
+>log : (...data: any[]) => void
+>"ordinary array truthiness" : "ordinary array truthiness"
+}
+
+if ({}) {
+>{} : {}
+
+    console.log("ordinary object truthiness");
+>console.log("ordinary object truthiness") : void
+>console.log : (...data: any[]) => void
+>console : Console
+>log : (...data: any[]) => void
+>"ordinary object truthiness" : "ordinary object truthiness"
+}
+
+const sameEmptyArray = (items || []) === items;
+>sameEmptyArray : boolean
+>(items || []) === items : boolean
+>(items || []) : number[]
+>items || [] : number[]
+>items : number[]
+>[] : never[]
+>items : number[]
+
+const absent = ~~null;
+>absent : null
+>~~null : null
+
+const undefinedValue = ~~undefined;
+>undefinedValue : null
+>~~undefined : null
+>undefined : undefined
+
+const falseValue = ~~false;
+>falseValue : false | null
+>~~false : false | null
+>false : false
+
+const zero = ~~0;
+>zero : 0 | null
+>~~0 : 0 | null
+>0 : 0
+
+const notANumber = ~~NaN;
+>notANumber : number | null
+>~~NaN : number | null
+>NaN : number
+
+const emptyString = ~~"";
+>emptyString : "" | null
+>~~"" : "" | null
+>"" : ""
+
+const emptyArray = ~~[];
+>emptyArray : never[] | null
+>~~[] : never[] | null
+>[] : never[]
+
+const emptyRecord = ~~{};
+>emptyRecord : {} | null
+>~~{} : {} | null
+>{} : {}
+
+const decimal = ~~3.7;
+>decimal : 3.7 | null
+>~~3.7 : 3.7 | null
+>3.7 : 3.7
+
+const text = ~~"x";
+>text : "x" | null
+>~~"x" : "x" | null
+>"x" : "x"
+
+const maybeItems = ~~nullableItems;
+>maybeItems : number[] | null
+>~~nullableItems : number[] | null
+>nullableItems : number[] | null | undefined
+
+const dynamicValue = ~~dynamic;
+>dynamicValue : {} | null
+>~~dynamic : {} | null
+>dynamic : unknown
+
+function filterArray<T extends readonly unknown[]>(value: T?) {
+>filterArray : <T extends readonly unknown[]>(value: T?) => T | null
+>value : T | null | undefined
+
+    return ~~value;
+>~~value : T | null
+>value : T | null | undefined
+}
+
+declare const maybeText: string?;
+>maybeText : string | null | undefined
+
+if (~~maybeText) {
+>~~maybeText : string | null
+>maybeText : string | null | undefined
+
+    const narrowedText: string = maybeText;
+>narrowedText : string
+>maybeText : string
+}
+
+const array = [1];
+>array : number[]
+>[1] : number[]
+>1 : 1
+
+const sameArray = ~~array === array;
+>sameArray : boolean
+>~~array === array : boolean
+>~~array : number[] | null
+>array : number[]
+>array : number[]
+
+const record = { x: null };
+>record : { x: null; }
+>{ x: null } : { x: null; }
+>x : null
+
+const sameRecord = ~~record === record;
+>sameRecord : boolean
+>~~record === record : boolean
+>~~record : { x: null; } | null
+>record : { x: null; }
+>record : { x: null; }
+
+const emptyBytes = ~~new Uint8Array(0);
+>emptyBytes : Uint8Array<ArrayBuffer> | null
+>~~new Uint8Array(0) : Uint8Array<ArrayBuffer> | null
+>new Uint8Array(0) : Uint8Array<ArrayBuffer>
+>Uint8Array : Uint8ArrayConstructor
+>0 : 0
+
+const bytes = new Uint8Array([1]);
+>bytes : Uint8Array<ArrayBuffer>
+>new Uint8Array([1]) : Uint8Array<ArrayBuffer>
+>Uint8Array : Uint8ArrayConstructor
+>[1] : number[]
+>1 : 1
+
+const sameBytes = ~~bytes === bytes;
+>sameBytes : boolean
+>~~bytes === bytes : boolean
+>~~bytes : Uint8Array<ArrayBuffer> | null
+>bytes : Uint8Array<ArrayBuffer>
+>bytes : Uint8Array<ArrayBuffer>
+
+const emptyMap = ~~new Map();
+>emptyMap : Map<any, any> | null
+>~~new Map() : Map<any, any> | null
+>new Map() : Map<any, any>
+>Map : MapConstructor
+
+const map = new Map([["x", 1]]);
+>map : Map<string, number>
+>new Map([["x", 1]]) : Map<string, number>
+>Map : MapConstructor
+>[["x", 1]] : [string, number][]
+>["x", 1] : [string, number]
+>"x" : "x"
+>1 : 1
+
+const sameMap = ~~map === map;
+>sameMap : boolean
+>~~map === map : boolean
+>~~map : Map<string, number> | null
+>map : Map<string, number>
+>map : Map<string, number>
+
+const emptySet = ~~new Set();
+>emptySet : Set<unknown> | null
+>~~new Set() : Set<unknown> | null
+>new Set() : Set<unknown>
+>Set : SetConstructor
+
+const set = new Set([1]);
+>set : Set<number>
+>new Set([1]) : Set<number>
+>Set : SetConstructor
+>[1] : number[]
+>1 : 1
+
+const sameSet = ~~set === set;
+>sameSet : boolean
+>~~set === set : boolean
+>~~set : Set<number> | null
+>set : Set<number>
+>set : Set<number>
+
+class EmptyClass {}
+>EmptyClass : EmptyClass
+
+const instance = new EmptyClass();
+>instance : EmptyClass
+>new EmptyClass() : EmptyClass
+>EmptyClass : typeof EmptyClass
+
+const sameInstance = ~~instance === instance;
+>sameInstance : boolean
+>~~instance === instance : boolean
+>~~instance : EmptyClass | null
+>instance : EmptyClass
+>instance : EmptyClass
+
+let evaluations = 0;
+>evaluations : number
+>0 : 0
+
+function readOnce() {
+>readOnce : () => number[]
+
+    evaluations++;
+>evaluations++ : number
+>evaluations : number
+
+    return [1];
+>[1] : number[]
+>1 : 1
+}
+const once = ~~readOnce();
+>once : number[] | null
+>~~readOnce() : number[] | null
+>readOnce() : number[]
+>readOnce : () => number[]
+
+function throws(): never {
+>throws : () => never
+
+    throw new Error("expected");
+>new Error("expected") : Error
+>Error : ErrorConstructor
+>"expected" : "expected"
+}
+const propagated = ~~throws();
+>propagated : null
+>~~throws() : null
+>throws() : never
+>throws : () => never
+
+const compact ~= nullableItems;
+>compact : number[] | null
+>~= nullableItems : number[] | null
+>nullableItems : number[] | null | undefined
+
+let mutable ~= items;
+>mutable : number[] | null
+>~= items : number[] | null
+>items : number[]
+
+if (const rejected ~= []) {
+>rejected : never[] | null
+>~= [] : never[] | null
+>[] : never[]
+
+    rejected;
+>rejected : never[]
+}
+
+if (const accepted ~= array) {
+>accepted : number[] | null
+>~= array : number[] | null
+>array : number[]
+
+    accepted;
+>accepted : number[]
+
+    accepted === array;
+>accepted === array : boolean
+>accepted : number[]
+>array : number[]
+}
+
+const javascriptDoubleNot = ~ ~3.7;
+>javascriptDoubleNot : number
+>~ ~3.7 : number
+>~3.7 : number
+>3.7 : 3.7
+
+var rejectedVar ~= items;
+>rejectedVar : number[] | null
+>~= items : number[] | null
+>items : number[]
+
+const rejectedSpaced ~ = items;
+>rejectedSpaced : any
+>~ : number
+> : any
+>items : number[]
+

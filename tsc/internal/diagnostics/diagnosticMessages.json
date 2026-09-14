@@ -8607,5 +8607,9 @@
     "KVS template interpolation does not accept nullable values; resolve absence explicitly.": {
         "category": "Error",
         "code": 100075
+    },
+    "A KVS sieve binding requires a 'const' or 'let' declaration.": {
+        "category": "Error",
+        "code": 100076
     }
 }

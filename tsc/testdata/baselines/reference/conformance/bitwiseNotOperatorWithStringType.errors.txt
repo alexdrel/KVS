@@ -3,9 +3,9 @@ bitwiseNotOperatorWithStringType.ts(18,24): error TS2454: Variable 'STRING' is u
 bitwiseNotOperatorWithStringType.ts(32,26): error TS2454: Variable 'STRING' is used before being assigned.
 bitwiseNotOperatorWithStringType.ts(32,35): error TS2454: Variable 'STRING' is used before being assigned.
 bitwiseNotOperatorWithStringType.ts(33,25): error TS2454: Variable 'STRING' is used before being assigned.
-bitwiseNotOperatorWithStringType.ts(36,26): error TS2454: Variable 'STRING' is used before being assigned.
-bitwiseNotOperatorWithStringType.ts(37,28): error TS2454: Variable 'STRING' is used before being assigned.
-bitwiseNotOperatorWithStringType.ts(37,37): error TS2454: Variable 'STRING' is used before being assigned.
+bitwiseNotOperatorWithStringType.ts(36,27): error TS2454: Variable 'STRING' is used before being assigned.
+bitwiseNotOperatorWithStringType.ts(37,30): error TS2454: Variable 'STRING' is used before being assigned.
+bitwiseNotOperatorWithStringType.ts(37,39): error TS2454: Variable 'STRING' is used before being assigned.
 bitwiseNotOperatorWithStringType.ts(40,2): error TS2454: Variable 'STRING' is used before being assigned.
 
 
@@ -55,13 +55,13 @@ bitwiseNotOperatorWithStringType.ts(40,2): error TS2454: Variable 'STRING' is us
 !!! error TS2454: Variable 'STRING' is used before being assigned.
     
     // multiple ~ operators
-    var ResultIsNumber13 = ~~STRING;
-                             ~~~~~~
+    var ResultIsNumber13 = ~ ~STRING;
+                              ~~~~~~
 !!! error TS2454: Variable 'STRING' is used before being assigned.
-    var ResultIsNumber14 = ~~~(STRING + STRING);
-                               ~~~~~~
+    var ResultIsNumber14 = ~ ~ ~(STRING + STRING);
+                                 ~~~~~~
 !!! error TS2454: Variable 'STRING' is used before being assigned.
-                                        ~~~~~~
+                                          ~~~~~~
 !!! error TS2454: Variable 'STRING' is used before being assigned.
     
     //miss assignment operators
@@ -71,3 +71,4 @@ bitwiseNotOperatorWithStringType.ts(40,2): error TS2454: Variable 'STRING' is us
     ~STRING1;
     ~foo();
     ~objA.a,M.n;
+    

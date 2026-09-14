@@ -128,16 +128,16 @@ var ResultIsNumber12 = ~STRING.charAt(0);
 >0 : 0
 
 // multiple ~ operators
-var ResultIsNumber13 = ~~STRING;
+var ResultIsNumber13 = ~ ~STRING;
 >ResultIsNumber13 : number
->~~STRING : number
+>~ ~STRING : number
 >~STRING : number
 >STRING : string
 
-var ResultIsNumber14 = ~~~(STRING + STRING);
+var ResultIsNumber14 = ~ ~ ~(STRING + STRING);
 >ResultIsNumber14 : number
->~~~(STRING + STRING) : number
->~~(STRING + STRING) : number
+>~ ~ ~(STRING + STRING) : number
+>~ ~(STRING + STRING) : number
 >~(STRING + STRING) : number
 >(STRING + STRING) : string
 >STRING + STRING : string

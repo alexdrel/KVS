@@ -262,6 +262,8 @@ const (
 	KindKvsExtantAssignmentExpression
 	KindKvsExtantTestExpression
 	KindKvsDefaultExpression
+	KindKvsNullingSieveExpression
+	KindKvsSieveBindingInitializer
 	KindKvsNullingExpression
 	KindKvsConditionalElement
 	KindKvsCompactArrayExpression

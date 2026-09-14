@@ -273,9 +273,9 @@ go -C ./tsc test -run='TestLocal/kvsIfBinding' ./internal/testrunner
 
 `kvsNullabilityTypes.ts` checks that `T?` adds both `null` and `undefined` and
 that `T!` removes both. It covers idempotence, all four `?`/`!` compositions,
-unions, arrays, ordinary nullish narrowing, and direct rejection where a
-present type is required. Minimal final parse cases reject whitespace before
-each postfix operator.
+unions, arrays, ordinary nullish narrowing, nullable-boolean condition
+narrowing to `true`, and direct rejection where a present type is required.
+Minimal final parse cases reject whitespace before each postfix operator.
 
 Its declaration baseline verifies postfix source printing, while the
 JavaScript baseline verifies ordinary type erasure. The same file combines
@@ -338,6 +338,35 @@ Run it with:
 
 ```sh
 go -C ./tsc test -run='TestLocal/kvsCompactArray' ./internal/testrunner
+```
+
+## Truthy/non-empty-filter slice
+
+`kvsNullingSieve.ts` checks ordinary JavaScript truthiness for empty arrays and
+objects, identity-preserving `||`, prefix `~~` across primitive values, arrays,
+typed arrays, maps, sets, records, nullable operands, and class instances, and
+the `const`/`let` filtered-binding form `~=`. Its type baseline verifies that
+the result adds null without introducing a non-empty collection type. Its
+JavaScript baseline verifies type-directed primitive, `length`, `size`,
+`Object.keys`, and identity lowering; dynamic-helper fallback; once-only
+operand evaluation; identity preservation; exception propagation; and reuse
+of the same lowering for `~=`. It also verifies that `if (~~value)` narrows the
+original operand through TypeScript's existing truthiness analysis.
+`kvsNullingSieveImportHelpers.ts` and
+`kvsNullingSieveNoEmitHelpers.ts` fence the helper's standard TypeScript flag
+behavior.
+
+The test also fences syntax compatibility: contiguous `~~` has KVS filtering
+semantics, spaced `~ ~` remains JavaScript bitwise NOT, contiguous `~=` is a
+sieve binding, spaced `~ =` is rejected, and `var` sieve bindings are
+rejected. Existing TypeScript bitwise-NOT cases use spaced `~ ~` and `~ ~ ~`
+spellings so they continue to test ordinary JavaScript operators independently;
+contiguous KVS semantics are owned by the KVS conformance case.
+
+Run it with:
+
+```sh
+go -C ./tsc test -run='TestLocal/kvsNullingSieve' ./internal/testrunner
 ```
 
 ## Conditional-placement and compact-object slice

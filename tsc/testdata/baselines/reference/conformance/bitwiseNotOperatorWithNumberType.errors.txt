@@ -2,9 +2,9 @@ bitwiseNotOperatorWithNumberType.ts(8,12): error TS2564: Property 'a' has no ini
 bitwiseNotOperatorWithNumberType.ts(18,24): error TS2454: Variable 'NUMBER' is used before being assigned.
 bitwiseNotOperatorWithNumberType.ts(32,26): error TS2454: Variable 'NUMBER' is used before being assigned.
 bitwiseNotOperatorWithNumberType.ts(32,35): error TS2454: Variable 'NUMBER' is used before being assigned.
-bitwiseNotOperatorWithNumberType.ts(35,26): error TS2454: Variable 'NUMBER' is used before being assigned.
-bitwiseNotOperatorWithNumberType.ts(36,28): error TS2454: Variable 'NUMBER' is used before being assigned.
-bitwiseNotOperatorWithNumberType.ts(36,37): error TS2454: Variable 'NUMBER' is used before being assigned.
+bitwiseNotOperatorWithNumberType.ts(35,27): error TS2454: Variable 'NUMBER' is used before being assigned.
+bitwiseNotOperatorWithNumberType.ts(36,30): error TS2454: Variable 'NUMBER' is used before being assigned.
+bitwiseNotOperatorWithNumberType.ts(36,39): error TS2454: Variable 'NUMBER' is used before being assigned.
 bitwiseNotOperatorWithNumberType.ts(39,2): error TS2454: Variable 'NUMBER' is used before being assigned.
 
 
@@ -51,13 +51,13 @@ bitwiseNotOperatorWithNumberType.ts(39,2): error TS2454: Variable 'NUMBER' is us
 !!! error TS2454: Variable 'NUMBER' is used before being assigned.
     
     // multiple ~ operators
-    var ResultIsNumber12 = ~~NUMBER;
-                             ~~~~~~
+    var ResultIsNumber12 = ~ ~NUMBER;
+                              ~~~~~~
 !!! error TS2454: Variable 'NUMBER' is used before being assigned.
-    var ResultIsNumber13 = ~~~(NUMBER + NUMBER);
-                               ~~~~~~
+    var ResultIsNumber13 = ~ ~ ~(NUMBER + NUMBER);
+                                 ~~~~~~
 !!! error TS2454: Variable 'NUMBER' is used before being assigned.
-                                        ~~~~~~
+                                          ~~~~~~
 !!! error TS2454: Variable 'NUMBER' is used before being assigned.
     
     // miss assignment operators
@@ -69,3 +69,4 @@ bitwiseNotOperatorWithNumberType.ts(39,2): error TS2454: Variable 'NUMBER' is us
     ~objA.a;
     ~M.n;
     ~objA.a, M.n;
+    

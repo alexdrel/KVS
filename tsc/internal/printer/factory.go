@@ -598,6 +598,17 @@ func (f *NodeFactory) NewUnscopedHelperName(name string) *ast.IdentifierNode {
 
 // TypeScript Helpers
 
+func (f *NodeFactory) NewKvsNullingSieveHelper(value *ast.Expression) *ast.Expression {
+	f.emitContext.RequestEmitHelper(KvsNullingSieveHelper)
+	return f.NewCallExpression(
+		f.NewUnscopedHelperName("__kvsNullingSieve"),
+		nil,
+		nil,
+		f.NewNodeList([]*ast.Node{value}),
+		ast.NodeFlagsNone,
+	)
+}
+
 func (f *NodeFactory) NewDecorateHelper(decoratorExpressions []*ast.Node, target *ast.Node, memberName *ast.Node, descriptor *ast.Node) *ast.Expression {
 	f.emitContext.RequestEmitHelper(decorateHelper)
 

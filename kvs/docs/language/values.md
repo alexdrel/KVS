@@ -80,7 +80,7 @@ Code should not rely on an optional path to suppress effects in a later
 operand: such expressions become difficult to read as soon as several values
 may be absent. Make effectful sequencing explicit with statements.
 
-## Presence and truthiness
+## Presence and ordinary truthiness
 
 Postfix `?` tests presence without changing or unwrapping the value:
 
@@ -113,45 +113,74 @@ false?      true
 {}?         true
 ```
 
-Ordinary conditions use KVS truthiness. Primitive truthiness follows JavaScript, while empty collection-like values are false:
+Ordinary conditions and boolean operators use JavaScript/TypeScript truthiness.
+Objects and collections are therefore truthy even when empty:
 
 ```kvs
-if ([])       // false
+if ([])       // true
 if ([0])      // true
-if ({})       // false
+if ({})       // true
 if ({ x: 0 }) // true
 ```
 
-Arrays and typed arrays are empty when their length is zero. Maps and sets are empty when their size is zero. Record-like objects are empty when they have no own enumerable properties. Property values are not inspected, so `{ x: null }` is truthy.
+Logical `!`, `&&`, and `||` retain their ordinary JavaScript behavior. In
+particular, `arr || []` preserves an existing empty array and its identity.
+The condition of the KVS nulling operator `?:` uses the same ordinary
+truthiness.
 
-[POD construction](data.md#pod-construction) produces plain structural objects. POD truthiness follows the same shallow record rule. KVS does not recursively compare fields with their defaults:
+## Nulling sieve
 
-```kvs
-if (Profile{}) // true when this constructed POD owns required fields
-```
-
-An arbitrary class or object instance remains truthy regardless of its properties unless its type is explicitly collection-like.
-
-Ordinary `||` collapses a falsy or empty value to null when absence is needed by a later operation:
+**Nulling sieve `~~`** preserves a truthy/non-empty value and turns a falsy or
+empty value into `null`.
 
 ```kvs
-const query = form.query || null;
-const title = customTitle || document.title || "Untitled";
+const items = ~~readItems();
 ```
 
-`x || null` evaluates `x` once and returns the original value when truthy, preserving its identity.
+The operand is evaluated exactly once. A retained array, collection, record,
+or object is returned unchanged, preserving its identity. Thrown exceptions
+are not handled and propagate normally.
+
+The filter rejects primitive falsy values and absence. Arrays and typed arrays
+are empty when their `length` is zero; maps and sets are empty when their
+`size` is zero; record-like objects are empty when `Object.keys(value).length`
+is zero. Symbols and property values are not inspected, so `{ x: null }` is
+retained. Ordinary class instances are retained regardless of their own
+properties.
+
+```kvs
+~~null       // null
+~~false      // null
+~~0          // null
+~~""         // null
+~~[]         // null
+~~{}         // null
+~~3.7        // 3.7, not JavaScript integer truncation
+~~[value]    // the original array
+~~{ x: null } // the original object
+```
+
+Prefix `~~` deliberately takes over JavaScript's double-bitwise-NOT spelling
+in KVS. Its result type is the operand's value type with absence added as
+necessary; it does not introduce non-empty collection types.
+
+This prefix operation is distinct from infix `expression ~~ error`, which
+[promotes absence or failure to an exception](errors.md#infix-promotion-of-absence-or-failure).
 
 ## Conditions
 
 A nullable boolean satisfies a condition only when it is `true`:
 
 ```kvs
-if (metadata.width * metadata.height > 1_000_000) {
+const renderLarge: boolean? = metadata.renderLarge;
+if (renderLarge) {
     renderLargePhoto();
 }
 ```
 
-The branch is not taken when the condition evaluates to null. A successful comparison may narrow operands that had to be present for it to succeed.
+The branch is not taken when the condition is false or absent. Inside the
+successful branch, the condition is narrowed to `true` by ordinary TypeScript
+truthiness analysis.
 
 ## Binding inference
 

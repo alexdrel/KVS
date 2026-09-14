@@ -4440,6 +4440,8 @@ var KVS_expression_valued_for_must_be_at_the_head_of_a_supported_value_expressio
 
 var KVS_template_interpolation_does_not_accept_nullable_values_resolve_absence_explicitly = &Message{code: 100075, category: CategoryError, key: "KVS_template_interpolation_does_not_accept_nullable_values_resolve_absence_explicitly_100075", text: "KVS template interpolation does not accept nullable values; resolve absence explicitly."}
 
+var A_KVS_sieve_binding_requires_a_const_or_let_declaration = &Message{code: 100076, category: CategoryError, key: "A_KVS_sieve_binding_requires_a_const_or_let_declaration_100076", text: "A KVS sieve binding requires a 'const' or 'let' declaration."}
+
 func keyToMessage(key Key) *Message {
 	switch key {
 	case "Unterminated_string_literal_1002":
@@ -8880,6 +8882,8 @@ func keyToMessage(key Key) *Message {
 		return KVS_expression_valued_for_must_be_at_the_head_of_a_supported_value_expression
 	case "KVS_template_interpolation_does_not_accept_nullable_values_resolve_absence_explicitly_100075":
 		return KVS_template_interpolation_does_not_accept_nullable_values_resolve_absence_explicitly
+	case "A_KVS_sieve_binding_requires_a_const_or_let_declaration_100076":
+		return A_KVS_sieve_binding_requires_a_const_or_let_declaration
 	default:
 		return nil
 	}

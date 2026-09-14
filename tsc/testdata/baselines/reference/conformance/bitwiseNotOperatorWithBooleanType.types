@@ -82,9 +82,9 @@ var ResultIsNumber7 = ~A.foo();
 >foo : () => boolean
 
 // multiple ~ operators
-var ResultIsNumber8 = ~~BOOLEAN;
+var ResultIsNumber8 = ~ ~BOOLEAN;
 >ResultIsNumber8 : number
->~~BOOLEAN : number
+>~ ~BOOLEAN : number
 >~BOOLEAN : number
 >BOOLEAN : boolean
 

@@ -633,6 +633,18 @@ export interface KvsDefaultExpression extends ExpressionBase {
     readonly kind: SyntaxKind.KvsDefaultExpression;
     readonly expression: Expression;
 }
+export interface KvsNullingSieveExpression extends ExpressionBase {
+    readonly kind: SyntaxKind.KvsNullingSieveExpression;
+    readonly firstTildeToken: TildeToken;
+    readonly secondTildeToken: TildeToken;
+    readonly expression: Expression;
+}
+export interface KvsSieveBindingInitializer extends ExpressionBase {
+    readonly kind: SyntaxKind.KvsSieveBindingInitializer;
+    readonly tildeToken: TildeToken;
+    readonly equalsToken: EqualsToken;
+    readonly expression: Expression;
+}
 export interface KvsNullingExpression extends ExpressionBase {
     readonly kind: SyntaxKind.KvsNullingExpression;
     readonly condition: Expression;
@@ -1572,6 +1584,7 @@ export type DotToken = Token<SyntaxKind.DotToken>;
 export type DotDotDotToken = Token<SyntaxKind.DotDotDotToken>;
 export type QuestionToken = Token<SyntaxKind.QuestionToken>;
 export type ExclamationToken = Token<SyntaxKind.ExclamationToken>;
+export type TildeToken = Token<SyntaxKind.TildeToken>;
 export type ColonToken = Token<SyntaxKind.ColonToken>;
 export type EqualsToken = Token<SyntaxKind.EqualsToken>;
 export type AsteriskToken = Token<SyntaxKind.AsteriskToken>;

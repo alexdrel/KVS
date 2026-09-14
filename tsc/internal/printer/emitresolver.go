@@ -80,6 +80,7 @@ type EmitResolver interface {
 	IsKvsLiftedBinaryLeftNullable(node *ast.Node) bool
 	IsKvsLiftedBinaryRightNullable(node *ast.Node) bool
 	IsKvsNullableExpression(node *ast.Node) bool
+	GetKvsNullingSieveKind(node *ast.Node) KvsNullingSieveKind
 	IsKvsNullableIterableSource(node *ast.Node) bool
 	IsKvsNullableIterableElement(node *ast.Node) bool
 	IsReferencedAliasDeclaration(node *ast.Node) bool
@@ -132,3 +133,14 @@ type EmitResolver interface {
 	CreateLateBoundIndexSignatures(emitContext *EmitContext, container *ast.Node, enclosingDeclaration *ast.Node, flags nodebuilder.Flags, internalFlags nodebuilder.InternalFlags, tracker nodebuilder.SymbolTracker) []*ast.Node
 	TryJSTypeNodeToTypeNode(emitContext *EmitContext, typeNode *ast.Node, enclosingDeclaration *ast.Node, flags nodebuilder.Flags, internalFlags nodebuilder.InternalFlags, tracker nodebuilder.SymbolTracker) *ast.Node
 }
+
+type KvsNullingSieveKind uint8
+
+const (
+	KvsNullingSieveDynamic KvsNullingSieveKind = iota
+	KvsNullingSievePrimitive
+	KvsNullingSieveLength
+	KvsNullingSieveSize
+	KvsNullingSieveRecord
+	KvsNullingSieveIdentity
+)

@@ -4,9 +4,9 @@ kvsNullabilityTypes.ts(25,7): error TS2322: Type 'number | null | undefined' is 
   Type 'undefined' is not assignable to type 'number'.
 kvsNullabilityTypes.ts(29,7): error TS2322: Type 'number | null | undefined' is not assignable to type 'number'.
   Type 'undefined' is not assignable to type 'number'.
-kvsNullabilityTypes.ts(40,36): error TS1005: ';' expected.
-kvsNullabilityTypes.ts(41,42): error TS1005: ';' expected.
-kvsNullabilityTypes.ts(41,43): error TS1109: Expression expected.
+kvsNullabilityTypes.ts(48,36): error TS1005: ';' expected.
+kvsNullabilityTypes.ts(49,42): error TS1005: ';' expected.
+kvsNullabilityTypes.ts(49,43): error TS1109: Expression expected.
 
 
 ==== kvsNullabilityTypes.ts (6 errors) ====
@@ -52,6 +52,14 @@ kvsNullabilityTypes.ts(41,43): error TS1109: Expression expected.
     function incrementPresent(candidate: number?): number {
         if (candidate != null) return candidate + 1;
         return 0;
+    }
+    
+    function nullableBooleanCondition(condition: boolean?): true | null {
+        if (condition) {
+            const narrowed: true = condition;
+            return narrowed;
+        }
+        return null;
     }
     
     function realSqrt(x: number): number? {

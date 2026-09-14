@@ -1,0 +1,17 @@
+//// [tests/cases/conformance/kvs/kvsNullingSieveImportHelpers.ts] ////
+
+=== /node_modules/tslib/tslib.d.ts ===
+export declare function __kvsNullingSieve(value: unknown): unknown;
+>__kvsNullingSieve : (value: unknown) => unknown
+>value : unknown
+
+=== /index.ts ===
+export {};
+declare const dynamic: unknown;
+>dynamic : unknown
+
+export const filtered = ~~dynamic;
+>filtered : {} | null
+>~~dynamic : {} | null
+>dynamic : unknown
+

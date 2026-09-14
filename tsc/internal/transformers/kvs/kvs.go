@@ -33,6 +33,8 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 		return replacement
 	}
 	switch node.Kind {
+	case ast.KindSourceFile:
+		return tx.Visitor().VisitEachChild(node)
 	case ast.KindForOfStatement:
 		return tx.transformForOfStatement(node.AsForInOrOfStatement())
 	case ast.KindKvsIfBindingStatement:
@@ -101,6 +103,10 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 		return tx.transformExtantTest(node.AsKvsExtantTestExpression())
 	case ast.KindKvsDefaultExpression:
 		return tx.transformDefault(node.AsKvsDefaultExpression())
+	case ast.KindKvsNullingSieveExpression:
+		return tx.transformNullingSieve(node.AsKvsNullingSieveExpression().Expression)
+	case ast.KindKvsSieveBindingInitializer:
+		return tx.transformNullingSieve(node.AsKvsSieveBindingInitializer().Expression)
 	case ast.KindKvsNullingExpression:
 		return tx.transformNullingExpression(node.AsKvsNullingExpression())
 	case ast.KindArrayLiteralExpression:
@@ -129,6 +135,51 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 		return tx.Factory().NewArrayLiteralExpression(nil, false)
 	}
 	return tx.Visitor().VisitEachChild(node)
+}
+
+func (tx *transformer) transformNullingSieve(expression *ast.Expression) *ast.Node {
+	factory := tx.Factory()
+	kind := tx.resolver.GetKvsNullingSieveKind(expression)
+	value := tx.Visitor().VisitNode(expression)
+	if kind == printer.KvsNullingSieveDynamic {
+		return factory.NewKvsNullingSieveHelper(value)
+	}
+	if kind == printer.KvsNullingSieveIdentity {
+		if tx.resolver.IsKvsNullableExpression(expression) {
+			return factory.NewBinaryExpression(nil, value, nil, factory.NewToken(ast.KindQuestionQuestionToken), factory.NewKeywordExpression(ast.KindNullKeyword))
+		}
+		return value
+	}
+	temp := factory.NewTempVariable()
+	tx.EmitContext().AddVariableDeclaration(temp)
+	assigned := factory.NewAssignmentExpression(temp, value)
+	var test *ast.Node
+	switch kind {
+	case printer.KvsNullingSievePrimitive:
+		test = assigned
+	case printer.KvsNullingSieveLength, printer.KvsNullingSieveSize:
+		property := "length"
+		if kind == printer.KvsNullingSieveSize {
+			property = "size"
+		}
+		member := factory.NewPropertyAccessExpression(temp, nil, factory.NewIdentifier(property), ast.NodeFlagsNone)
+		if tx.resolver.IsKvsNullableExpression(expression) {
+			present := factory.NewBinaryExpression(nil, assigned, nil, factory.NewToken(ast.KindExclamationEqualsToken), factory.NewKeywordExpression(ast.KindNullKeyword))
+			test = factory.NewBinaryExpression(nil, present, nil, factory.NewToken(ast.KindAmpersandAmpersandToken), member)
+		} else {
+			test = factory.NewCommaExpression(assigned, member)
+		}
+	case printer.KvsNullingSieveRecord:
+		keys := factory.NewCallExpression(factory.NewPropertyAccessExpression(factory.NewIdentifier("Object"), nil, factory.NewIdentifier("keys"), ast.NodeFlagsNone), nil, nil, factory.NewNodeList([]*ast.Node{temp}), ast.NodeFlagsNone)
+		length := factory.NewPropertyAccessExpression(keys, nil, factory.NewIdentifier("length"), ast.NodeFlagsNone)
+		if tx.resolver.IsKvsNullableExpression(expression) {
+			present := factory.NewBinaryExpression(nil, assigned, nil, factory.NewToken(ast.KindExclamationEqualsToken), factory.NewKeywordExpression(ast.KindNullKeyword))
+			test = factory.NewBinaryExpression(nil, present, nil, factory.NewToken(ast.KindAmpersandAmpersandToken), length)
+		} else {
+			test = factory.NewCommaExpression(assigned, length)
+		}
+	}
+	return factory.NewConditionalExpression(test, factory.NewToken(ast.KindQuestionToken), temp, factory.NewToken(ast.KindColonToken), factory.NewKeywordExpression(ast.KindNullKeyword))
 }
 
 func (tx *transformer) transformArrayExpression(node *ast.ArrayLiteralExpression) *ast.Node {

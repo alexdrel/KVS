@@ -51,6 +51,7 @@ type NodeFactory struct {
 	kvsExtantTestExpressionArena        core.Arena[KvsExtantTestExpression]
 	kvsExtantTypeArena                  core.Arena[KvsExtantType]
 	kvsExtantYieldStatementArena        core.Arena[KvsExtantYieldStatement]
+	kvsSieveBindingInitializerArena     core.Arena[KvsSieveBindingInitializer]
 	kvsForExpressionArena               core.Arena[KvsForExpression]
 	kvsIfBindingClauseArena             core.Arena[KvsIfBindingClause]
 	kvsIfBindingStatementArena          core.Arena[KvsIfBindingStatement]
@@ -58,6 +59,7 @@ type NodeFactory struct {
 	kvsNullableTypeArena                core.Arena[KvsNullableType]
 	kvsNullingExpressionArena           core.Arena[KvsNullingExpression]
 	kvsSelectExpressionArena            core.Arena[KvsSelectExpression]
+	kvsNullingSieveExpressionArena      core.Arena[KvsNullingSieveExpression]
 	kvsYieldStatementArena              core.Arena[KvsYieldStatement]
 	literalTypeNodeArena                core.Arena[LiteralTypeNode]
 	methodSignatureDeclarationArena     core.Arena[MethodSignatureDeclaration]
@@ -298,6 +300,8 @@ type (
 	KvsExtantAssignmentExpressionNode  = Node
 	KvsExtantTestExpressionNode        = Node
 	KvsDefaultExpressionNode           = Node
+	KvsNullingSieveExpressionNode      = Node
+	KvsSieveBindingInitializerNode     = Node
 	KvsNullingExpressionNode           = Node
 	KvsCompactArrayExpressionNode      = Node
 	KvsConditionalElementNode          = Node
@@ -481,6 +485,7 @@ type (
 	DotDotDotToken                     = Node
 	QuestionToken                      = Node
 	ExclamationToken                   = Node
+	TildeToken                         = Node
 	ColonToken                         = Node
 	EqualsToken                        = Node
 	AsteriskToken                      = Node
@@ -1961,6 +1966,92 @@ func (node *KvsDefaultExpression) Clone(f NodeFactoryCoercible) *Node {
 
 func IsKvsDefaultExpression(node *Node) bool {
 	return node.Kind == KindKvsDefaultExpression
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// KvsNullingSieveExpression
+// ──────────────────────────────────────────────────────────────────────
+
+type KvsNullingSieveExpression struct {
+	ExpressionBase
+	CompositeBase
+	FirstTildeToken  *TildeToken
+	SecondTildeToken *TildeToken
+	Expression       *Expression
+}
+
+func (f *NodeFactory) NewKvsNullingSieveExpression(firstTildeToken *TildeToken, secondTildeToken *TildeToken, expression *Expression) *Node {
+	data := f.kvsNullingSieveExpressionArena.New()
+	data.FirstTildeToken = firstTildeToken
+	data.SecondTildeToken = secondTildeToken
+	data.Expression = expression
+	return f.newNode(KindKvsNullingSieveExpression, data)
+}
+
+func (f *NodeFactory) UpdateKvsNullingSieveExpression(node *KvsNullingSieveExpression, firstTildeToken *TildeToken, secondTildeToken *TildeToken, expression *Expression) *Node {
+	if firstTildeToken != node.FirstTildeToken || secondTildeToken != node.SecondTildeToken || expression != node.Expression {
+		return updateNode(f.NewKvsNullingSieveExpression(firstTildeToken, secondTildeToken, expression), node.AsNode(), f.hooks)
+	}
+	return node.AsNode()
+}
+
+func (node *KvsNullingSieveExpression) ForEachChild(v Visitor) bool {
+	return visit(v, node.FirstTildeToken) || visit(v, node.SecondTildeToken) || visit(v, node.Expression)
+}
+
+func (node *KvsNullingSieveExpression) VisitEachChild(v *NodeVisitor) *Node {
+	return v.Factory.UpdateKvsNullingSieveExpression(node, v.visitNode(node.FirstTildeToken), v.visitNode(node.SecondTildeToken), v.visitNode(node.Expression))
+}
+
+func (node *KvsNullingSieveExpression) Clone(f NodeFactoryCoercible) *Node {
+	return cloneNode(f.AsNodeFactory().NewKvsNullingSieveExpression(node.FirstTildeToken, node.SecondTildeToken, node.Expression), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func IsKvsNullingSieveExpression(node *Node) bool {
+	return node.Kind == KindKvsNullingSieveExpression
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// KvsSieveBindingInitializer
+// ──────────────────────────────────────────────────────────────────────
+
+type KvsSieveBindingInitializer struct {
+	ExpressionBase
+	CompositeBase
+	TildeToken  *TildeToken
+	EqualsToken *EqualsToken
+	Expression  *Expression
+}
+
+func (f *NodeFactory) NewKvsSieveBindingInitializer(tildeToken *TildeToken, equalsToken *EqualsToken, expression *Expression) *Node {
+	data := f.kvsSieveBindingInitializerArena.New()
+	data.TildeToken = tildeToken
+	data.EqualsToken = equalsToken
+	data.Expression = expression
+	return f.newNode(KindKvsSieveBindingInitializer, data)
+}
+
+func (f *NodeFactory) UpdateKvsSieveBindingInitializer(node *KvsSieveBindingInitializer, tildeToken *TildeToken, equalsToken *EqualsToken, expression *Expression) *Node {
+	if tildeToken != node.TildeToken || equalsToken != node.EqualsToken || expression != node.Expression {
+		return updateNode(f.NewKvsSieveBindingInitializer(tildeToken, equalsToken, expression), node.AsNode(), f.hooks)
+	}
+	return node.AsNode()
+}
+
+func (node *KvsSieveBindingInitializer) ForEachChild(v Visitor) bool {
+	return visit(v, node.TildeToken) || visit(v, node.EqualsToken) || visit(v, node.Expression)
+}
+
+func (node *KvsSieveBindingInitializer) VisitEachChild(v *NodeVisitor) *Node {
+	return v.Factory.UpdateKvsSieveBindingInitializer(node, v.visitNode(node.TildeToken), v.visitNode(node.EqualsToken), v.visitNode(node.Expression))
+}
+
+func (node *KvsSieveBindingInitializer) Clone(f NodeFactoryCoercible) *Node {
+	return cloneNode(f.AsNodeFactory().NewKvsSieveBindingInitializer(node.TildeToken, node.EqualsToken, node.Expression), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func IsKvsSieveBindingInitializer(node *Node) bool {
+	return node.Kind == KindKvsSieveBindingInitializer
 }
 
 // ──────────────────────────────────────────────────────────────────────
@@ -9617,6 +9708,10 @@ func (n *Node) ForEachChild(v Visitor) bool {
 		return n.data.(*KvsExtantTestExpression).ForEachChild(v)
 	case KindKvsDefaultExpression:
 		return n.data.(*KvsDefaultExpression).ForEachChild(v)
+	case KindKvsNullingSieveExpression:
+		return n.data.(*KvsNullingSieveExpression).ForEachChild(v)
+	case KindKvsSieveBindingInitializer:
+		return n.data.(*KvsSieveBindingInitializer).ForEachChild(v)
 	case KindKvsNullingExpression:
 		return n.data.(*KvsNullingExpression).ForEachChild(v)
 	case KindKvsCompactArrayExpression:
@@ -10072,6 +10167,14 @@ func (n *Node) AsKvsExtantTestExpression() *KvsExtantTestExpression {
 
 func (n *Node) AsKvsDefaultExpression() *KvsDefaultExpression {
 	return n.data.(*KvsDefaultExpression)
+}
+
+func (n *Node) AsKvsNullingSieveExpression() *KvsNullingSieveExpression {
+	return n.data.(*KvsNullingSieveExpression)
+}
+
+func (n *Node) AsKvsSieveBindingInitializer() *KvsSieveBindingInitializer {
+	return n.data.(*KvsSieveBindingInitializer)
 }
 
 func (n *Node) AsKvsNullingExpression() *KvsNullingExpression {

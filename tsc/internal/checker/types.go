@@ -141,10 +141,11 @@ const (
 	ExternalEmitHelpersPropKey                                                                            // __propKey (used by class fields and ECMAScript decorators)
 	ExternalEmitHelpersAddDisposableResourceAndDisposeResources                                           // __addDisposableResource and __disposeResources (used by ESNext transformations)
 	ExternalEmitHelpersRewriteRelativeImportExtension                                                     // __rewriteRelativeImportExtension (used by --rewriteRelativeImportExtensions)
+	ExternalEmitHelpersKvsNullingSieve                                                                    // __kvsNullingSieve (used by KVS dynamic nulling sieve)
 	ExternalEmitHelpersESDecorateAndRunInitializers             = ExternalEmitHelpersDecorate             // __esDecorate and __runInitializers (used by ECMAScript decorators transformation)
 
 	ExternalEmitHelpersFirstEmitHelper = ExternalEmitHelpersRest
-	ExternalEmitHelpersLastEmitHelper  = ExternalEmitHelpersRewriteRelativeImportExtension
+	ExternalEmitHelpersLastEmitHelper  = ExternalEmitHelpersKvsNullingSieve
 
 	// Helpers included by ES2017 for..await..of
 	ExternalEmitHelpersForAwaitOfIncludes = ExternalEmitHelpersAsyncValues

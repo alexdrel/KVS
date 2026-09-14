@@ -122,7 +122,9 @@ import type {
     KvsNullableAssertionExpression,
     KvsNullableType,
     KvsNullingExpression,
+    KvsNullingSieveExpression,
     KvsSelectExpression,
+    KvsSieveBindingInitializer,
     KvsYieldStatement,
     LabeledStatement,
     LiteralTypeNode,
@@ -315,7 +317,9 @@ import {
     updateKvsNullableAssertionExpression,
     updateKvsNullableType,
     updateKvsNullingExpression,
+    updateKvsNullingSieveExpression,
     updateKvsSelectExpression,
+    updateKvsSieveBindingInitializer,
     updateKvsYieldStatement,
     updateLabeledStatement,
     updateLiteralTypeNode,
@@ -439,6 +443,7 @@ import {
     isTemplateHead,
     isTemplateLiteral,
     isTemplateMiddleOrTail,
+    isTildeToken,
     isTypeLiteralNode,
     isTypeNode,
     isTypeParameterDeclaration,
@@ -677,6 +682,18 @@ const visitEachChildTable: Record<number, VisitEachChildFunction> = {
     [SyntaxKind.KvsDefaultExpression]: (node: KvsDefaultExpression, visitor: Visitor): KvsDefaultExpression => {
         const _expression = visitNode(node.expression, visitor, isExpression);
         return updateKvsDefaultExpression(node, _expression);
+    },
+    [SyntaxKind.KvsNullingSieveExpression]: (node: KvsNullingSieveExpression, visitor: Visitor): KvsNullingSieveExpression => {
+        const _firstTildeToken = visitNode(node.firstTildeToken, visitor, isTildeToken);
+        const _secondTildeToken = visitNode(node.secondTildeToken, visitor, isTildeToken);
+        const _expression = visitNode(node.expression, visitor, isExpression);
+        return updateKvsNullingSieveExpression(node, _firstTildeToken, _secondTildeToken, _expression);
+    },
+    [SyntaxKind.KvsSieveBindingInitializer]: (node: KvsSieveBindingInitializer, visitor: Visitor): KvsSieveBindingInitializer => {
+        const _tildeToken = visitNode(node.tildeToken, visitor, isTildeToken);
+        const _equalsToken = visitNode(node.equalsToken, visitor, isEqualsToken);
+        const _expression = visitNode(node.expression, visitor, isExpression);
+        return updateKvsSieveBindingInitializer(node, _tildeToken, _equalsToken, _expression);
     },
     [SyntaxKind.KvsNullingExpression]: (node: KvsNullingExpression, visitor: Visitor): KvsNullingExpression => {
         const _condition = visitNode(node.condition, visitor, isExpression);

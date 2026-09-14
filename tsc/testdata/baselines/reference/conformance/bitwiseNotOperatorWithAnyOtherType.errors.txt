@@ -66,8 +66,8 @@ bitwiseNotOperatorWithAnyOtherType.ts(48,26): error TS2365: Operator '+' cannot 
 !!! error TS2365: Operator '+' cannot be applied to types 'undefined' and 'undefined'.
     
     // multiple ~ operators
-    var ResultIsNumber19 = ~~ANY;
-    var ResultIsNumber20 = ~~~(ANY + ANY1);
+    var ResultIsNumber19 = ~ ~ANY;
+    var ResultIsNumber20 = ~ ~ ~(ANY + ANY1);
     
     //miss assignment operators
     ~ANY;
@@ -77,4 +77,5 @@ bitwiseNotOperatorWithAnyOtherType.ts(48,26): error TS2365: Operator '+' cannot 
     ~obj1.y;
     ~objA.a;
     ~M.n;
-    ~~obj1.x;
+    ~ ~obj1.x;
+    

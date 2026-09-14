@@ -36,10 +36,10 @@ var ResultIsNumber3 = ~(ENUM1.A + ENUM1["B"]);
 >"B" : "B"
 
 // multiple ~ operators
-var ResultIsNumber4 = ~~~(ENUM1["A"] + ENUM1.B);
+var ResultIsNumber4 = ~ ~ ~(ENUM1["A"] + ENUM1.B);
 >ResultIsNumber4 : number
->~~~(ENUM1["A"] + ENUM1.B) : number
->~~(ENUM1["A"] + ENUM1.B) : number
+>~ ~ ~(ENUM1["A"] + ENUM1.B) : number
+>~ ~(ENUM1["A"] + ENUM1.B) : number
 >~(ENUM1["A"] + ENUM1.B) : number
 >(ENUM1["A"] + ENUM1.B) : number
 >ENUM1["A"] + ENUM1.B : number

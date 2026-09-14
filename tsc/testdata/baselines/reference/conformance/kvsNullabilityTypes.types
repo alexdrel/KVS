@@ -95,6 +95,25 @@ function incrementPresent(candidate: number?): number {
 >0 : 0
 }
 
+function nullableBooleanCondition(condition: boolean?): true | null {
+>nullableBooleanCondition : (condition: boolean?) => true | null
+>condition : boolean | null | undefined
+>true : true
+
+    if (condition) {
+>condition : boolean | null | undefined
+
+        const narrowed: true = condition;
+>narrowed : true
+>true : true
+>condition : true
+
+        return narrowed;
+>narrowed : true
+    }
+    return null;
+}
+
 function realSqrt(x: number): number? {
 >realSqrt : (x: number) => number?
 >x : number

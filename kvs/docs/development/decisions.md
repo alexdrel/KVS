@@ -262,10 +262,9 @@ the contextual type of the whole expression, and is evaluated lazily. The
 result type is the right-operand type unioned with `null`.
 
 Lowering produces the ordinary JavaScript conditional
-`condition ? expression : null`. This directly preserves RHS laziness and
-once-only condition evaluation. It currently inherits JavaScript truthiness;
-the distinct runtime behavior required by KVS truthiness remains an explicit
-future lowering step.
+`condition ? expression : null`. This directly preserves RHS laziness,
+once-only condition evaluation, and the accepted ordinary JavaScript
+truthiness rule.
 
 ## First extant-test slice
 
@@ -301,8 +300,8 @@ truthiness analysis.
 Lowering captures the initializer in a generated temporary, tests that
 temporary, and declares the source binding at the start of the successful
 block. This preserves both once-only evaluation and successful-branch-only
-runtime scope. KVS truthiness remains postponed; replacing the emitted
-JavaScript truthiness test is a later lowering concern.
+runtime scope. The emitted JavaScript truthiness test is the accepted ordinary
+binding behavior; `~=` explicitly filters the initializer when needed.
 
 ## First nullability-type slice
 
@@ -515,9 +514,50 @@ but KVS discourages using it to hide effects behind nullable paths because the
 resulting code is difficult to read. Effects should be sequenced explicitly.
 
 A relational comparison performs no KVS-specific narrowing. Strict identity
-remains ordinary JavaScript. Loose equality, member and indexed access, bitwise and
-shift operators, unary operators, compound assignments, and KVS truthiness are
-outside this slice.
+remains ordinary JavaScript. Loose equality, member and indexed access, bitwise
+and shift operators, unary operators, compound assignments, and explicit
+nulling sieve are outside this slice.
 
 No new syntax node is needed: the checker owns the nullable result and reports
 to the KVS emitter whether an ordinary binary expression requires lifting.
+
+## Explicit nulling sieve
+
+Status: accepted.
+
+KVS retains JavaScript/TypeScript truthiness for ordinary conditions, unary
+`!`, logical operators, and the nulling operator `?:`. Empty collections and
+records therefore remain truthy in those contexts. The abandoned global
+truthiness experiment is not part of the language or compiler architecture.
+
+Contiguous prefix `~~expression` explicitly filters a value. It returns null
+for absence, primitive falsy values, empty arrays and typed arrays, empty maps
+and sets, and empty record-like objects. Arrays and typed arrays use `length`,
+maps and sets use `size`, and records use `Object.keys(value).length`.
+Ordinary class instances pass through. Accepted objects retain their identity,
+the operand is evaluated once, and exceptions propagate.
+
+The parser represents the operation as a dedicated
+`KvsNullingSieveExpression`. The two tilde tokens must be adjacent; spaced
+`~ ~expression` remains ordinary JavaScript double bitwise NOT. KVS deliberately
+takes over the contiguous numeric spelling without issuing a normal compiler
+warning.
+
+Declaration initializer `~=` is the same operation expressed at the binding.
+It is represented by `KvsSieveBindingInitializer`, is restricted to `const`
+and `let`, and likewise requires its punctuation to be adjacent. It always
+binds the filtered result, including null; it is neither extant assignment
+`?=` nor a general assignment operator. Conditional binding reuses its existing
+scope and ordinary successful-condition narrowing.
+
+The checker adds null to the operand's present value type but does not invent
+non-empty collection types. It also selects an emit strategy: primitive
+truthiness, `length`, `size`, `Object.keys`, or identity for statically known
+families. Mixed or otherwise dynamic types use a runtime-dispatch helper.
+Both spellings share these strategies. The helper follows TypeScript's normal
+unscoped-helper path, including `--importHelpers` and `--noEmitHelpers`.
+
+As a condition, a successful prefix filter narrows its original operand through
+TypeScript's existing truthiness analysis. The filter does not add broader
+type-predicate inference: a callback such as `value => ~~value` follows the
+same inference rules as an ordinary value-returning callback.

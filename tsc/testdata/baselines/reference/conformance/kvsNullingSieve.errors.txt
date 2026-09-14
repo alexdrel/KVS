@@ -1,0 +1,104 @@
+kvsNullingSieve.ts(5,5): error TS2872: This kind of expression is always truthy.
+kvsNullingSieve.ts(9,5): error TS2872: This kind of expression is always truthy.
+kvsNullingSieve.ts(85,7): error TS7005: Variable 'rejectedSpaced' implicitly has an 'any' type.
+kvsNullingSieve.ts(85,22): error TS1005: ',' expected.
+kvsNullingSieve.ts(85,24): error TS1109: Expression expected.
+
+
+==== kvsNullingSieve.ts (5 errors) ====
+    declare const nullableItems: number[]?;
+    declare const items: number[];
+    declare const dynamic: unknown;
+    
+    if ([]) {
+        ~~
+!!! error TS2872: This kind of expression is always truthy.
+        console.log("ordinary array truthiness");
+    }
+    
+    if ({}) {
+        ~~
+!!! error TS2872: This kind of expression is always truthy.
+        console.log("ordinary object truthiness");
+    }
+    
+    const sameEmptyArray = (items || []) === items;
+    
+    const absent = ~~null;
+    const undefinedValue = ~~undefined;
+    const falseValue = ~~false;
+    const zero = ~~0;
+    const notANumber = ~~NaN;
+    const emptyString = ~~"";
+    const emptyArray = ~~[];
+    const emptyRecord = ~~{};
+    const decimal = ~~3.7;
+    const text = ~~"x";
+    const maybeItems = ~~nullableItems;
+    const dynamicValue = ~~dynamic;
+    
+    function filterArray<T extends readonly unknown[]>(value: T?) {
+        return ~~value;
+    }
+    
+    declare const maybeText: string?;
+    if (~~maybeText) {
+        const narrowedText: string = maybeText;
+    }
+    
+    const array = [1];
+    const sameArray = ~~array === array;
+    
+    const record = { x: null };
+    const sameRecord = ~~record === record;
+    
+    const emptyBytes = ~~new Uint8Array(0);
+    const bytes = new Uint8Array([1]);
+    const sameBytes = ~~bytes === bytes;
+    
+    const emptyMap = ~~new Map();
+    const map = new Map([["x", 1]]);
+    const sameMap = ~~map === map;
+    
+    const emptySet = ~~new Set();
+    const set = new Set([1]);
+    const sameSet = ~~set === set;
+    
+    class EmptyClass {}
+    const instance = new EmptyClass();
+    const sameInstance = ~~instance === instance;
+    
+    let evaluations = 0;
+    function readOnce() {
+        evaluations++;
+        return [1];
+    }
+    const once = ~~readOnce();
+    
+    function throws(): never {
+        throw new Error("expected");
+    }
+    const propagated = ~~throws();
+    
+    const compact ~= nullableItems;
+    let mutable ~= items;
+    
+    if (const rejected ~= []) {
+        rejected;
+    }
+    
+    if (const accepted ~= array) {
+        accepted;
+        accepted === array;
+    }
+    
+    const javascriptDoubleNot = ~ ~3.7;
+    var rejectedVar ~= items;
+    const rejectedSpaced ~ = items;
+          ~~~~~~~~~~~~~~
+!!! error TS7005: Variable 'rejectedSpaced' implicitly has an 'any' type.
+                         ~
+!!! error TS1005: ',' expected.
+                           ~
+!!! error TS1109: Expression expected.
+    

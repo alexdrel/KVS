@@ -291,6 +291,8 @@
             "KvsExtantAssignmentExpression",
             "KvsExtantTestExpression",
             "KvsDefaultExpression",
+            "KvsNullingSieveExpression",
+            "KvsSieveBindingInitializer",
             "KvsNullingExpression",
             "KvsConditionalElement",
             "KvsCompactArrayExpression",
@@ -1209,6 +1211,7 @@
                     "DotDotDotToken": "DotDotDotToken",
                     "QuestionToken": "QuestionToken",
                     "ExclamationToken": "ExclamationToken",
+                    "TildeToken": "TildeToken",
                     "ColonToken": "ColonToken",
                     "EqualsToken": "EqualsToken",
                     "AsteriskToken": "AsteriskToken",
@@ -1780,6 +1783,48 @@
                     "CompositeBase"
                 ],
                 "members": [
+                    {
+                        "name": "Expression",
+                        "type": "Expression"
+                    }
+                ],
+                "arena": true
+            },
+            "KvsNullingSieveExpression": {
+                "extends": [
+                    "ExpressionBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "FirstTildeToken",
+                        "type": "TildeToken"
+                    },
+                    {
+                        "name": "SecondTildeToken",
+                        "type": "TildeToken"
+                    },
+                    {
+                        "name": "Expression",
+                        "type": "Expression"
+                    }
+                ],
+                "arena": true
+            },
+            "KvsSieveBindingInitializer": {
+                "extends": [
+                    "ExpressionBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "TildeToken",
+                        "type": "TildeToken"
+                    },
+                    {
+                        "name": "EqualsToken",
+                        "type": "EqualsToken"
+                    },
                     {
                         "name": "Expression",
                         "type": "Expression"

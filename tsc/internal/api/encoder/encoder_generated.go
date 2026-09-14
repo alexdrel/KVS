@@ -119,6 +119,12 @@ func getChildrenPropertyMask(node *ast.Node) uint8 {
 	case ast.KindKvsDefaultExpression:
 		n := node.AsKvsDefaultExpression()
 		return (boolToByte(n.Expression != nil) << 0)
+	case ast.KindKvsNullingSieveExpression:
+		n := node.AsKvsNullingSieveExpression()
+		return (boolToByte(n.FirstTildeToken != nil) << 0) | (boolToByte(n.SecondTildeToken != nil) << 1) | (boolToByte(n.Expression != nil) << 2)
+	case ast.KindKvsSieveBindingInitializer:
+		n := node.AsKvsSieveBindingInitializer()
+		return (boolToByte(n.TildeToken != nil) << 0) | (boolToByte(n.EqualsToken != nil) << 1) | (boolToByte(n.Expression != nil) << 2)
 	case ast.KindKvsNullingExpression:
 		n := node.AsKvsNullingExpression()
 		return (boolToByte(n.Condition != nil) << 0) | (boolToByte(n.QuestionToken != nil) << 1) | (boolToByte(n.ColonToken != nil) << 2) | (boolToByte(n.WhenTrue != nil) << 3)

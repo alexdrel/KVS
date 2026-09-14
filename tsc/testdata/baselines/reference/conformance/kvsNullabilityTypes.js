@@ -36,6 +36,14 @@ function incrementPresent(candidate: number?): number {
     return 0;
 }
 
+function nullableBooleanCondition(condition: boolean?): true | null {
+    if (condition) {
+        const narrowed: true = condition;
+        return narrowed;
+    }
+    return null;
+}
+
 function realSqrt(x: number): number? {
     return x >= 0 ?: Math.sqrt(x);
 }
@@ -57,6 +65,13 @@ function incrementPresent(candidate) {
     if (candidate != null)
         return candidate + 1;
     return 0;
+}
+function nullableBooleanCondition(condition) {
+    if (condition) {
+        const narrowed = condition;
+        return narrowed;
+    }
+    return null;
 }
 function realSqrt(x) {
     return x >= 0 ? Math.sqrt(x) : null;
@@ -90,6 +105,7 @@ declare const calculation: number;
 declare const values: ArrayOfNullable;
 declare const rejectNullableElement: number;
 declare function incrementPresent(candidate: number?): number;
+declare function nullableBooleanCondition(condition: boolean?): true | null;
 declare function realSqrt(x: number): number?;
 type RejectSpacedNullable = number;
 type RejectSpacedExtant = NullableNumber;

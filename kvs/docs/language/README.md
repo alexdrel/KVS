@@ -52,7 +52,7 @@ const total = for (orders; total = 0) {
 };
 ```
 
-The result binding belongs to the loop; the surrounding code receives its final value. The same locality applies to `return? lookup()`, extant assignment such as `profile.nickname ?= patch.nickname`, and conditional fields in literals, without adding setup to a wider scope.
+The result binding belongs to the loop; the surrounding code receives its final value. The same locality applies to `return? lookup()`, sieve bindings such as `if (const items ~= getItems())`, extant assignment such as `profile.nickname ?= patch.nickname`, and conditional fields in literals, without adding setup to a wider scope.
 
 ## Keep the familiar programming model
 
@@ -78,9 +78,13 @@ normalize?(name)        // call when the value is present
 return? cached          // return when present
 yield? candidate        // produce when present
 nickname ?= suggestion  // assign when present
+const usable = ~~value  // preserve a truthy/non-empty value, otherwise null
 ```
 
-Presence has its own direct test, `value?`. Ordinary conditions use application truthiness, including empty collections being false.
+Presence has its own direct test, `value?`. Ordinary conditions and boolean
+operators retain JavaScript/TypeScript truthiness, so empty collections remain
+truthy. Prefix `~~value` explicitly filters primitive falsy values and empty
+collections to null when that distinction is wanted.
 
 When flow analysis needs an explicit escape hatch, `as!` asserts that one expression is present. It is static only; runtime `!` instead resolves absence using the type's default value.
 

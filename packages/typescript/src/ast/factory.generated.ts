@@ -166,7 +166,9 @@ import type {
     KvsNullableAssertionExpression,
     KvsNullableType,
     KvsNullingExpression,
+    KvsNullingSieveExpression,
     KvsSelectExpression,
+    KvsSieveBindingInitializer,
     KvsYieldStatement,
     LabeledStatement,
     LeftHandSideExpression,
@@ -252,6 +254,7 @@ import type {
     TemplateTail,
     ThisTypeNode,
     ThrowStatement,
+    TildeToken,
     Token,
     TokenSyntaxKind,
     TryStatement,
@@ -440,6 +443,9 @@ export class NodeObject {
     get finallyBlock(): any {
         return this._data?.finallyBlock;
     }
+    get firstTildeToken(): any {
+        return this._data?.firstTildeToken;
+    }
     get forIn(): any {
         return this._data?.forIn;
     }
@@ -620,6 +626,9 @@ export class NodeObject {
     get scriptKind(): any {
         return this._data?.scriptKind;
     }
+    get secondTildeToken(): any {
+        return this._data?.secondTildeToken;
+    }
     get spanMap(): any {
         return this._data?.spanMap;
     }
@@ -658,6 +667,9 @@ export class NodeObject {
     }
     get thisArg(): any {
         return this._data?.thisArg;
+    }
+    get tildeToken(): any {
+        return this._data?.tildeToken;
     }
     get token(): any {
         return this._data?.token;
@@ -865,6 +877,10 @@ function cloneNodeData(node: Node): any {
             return { expression: n.expression, questionToken: n.questionToken };
         case SyntaxKind.KvsDefaultExpression:
             return { expression: n.expression };
+        case SyntaxKind.KvsNullingSieveExpression:
+            return { firstTildeToken: n.firstTildeToken, secondTildeToken: n.secondTildeToken, expression: n.expression };
+        case SyntaxKind.KvsSieveBindingInitializer:
+            return { tildeToken: n.tildeToken, equalsToken: n.equalsToken, expression: n.expression };
         case SyntaxKind.KvsNullingExpression:
             return { condition: n.condition, questionToken: n.questionToken, colonToken: n.colonToken, whenTrue: n.whenTrue };
         case SyntaxKind.KvsCompactArrayExpression:
@@ -1285,6 +1301,14 @@ const forEachChildTable: Record<number, ForEachChildFunction> = {
         visitNode(cbNode, data.expression) ||
         visitNode(cbNode, data.questionToken),
     [SyntaxKind.KvsDefaultExpression]: (data, cbNode, cbNodes) => visitNode(cbNode, data.expression),
+    [SyntaxKind.KvsNullingSieveExpression]: (data, cbNode, cbNodes) =>
+        visitNode(cbNode, data.firstTildeToken) ||
+        visitNode(cbNode, data.secondTildeToken) ||
+        visitNode(cbNode, data.expression),
+    [SyntaxKind.KvsSieveBindingInitializer]: (data, cbNode, cbNodes) =>
+        visitNode(cbNode, data.tildeToken) ||
+        visitNode(cbNode, data.equalsToken) ||
+        visitNode(cbNode, data.expression),
     [SyntaxKind.KvsNullingExpression]: (data, cbNode, cbNodes) =>
         visitNode(cbNode, data.condition) ||
         visitNode(cbNode, data.questionToken) ||
@@ -2035,6 +2059,22 @@ export function createKvsDefaultExpression(expression: Expression): KvsDefaultEx
     return new NodeObject(SyntaxKind.KvsDefaultExpression, {
         expression,
     }) as unknown as KvsDefaultExpression;
+}
+
+export function createKvsNullingSieveExpression(firstTildeToken: TildeToken, secondTildeToken: TildeToken, expression: Expression): KvsNullingSieveExpression {
+    return new NodeObject(SyntaxKind.KvsNullingSieveExpression, {
+        firstTildeToken,
+        secondTildeToken,
+        expression,
+    }) as unknown as KvsNullingSieveExpression;
+}
+
+export function createKvsSieveBindingInitializer(tildeToken: TildeToken, equalsToken: EqualsToken, expression: Expression): KvsSieveBindingInitializer {
+    return new NodeObject(SyntaxKind.KvsSieveBindingInitializer, {
+        tildeToken,
+        equalsToken,
+        expression,
+    }) as unknown as KvsSieveBindingInitializer;
 }
 
 export function createKvsNullingExpression(condition: Expression, questionToken: QuestionToken, colonToken: ColonToken, whenTrue: Expression): KvsNullingExpression {
@@ -3532,6 +3572,14 @@ export function updateKvsExtantTestExpression(node: KvsExtantTestExpression, exp
 
 export function updateKvsDefaultExpression(node: KvsDefaultExpression, expression: Expression): KvsDefaultExpression {
     return node.expression !== expression ? createKvsDefaultExpression(expression) : node;
+}
+
+export function updateKvsNullingSieveExpression(node: KvsNullingSieveExpression, firstTildeToken: TildeToken, secondTildeToken: TildeToken, expression: Expression): KvsNullingSieveExpression {
+    return node.firstTildeToken !== firstTildeToken || node.secondTildeToken !== secondTildeToken || node.expression !== expression ? createKvsNullingSieveExpression(firstTildeToken, secondTildeToken, expression) : node;
+}
+
+export function updateKvsSieveBindingInitializer(node: KvsSieveBindingInitializer, tildeToken: TildeToken, equalsToken: EqualsToken, expression: Expression): KvsSieveBindingInitializer {
+    return node.tildeToken !== tildeToken || node.equalsToken !== equalsToken || node.expression !== expression ? createKvsSieveBindingInitializer(tildeToken, equalsToken, expression) : node;
 }
 
 export function updateKvsNullingExpression(node: KvsNullingExpression, condition: Expression, questionToken: QuestionToken, colonToken: ColonToken, whenTrue: Expression): KvsNullingExpression {

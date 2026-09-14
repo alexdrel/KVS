@@ -23,6 +23,7 @@ import (
 	"github.com/microsoft/TypeScript/tsc/internal/jsnum"
 	"github.com/microsoft/TypeScript/tsc/internal/module"
 	"github.com/microsoft/TypeScript/tsc/internal/modulespecifiers"
+	"github.com/microsoft/TypeScript/tsc/internal/printer"
 	"github.com/microsoft/TypeScript/tsc/internal/scanner"
 	"github.com/microsoft/TypeScript/tsc/internal/stringutil"
 	"github.com/microsoft/TypeScript/tsc/internal/tracing"
@@ -8061,6 +8062,8 @@ func (c *Checker) checkExpressionWorker(node *ast.Node, checkMode CheckMode) *Ty
 		return c.booleanType
 	case ast.KindKvsDefaultExpression:
 		return c.checkKvsDefaultExpression(node, checkMode)
+	case ast.KindKvsNullingSieveExpression, ast.KindKvsSieveBindingInitializer:
+		return c.checkKvsNullingSieveExpression(node, checkMode)
 	case ast.KindKvsCollectExpression:
 		return c.checkKvsCollectExpression(node)
 	case ast.KindKvsSelectExpression:
@@ -8083,6 +8086,20 @@ func (c *Checker) checkExpressionWorker(node *ast.Node, checkMode CheckMode) *Ty
 		panic("Should never directly check a JsxOpeningElement")
 	}
 	return c.errorType
+}
+
+func (c *Checker) checkKvsNullingSieveExpression(node *ast.Node, checkMode CheckMode) *Type {
+	var expression *ast.Node
+	if node.Kind == ast.KindKvsNullingSieveExpression {
+		expression = node.AsKvsNullingSieveExpression().Expression
+	} else {
+		expression = node.AsKvsSieveBindingInitializer().Expression
+	}
+	operandType := c.checkExpressionEx(expression, checkMode)
+	if c.getKvsNullingSieveKind(operandType) == printer.KvsNullingSieveDynamic {
+		c.checkExternalEmitHelpers(node, ExternalEmitHelpersKvsNullingSieve)
+	}
+	return c.getNullableType(c.GetNonNullableType(operandType), TypeFlagsNull)
 }
 
 func (c *Checker) checkKvsDefaultExpression(node *ast.Node, checkMode CheckMode) *Type {
@@ -29510,6 +29527,8 @@ func (c *Checker) getHelperNames(helper ExternalEmitHelpers) []string {
 		return []string{"__addDisposableResource", "__disposeResources"}
 	case ExternalEmitHelpersRewriteRelativeImportExtension:
 		return []string{"__rewriteRelativeImportExtension"}
+	case ExternalEmitHelpersKvsNullingSieve:
+		return []string{"__kvsNullingSieve"}
 	default:
 		panic("Unrecognized helper")
 	}

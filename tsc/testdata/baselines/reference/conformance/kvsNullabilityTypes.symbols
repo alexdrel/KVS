@@ -96,22 +96,39 @@ function incrementPresent(candidate: number?): number {
     return 0;
 }
 
+function nullableBooleanCondition(condition: boolean?): true | null {
+>nullableBooleanCondition : Symbol(nullableBooleanCondition, Decl(kvsNullabilityTypes.ts, 33, 1))
+>condition : Symbol(condition, Decl(kvsNullabilityTypes.ts, 35, 34))
+
+    if (condition) {
+>condition : Symbol(condition, Decl(kvsNullabilityTypes.ts, 35, 34))
+
+        const narrowed: true = condition;
+>narrowed : Symbol(narrowed, Decl(kvsNullabilityTypes.ts, 37, 13))
+>condition : Symbol(condition, Decl(kvsNullabilityTypes.ts, 35, 34))
+
+        return narrowed;
+>narrowed : Symbol(narrowed, Decl(kvsNullabilityTypes.ts, 37, 13))
+    }
+    return null;
+}
+
 function realSqrt(x: number): number? {
->realSqrt : Symbol(realSqrt, Decl(kvsNullabilityTypes.ts, 33, 1))
->x : Symbol(x, Decl(kvsNullabilityTypes.ts, 35, 18))
+>realSqrt : Symbol(realSqrt, Decl(kvsNullabilityTypes.ts, 41, 1))
+>x : Symbol(x, Decl(kvsNullabilityTypes.ts, 43, 18))
 
     return x >= 0 ?: Math.sqrt(x);
->x : Symbol(x, Decl(kvsNullabilityTypes.ts, 35, 18))
+>x : Symbol(x, Decl(kvsNullabilityTypes.ts, 43, 18))
 >Math.sqrt : Symbol(Math.sqrt, Decl(lib.es5.d.ts, --, --))
 >Math : Symbol(Math, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --), Decl(lib.es2015.core.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --), Decl(lib.es2025.float16.d.ts, --, --))
 >sqrt : Symbol(Math.sqrt, Decl(lib.es5.d.ts, --, --))
->x : Symbol(x, Decl(kvsNullabilityTypes.ts, 35, 18))
+>x : Symbol(x, Decl(kvsNullabilityTypes.ts, 43, 18))
 }
 
 type RejectSpacedNullable = number ?;
->RejectSpacedNullable : Symbol(RejectSpacedNullable, Decl(kvsNullabilityTypes.ts, 37, 1))
+>RejectSpacedNullable : Symbol(RejectSpacedNullable, Decl(kvsNullabilityTypes.ts, 45, 1))
 
 type RejectSpacedExtant = NullableNumber !;
->RejectSpacedExtant : Symbol(RejectSpacedExtant, Decl(kvsNullabilityTypes.ts, 39, 37))
+>RejectSpacedExtant : Symbol(RejectSpacedExtant, Decl(kvsNullabilityTypes.ts, 47, 37))
 >NullableNumber : Symbol(NullableNumber, Decl(kvsNullabilityTypes.ts, 0, 0))
 

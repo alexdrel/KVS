@@ -109,6 +109,77 @@ func (r *EmitResolver) IsKvsNullableExpression(node *ast.Node) bool {
 	return isKvsNullableType(r.checker.checkExpression(node))
 }
 
+func (r *EmitResolver) GetKvsNullingSieveKind(node *ast.Node) printer.KvsNullingSieveKind {
+	r.checkerMu.Lock()
+	defer r.checkerMu.Unlock()
+	return r.checker.getKvsNullingSieveKind(r.checker.checkExpression(node))
+}
+
+func (c *Checker) getKvsNullingSieveKind(t *Type) printer.KvsNullingSieveKind {
+	if t.flags&TypeFlagsTypeParameter != 0 {
+		if constraint := c.getBaseConstraintOfType(t); constraint != nil {
+			return c.getKvsNullingSieveKind(constraint)
+		}
+		return printer.KvsNullingSieveDynamic
+	}
+	if t.flags&TypeFlagsUnion != 0 {
+		kind := printer.KvsNullingSieveIdentity
+		found := false
+		for _, part := range t.Types() {
+			if part.flags&TypeFlagsNullable != 0 {
+				continue
+			}
+			partKind := c.getKvsNullingSieveKind(part)
+			if !found {
+				kind, found = partKind, true
+			} else if kind != partKind {
+				return printer.KvsNullingSieveDynamic
+			}
+		}
+		return kind
+	}
+	if t.flags&(TypeFlagsNullable|TypeFlagsNever) != 0 {
+		return printer.KvsNullingSieveIdentity
+	}
+	if t.flags&(TypeFlagsAny|TypeFlagsUnknown) != 0 {
+		return printer.KvsNullingSieveDynamic
+	}
+	if t.flags&(TypeFlagsStringLike|TypeFlagsNumberLike|TypeFlagsBigIntLike|TypeFlagsBooleanLike|TypeFlagsESSymbolLike) != 0 {
+		return printer.KvsNullingSievePrimitive
+	}
+	if c.isArrayOrTupleType(t) {
+		return printer.KvsNullingSieveLength
+	}
+	if t.flags&TypeFlagsObject == 0 {
+		return printer.KvsNullingSieveDynamic
+	}
+	object := t.AsObjectType()
+	symbol := object.symbol
+	objectFlags := object.objectFlags
+	if object.objectFlags&ObjectFlagsReference != 0 && object.Target() != nil {
+		symbol = object.Target().symbol
+		objectFlags = object.Target().objectFlags
+	}
+	if symbol != nil && c.getSymbolIfSameReference(symbol, c.globals[symbol.Name]) != nil {
+		switch symbol.Name {
+		case "Int8Array", "Uint8Array", "Uint8ClampedArray", "Int16Array", "Uint16Array", "Int32Array", "Uint32Array", "Float32Array", "Float64Array", "BigInt64Array", "BigUint64Array":
+			return printer.KvsNullingSieveLength
+		case "Map", "ReadonlyMap", "Set", "ReadonlySet":
+			return printer.KvsNullingSieveSize
+		}
+	}
+	if objectFlags&ObjectFlagsClass != 0 || len(c.getSignaturesOfType(t, SignatureKindCall)) != 0 || len(c.getSignaturesOfType(t, SignatureKindConstruct)) != 0 {
+		return printer.KvsNullingSieveIdentity
+	}
+	if object.objectFlags&ObjectFlagsObjectLiteral != 0 {
+		return printer.KvsNullingSieveRecord
+	}
+	if object.objectFlags&ObjectFlagsAnonymous != 0 {
+		return printer.KvsNullingSieveRecord
+	}
+	return printer.KvsNullingSieveDynamic
+}
+
 func (r *EmitResolver) IsKvsNullableIterableSource(node *ast.Node) bool {
 	r.checkerMu.Lock()
 	defer r.checkerMu.Unlock()

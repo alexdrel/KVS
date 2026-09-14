@@ -66,7 +66,7 @@ var ResultIsNumber7 = ~A.foo();
 >foo : Symbol(A.foo, Decl(bitwiseNotOperatorWithBooleanType.ts, 6, 22))
 
 // multiple ~ operators
-var ResultIsNumber8 = ~~BOOLEAN;
+var ResultIsNumber8 = ~ ~BOOLEAN;
 >ResultIsNumber8 : Symbol(ResultIsNumber8, Decl(bitwiseNotOperatorWithBooleanType.ts, 29, 3))
 >BOOLEAN : Symbol(BOOLEAN, Decl(bitwiseNotOperatorWithBooleanType.ts, 1, 3))
 

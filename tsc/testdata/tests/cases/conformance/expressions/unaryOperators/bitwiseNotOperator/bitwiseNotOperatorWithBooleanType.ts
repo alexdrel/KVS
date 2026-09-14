@@ -30,7 +30,7 @@ var ResultIsNumber6 = ~foo();
 var ResultIsNumber7 = ~A.foo();
 
 // multiple ~ operators
-var ResultIsNumber8 = ~~BOOLEAN;
+var ResultIsNumber8 = ~ ~BOOLEAN;
 
 // miss assignment operators
 ~true;
