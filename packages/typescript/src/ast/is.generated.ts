@@ -187,6 +187,8 @@ import type {
     KvsCollectExpression,
     KvsCompactArrayExpression,
     KvsCompactObjectExpression,
+    KvsComparisonAlternativesExpression,
+    KvsComparisonChainExpression,
     KvsConditionalElement,
     KvsDefaultExpression,
     KvsExtantAssertionExpression,
@@ -649,6 +651,24 @@ export declare namespace isKvsSieveBindingInitializer {
     function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsSieveBindingInitializer>;
 }
 isKvsSieveBindingInitializer.Handle = isKvsSieveBindingInitializer as any;
+
+export function isKvsComparisonAlternativesExpression(node: Node): node is KvsComparisonAlternativesExpression {
+    return node.kind === SyntaxKind.KvsComparisonAlternativesExpression;
+}
+
+export declare namespace isKvsComparisonAlternativesExpression {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsComparisonAlternativesExpression>;
+}
+isKvsComparisonAlternativesExpression.Handle = isKvsComparisonAlternativesExpression as any;
+
+export function isKvsComparisonChainExpression(node: Node): node is KvsComparisonChainExpression {
+    return node.kind === SyntaxKind.KvsComparisonChainExpression;
+}
+
+export declare namespace isKvsComparisonChainExpression {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsComparisonChainExpression>;
+}
+isKvsComparisonChainExpression.Handle = isKvsComparisonChainExpression as any;
 
 export function isKvsNullingExpression(node: Node): node is KvsNullingExpression {
     return node.kind === SyntaxKind.KvsNullingExpression;

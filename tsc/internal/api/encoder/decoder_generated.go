@@ -343,6 +343,18 @@ func (d *astDecoder) createChildrenNode(kind ast.Kind, data uint32, childIndices
 		equalsToken := d.nodeAt(it.nextIf(mask, 1))
 		expression := d.nodeAt(it.nextIf(mask, 2))
 		return d.factory.NewKvsSieveBindingInitializer(tildeToken, equalsToken, expression), nil
+	case ast.KindKvsComparisonAlternativesExpression:
+		it := newChildIter(childIndices)
+		subject := d.nodeAt(it.nextIf(mask, 0))
+		operatorToken := d.nodeAt(it.nextIf(mask, 1))
+		spreadToken := d.nodeAt(it.nextIf(mask, 2))
+		alternatives := d.nodeListAt(it.nextIf(mask, 3))
+		return d.factory.NewKvsComparisonAlternativesExpression(subject, operatorToken, spreadToken, alternatives), nil
+	case ast.KindKvsComparisonChainExpression:
+		it := newChildIter(childIndices)
+		operands := d.nodeListAt(it.nextIf(mask, 0))
+		operators := d.nodeListAt(it.nextIf(mask, 1))
+		return d.factory.NewKvsComparisonChainExpression(operands, operators), nil
 	case ast.KindKvsNullingExpression:
 		it := newChildIter(childIndices)
 		condition := d.nodeAt(it.nextIf(mask, 0))

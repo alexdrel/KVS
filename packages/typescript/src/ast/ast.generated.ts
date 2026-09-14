@@ -645,6 +645,18 @@ export interface KvsSieveBindingInitializer extends ExpressionBase {
     readonly equalsToken: EqualsToken;
     readonly expression: Expression;
 }
+export interface KvsComparisonAlternativesExpression extends ExpressionBase {
+    readonly kind: SyntaxKind.KvsComparisonAlternativesExpression;
+    readonly subject: Expression;
+    readonly operatorToken: BinaryOperatorToken;
+    readonly spreadToken?: DotDotDotToken;
+    readonly alternatives: NodeArray<Expression>;
+}
+export interface KvsComparisonChainExpression extends ExpressionBase {
+    readonly kind: SyntaxKind.KvsComparisonChainExpression;
+    readonly operands: NodeArray<Expression>;
+    readonly operators: NodeArray<BinaryOperatorToken>;
+}
 export interface KvsNullingExpression extends ExpressionBase {
     readonly kind: SyntaxKind.KvsNullingExpression;
     readonly condition: Expression;

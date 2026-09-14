@@ -3372,6 +3372,10 @@ func (p *Printer) emitExpression(node *ast.Expression, precedence ast.OperatorPr
 		p.emitKvsNullingSieveExpression(node.AsKvsNullingSieveExpression())
 	case ast.KindKvsSieveBindingInitializer:
 		p.emitKvsSieveBindingInitializer(node.AsKvsSieveBindingInitializer())
+	case ast.KindKvsComparisonAlternativesExpression:
+		p.emitKvsComparisonAlternativesExpression(node.AsKvsComparisonAlternativesExpression())
+	case ast.KindKvsComparisonChainExpression:
+		p.emitKvsComparisonChainExpression(node.AsKvsComparisonChainExpression())
 	case ast.KindKvsCompactArrayExpression:
 		p.emitKvsCompactArrayExpression(node.AsKvsCompactArrayExpression())
 	case ast.KindKvsCompactObjectExpression:
@@ -3807,6 +3811,38 @@ func (p *Printer) emitKvsSieveBindingInitializer(node *ast.KvsSieveBindingInitia
 	p.emitPunctuationNode(node.EqualsToken)
 	p.writeSpace()
 	p.emitExpression(node.Expression, ast.OperatorPrecedenceAssignment)
+	p.exitNode(node.AsNode(), state)
+}
+
+func (p *Printer) emitKvsComparisonAlternativesExpression(node *ast.KvsComparisonAlternativesExpression) {
+	state := p.enterNode(node.AsNode())
+	p.emitExpression(node.Subject, ast.OperatorPrecedenceEquality)
+	p.writeSpace()
+	p.emitPunctuationNode(node.OperatorToken)
+	p.writeSpace()
+	if node.SpreadToken != nil {
+		p.emitPunctuationNode(node.SpreadToken)
+	}
+	for i, alternative := range node.Alternatives.Nodes {
+		if i > 0 {
+			p.writeSpace()
+			p.writePunctuation("|")
+			p.writeSpace()
+		}
+		p.emitExpression(alternative, ast.OperatorPrecedenceBitwiseOR)
+	}
+	p.exitNode(node.AsNode(), state)
+}
+
+func (p *Printer) emitKvsComparisonChainExpression(node *ast.KvsComparisonChainExpression) {
+	state := p.enterNode(node.AsNode())
+	p.emitExpression(node.Operands.Nodes[0], ast.OperatorPrecedenceRelational)
+	for i, operator := range node.Operators.Nodes {
+		p.writeSpace()
+		p.emitPunctuationNode(operator)
+		p.writeSpace()
+		p.emitExpression(node.Operands.Nodes[i+1], ast.OperatorPrecedenceRelational)
+	}
 	p.exitNode(node.AsNode(), state)
 }
 

@@ -1,0 +1,199 @@
+//// [tests/cases/conformance/kvs/kvsNullableEquality.ts] ////
+
+=== kvsNullableEquality.ts ===
+declare let x: string?;
+>x : string | null | undefined
+
+declare let y: string?;
+>y : string | null | undefined
+
+declare let z: string;
+>z : string
+
+declare const nullAlias: null;
+>nullAlias : null
+
+declare const undefinedAlias: undefined;
+>undefinedAlias : undefined
+
+const rejectLooseEqual = x == y;
+>rejectLooseEqual : boolean
+>x == y : boolean
+>x : string | null | undefined
+>y : string | null | undefined
+
+const rejectLooseNotEqual = x != y;
+>rejectLooseNotEqual : boolean
+>x != y : boolean
+>x : string | null | undefined
+>y : string | null | undefined
+
+const rejectStrictEqual = x === y;
+>rejectStrictEqual : boolean
+>x === y : boolean
+>x : string | null | undefined
+>y : string | null | undefined
+
+const rejectStrictNotEqual = x !== y;
+>rejectStrictNotEqual : boolean
+>x !== y : boolean
+>x : string | null | undefined
+>y : string | null | undefined
+
+const looseEqualPresent = x == z;
+>looseEqualPresent : boolean
+>x == z : boolean
+>x : string | null | undefined
+>z : string
+
+const looseNotEqualPresent = x != z;
+>looseNotEqualPresent : boolean
+>x != z : boolean
+>x : string | null | undefined
+>z : string
+
+const strictEqualPresent = x === z;
+>strictEqualPresent : boolean
+>x === z : boolean
+>x : string | null | undefined
+>z : string
+
+const strictNotEqualPresent = x !== z;
+>strictNotEqualPresent : boolean
+>x !== z : boolean
+>x : string | null | undefined
+>z : string
+
+const looseEqualNull = x == null;
+>looseEqualNull : boolean
+>x == null : boolean
+>x : string | null | undefined
+
+const looseNotEqualNull = x != null;
+>looseNotEqualNull : boolean
+>x != null : boolean
+>x : string | null | undefined
+
+const looseEqualUndefined = x == undefined;
+>looseEqualUndefined : boolean
+>x == undefined : boolean
+>x : string | null | undefined
+>undefined : undefined
+
+const looseNotEqualUndefined = x != undefined;
+>looseNotEqualUndefined : boolean
+>x != undefined : boolean
+>x : string | null | undefined
+>undefined : undefined
+
+const strictEqualNull = x === null;
+>strictEqualNull : boolean
+>x === null : boolean
+>x : string | null | undefined
+
+const strictNotEqualNull = x !== null;
+>strictNotEqualNull : boolean
+>x !== null : boolean
+>x : string | null | undefined
+
+const strictEqualUndefined = x === undefined;
+>strictEqualUndefined : boolean
+>x === undefined : boolean
+>x : string | null | undefined
+>undefined : undefined
+
+const strictNotEqualUndefined = x !== undefined;
+>strictNotEqualUndefined : boolean
+>x !== undefined : boolean
+>x : string | null | undefined
+>undefined : undefined
+
+const strictEqualNullAlias = x === nullAlias;
+>strictEqualNullAlias : boolean
+>x === nullAlias : boolean
+>x : string | null | undefined
+>nullAlias : null
+
+const strictNotEqualNullAlias = x !== nullAlias;
+>strictNotEqualNullAlias : boolean
+>x !== nullAlias : boolean
+>x : string | null | undefined
+>nullAlias : null
+
+const strictEqualUndefinedAlias = x === undefinedAlias;
+>strictEqualUndefinedAlias : boolean
+>x === undefinedAlias : boolean
+>x : string | null | undefined
+>undefinedAlias : undefined
+
+const strictNotEqualUndefinedAlias = x !== undefinedAlias;
+>strictNotEqualUndefinedAlias : boolean
+>x !== undefinedAlias : boolean
+>x : string | null | undefined
+>undefinedAlias : undefined
+
+function narrowLoose(value: string?) {
+>narrowLoose : (value: string?) => string | null
+>value : string | null | undefined
+
+    if (value != null) {
+>value != null : boolean
+>value : string | null | undefined
+
+        const present: string = value;
+>present : string
+>value : string
+
+        return present;
+>present : string
+    }
+    return null;
+}
+
+function narrowStrictNull(value: string?) {
+>narrowStrictNull : (value: string?) => string | null | undefined
+>value : string | null | undefined
+
+    if (value !== null) {
+>value !== null : boolean
+>value : string | null | undefined
+
+        return value;
+>value : string | undefined
+    }
+    return null;
+}
+
+function narrowStrictUndefined(value: string?) {
+>narrowStrictUndefined : (value: string?) => string | null
+>value : string | null | undefined
+
+    if (value !== undefined) {
+>value !== undefined : boolean
+>value : string | null | undefined
+>undefined : undefined
+
+        return value;
+>value : string | null
+    }
+    return null;
+}
+
+function compareFlowNarrowedAbsence(left: string?, right: string?) {
+>compareFlowNarrowedAbsence : (left: string?, right: string?) => boolean
+>left : string | null | undefined
+>right : string | null | undefined
+
+    if (left == null) {
+>left == null : boolean
+>left : string | null | undefined
+
+        return left === right;
+>left === right : boolean
+>left : null | undefined
+>right : string | null | undefined
+    }
+    return false;
+>false : false
+}
+

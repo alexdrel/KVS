@@ -107,6 +107,10 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 		return tx.transformNullingSieve(node.AsKvsNullingSieveExpression().Expression)
 	case ast.KindKvsSieveBindingInitializer:
 		return tx.transformNullingSieve(node.AsKvsSieveBindingInitializer().Expression)
+	case ast.KindKvsComparisonAlternativesExpression:
+		return tx.transformComparisonAlternatives(node.AsKvsComparisonAlternativesExpression())
+	case ast.KindKvsComparisonChainExpression:
+		return tx.transformComparisonChain(node.AsKvsComparisonChainExpression())
 	case ast.KindKvsNullingExpression:
 		return tx.transformNullingExpression(node.AsKvsNullingExpression())
 	case ast.KindArrayLiteralExpression:
@@ -135,6 +139,73 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 		return tx.Factory().NewArrayLiteralExpression(nil, false)
 	}
 	return tx.Visitor().VisitEachChild(node)
+}
+
+func (tx *transformer) transformComparisonAlternatives(node *ast.KvsComparisonAlternativesExpression) *ast.Node {
+	factory := tx.Factory()
+	temp := factory.NewTempVariable()
+	tx.EmitContext().AddVariableDeclaration(temp)
+	assignSubject := factory.NewAssignmentExpression(temp, tx.Visitor().VisitNode(node.Subject))
+	var membership *ast.Node
+	if node.SpreadToken != nil || len(node.Alternatives.Nodes) >= 3 {
+		var array *ast.Node
+		if node.SpreadToken != nil {
+			allowed := tx.Visitor().VisitNode(node.Alternatives.Nodes[0])
+			allowedOrEmpty := factory.NewBinaryExpression(nil, allowed, nil, factory.NewToken(ast.KindQuestionQuestionToken), factory.NewArrayLiteralExpression(nil, false))
+			spread := factory.NewSpreadElement(allowedOrEmpty)
+			array = factory.NewArrayLiteralExpression(factory.NewNodeList([]*ast.Node{spread}), false)
+		} else {
+			array = factory.NewArrayLiteralExpression(factory.NewNodeList(tx.Visitor().VisitNodes(node.Alternatives).Nodes), false)
+		}
+		includes := factory.NewPropertyAccessExpression(array, nil, factory.NewIdentifier("includes"), ast.NodeFlagsNone)
+		membership = factory.NewCallExpression(includes, nil, nil, factory.NewNodeList([]*ast.Node{temp}), ast.NodeFlagsNone)
+		if node.OperatorToken.Kind == ast.KindExclamationEqualsToken {
+			membership = factory.NewPrefixUnaryExpression(ast.KindExclamationToken, membership)
+		}
+	} else {
+		join := ast.KindBarBarToken
+		if node.OperatorToken.Kind == ast.KindExclamationEqualsToken {
+			join = ast.KindAmpersandAmpersandToken
+		}
+		for _, alternative := range node.Alternatives.Nodes {
+			comparison := factory.NewBinaryExpression(nil, temp, nil, factory.NewToken(node.OperatorToken.Kind), tx.Visitor().VisitNode(alternative))
+			if membership == nil {
+				membership = comparison
+			} else {
+				membership = factory.NewBinaryExpression(nil, membership, nil, factory.NewToken(join), comparison)
+			}
+		}
+	}
+	return factory.NewCommaExpression(assignSubject, membership)
+}
+
+func (tx *transformer) transformComparisonChain(node *ast.KvsComparisonChainExpression) *ast.Node {
+	factory := tx.Factory()
+	left := tx.Visitor().VisitNode(node.Operands.Nodes[0])
+	var result *ast.Node
+	for i, operator := range node.Operators.Nodes {
+		right := tx.Visitor().VisitNode(node.Operands.Nodes[i+1])
+		if i+1 < len(node.Operands.Nodes)-1 {
+			temp := factory.NewTempVariable()
+			tx.EmitContext().AddVariableDeclaration(temp)
+			right = factory.NewAssignmentExpression(temp, right)
+			comparison := factory.NewBinaryExpression(nil, left, nil, factory.NewToken(operator.Kind), right)
+			left = temp
+			if result == nil {
+				result = comparison
+			} else {
+				result = factory.NewLogicalANDExpression(result, comparison)
+			}
+			continue
+		}
+		comparison := factory.NewBinaryExpression(nil, left, nil, factory.NewToken(operator.Kind), right)
+		if result == nil {
+			result = comparison
+		} else {
+			result = factory.NewLogicalANDExpression(result, comparison)
+		}
+	}
+	return result
 }
 
 func (tx *transformer) transformNullingSieve(expression *ast.Expression) *ast.Node {

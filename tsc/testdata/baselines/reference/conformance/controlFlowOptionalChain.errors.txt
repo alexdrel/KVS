@@ -18,14 +18,26 @@ controlFlowOptionalChain.ts(112,1): error TS18048: 'o5.x' is possibly 'undefined
 controlFlowOptionalChain.ts(112,1): error TS18048: 'o5.x.y.z' is possibly 'undefined'.
 controlFlowOptionalChain.ts(130,5): error TS18048: 'o6' is possibly 'undefined'.
 controlFlowOptionalChain.ts(134,1): error TS18048: 'o6' is possibly 'undefined'.
+controlFlowOptionalChain.ts(207,16): error TS100077: KVS equality between two values that may both be absent is not allowed; compare absence explicitly.
 controlFlowOptionalChain.ts(208,9): error TS18048: 'o' is possibly 'undefined'.
+controlFlowOptionalChain.ts(210,20): error TS100077: KVS equality between two values that may both be absent is not allowed; compare absence explicitly.
 controlFlowOptionalChain.ts(211,9): error TS18048: 'o' is possibly 'undefined'.
+controlFlowOptionalChain.ts(213,18): error TS100077: KVS equality between two values that may both be absent is not allowed; compare absence explicitly.
 controlFlowOptionalChain.ts(214,9): error TS18048: 'o' is possibly 'undefined'.
+controlFlowOptionalChain.ts(216,16): error TS100077: KVS equality between two values that may both be absent is not allowed; compare absence explicitly.
 controlFlowOptionalChain.ts(217,9): error TS18048: 'o' is possibly 'undefined'.
+controlFlowOptionalChain.ts(219,20): error TS100077: KVS equality between two values that may both be absent is not allowed; compare absence explicitly.
 controlFlowOptionalChain.ts(220,9): error TS18048: 'o' is possibly 'undefined'.
+controlFlowOptionalChain.ts(222,18): error TS100077: KVS equality between two values that may both be absent is not allowed; compare absence explicitly.
 controlFlowOptionalChain.ts(223,9): error TS18048: 'o' is possibly 'undefined'.
+controlFlowOptionalChain.ts(228,16): error TS100077: KVS equality between two values that may both be absent is not allowed; compare absence explicitly.
+controlFlowOptionalChain.ts(231,20): error TS100077: KVS equality between two values that may both be absent is not allowed; compare absence explicitly.
+controlFlowOptionalChain.ts(234,18): error TS100077: KVS equality between two values that may both be absent is not allowed; compare absence explicitly.
+controlFlowOptionalChain.ts(237,16): error TS100077: KVS equality between two values that may both be absent is not allowed; compare absence explicitly.
 controlFlowOptionalChain.ts(238,9): error TS18048: 'o' is possibly 'undefined'.
+controlFlowOptionalChain.ts(240,20): error TS100077: KVS equality between two values that may both be absent is not allowed; compare absence explicitly.
 controlFlowOptionalChain.ts(241,9): error TS18048: 'o' is possibly 'undefined'.
+controlFlowOptionalChain.ts(243,18): error TS100077: KVS equality between two values that may both be absent is not allowed; compare absence explicitly.
 controlFlowOptionalChain.ts(244,9): error TS18048: 'o' is possibly 'undefined'.
 controlFlowOptionalChain.ts(271,9): error TS18048: 'o' is possibly 'undefined'.
 controlFlowOptionalChain.ts(274,9): error TS18048: 'o' is possibly 'undefined'.
@@ -61,7 +73,7 @@ controlFlowOptionalChain.ts(518,13): error TS18048: 'o' is possibly 'undefined'.
 controlFlowOptionalChain.ts(567,21): error TS18048: 'someOptionalObject' is possibly 'undefined'.
 
 
-==== controlFlowOptionalChain.ts (61 errors) ====
+==== controlFlowOptionalChain.ts (73 errors) ====
     // assignments in shortcutting chain
     declare const o: undefined | {
         [key: string]: any;
@@ -309,31 +321,43 @@ controlFlowOptionalChain.ts(567,21): error TS18048: 'someOptionalObject' is poss
     
     function f12(o: Thing | undefined, value: number | undefined) {
         if (o?.foo === value) {
+                   ~~~
+!!! error TS100077: KVS equality between two values that may both be absent is not allowed; compare absence explicitly.
             o.foo;  // Error
             ~
 !!! error TS18048: 'o' is possibly 'undefined'.
         }
         if (o?.["foo"] === value) {
+                       ~~~
+!!! error TS100077: KVS equality between two values that may both be absent is not allowed; compare absence explicitly.
             o["foo"];  // Error
             ~
 !!! error TS18048: 'o' is possibly 'undefined'.
         }
         if (o?.bar() === value) {
+                     ~~~
+!!! error TS100077: KVS equality between two values that may both be absent is not allowed; compare absence explicitly.
             o.bar;  // Error
             ~
 !!! error TS18048: 'o' is possibly 'undefined'.
         }
         if (o?.foo == value) {
+                   ~~
+!!! error TS100077: KVS equality between two values that may both be absent is not allowed; compare absence explicitly.
             o.foo;  // Error
             ~
 !!! error TS18048: 'o' is possibly 'undefined'.
         }
         if (o?.["foo"] == value) {
+                       ~~
+!!! error TS100077: KVS equality between two values that may both be absent is not allowed; compare absence explicitly.
             o["foo"];  // Error
             ~
 !!! error TS18048: 'o' is possibly 'undefined'.
         }
         if (o?.bar() == value) {
+                     ~~
+!!! error TS100077: KVS equality between two values that may both be absent is not allowed; compare absence explicitly.
             o.bar;  // Error
             ~
 !!! error TS18048: 'o' is possibly 'undefined'.
@@ -342,25 +366,37 @@ controlFlowOptionalChain.ts(567,21): error TS18048: 'someOptionalObject' is poss
     
     function f12a(o: Thing | undefined, value: number | null) {
         if (o?.foo === value) {
+                   ~~~
+!!! error TS100077: KVS equality between two values that may both be absent is not allowed; compare absence explicitly.
             o.foo;
         }
         if (o?.["foo"] === value) {
+                       ~~~
+!!! error TS100077: KVS equality between two values that may both be absent is not allowed; compare absence explicitly.
             o["foo"];
         }
         if (o?.bar() === value) {
+                     ~~~
+!!! error TS100077: KVS equality between two values that may both be absent is not allowed; compare absence explicitly.
             o.bar;
         }
         if (o?.foo == value) {
+                   ~~
+!!! error TS100077: KVS equality between two values that may both be absent is not allowed; compare absence explicitly.
             o.foo;  // Error
             ~
 !!! error TS18048: 'o' is possibly 'undefined'.
         }
         if (o?.["foo"] == value) {
+                       ~~
+!!! error TS100077: KVS equality between two values that may both be absent is not allowed; compare absence explicitly.
             o["foo"];  // Error
             ~
 !!! error TS18048: 'o' is possibly 'undefined'.
         }
         if (o?.bar() == value) {
+                     ~~
+!!! error TS100077: KVS equality between two values that may both be absent is not allowed; compare absence explicitly.
             o.bar;  // Error
             ~
 !!! error TS18048: 'o' is possibly 'undefined'.

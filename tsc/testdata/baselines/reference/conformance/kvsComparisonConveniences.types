@@ -1,0 +1,197 @@
+//// [tests/cases/conformance/kvs/kvsComparisonConveniences.ts] ////
+
+=== kvsComparisonConveniences.ts ===
+type Shape = "circle" | "oval" | "rect" | "line";
+>Shape : Shape
+
+declare let shape: Shape;
+>shape : Shape
+
+declare const allowed: Shape[]?;
+>allowed : Shape[] | null | undefined
+
+const twoIncluded = shape == "circle" | "oval";
+>twoIncluded : boolean
+>shape : any
+
+const twoExcluded = shape != "circle" | "oval";
+>twoExcluded : boolean
+>shape : any
+
+const threeIncluded = shape == "circle" | "oval" | "rect";
+>threeIncluded : boolean
+>shape : any
+
+const threeExcluded = shape != "circle" | "oval" | "rect";
+>threeExcluded : boolean
+>shape : any
+
+const runtimeIncluded = shape == ...allowed;
+>runtimeIncluded : boolean
+>shape : any
+>allowed : any
+
+const runtimeExcluded = shape != ...allowed;
+>runtimeExcluded : boolean
+>shape : any
+>allowed : any
+
+declare function readShape(): Shape;
+>readShape : () => Shape
+
+declare function readAllowed(): Shape[]?;
+>readAllowed : () => Shape[]?
+
+const runtimeOnce = readShape() == ...readAllowed();
+>runtimeOnce : boolean
+>readShape() : Shape
+>readShape : () => Shape
+>readAllowed() : Shape[] | null | undefined
+>readAllowed : () => Shape[]?
+
+if (shape == "circle" | "oval") {
+>shape : any
+
+    const narrowed: "circle" | "oval" = shape;
+>narrowed : "circle" | "oval"
+>shape : "circle" | "oval"
+}
+
+if (shape != "circle" | "oval") {
+>shape : any
+
+    const narrowed: "rect" | "line" = shape;
+>narrowed : "line" | "rect"
+>shape : "line" | "rect"
+}
+
+declare const nullableLeft: number?;
+>nullableLeft : number | null | undefined
+
+declare const nullableA: number?;
+>nullableA : number | null | undefined
+
+declare const nullableB: number?;
+>nullableB : number | null | undefined
+
+const rejectNullableAlternatives = nullableLeft == nullableA | nullableB;
+>rejectNullableAlternatives : boolean
+>nullableLeft : any
+>nullableA : any
+>nullableB : any
+
+declare const notAnArray: Set<number>;
+>notAnArray : Set<number>
+
+const rejectRuntimeNonArray = nullableLeft == ...notAnArray;
+>rejectRuntimeNonArray : boolean
+>nullableLeft : any
+>notAnArray : any
+
+declare const nullableAlternatives: number?[];
+>nullableAlternatives : (number | null | undefined)[]
+
+const rejectNullableRuntimeAlternatives = nullableLeft == ...nullableAlternatives;
+>rejectNullableRuntimeAlternatives : boolean
+>nullableLeft : any
+>nullableAlternatives : any
+
+declare function lower(): number;
+>lower : () => number
+
+declare function middle(): number;
+>middle : () => number
+
+declare function upper(): number;
+>upper : () => number
+
+const range = lower() < middle() <= upper();
+>range : boolean
+>lower() : number
+>lower : () => number
+>middle() : number
+>middle : () => number
+>upper() : number
+>upper : () => number
+
+const descendingRange = upper() >= middle() > lower();
+>descendingRange : boolean
+>upper() : number
+>upper : () => number
+>middle() : number
+>middle : () => number
+>lower() : number
+>lower : () => number
+
+const equalityChain = lower() == middle() == upper();
+>equalityChain : boolean
+>lower() : number
+>lower : () => number
+>middle() : number
+>middle : () => number
+>upper() : number
+>upper : () => number
+
+const strictEqualityChain = lower() === middle() === upper();
+>strictEqualityChain : boolean
+>lower() : number
+>lower : () => number
+>middle() : number
+>middle : () => number
+>upper() : number
+>upper : () => number
+
+const mixedDirectionIsNested = lower() < middle() > upper();
+>mixedDirectionIsNested : boolean
+>lower() < middle() > upper() : boolean
+>lower() < middle() : boolean
+>lower() : number
+>lower : () => number
+>middle() : number
+>middle : () => number
+>upper() : number
+>upper : () => number
+
+const inequalityIsNested = lower() != middle() != upper();
+>inequalityIsNested : boolean
+>lower() != middle() != upper() : boolean
+>lower() != middle() : boolean
+>lower() : number
+>lower : () => number
+>middle() : number
+>middle : () => number
+>upper() : number
+>upper : () => number
+
+const lineBreakAfterOperatorIsNested = lower() <
+>lineBreakAfterOperatorIsNested : boolean
+>lower() <    middle() < upper() : boolean
+>lower() <    middle() : boolean
+>lower() : number
+>lower : () => number
+
+    middle() < upper();
+>middle() : number
+>middle : () => number
+>upper() : number
+>upper : () => number
+
+function narrowSuccessfulChain(value: 1 | 2 | null, other: number) {
+>narrowSuccessfulChain : (value: 1 | 2 | null, other: number) => 1 | null
+>value : 1 | 2 | null
+>other : number
+
+    if (value == 1 == other) {
+>value : any
+>other : any
+
+        const narrowed: 1 = value;
+>narrowed : 1
+>value : 1
+
+        return narrowed;
+>narrowed : 1
+    }
+    return null;
+}
+

@@ -237,6 +237,10 @@ func GetOperatorPrecedence(nodeKind Kind, operatorKind Kind, flags OperatorPrece
 		return OperatorPrecedenceUnary
 	case KindKvsSieveBindingInitializer:
 		return OperatorPrecedenceAssignment
+	case KindKvsComparisonAlternativesExpression:
+		return OperatorPrecedenceEquality
+	case KindKvsComparisonChainExpression:
+		return OperatorPrecedenceRelational
 	case KindConditionalExpression, KindKvsNullingExpression:
 		return OperatorPrecedenceConditional
 	case KindBinaryExpression:

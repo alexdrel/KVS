@@ -4913,11 +4913,100 @@ func (p *Parser) parseBinaryExpressionRest(precedence ast.OperatorPrecedence, le
 				}
 			}
 		} else {
-			leftOperand = p.makeBinaryExpression(leftOperand, p.parseTokenNode(), p.parseBinaryExpressionOrHigher(newPrecedence), pos)
+			operatorToken := p.parseTokenNode()
+			if (operator == ast.KindEqualsEqualsToken || operator == ast.KindExclamationEqualsToken) && p.token == ast.KindDotDotDotToken {
+				spreadToken := p.parseTokenNode()
+				alternative := p.parseBinaryExpressionOrHigher(newPrecedence)
+				leftOperand = p.finishNode(p.factory.NewKvsComparisonAlternativesExpression(leftOperand, operatorToken, spreadToken, p.factory.NewNodeList([]*ast.Node{alternative})), pos)
+			} else {
+				rightOperand := p.parseBinaryExpressionOrHigher(newPrecedence)
+				if operator == ast.KindEqualsEqualsToken || operator == ast.KindExclamationEqualsToken {
+					alternatives := []*ast.Node{rightOperand}
+					for p.token == ast.KindBarToken {
+						p.nextToken()
+						alternatives = append(alternatives, p.parseBinaryExpressionOrHigher(ast.OperatorPrecedenceBitwiseOR))
+					}
+					if len(alternatives) > 1 {
+						leftOperand = p.finishNode(p.factory.NewKvsComparisonAlternativesExpression(leftOperand, operatorToken, nil, p.factory.NewNodeList(alternatives)), pos)
+					} else if p.canExtendKvsComparisonChain(leftOperand, operatorToken, rightOperand) {
+						leftOperand = p.extendKvsComparisonChain(leftOperand, operatorToken, rightOperand, pos)
+					} else {
+						leftOperand = p.makeBinaryExpression(leftOperand, operatorToken, rightOperand, pos)
+					}
+				} else if p.canExtendKvsComparisonChain(leftOperand, operatorToken, rightOperand) {
+					leftOperand = p.extendKvsComparisonChain(leftOperand, operatorToken, rightOperand, pos)
+				} else {
+					leftOperand = p.makeBinaryExpression(leftOperand, operatorToken, rightOperand, pos)
+				}
+			}
 			lastOperand = leftOperand
 		}
 	}
 	return leftOperand
+}
+
+func (p *Parser) extendKvsComparisonChain(leftOperand *ast.Node, operatorToken *ast.Node, rightOperand *ast.Node, pos int) *ast.Node {
+	if ast.IsBinaryExpression(leftOperand) {
+		binary := leftOperand.AsBinaryExpression()
+		return p.finishNode(p.factory.NewKvsComparisonChainExpression(
+			p.factory.NewNodeList([]*ast.Node{binary.Left, binary.Right, rightOperand}),
+			p.factory.NewNodeList([]*ast.Node{binary.OperatorToken, operatorToken}),
+		), pos)
+	}
+	chain := leftOperand.AsKvsComparisonChainExpression()
+	operands := append([]*ast.Node{}, chain.Operands.Nodes...)
+	operators := append([]*ast.Node{}, chain.Operators.Nodes...)
+	return p.finishNode(p.factory.NewKvsComparisonChainExpression(
+		p.factory.NewNodeList(append(operands, rightOperand)),
+		p.factory.NewNodeList(append(operators, operatorToken)),
+	), pos)
+}
+
+func (p *Parser) canExtendKvsComparisonChain(leftOperand *ast.Node, operatorToken *ast.Node, rightOperand *ast.Node) bool {
+	if !isValidKvsComparisonChainOperand(rightOperand) || rightOperand.Flags&(ast.NodeFlagsThisNodeHasError|ast.NodeFlagsThisNodeOrAnySubNodesHasError) != 0 ||
+		leftOperand.Flags&(ast.NodeFlagsThisNodeHasError|ast.NodeFlagsThisNodeOrAnySubNodesHasError) != 0 ||
+		p.hasLineBreakBetween(operatorToken.End(), rightOperand.Pos()) {
+		return false
+	}
+	operator := operatorToken.Kind
+	if ast.IsBinaryExpression(leftOperand) {
+		binary := leftOperand.AsBinaryExpression()
+		return areKvsComparisonChainOperatorsCompatible(binary.OperatorToken.Kind, operator) &&
+			isValidKvsComparisonChainOperand(binary.Left) && isValidKvsComparisonChainOperand(binary.Right) &&
+			!p.hasLineBreakBetween(binary.OperatorToken.End(), binary.Right.Pos())
+	}
+	if ast.IsKvsComparisonChainExpression(leftOperand) {
+		operators := leftOperand.AsKvsComparisonChainExpression().Operators.Nodes
+		return areKvsComparisonChainOperatorsCompatible(operators[len(operators)-1].Kind, operator)
+	}
+	return false
+}
+
+func (p *Parser) hasLineBreakBetween(start int, end int) bool {
+	end = scanner.SkipTrivia(p.sourceText, end)
+	return start >= 0 && end >= start && end <= len(p.sourceText) && strings.ContainsAny(p.sourceText[start:end], "\r\n")
+}
+
+func areKvsComparisonChainOperatorsCompatible(left ast.Kind, right ast.Kind) bool {
+	ascending := func(operator ast.Kind) bool {
+		return operator == ast.KindLessThanToken || operator == ast.KindLessThanEqualsToken
+	}
+	descending := func(operator ast.Kind) bool {
+		return operator == ast.KindGreaterThanToken || operator == ast.KindGreaterThanEqualsToken
+	}
+	return ascending(left) && ascending(right) || descending(left) && descending(right) ||
+		left == ast.KindEqualsEqualsToken && right == ast.KindEqualsEqualsToken ||
+		left == ast.KindEqualsEqualsEqualsToken && right == ast.KindEqualsEqualsEqualsToken
+}
+
+func isValidKvsComparisonChainOperand(operand *ast.Node) bool {
+	if operand == nil || ast.NodeIsMissing(operand) {
+		return false
+	}
+	if ast.IsNewExpression(operand) {
+		return operand.Expression() != nil && !ast.NodeIsMissing(operand.Expression())
+	}
+	return true
 }
 
 func (p *Parser) makeSatisfiesExpression(expression *ast.Expression, typeNode *ast.TypeNode) *ast.Node {

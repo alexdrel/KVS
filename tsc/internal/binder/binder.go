@@ -2849,6 +2849,10 @@ func isNarrowingExpression(expr *ast.Node) bool {
 		return hasNarrowableArgument(expr)
 	case ast.KindParenthesizedExpression, ast.KindNonNullExpression, ast.KindKvsExtantAssertionExpression, ast.KindTypeOfExpression, ast.KindKvsExtantTestExpression, ast.KindKvsNullingSieveExpression:
 		return isNarrowingExpression(expr.Expression())
+	case ast.KindKvsComparisonAlternativesExpression:
+		return isNarrowingExpression(expr.AsKvsComparisonAlternativesExpression().Subject)
+	case ast.KindKvsComparisonChainExpression:
+		return core.Some(expr.AsKvsComparisonChainExpression().Operands.Nodes, isNarrowingExpression)
 	case ast.KindBinaryExpression:
 		return isNarrowingBinaryExpression(expr.AsBinaryExpression())
 	case ast.KindPrefixUnaryExpression:

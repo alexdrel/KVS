@@ -40,14 +40,27 @@ const total = subtotal + tax;
 const area = metadata.width * metadata.height;
 ```
 
-If a required operand is absent, the operator result is null. For `==` and `!=`, an absent operand likewise produces null. This includes value equality:
+If a required operand is absent, the arithmetic result is null.
+
+Equality does not lift. `==`, `!=`, `===`, and `!==` retain their JavaScript
+semantics and always produce booleans. Comparing two operands whose types may
+both be present or absent is an error: two computations do not count as equal
+merely because neither produced a value. Resolve one operand first or compare
+with an absence-only value.
 
 ```kvs
-a + 4 == b + 5
-null == null
+nullable == present
+nullable != null
+nullable == undefined
+nullable === null
+nullable === undefined
 ```
 
-Either expression is null when an operand is absent. Value equality does not claim two computations are equal merely because neither produced a value.
+Loose comparison with either `null` or `undefined` tests both forms of absence.
+Strict comparison preserves their runtime distinction. KVS-produced absence
+normally uses `null`, while JavaScript interoperation may still produce
+`undefined`. An expression narrowed or declared to contain only `null` or
+`undefined` is likewise an explicit absence comparison.
 
 Lifted arithmetic is numeric. Operands must belong to the same numeric family,
 and an operand whose type is known to be only `null` or `undefined` is an error
@@ -66,13 +79,6 @@ operands are errors and must be resolved explicitly before comparison. Their
 result remains ordinary binary `boolean`; KVS does not introduce a nullable
 third result for ordering. Use `!` or another explicit absence choice before
 comparing.
-
-`===` and `!==` retain their JavaScript identity semantics and always produce booleans:
-
-```kvs
-null === null       // true
-undefined === null  // false
-```
 
 Lifted operators evaluate required operands from left to right and stop at the
 first absent operand. This is a safety guarantee, not an effect-control idiom.
@@ -332,7 +338,8 @@ When `x` is present they produce the same value. When it is absent, only `x!` ap
 
 ## Comparison conveniences
 
-The same value-comparison rules support finite alternatives and readable ranges.
+The same boolean comparison rules support finite alternatives and readable
+ranges.
 
 ### Finite alternatives
 
@@ -350,9 +357,15 @@ if (type != "circle" | "oval") {
 }
 ```
 
-The left operand is evaluated once. Alternatives are tested from left to right with short-circuiting. `!=` negates membership in the complete set.
+The left operand is evaluated once. One or two alternatives use direct
+comparisons, tested from left to right with short-circuiting. Three or more
+alternatives use membership in a constructed array. `!=` negates membership in
+the complete set.
 
-If the left operand or a required alternative is absent, the comparison follows the ordinary nullable value-comparison rule. Union alternatives are syntax within `==` and `!=`; they are not first-class values and do not propagate through calls or arithmetic.
+Each direct comparison follows the nullable-equality rule: it is an error when
+both sides have present and absent alternatives. Union alternatives are syntax
+within `==` and `!=`; they are not first-class values and do not propagate
+through calls or arithmetic.
 
 For a runtime iterable of alternatives, spread syntax keeps the compared value in the readable first position:
 
@@ -366,7 +379,10 @@ if (type != ...blockedTypes) {
 }
 ```
 
-The iterable expression is evaluated once and consumed from left to right with the same short-circuiting semantics as static alternatives. An absent iterable contributes no alternatives, consistent with other nullable iterable spreads; equality is then false and inequality true.
+Runtime alternatives are limited to arrays. The array expression is evaluated
+once. An absent array contributes no alternatives, consistent with other
+nullable array spreads; equality is then false and inequality true. Runtime
+membership does not provide static narrowing.
 
 Alternative syntax is exclusive to `==` and `!=`. It is not available for `===`, `!==`, `<`, `>`, `<=`, or `>=`; those operators retain their ordinary binary meanings.
 
@@ -380,7 +396,8 @@ if (min <= value < max) {
 }
 ```
 
-Each operand is evaluated at most once. Evaluation proceeds from left to right and stops when a comparison is false or null. For example:
+Each operand is evaluated at most once. Evaluation proceeds from left to right
+and stops when a comparison is false. For example:
 
 ```kvs
 lower() < value() <= upper()
@@ -394,15 +411,26 @@ const middle = value();
 first < middle && middle <= upper()
 ```
 
-`upper()` is evaluated only if the first comparison succeeds. A false comparison makes the chain false; a nullable comparison makes the chain null. A true chain can narrow nullable operands whose presence was required for its comparisons.
+`upper()` is evaluated only if the first comparison succeeds. A false
+comparison makes the chain false. Relational links reject nullable operands;
+equality links apply the nullable-equality restriction. A successful chain can
+narrow operands through its constituent comparisons.
 
-Chains allow `==`, `!=`, `===`, `!==`, `<`, `<=`, `>`, and `>=`. Each operator retains its own semantics, and every operator compares the operands immediately beside it:
+Chains are either ascending (`<` and `<=`), descending (`>` and `>=`), loose
+equality (`==`), or strict equality (`===`). Operators may mix only within one
+relational direction. Every operator compares the operands immediately beside
+it:
 
 ```kvs
-a != b != c
+min <= value < max
+a == b == c
 ```
 
-means `a != b && b != c`, with `b` evaluated once.
+The equality chain means `a == b && b == c`, with `b` evaluated once. Mixed
+directions, equality/relational mixtures, strictness mixtures, and `!=` / `!==`
+sequences retain their ordinary nested JavaScript interpretation. A line break
+between a comparison operator and its following operand also prevents chain
+formation, preserving TypeScript's incomplete-generic parsing and recovery.
 
 
 ---

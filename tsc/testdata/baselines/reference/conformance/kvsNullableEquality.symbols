@@ -1,0 +1,173 @@
+//// [tests/cases/conformance/kvs/kvsNullableEquality.ts] ////
+
+=== kvsNullableEquality.ts ===
+declare let x: string?;
+>x : Symbol(x, Decl(kvsNullableEquality.ts, 0, 11))
+
+declare let y: string?;
+>y : Symbol(y, Decl(kvsNullableEquality.ts, 1, 11))
+
+declare let z: string;
+>z : Symbol(z, Decl(kvsNullableEquality.ts, 2, 11))
+
+declare const nullAlias: null;
+>nullAlias : Symbol(nullAlias, Decl(kvsNullableEquality.ts, 3, 13))
+
+declare const undefinedAlias: undefined;
+>undefinedAlias : Symbol(undefinedAlias, Decl(kvsNullableEquality.ts, 4, 13))
+
+const rejectLooseEqual = x == y;
+>rejectLooseEqual : Symbol(rejectLooseEqual, Decl(kvsNullableEquality.ts, 6, 5))
+>x : Symbol(x, Decl(kvsNullableEquality.ts, 0, 11))
+>y : Symbol(y, Decl(kvsNullableEquality.ts, 1, 11))
+
+const rejectLooseNotEqual = x != y;
+>rejectLooseNotEqual : Symbol(rejectLooseNotEqual, Decl(kvsNullableEquality.ts, 7, 5))
+>x : Symbol(x, Decl(kvsNullableEquality.ts, 0, 11))
+>y : Symbol(y, Decl(kvsNullableEquality.ts, 1, 11))
+
+const rejectStrictEqual = x === y;
+>rejectStrictEqual : Symbol(rejectStrictEqual, Decl(kvsNullableEquality.ts, 8, 5))
+>x : Symbol(x, Decl(kvsNullableEquality.ts, 0, 11))
+>y : Symbol(y, Decl(kvsNullableEquality.ts, 1, 11))
+
+const rejectStrictNotEqual = x !== y;
+>rejectStrictNotEqual : Symbol(rejectStrictNotEqual, Decl(kvsNullableEquality.ts, 9, 5))
+>x : Symbol(x, Decl(kvsNullableEquality.ts, 0, 11))
+>y : Symbol(y, Decl(kvsNullableEquality.ts, 1, 11))
+
+const looseEqualPresent = x == z;
+>looseEqualPresent : Symbol(looseEqualPresent, Decl(kvsNullableEquality.ts, 11, 5))
+>x : Symbol(x, Decl(kvsNullableEquality.ts, 0, 11))
+>z : Symbol(z, Decl(kvsNullableEquality.ts, 2, 11))
+
+const looseNotEqualPresent = x != z;
+>looseNotEqualPresent : Symbol(looseNotEqualPresent, Decl(kvsNullableEquality.ts, 12, 5))
+>x : Symbol(x, Decl(kvsNullableEquality.ts, 0, 11))
+>z : Symbol(z, Decl(kvsNullableEquality.ts, 2, 11))
+
+const strictEqualPresent = x === z;
+>strictEqualPresent : Symbol(strictEqualPresent, Decl(kvsNullableEquality.ts, 13, 5))
+>x : Symbol(x, Decl(kvsNullableEquality.ts, 0, 11))
+>z : Symbol(z, Decl(kvsNullableEquality.ts, 2, 11))
+
+const strictNotEqualPresent = x !== z;
+>strictNotEqualPresent : Symbol(strictNotEqualPresent, Decl(kvsNullableEquality.ts, 14, 5))
+>x : Symbol(x, Decl(kvsNullableEquality.ts, 0, 11))
+>z : Symbol(z, Decl(kvsNullableEquality.ts, 2, 11))
+
+const looseEqualNull = x == null;
+>looseEqualNull : Symbol(looseEqualNull, Decl(kvsNullableEquality.ts, 16, 5))
+>x : Symbol(x, Decl(kvsNullableEquality.ts, 0, 11))
+
+const looseNotEqualNull = x != null;
+>looseNotEqualNull : Symbol(looseNotEqualNull, Decl(kvsNullableEquality.ts, 17, 5))
+>x : Symbol(x, Decl(kvsNullableEquality.ts, 0, 11))
+
+const looseEqualUndefined = x == undefined;
+>looseEqualUndefined : Symbol(looseEqualUndefined, Decl(kvsNullableEquality.ts, 18, 5))
+>x : Symbol(x, Decl(kvsNullableEquality.ts, 0, 11))
+>undefined : Symbol(undefined)
+
+const looseNotEqualUndefined = x != undefined;
+>looseNotEqualUndefined : Symbol(looseNotEqualUndefined, Decl(kvsNullableEquality.ts, 19, 5))
+>x : Symbol(x, Decl(kvsNullableEquality.ts, 0, 11))
+>undefined : Symbol(undefined)
+
+const strictEqualNull = x === null;
+>strictEqualNull : Symbol(strictEqualNull, Decl(kvsNullableEquality.ts, 21, 5))
+>x : Symbol(x, Decl(kvsNullableEquality.ts, 0, 11))
+
+const strictNotEqualNull = x !== null;
+>strictNotEqualNull : Symbol(strictNotEqualNull, Decl(kvsNullableEquality.ts, 22, 5))
+>x : Symbol(x, Decl(kvsNullableEquality.ts, 0, 11))
+
+const strictEqualUndefined = x === undefined;
+>strictEqualUndefined : Symbol(strictEqualUndefined, Decl(kvsNullableEquality.ts, 23, 5))
+>x : Symbol(x, Decl(kvsNullableEquality.ts, 0, 11))
+>undefined : Symbol(undefined)
+
+const strictNotEqualUndefined = x !== undefined;
+>strictNotEqualUndefined : Symbol(strictNotEqualUndefined, Decl(kvsNullableEquality.ts, 24, 5))
+>x : Symbol(x, Decl(kvsNullableEquality.ts, 0, 11))
+>undefined : Symbol(undefined)
+
+const strictEqualNullAlias = x === nullAlias;
+>strictEqualNullAlias : Symbol(strictEqualNullAlias, Decl(kvsNullableEquality.ts, 26, 5))
+>x : Symbol(x, Decl(kvsNullableEquality.ts, 0, 11))
+>nullAlias : Symbol(nullAlias, Decl(kvsNullableEquality.ts, 3, 13))
+
+const strictNotEqualNullAlias = x !== nullAlias;
+>strictNotEqualNullAlias : Symbol(strictNotEqualNullAlias, Decl(kvsNullableEquality.ts, 27, 5))
+>x : Symbol(x, Decl(kvsNullableEquality.ts, 0, 11))
+>nullAlias : Symbol(nullAlias, Decl(kvsNullableEquality.ts, 3, 13))
+
+const strictEqualUndefinedAlias = x === undefinedAlias;
+>strictEqualUndefinedAlias : Symbol(strictEqualUndefinedAlias, Decl(kvsNullableEquality.ts, 28, 5))
+>x : Symbol(x, Decl(kvsNullableEquality.ts, 0, 11))
+>undefinedAlias : Symbol(undefinedAlias, Decl(kvsNullableEquality.ts, 4, 13))
+
+const strictNotEqualUndefinedAlias = x !== undefinedAlias;
+>strictNotEqualUndefinedAlias : Symbol(strictNotEqualUndefinedAlias, Decl(kvsNullableEquality.ts, 29, 5))
+>x : Symbol(x, Decl(kvsNullableEquality.ts, 0, 11))
+>undefinedAlias : Symbol(undefinedAlias, Decl(kvsNullableEquality.ts, 4, 13))
+
+function narrowLoose(value: string?) {
+>narrowLoose : Symbol(narrowLoose, Decl(kvsNullableEquality.ts, 29, 58))
+>value : Symbol(value, Decl(kvsNullableEquality.ts, 31, 21))
+
+    if (value != null) {
+>value : Symbol(value, Decl(kvsNullableEquality.ts, 31, 21))
+
+        const present: string = value;
+>present : Symbol(present, Decl(kvsNullableEquality.ts, 33, 13))
+>value : Symbol(value, Decl(kvsNullableEquality.ts, 31, 21))
+
+        return present;
+>present : Symbol(present, Decl(kvsNullableEquality.ts, 33, 13))
+    }
+    return null;
+}
+
+function narrowStrictNull(value: string?) {
+>narrowStrictNull : Symbol(narrowStrictNull, Decl(kvsNullableEquality.ts, 37, 1))
+>value : Symbol(value, Decl(kvsNullableEquality.ts, 39, 26))
+
+    if (value !== null) {
+>value : Symbol(value, Decl(kvsNullableEquality.ts, 39, 26))
+
+        return value;
+>value : Symbol(value, Decl(kvsNullableEquality.ts, 39, 26))
+    }
+    return null;
+}
+
+function narrowStrictUndefined(value: string?) {
+>narrowStrictUndefined : Symbol(narrowStrictUndefined, Decl(kvsNullableEquality.ts, 44, 1))
+>value : Symbol(value, Decl(kvsNullableEquality.ts, 46, 31))
+
+    if (value !== undefined) {
+>value : Symbol(value, Decl(kvsNullableEquality.ts, 46, 31))
+>undefined : Symbol(undefined)
+
+        return value;
+>value : Symbol(value, Decl(kvsNullableEquality.ts, 46, 31))
+    }
+    return null;
+}
+
+function compareFlowNarrowedAbsence(left: string?, right: string?) {
+>compareFlowNarrowedAbsence : Symbol(compareFlowNarrowedAbsence, Decl(kvsNullableEquality.ts, 51, 1))
+>left : Symbol(left, Decl(kvsNullableEquality.ts, 53, 36))
+>right : Symbol(right, Decl(kvsNullableEquality.ts, 53, 50))
+
+    if (left == null) {
+>left : Symbol(left, Decl(kvsNullableEquality.ts, 53, 36))
+
+        return left === right;
+>left : Symbol(left, Decl(kvsNullableEquality.ts, 53, 36))
+>right : Symbol(right, Decl(kvsNullableEquality.ts, 53, 50))
+    }
+    return false;
+}
+

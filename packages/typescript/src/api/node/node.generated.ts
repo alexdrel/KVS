@@ -607,6 +607,9 @@ export class RemoteNode extends RemoteNodeBase implements Node {
 
     // ═══ Generated child property getters ═══
 
+    get alternatives(): RemoteNodeList | undefined {
+        return this.getNamedChild("alternatives") as RemoteNodeList;
+    }
     get argument(): RemoteNode | undefined {
         return this.getNamedChild("argument") as RemoteNode;
     }
@@ -799,6 +802,12 @@ export class RemoteNode extends RemoteNodeBase implements Node {
     get operand(): RemoteNode | undefined {
         return this.getNamedChild("operand") as RemoteNode;
     }
+    get operands(): RemoteNodeList | undefined {
+        return this.getNamedChild("operands") as RemoteNodeList;
+    }
+    get operators(): RemoteNodeList | undefined {
+        return this.getNamedChild("operators") as RemoteNodeList;
+    }
     get operatorToken(): RemoteNode | undefined {
         return this.getNamedChild("operatorToken") as RemoteNode;
     }
@@ -838,11 +847,17 @@ export class RemoteNode extends RemoteNodeBase implements Node {
     get secondTildeToken(): RemoteNode | undefined {
         return this.getNamedChild("secondTildeToken") as RemoteNode;
     }
+    get spreadToken(): RemoteNode | undefined {
+        return this.getNamedChild("spreadToken") as RemoteNode;
+    }
     get statement(): RemoteNode | undefined {
         return this.getNamedChild("statement") as RemoteNode;
     }
     get statements(): RemoteNodeList | undefined {
         return this.getNamedChild("statements") as RemoteNodeList;
+    }
+    get subject(): RemoteNode | undefined {
+        return this.getNamedChild("subject") as RemoteNode;
     }
     get tag(): RemoteNode | undefined {
         return this.getNamedChild("tag") as RemoteNode;

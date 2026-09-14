@@ -293,6 +293,8 @@
             "KvsDefaultExpression",
             "KvsNullingSieveExpression",
             "KvsSieveBindingInitializer",
+            "KvsComparisonAlternativesExpression",
+            "KvsComparisonChainExpression",
             "KvsNullingExpression",
             "KvsConditionalElement",
             "KvsCompactArrayExpression",
@@ -1828,6 +1830,54 @@
                     {
                         "name": "Expression",
                         "type": "Expression"
+                    }
+                ],
+                "arena": true
+            },
+            "KvsComparisonAlternativesExpression": {
+                "generateSubtreeFacts": true,
+                "extends": [
+                    "ExpressionBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "Subject",
+                        "type": "Expression"
+                    },
+                    {
+                        "name": "OperatorToken",
+                        "type": "BinaryOperatorToken"
+                    },
+                    {
+                        "name": "SpreadToken",
+                        "type": "DotDotDotToken",
+                        "optional": true
+                    },
+                    {
+                        "name": "Alternatives",
+                        "type": "Expression",
+                        "list": "NodeList"
+                    }
+                ],
+                "arena": true
+            },
+            "KvsComparisonChainExpression": {
+                "generateSubtreeFacts": true,
+                "extends": [
+                    "ExpressionBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "Operands",
+                        "type": "Expression",
+                        "list": "NodeList"
+                    },
+                    {
+                        "name": "Operators",
+                        "type": "BinaryOperatorToken",
+                        "list": "NodeList"
                     }
                 ],
                 "arena": true

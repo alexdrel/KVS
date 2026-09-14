@@ -152,6 +152,8 @@ import type {
     KvsCollectExpression,
     KvsCompactArrayExpression,
     KvsCompactObjectExpression,
+    KvsComparisonAlternativesExpression,
+    KvsComparisonChainExpression,
     KvsConditionalElement,
     KvsDefaultExpression,
     KvsExtantAssertionExpression,
@@ -305,6 +307,9 @@ export class NodeObject {
         this._data = data;
     }
 
+    get alternatives(): any {
+        return this._data?.alternatives;
+    }
     get ambientModuleNames(): any {
         return this._data?.ambientModuleNames;
     }
@@ -569,11 +574,17 @@ export class NodeObject {
     get operand(): any {
         return this._data?.operand;
     }
+    get operands(): any {
+        return this._data?.operands;
+    }
     get operator(): any {
         return this._data?.operator;
     }
     get operatorToken(): any {
         return this._data?.operatorToken;
+    }
+    get operators(): any {
+        return this._data?.operators;
     }
     get originalText(): any {
         return this._data?.originalText;
@@ -632,11 +643,17 @@ export class NodeObject {
     get spanMap(): any {
         return this._data?.spanMap;
     }
+    get spreadToken(): any {
+        return this._data?.spreadToken;
+    }
     get statement(): any {
         return this._data?.statement;
     }
     get statements(): any {
         return this._data?.statements;
+    }
+    get subject(): any {
+        return this._data?.subject;
     }
     get supplementalSourceFileNames(): any {
         return this._data?.supplementalSourceFileNames;
@@ -881,6 +898,10 @@ function cloneNodeData(node: Node): any {
             return { firstTildeToken: n.firstTildeToken, secondTildeToken: n.secondTildeToken, expression: n.expression };
         case SyntaxKind.KvsSieveBindingInitializer:
             return { tildeToken: n.tildeToken, equalsToken: n.equalsToken, expression: n.expression };
+        case SyntaxKind.KvsComparisonAlternativesExpression:
+            return { subject: n.subject, operatorToken: n.operatorToken, spreadToken: n.spreadToken, alternatives: n.alternatives };
+        case SyntaxKind.KvsComparisonChainExpression:
+            return { operands: n.operands, operators: n.operators };
         case SyntaxKind.KvsNullingExpression:
             return { condition: n.condition, questionToken: n.questionToken, colonToken: n.colonToken, whenTrue: n.whenTrue };
         case SyntaxKind.KvsCompactArrayExpression:
@@ -1309,6 +1330,14 @@ const forEachChildTable: Record<number, ForEachChildFunction> = {
         visitNode(cbNode, data.tildeToken) ||
         visitNode(cbNode, data.equalsToken) ||
         visitNode(cbNode, data.expression),
+    [SyntaxKind.KvsComparisonAlternativesExpression]: (data, cbNode, cbNodes) =>
+        visitNode(cbNode, data.subject) ||
+        visitNode(cbNode, data.operatorToken) ||
+        visitNode(cbNode, data.spreadToken) ||
+        visitNodes(cbNode, cbNodes, data.alternatives),
+    [SyntaxKind.KvsComparisonChainExpression]: (data, cbNode, cbNodes) =>
+        visitNodes(cbNode, cbNodes, data.operands) ||
+        visitNodes(cbNode, cbNodes, data.operators),
     [SyntaxKind.KvsNullingExpression]: (data, cbNode, cbNodes) =>
         visitNode(cbNode, data.condition) ||
         visitNode(cbNode, data.questionToken) ||
@@ -2075,6 +2104,22 @@ export function createKvsSieveBindingInitializer(tildeToken: TildeToken, equalsT
         equalsToken,
         expression,
     }) as unknown as KvsSieveBindingInitializer;
+}
+
+export function createKvsComparisonAlternativesExpression(subject: Expression, operatorToken: BinaryOperatorToken, spreadToken: DotDotDotToken | undefined, alternatives: readonly Expression[]): KvsComparisonAlternativesExpression {
+    return new NodeObject(SyntaxKind.KvsComparisonAlternativesExpression, {
+        subject,
+        operatorToken,
+        spreadToken,
+        alternatives: createNodeArray(alternatives),
+    }) as unknown as KvsComparisonAlternativesExpression;
+}
+
+export function createKvsComparisonChainExpression(operands: readonly Expression[], operators: readonly BinaryOperatorToken[]): KvsComparisonChainExpression {
+    return new NodeObject(SyntaxKind.KvsComparisonChainExpression, {
+        operands: createNodeArray(operands),
+        operators: createNodeArray(operators),
+    }) as unknown as KvsComparisonChainExpression;
 }
 
 export function createKvsNullingExpression(condition: Expression, questionToken: QuestionToken, colonToken: ColonToken, whenTrue: Expression): KvsNullingExpression {
@@ -3580,6 +3625,14 @@ export function updateKvsNullingSieveExpression(node: KvsNullingSieveExpression,
 
 export function updateKvsSieveBindingInitializer(node: KvsSieveBindingInitializer, tildeToken: TildeToken, equalsToken: EqualsToken, expression: Expression): KvsSieveBindingInitializer {
     return node.tildeToken !== tildeToken || node.equalsToken !== equalsToken || node.expression !== expression ? createKvsSieveBindingInitializer(tildeToken, equalsToken, expression) : node;
+}
+
+export function updateKvsComparisonAlternativesExpression(node: KvsComparisonAlternativesExpression, subject: Expression, operatorToken: BinaryOperatorToken, spreadToken: DotDotDotToken | undefined, alternatives: readonly Expression[]): KvsComparisonAlternativesExpression {
+    return node.subject !== subject || node.operatorToken !== operatorToken || node.spreadToken !== spreadToken || node.alternatives !== alternatives ? createKvsComparisonAlternativesExpression(subject, operatorToken, spreadToken, alternatives) : node;
+}
+
+export function updateKvsComparisonChainExpression(node: KvsComparisonChainExpression, operands: readonly Expression[], operators: readonly BinaryOperatorToken[]): KvsComparisonChainExpression {
+    return node.operands !== operands || node.operators !== operators ? createKvsComparisonChainExpression(operands, operators) : node;
 }
 
 export function updateKvsNullingExpression(node: KvsNullingExpression, condition: Expression, questionToken: QuestionToken, colonToken: ColonToken, whenTrue: Expression): KvsNullingExpression {

@@ -406,12 +406,41 @@ func (c *Checker) narrowType(f *FlowState, t *Type, expr *ast.Node, assumeTrue b
 		return c.narrowTypeByOptionality(f, t, expr.Expression(), assumeTrue)
 	case ast.KindKvsNullingSieveExpression:
 		return c.narrowType(f, t, expr.Expression(), assumeTrue)
+	case ast.KindKvsComparisonAlternativesExpression:
+		return c.narrowTypeByKvsComparisonAlternatives(f, t, expr.AsKvsComparisonAlternativesExpression(), assumeTrue)
+	case ast.KindKvsComparisonChainExpression:
+		if assumeTrue {
+			chain := expr.AsKvsComparisonChainExpression()
+			for i, operator := range chain.Operators.Nodes {
+				binary := c.factory.NewBinaryExpression(nil, chain.Operands.Nodes[i], nil, operator, chain.Operands.Nodes[i+1])
+				t = c.narrowTypeByBinaryExpression(f, t, binary.AsBinaryExpression(), true)
+			}
+		}
+		return t
 	case ast.KindBinaryExpression:
 		return c.narrowTypeByBinaryExpression(f, t, expr.AsBinaryExpression(), assumeTrue)
 	case ast.KindPrefixUnaryExpression:
 		if expr.AsPrefixUnaryExpression().Operator == ast.KindExclamationToken {
 			return c.narrowType(f, t, expr.AsPrefixUnaryExpression().Operand, !assumeTrue)
 		}
+	}
+	return t
+}
+
+func (c *Checker) narrowTypeByKvsComparisonAlternatives(f *FlowState, t *Type, expr *ast.KvsComparisonAlternativesExpression, assumeTrue bool) *Type {
+	if expr.SpreadToken != nil || !c.isMatchingReference(f.reference, c.getReferenceCandidate(expr.Subject)) {
+		return t
+	}
+	membership := (expr.OperatorToken.Kind == ast.KindEqualsEqualsToken) == assumeTrue
+	if membership {
+		narrowed := make([]*Type, 0, len(expr.Alternatives.Nodes))
+		for _, alternative := range expr.Alternatives.Nodes {
+			narrowed = append(narrowed, c.narrowTypeByEquality(t, ast.KindEqualsEqualsToken, alternative, true))
+		}
+		return c.getUnionType(narrowed)
+	}
+	for _, alternative := range expr.Alternatives.Nodes {
+		t = c.narrowTypeByEquality(t, ast.KindExclamationEqualsToken, alternative, true)
 	}
 	return t
 }

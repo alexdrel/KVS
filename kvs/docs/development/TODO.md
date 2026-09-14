@@ -123,8 +123,9 @@ them; generated example `.js` files are intentionally ignored.
 - [x] Relational operators reject nullable operands
 - [x] Ordinary template interpolation rejects nullable substitutions
 - [x] Tagged templates accept nullable substitutions
-- [ ] `==` / `!=` lift over absence
-- [x] `===` / `!==` retain JavaScript semantics
+- [x] Equality operators retain JavaScript semantics
+- [x] Equality rejects operands that both have present and absent alternatives
+- [x] Equality with literal, aliased, or flow-narrowed absence remains available
 
 ### Nulling sieve
 
@@ -157,14 +158,14 @@ them; generated example `.js` files are intentionally ignored.
 
 ### Comparison conveniences
 
-- [ ] Finite alternatives: `x == a | b`
-- [ ] Finite exclusion: `x != a | b`
-- [ ] Runtime alternatives: `x == ...allowed`
-- [ ] Runtime exclusions: `x != ...blocked`
-- [ ] Comparison chains: `min <= x < max`
-- [ ] Once-only evaluation
-- [ ] Short-circuiting
-- [ ] Narrowing from successful comparison chains
+- [x] Finite alternatives: `x == a | b`
+- [x] Finite exclusion: `x != a | b`
+- [x] Runtime array alternatives: `x == ...allowed`
+- [x] Runtime array exclusions: `x != ...blocked`
+- [x] Comparison chains: `min <= x < max`
+- [x] Once-only evaluation
+- [x] Short-circuiting
+- [x] Narrowing from finite alternatives and successful comparison chains
 
 ## 2. Structured production and procedural expressions
 

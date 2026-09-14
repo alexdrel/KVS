@@ -264,6 +264,8 @@ const (
 	KindKvsDefaultExpression
 	KindKvsNullingSieveExpression
 	KindKvsSieveBindingInitializer
+	KindKvsComparisonAlternativesExpression
+	KindKvsComparisonChainExpression
 	KindKvsNullingExpression
 	KindKvsConditionalElement
 	KindKvsCompactArrayExpression

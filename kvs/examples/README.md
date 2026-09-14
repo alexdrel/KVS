@@ -21,6 +21,7 @@ runnable `.ts` file must have a matching `.stdout` file.
 - [Binding in an `if` condition](if-binding.ts)
 - [Implicit iteration subjects](implicit-subject.ts)
 - [Nullable operators](nullable-operators.ts)
+- [Comparison conveniences](comparisons.ts)
 - [Presence-aware arrays](presence-aware-arrays.ts)
 - [Presence-aware objects](presence-aware-objects.ts)
 - [Goalposts](goalposts/README.md)

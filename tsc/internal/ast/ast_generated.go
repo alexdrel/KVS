@@ -18,73 +18,75 @@ var (
 // ──────────────────────────────────────────────────────────────────────
 
 type NodeFactory struct {
-	hooks                               NodeFactoryHooks
-	arrayTypeNodeArena                  core.Arena[ArrayTypeNode]
-	binaryExpressionArena               core.Arena[BinaryExpression]
-	blockArena                          core.Arena[Block]
-	callExpressionArena                 core.Arena[CallExpression]
-	conditionalExpressionArena          core.Arena[ConditionalExpression]
-	constructSignatureDeclarationArena  core.Arena[ConstructSignatureDeclaration]
-	elementAccessExpressionArena        core.Arena[ElementAccessExpression]
-	expressionStatementArena            core.Arena[ExpressionStatement]
-	expressionWithTypeArgumentsArena    core.Arena[ExpressionWithTypeArguments]
-	functionDeclarationArena            core.Arena[FunctionDeclaration]
-	functionTypeNodeArena               core.Arena[FunctionTypeNode]
-	heritageClauseArena                 core.Arena[HeritageClause]
-	identifierArena                     core.Arena[Identifier]
-	ifStatementArena                    core.Arena[IfStatement]
-	importSpecifierArena                core.Arena[ImportSpecifier]
-	indexedAccessTypeNodeArena          core.Arena[IndexedAccessTypeNode]
-	interfaceDeclarationArena           core.Arena[InterfaceDeclaration]
-	intersectionTypeNodeArena           core.Arena[IntersectionTypeNode]
-	jsdocArena                          core.Arena[JSDoc]
-	jsdocDeprecatedTagArena             core.Arena[JSDocDeprecatedTag]
-	jsdocTextArena                      core.Arena[JSDocText]
-	jsdocUnknownTagArena                core.Arena[JSDocUnknownTag]
-	keywordExpressionArena              core.Arena[KeywordExpression]
-	keywordTypeNodeArena                core.Arena[KeywordTypeNode]
-	kvsCollectExpressionArena           core.Arena[KvsCollectExpression]
-	kvsDefaultExpressionArena           core.Arena[KvsDefaultExpression]
-	kvsExtantAssertionExpressionArena   core.Arena[KvsExtantAssertionExpression]
-	kvsExtantAssignmentExpressionArena  core.Arena[KvsExtantAssignmentExpression]
-	kvsExtantReturnStatementArena       core.Arena[KvsExtantReturnStatement]
-	kvsExtantTestExpressionArena        core.Arena[KvsExtantTestExpression]
-	kvsExtantTypeArena                  core.Arena[KvsExtantType]
-	kvsExtantYieldStatementArena        core.Arena[KvsExtantYieldStatement]
-	kvsSieveBindingInitializerArena     core.Arena[KvsSieveBindingInitializer]
-	kvsForExpressionArena               core.Arena[KvsForExpression]
-	kvsIfBindingClauseArena             core.Arena[KvsIfBindingClause]
-	kvsIfBindingStatementArena          core.Arena[KvsIfBindingStatement]
-	kvsNullableAssertionExpressionArena core.Arena[KvsNullableAssertionExpression]
-	kvsNullableTypeArena                core.Arena[KvsNullableType]
-	kvsNullingExpressionArena           core.Arena[KvsNullingExpression]
-	kvsSelectExpressionArena            core.Arena[KvsSelectExpression]
-	kvsNullingSieveExpressionArena      core.Arena[KvsNullingSieveExpression]
-	kvsYieldStatementArena              core.Arena[KvsYieldStatement]
-	literalTypeNodeArena                core.Arena[LiteralTypeNode]
-	methodSignatureDeclarationArena     core.Arena[MethodSignatureDeclaration]
-	modifierListArena                   core.Arena[ModifierList]
-	nodeListArena                       core.Arena[NodeList]
-	numericLiteralArena                 core.Arena[NumericLiteral]
-	parameterDeclarationArena           core.Arena[ParameterDeclaration]
-	parenthesizedExpressionArena        core.Arena[ParenthesizedExpression]
-	parenthesizedTypeNodeArena          core.Arena[ParenthesizedTypeNode]
-	prefixUnaryExpressionArena          core.Arena[PrefixUnaryExpression]
-	propertyAccessExpressionArena       core.Arena[PropertyAccessExpression]
-	propertyAssignmentArena             core.Arena[PropertyAssignment]
-	propertySignatureDeclarationArena   core.Arena[PropertySignatureDeclaration]
-	returnStatementArena                core.Arena[ReturnStatement]
-	stringLiteralArena                  core.Arena[StringLiteral]
-	tokenArena                          core.Arena[Token]
-	typeAliasDeclarationArena           core.Arena[TypeAliasDeclaration]
-	typeLiteralNodeArena                core.Arena[TypeLiteralNode]
-	typeOperatorNodeArena               core.Arena[TypeOperatorNode]
-	typeParameterDeclarationArena       core.Arena[TypeParameterDeclaration]
-	typeReferenceNodeArena              core.Arena[TypeReferenceNode]
-	unionTypeNodeArena                  core.Arena[UnionTypeNode]
-	variableDeclarationArena            core.Arena[VariableDeclaration]
-	variableDeclarationListArena        core.Arena[VariableDeclarationList]
-	variableStatementArena              core.Arena[VariableStatement]
+	hooks                                    NodeFactoryHooks
+	arrayTypeNodeArena                       core.Arena[ArrayTypeNode]
+	binaryExpressionArena                    core.Arena[BinaryExpression]
+	blockArena                               core.Arena[Block]
+	callExpressionArena                      core.Arena[CallExpression]
+	conditionalExpressionArena               core.Arena[ConditionalExpression]
+	constructSignatureDeclarationArena       core.Arena[ConstructSignatureDeclaration]
+	elementAccessExpressionArena             core.Arena[ElementAccessExpression]
+	expressionStatementArena                 core.Arena[ExpressionStatement]
+	expressionWithTypeArgumentsArena         core.Arena[ExpressionWithTypeArguments]
+	functionDeclarationArena                 core.Arena[FunctionDeclaration]
+	functionTypeNodeArena                    core.Arena[FunctionTypeNode]
+	heritageClauseArena                      core.Arena[HeritageClause]
+	identifierArena                          core.Arena[Identifier]
+	ifStatementArena                         core.Arena[IfStatement]
+	importSpecifierArena                     core.Arena[ImportSpecifier]
+	indexedAccessTypeNodeArena               core.Arena[IndexedAccessTypeNode]
+	interfaceDeclarationArena                core.Arena[InterfaceDeclaration]
+	intersectionTypeNodeArena                core.Arena[IntersectionTypeNode]
+	jsdocArena                               core.Arena[JSDoc]
+	jsdocDeprecatedTagArena                  core.Arena[JSDocDeprecatedTag]
+	jsdocTextArena                           core.Arena[JSDocText]
+	jsdocUnknownTagArena                     core.Arena[JSDocUnknownTag]
+	keywordExpressionArena                   core.Arena[KeywordExpression]
+	keywordTypeNodeArena                     core.Arena[KeywordTypeNode]
+	kvsCollectExpressionArena                core.Arena[KvsCollectExpression]
+	kvsComparisonAlternativesExpressionArena core.Arena[KvsComparisonAlternativesExpression]
+	kvsComparisonChainExpressionArena        core.Arena[KvsComparisonChainExpression]
+	kvsDefaultExpressionArena                core.Arena[KvsDefaultExpression]
+	kvsExtantAssertionExpressionArena        core.Arena[KvsExtantAssertionExpression]
+	kvsExtantAssignmentExpressionArena       core.Arena[KvsExtantAssignmentExpression]
+	kvsExtantReturnStatementArena            core.Arena[KvsExtantReturnStatement]
+	kvsExtantTestExpressionArena             core.Arena[KvsExtantTestExpression]
+	kvsExtantTypeArena                       core.Arena[KvsExtantType]
+	kvsExtantYieldStatementArena             core.Arena[KvsExtantYieldStatement]
+	kvsForExpressionArena                    core.Arena[KvsForExpression]
+	kvsIfBindingClauseArena                  core.Arena[KvsIfBindingClause]
+	kvsIfBindingStatementArena               core.Arena[KvsIfBindingStatement]
+	kvsNullableAssertionExpressionArena      core.Arena[KvsNullableAssertionExpression]
+	kvsNullableTypeArena                     core.Arena[KvsNullableType]
+	kvsNullingExpressionArena                core.Arena[KvsNullingExpression]
+	kvsNullingSieveExpressionArena           core.Arena[KvsNullingSieveExpression]
+	kvsSelectExpressionArena                 core.Arena[KvsSelectExpression]
+	kvsSieveBindingInitializerArena          core.Arena[KvsSieveBindingInitializer]
+	kvsYieldStatementArena                   core.Arena[KvsYieldStatement]
+	literalTypeNodeArena                     core.Arena[LiteralTypeNode]
+	methodSignatureDeclarationArena          core.Arena[MethodSignatureDeclaration]
+	modifierListArena                        core.Arena[ModifierList]
+	nodeListArena                            core.Arena[NodeList]
+	numericLiteralArena                      core.Arena[NumericLiteral]
+	parameterDeclarationArena                core.Arena[ParameterDeclaration]
+	parenthesizedExpressionArena             core.Arena[ParenthesizedExpression]
+	parenthesizedTypeNodeArena               core.Arena[ParenthesizedTypeNode]
+	prefixUnaryExpressionArena               core.Arena[PrefixUnaryExpression]
+	propertyAccessExpressionArena            core.Arena[PropertyAccessExpression]
+	propertyAssignmentArena                  core.Arena[PropertyAssignment]
+	propertySignatureDeclarationArena        core.Arena[PropertySignatureDeclaration]
+	returnStatementArena                     core.Arena[ReturnStatement]
+	stringLiteralArena                       core.Arena[StringLiteral]
+	tokenArena                               core.Arena[Token]
+	typeAliasDeclarationArena                core.Arena[TypeAliasDeclaration]
+	typeLiteralNodeArena                     core.Arena[TypeLiteralNode]
+	typeOperatorNodeArena                    core.Arena[TypeOperatorNode]
+	typeParameterDeclarationArena            core.Arena[TypeParameterDeclaration]
+	typeReferenceNodeArena                   core.Arena[TypeReferenceNode]
+	unionTypeNodeArena                       core.Arena[UnionTypeNode]
+	variableDeclarationArena                 core.Arena[VariableDeclaration]
+	variableDeclarationListArena             core.Arena[VariableDeclarationList]
+	variableStatementArena                   core.Arena[VariableStatement]
 
 	nodeCount int
 	textCount int
@@ -267,259 +269,261 @@ type JSDocCommentBase struct {
 // ──────────────────────────────────────────────────────────────────────
 
 type (
-	TokenNode                          = Node
-	IdentifierNode                     = Node
-	PrivateIdentifierNode              = Node
-	QualifiedNameNode                  = Node
-	ComputedPropertyNameNode           = Node
-	DecoratorNode                      = Node
-	EmptyStatementNode                 = Node
-	IfStatementNode                    = Node
-	DoStatementNode                    = Node
-	WhileStatementNode                 = Node
-	ForStatementNode                   = Node
-	ForInOrOfStatementNode             = Node
-	BreakStatementNode                 = Node
-	ContinueStatementNode              = Node
-	ReturnStatementNode                = Node
-	WithStatementNode                  = Node
-	SwitchStatementNode                = Node
-	CaseBlockNode                      = Node
-	CaseOrDefaultClauseNode            = Node
-	ThrowStatementNode                 = Node
-	TryStatementNode                   = Node
-	CatchClauseNode                    = Node
-	DebuggerStatementNode              = Node
-	KvsExtantReturnStatementNode       = Node
-	KvsYieldStatementNode              = Node
-	KvsExtantYieldStatementNode        = Node
-	KvsIfBindingStatementNode          = Node
-	KvsIfBindingClauseNode             = Node
-	KvsNullableAssertionExpressionNode = Node
-	KvsExtantAssertionExpressionNode   = Node
-	KvsExtantAssignmentExpressionNode  = Node
-	KvsExtantTestExpressionNode        = Node
-	KvsDefaultExpressionNode           = Node
-	KvsNullingSieveExpressionNode      = Node
-	KvsSieveBindingInitializerNode     = Node
-	KvsNullingExpressionNode           = Node
-	KvsCompactArrayExpressionNode      = Node
-	KvsConditionalElementNode          = Node
-	KvsCompactObjectExpressionNode     = Node
-	KvsCollectExpressionNode           = Node
-	KvsSelectExpressionNode            = Node
-	KvsForExpressionNode               = Node
-	LabeledStatementNode               = Node
-	ExpressionStatementNode            = Node
-	BlockNode                          = Node
-	VariableStatementNode              = Node
-	VariableDeclarationNode            = Node
-	VariableDeclarationListNode        = Node
-	BindingPatternNode                 = Node
-	ParameterDeclarationNode           = Node
-	BindingElementNode                 = Node
-	MissingDeclarationNode             = Node
-	FunctionDeclarationNode            = Node
-	ClassDeclarationNode               = Node
-	ClassExpressionNode                = Node
-	HeritageClauseNode                 = Node
-	InterfaceDeclarationNode           = Node
-	TypeAliasDeclarationNode           = Node
-	EnumMemberNode                     = Node
-	EnumDeclarationNode                = Node
-	ModuleBlockNode                    = Node
-	NotEmittedStatementNode            = Node
-	NotEmittedTypeElementNode          = Node
-	ImportDeclarationNode              = Node
-	ExternalModuleReferenceNode        = Node
-	NamespaceImportNode                = Node
-	NamedImportsNode                   = Node
-	ExportAssignmentNode               = Node
-	NamespaceExportDeclarationNode     = Node
-	NamespaceExportNode                = Node
-	NamedExportsNode                   = Node
-	ExportSpecifierNode                = Node
-	CallSignatureDeclarationNode       = Node
-	ConstructSignatureDeclarationNode  = Node
-	ConstructorDeclarationNode         = Node
-	GetAccessorDeclarationNode         = Node
-	SetAccessorDeclarationNode         = Node
-	IndexSignatureDeclarationNode      = Node
-	MethodSignatureDeclarationNode     = Node
-	MethodDeclarationNode              = Node
-	PropertySignatureDeclarationNode   = Node
-	PropertyDeclarationNode            = Node
-	SemicolonClassElementNode          = Node
-	ClassStaticBlockDeclarationNode    = Node
-	OmittedExpressionNode              = Node
-	KeywordExpressionNode              = Node
-	StringLiteralNode                  = Node
-	NumericLiteralNode                 = Node
-	BigIntLiteralNode                  = Node
-	RegularExpressionLiteralNode       = Node
-	NoSubstitutionTemplateLiteralNode  = Node
-	BinaryExpressionNode               = Node
-	PrefixUnaryExpressionNode          = Node
-	PostfixUnaryExpressionNode         = Node
-	YieldExpressionNode                = Node
-	ArrowFunctionNode                  = Node
-	FunctionExpressionNode             = Node
-	AsExpressionNode                   = Node
-	SatisfiesExpressionNode            = Node
-	ConditionalExpressionNode          = Node
-	PropertyAccessExpressionNode       = Node
-	ElementAccessExpressionNode        = Node
-	CallExpressionNode                 = Node
-	NewExpressionNode                  = Node
-	MetaPropertyNode                   = Node
-	NonNullExpressionNode              = Node
-	SpreadElementNode                  = Node
-	TemplateExpressionNode             = Node
-	TemplateSpanNode                   = Node
-	TaggedTemplateExpressionNode       = Node
-	ParenthesizedExpressionNode        = Node
-	ArrayLiteralExpressionNode         = Node
-	ObjectLiteralExpressionNode        = Node
-	SpreadAssignmentNode               = Node
-	PropertyAssignmentNode             = Node
-	ShorthandPropertyAssignmentNode    = Node
-	DeleteExpressionNode               = Node
-	TypeOfExpressionNode               = Node
-	VoidExpressionNode                 = Node
-	AwaitExpressionNode                = Node
-	TypeAssertionNode                  = Node
-	KeywordTypeNodeNode                = Node
-	UnionTypeNodeNode                  = Node
-	IntersectionTypeNodeNode           = Node
-	ConditionalTypeNodeNode            = Node
-	TypeOperatorNodeNode               = Node
-	InferTypeNodeNode                  = Node
-	ArrayTypeNodeNode                  = Node
-	IndexedAccessTypeNodeNode          = Node
-	TypeReferenceNodeNode              = Node
-	ExpressionWithTypeArgumentsNode    = Node
-	LiteralTypeNodeNode                = Node
-	ThisTypeNodeNode                   = Node
-	TypePredicateNodeNode              = Node
-	ImportAttributeNode                = Node
-	ImportAttributesNode               = Node
-	TypeQueryNodeNode                  = Node
-	MappedTypeNodeNode                 = Node
-	TypeLiteralNodeNode                = Node
-	TupleTypeNodeNode                  = Node
-	NamedTupleMemberNode               = Node
-	OptionalTypeNodeNode               = Node
-	KvsNullableTypeNode                = Node
-	KvsExtantTypeNode                  = Node
-	RestTypeNodeNode                   = Node
-	ParenthesizedTypeNodeNode          = Node
-	FunctionTypeNodeNode               = Node
-	ConstructorTypeNodeNode            = Node
-	TemplateHeadNode                   = Node
-	TemplateMiddleNode                 = Node
-	TemplateTailNode                   = Node
-	TemplateLiteralTypeNodeNode        = Node
-	TemplateLiteralTypeSpanNode        = Node
-	SyntheticExpressionNode            = Node
-	PartiallyEmittedExpressionNode     = Node
-	JsxElementNode                     = Node
-	JsxAttributesNode                  = Node
-	JsxNamespacedNameNode              = Node
-	JsxOpeningElementNode              = Node
-	JsxSelfClosingElementNode          = Node
-	JsxFragmentNode                    = Node
-	JsxOpeningFragmentNode             = Node
-	JsxClosingFragmentNode             = Node
-	JsxAttributeNode                   = Node
-	JsxSpreadAttributeNode             = Node
-	JsxClosingElementNode              = Node
-	JsxExpressionNode                  = Node
-	JsxTextNode                        = Node
-	SyntaxListNode                     = Node
-	JSDocNode                          = Node
-	JSDocTypeExpressionNode            = Node
-	JSDocNonNullableTypeNode           = Node
-	JSDocNullableTypeNode              = Node
-	JSDocAllTypeNode                   = Node
-	JSDocVariadicTypeNode              = Node
-	JSDocOptionalTypeNode              = Node
-	JSDocTypeTagNode                   = Node
-	JSDocUnknownTagNode                = Node
-	JSDocTemplateTagNode               = Node
-	JSDocReturnTagNode                 = Node
-	JSDocPublicTagNode                 = Node
-	JSDocPrivateTagNode                = Node
-	JSDocProtectedTagNode              = Node
-	JSDocReadonlyTagNode               = Node
-	JSDocOverrideTagNode               = Node
-	JSDocDeprecatedTagNode             = Node
-	JSDocSeeTagNode                    = Node
-	JSDocImplementsTagNode             = Node
-	JSDocAugmentsTagNode               = Node
-	JSDocSatisfiesTagNode              = Node
-	JSDocThrowsTagNode                 = Node
-	JSDocThisTagNode                   = Node
-	JSDocImportTagNode                 = Node
-	JSDocCallbackTagNode               = Node
-	JSDocOverloadTagNode               = Node
-	JSDocTypedefTagNode                = Node
-	JSDocSignatureNode                 = Node
-	JSDocNameReferenceNode             = Node
-	SourceFileNode                     = Node
-	ModuleDeclarationNode              = Node
-	ImportEqualsDeclarationNode        = Node
-	ExportDeclarationNode              = Node
-	ImportTypeNodeNode                 = Node
-	ImportClauseNode                   = Node
-	ImportSpecifierNode                = Node
-	JSDocTextNode                      = Node
-	JSDocLinkNode                      = Node
-	JSDocLinkPlainNode                 = Node
-	JSDocLinkCodeNode                  = Node
-	TypeParameterDeclarationNode       = Node
-	SyntheticReferenceExpressionNode   = Node
-	JSDocTypeLiteralNode               = Node
-	JSDocParameterOrPropertyTagNode    = Node
-	EndOfFile                          = Node
-	DotToken                           = Node
-	DotDotDotToken                     = Node
-	QuestionToken                      = Node
-	ExclamationToken                   = Node
-	TildeToken                         = Node
-	ColonToken                         = Node
-	EqualsToken                        = Node
-	AsteriskToken                      = Node
-	EqualsGreaterThanToken             = Node
-	PlusToken                          = Node
-	MinusToken                         = Node
-	QuestionDotToken                   = Node
-	AssertsKeyword                     = Node
-	AssertKeyword                      = Node
-	AwaitKeyword                       = Node
-	CaseKeyword                        = Node
-	AbstractKeyword                    = Node
-	AccessorKeyword                    = Node
-	AsyncKeyword                       = Node
-	ConstKeyword                       = Node
-	DeclareKeyword                     = Node
-	DefaultKeyword                     = Node
-	ExportKeyword                      = Node
-	InKeyword                          = Node
-	PrivateKeyword                     = Node
-	ProtectedKeyword                   = Node
-	PublicKeyword                      = Node
-	ReadonlyKeyword                    = Node
-	OutKeyword                         = Node
-	OverrideKeyword                    = Node
-	StaticKeyword                      = Node
-	BinaryOperatorToken                = Node
-	AssignmentOperatorToken            = Node
-	NullLiteral                        = Node
-	TrueLiteral                        = Node
-	FalseLiteral                       = Node
-	ThisExpression                     = Node
-	SuperExpression                    = Node
-	ImportExpression                   = Node
+	TokenNode                               = Node
+	IdentifierNode                          = Node
+	PrivateIdentifierNode                   = Node
+	QualifiedNameNode                       = Node
+	ComputedPropertyNameNode                = Node
+	DecoratorNode                           = Node
+	EmptyStatementNode                      = Node
+	IfStatementNode                         = Node
+	DoStatementNode                         = Node
+	WhileStatementNode                      = Node
+	ForStatementNode                        = Node
+	ForInOrOfStatementNode                  = Node
+	BreakStatementNode                      = Node
+	ContinueStatementNode                   = Node
+	ReturnStatementNode                     = Node
+	WithStatementNode                       = Node
+	SwitchStatementNode                     = Node
+	CaseBlockNode                           = Node
+	CaseOrDefaultClauseNode                 = Node
+	ThrowStatementNode                      = Node
+	TryStatementNode                        = Node
+	CatchClauseNode                         = Node
+	DebuggerStatementNode                   = Node
+	KvsExtantReturnStatementNode            = Node
+	KvsYieldStatementNode                   = Node
+	KvsExtantYieldStatementNode             = Node
+	KvsIfBindingStatementNode               = Node
+	KvsIfBindingClauseNode                  = Node
+	KvsNullableAssertionExpressionNode      = Node
+	KvsExtantAssertionExpressionNode        = Node
+	KvsExtantAssignmentExpressionNode       = Node
+	KvsExtantTestExpressionNode             = Node
+	KvsDefaultExpressionNode                = Node
+	KvsNullingSieveExpressionNode           = Node
+	KvsSieveBindingInitializerNode          = Node
+	KvsComparisonAlternativesExpressionNode = Node
+	KvsComparisonChainExpressionNode        = Node
+	KvsNullingExpressionNode                = Node
+	KvsCompactArrayExpressionNode           = Node
+	KvsConditionalElementNode               = Node
+	KvsCompactObjectExpressionNode          = Node
+	KvsCollectExpressionNode                = Node
+	KvsSelectExpressionNode                 = Node
+	KvsForExpressionNode                    = Node
+	LabeledStatementNode                    = Node
+	ExpressionStatementNode                 = Node
+	BlockNode                               = Node
+	VariableStatementNode                   = Node
+	VariableDeclarationNode                 = Node
+	VariableDeclarationListNode             = Node
+	BindingPatternNode                      = Node
+	ParameterDeclarationNode                = Node
+	BindingElementNode                      = Node
+	MissingDeclarationNode                  = Node
+	FunctionDeclarationNode                 = Node
+	ClassDeclarationNode                    = Node
+	ClassExpressionNode                     = Node
+	HeritageClauseNode                      = Node
+	InterfaceDeclarationNode                = Node
+	TypeAliasDeclarationNode                = Node
+	EnumMemberNode                          = Node
+	EnumDeclarationNode                     = Node
+	ModuleBlockNode                         = Node
+	NotEmittedStatementNode                 = Node
+	NotEmittedTypeElementNode               = Node
+	ImportDeclarationNode                   = Node
+	ExternalModuleReferenceNode             = Node
+	NamespaceImportNode                     = Node
+	NamedImportsNode                        = Node
+	ExportAssignmentNode                    = Node
+	NamespaceExportDeclarationNode          = Node
+	NamespaceExportNode                     = Node
+	NamedExportsNode                        = Node
+	ExportSpecifierNode                     = Node
+	CallSignatureDeclarationNode            = Node
+	ConstructSignatureDeclarationNode       = Node
+	ConstructorDeclarationNode              = Node
+	GetAccessorDeclarationNode              = Node
+	SetAccessorDeclarationNode              = Node
+	IndexSignatureDeclarationNode           = Node
+	MethodSignatureDeclarationNode          = Node
+	MethodDeclarationNode                   = Node
+	PropertySignatureDeclarationNode        = Node
+	PropertyDeclarationNode                 = Node
+	SemicolonClassElementNode               = Node
+	ClassStaticBlockDeclarationNode         = Node
+	OmittedExpressionNode                   = Node
+	KeywordExpressionNode                   = Node
+	StringLiteralNode                       = Node
+	NumericLiteralNode                      = Node
+	BigIntLiteralNode                       = Node
+	RegularExpressionLiteralNode            = Node
+	NoSubstitutionTemplateLiteralNode       = Node
+	BinaryExpressionNode                    = Node
+	PrefixUnaryExpressionNode               = Node
+	PostfixUnaryExpressionNode              = Node
+	YieldExpressionNode                     = Node
+	ArrowFunctionNode                       = Node
+	FunctionExpressionNode                  = Node
+	AsExpressionNode                        = Node
+	SatisfiesExpressionNode                 = Node
+	ConditionalExpressionNode               = Node
+	PropertyAccessExpressionNode            = Node
+	ElementAccessExpressionNode             = Node
+	CallExpressionNode                      = Node
+	NewExpressionNode                       = Node
+	MetaPropertyNode                        = Node
+	NonNullExpressionNode                   = Node
+	SpreadElementNode                       = Node
+	TemplateExpressionNode                  = Node
+	TemplateSpanNode                        = Node
+	TaggedTemplateExpressionNode            = Node
+	ParenthesizedExpressionNode             = Node
+	ArrayLiteralExpressionNode              = Node
+	ObjectLiteralExpressionNode             = Node
+	SpreadAssignmentNode                    = Node
+	PropertyAssignmentNode                  = Node
+	ShorthandPropertyAssignmentNode         = Node
+	DeleteExpressionNode                    = Node
+	TypeOfExpressionNode                    = Node
+	VoidExpressionNode                      = Node
+	AwaitExpressionNode                     = Node
+	TypeAssertionNode                       = Node
+	KeywordTypeNodeNode                     = Node
+	UnionTypeNodeNode                       = Node
+	IntersectionTypeNodeNode                = Node
+	ConditionalTypeNodeNode                 = Node
+	TypeOperatorNodeNode                    = Node
+	InferTypeNodeNode                       = Node
+	ArrayTypeNodeNode                       = Node
+	IndexedAccessTypeNodeNode               = Node
+	TypeReferenceNodeNode                   = Node
+	ExpressionWithTypeArgumentsNode         = Node
+	LiteralTypeNodeNode                     = Node
+	ThisTypeNodeNode                        = Node
+	TypePredicateNodeNode                   = Node
+	ImportAttributeNode                     = Node
+	ImportAttributesNode                    = Node
+	TypeQueryNodeNode                       = Node
+	MappedTypeNodeNode                      = Node
+	TypeLiteralNodeNode                     = Node
+	TupleTypeNodeNode                       = Node
+	NamedTupleMemberNode                    = Node
+	OptionalTypeNodeNode                    = Node
+	KvsNullableTypeNode                     = Node
+	KvsExtantTypeNode                       = Node
+	RestTypeNodeNode                        = Node
+	ParenthesizedTypeNodeNode               = Node
+	FunctionTypeNodeNode                    = Node
+	ConstructorTypeNodeNode                 = Node
+	TemplateHeadNode                        = Node
+	TemplateMiddleNode                      = Node
+	TemplateTailNode                        = Node
+	TemplateLiteralTypeNodeNode             = Node
+	TemplateLiteralTypeSpanNode             = Node
+	SyntheticExpressionNode                 = Node
+	PartiallyEmittedExpressionNode          = Node
+	JsxElementNode                          = Node
+	JsxAttributesNode                       = Node
+	JsxNamespacedNameNode                   = Node
+	JsxOpeningElementNode                   = Node
+	JsxSelfClosingElementNode               = Node
+	JsxFragmentNode                         = Node
+	JsxOpeningFragmentNode                  = Node
+	JsxClosingFragmentNode                  = Node
+	JsxAttributeNode                        = Node
+	JsxSpreadAttributeNode                  = Node
+	JsxClosingElementNode                   = Node
+	JsxExpressionNode                       = Node
+	JsxTextNode                             = Node
+	SyntaxListNode                          = Node
+	JSDocNode                               = Node
+	JSDocTypeExpressionNode                 = Node
+	JSDocNonNullableTypeNode                = Node
+	JSDocNullableTypeNode                   = Node
+	JSDocAllTypeNode                        = Node
+	JSDocVariadicTypeNode                   = Node
+	JSDocOptionalTypeNode                   = Node
+	JSDocTypeTagNode                        = Node
+	JSDocUnknownTagNode                     = Node
+	JSDocTemplateTagNode                    = Node
+	JSDocReturnTagNode                      = Node
+	JSDocPublicTagNode                      = Node
+	JSDocPrivateTagNode                     = Node
+	JSDocProtectedTagNode                   = Node
+	JSDocReadonlyTagNode                    = Node
+	JSDocOverrideTagNode                    = Node
+	JSDocDeprecatedTagNode                  = Node
+	JSDocSeeTagNode                         = Node
+	JSDocImplementsTagNode                  = Node
+	JSDocAugmentsTagNode                    = Node
+	JSDocSatisfiesTagNode                   = Node
+	JSDocThrowsTagNode                      = Node
+	JSDocThisTagNode                        = Node
+	JSDocImportTagNode                      = Node
+	JSDocCallbackTagNode                    = Node
+	JSDocOverloadTagNode                    = Node
+	JSDocTypedefTagNode                     = Node
+	JSDocSignatureNode                      = Node
+	JSDocNameReferenceNode                  = Node
+	SourceFileNode                          = Node
+	ModuleDeclarationNode                   = Node
+	ImportEqualsDeclarationNode             = Node
+	ExportDeclarationNode                   = Node
+	ImportTypeNodeNode                      = Node
+	ImportClauseNode                        = Node
+	ImportSpecifierNode                     = Node
+	JSDocTextNode                           = Node
+	JSDocLinkNode                           = Node
+	JSDocLinkPlainNode                      = Node
+	JSDocLinkCodeNode                       = Node
+	TypeParameterDeclarationNode            = Node
+	SyntheticReferenceExpressionNode        = Node
+	JSDocTypeLiteralNode                    = Node
+	JSDocParameterOrPropertyTagNode         = Node
+	EndOfFile                               = Node
+	DotToken                                = Node
+	DotDotDotToken                          = Node
+	QuestionToken                           = Node
+	ExclamationToken                        = Node
+	TildeToken                              = Node
+	ColonToken                              = Node
+	EqualsToken                             = Node
+	AsteriskToken                           = Node
+	EqualsGreaterThanToken                  = Node
+	PlusToken                               = Node
+	MinusToken                              = Node
+	QuestionDotToken                        = Node
+	AssertsKeyword                          = Node
+	AssertKeyword                           = Node
+	AwaitKeyword                            = Node
+	CaseKeyword                             = Node
+	AbstractKeyword                         = Node
+	AccessorKeyword                         = Node
+	AsyncKeyword                            = Node
+	ConstKeyword                            = Node
+	DeclareKeyword                          = Node
+	DefaultKeyword                          = Node
+	ExportKeyword                           = Node
+	InKeyword                               = Node
+	PrivateKeyword                          = Node
+	ProtectedKeyword                        = Node
+	PublicKeyword                           = Node
+	ReadonlyKeyword                         = Node
+	OutKeyword                              = Node
+	OverrideKeyword                         = Node
+	StaticKeyword                           = Node
+	BinaryOperatorToken                     = Node
+	AssignmentOperatorToken                 = Node
+	NullLiteral                             = Node
+	TrueLiteral                             = Node
+	FalseLiteral                            = Node
+	ThisExpression                          = Node
+	SuperExpression                         = Node
+	ImportExpression                        = Node
 )
 
 type (
@@ -2052,6 +2056,107 @@ func (node *KvsSieveBindingInitializer) Clone(f NodeFactoryCoercible) *Node {
 
 func IsKvsSieveBindingInitializer(node *Node) bool {
 	return node.Kind == KindKvsSieveBindingInitializer
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// KvsComparisonAlternativesExpression
+// ──────────────────────────────────────────────────────────────────────
+
+type KvsComparisonAlternativesExpression struct {
+	ExpressionBase
+	CompositeBase
+	Subject       *Expression
+	OperatorToken *BinaryOperatorToken
+	SpreadToken   *DotDotDotToken // Optional
+	Alternatives  *ElementList
+}
+
+func (f *NodeFactory) NewKvsComparisonAlternativesExpression(subject *Expression, operatorToken *BinaryOperatorToken, spreadToken *DotDotDotToken, alternatives *ElementList) *Node {
+	data := f.kvsComparisonAlternativesExpressionArena.New()
+	data.Subject = subject
+	data.OperatorToken = operatorToken
+	data.SpreadToken = spreadToken
+	data.Alternatives = alternatives
+	return f.newNode(KindKvsComparisonAlternativesExpression, data)
+}
+
+func (f *NodeFactory) UpdateKvsComparisonAlternativesExpression(node *KvsComparisonAlternativesExpression, subject *Expression, operatorToken *BinaryOperatorToken, spreadToken *DotDotDotToken, alternatives *ElementList) *Node {
+	if subject != node.Subject || operatorToken != node.OperatorToken || spreadToken != node.SpreadToken || alternatives != node.Alternatives {
+		return updateNode(f.NewKvsComparisonAlternativesExpression(subject, operatorToken, spreadToken, alternatives), node.AsNode(), f.hooks)
+	}
+	return node.AsNode()
+}
+
+func (node *KvsComparisonAlternativesExpression) ForEachChild(v Visitor) bool {
+	return visit(v, node.Subject) ||
+		visit(v, node.OperatorToken) ||
+		visit(v, node.SpreadToken) ||
+		visitNodeList(v, node.Alternatives)
+}
+
+func (node *KvsComparisonAlternativesExpression) VisitEachChild(v *NodeVisitor) *Node {
+	return v.Factory.UpdateKvsComparisonAlternativesExpression(node, v.visitNode(node.Subject), v.visitNode(node.OperatorToken), v.visitNode(node.SpreadToken), v.visitNodes(node.Alternatives))
+}
+
+func (node *KvsComparisonAlternativesExpression) Clone(f NodeFactoryCoercible) *Node {
+	return cloneNode(f.AsNodeFactory().NewKvsComparisonAlternativesExpression(node.Subject, node.OperatorToken, node.SpreadToken, node.Alternatives), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func (node *KvsComparisonAlternativesExpression) computeSubtreeFacts() SubtreeFacts {
+	return propagateSubtreeFacts(node.Subject) |
+		propagateSubtreeFacts(node.OperatorToken) |
+		propagateSubtreeFacts(node.SpreadToken) |
+		propagateNodeListSubtreeFacts(node.Alternatives, propagateSubtreeFacts)
+}
+
+func IsKvsComparisonAlternativesExpression(node *Node) bool {
+	return node.Kind == KindKvsComparisonAlternativesExpression
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// KvsComparisonChainExpression
+// ──────────────────────────────────────────────────────────────────────
+
+type KvsComparisonChainExpression struct {
+	ExpressionBase
+	CompositeBase
+	Operands  *ElementList
+	Operators *NodeList
+}
+
+func (f *NodeFactory) NewKvsComparisonChainExpression(operands *ElementList, operators *NodeList) *Node {
+	data := f.kvsComparisonChainExpressionArena.New()
+	data.Operands = operands
+	data.Operators = operators
+	return f.newNode(KindKvsComparisonChainExpression, data)
+}
+
+func (f *NodeFactory) UpdateKvsComparisonChainExpression(node *KvsComparisonChainExpression, operands *ElementList, operators *NodeList) *Node {
+	if operands != node.Operands || operators != node.Operators {
+		return updateNode(f.NewKvsComparisonChainExpression(operands, operators), node.AsNode(), f.hooks)
+	}
+	return node.AsNode()
+}
+
+func (node *KvsComparisonChainExpression) ForEachChild(v Visitor) bool {
+	return visitNodeList(v, node.Operands) || visitNodeList(v, node.Operators)
+}
+
+func (node *KvsComparisonChainExpression) VisitEachChild(v *NodeVisitor) *Node {
+	return v.Factory.UpdateKvsComparisonChainExpression(node, v.visitNodes(node.Operands), v.visitNodes(node.Operators))
+}
+
+func (node *KvsComparisonChainExpression) Clone(f NodeFactoryCoercible) *Node {
+	return cloneNode(f.AsNodeFactory().NewKvsComparisonChainExpression(node.Operands, node.Operators), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func (node *KvsComparisonChainExpression) computeSubtreeFacts() SubtreeFacts {
+	return propagateNodeListSubtreeFacts(node.Operands, propagateSubtreeFacts) |
+		propagateNodeListSubtreeFacts(node.Operators, propagateSubtreeFacts)
+}
+
+func IsKvsComparisonChainExpression(node *Node) bool {
+	return node.Kind == KindKvsComparisonChainExpression
 }
 
 // ──────────────────────────────────────────────────────────────────────
@@ -9712,6 +9817,10 @@ func (n *Node) ForEachChild(v Visitor) bool {
 		return n.data.(*KvsNullingSieveExpression).ForEachChild(v)
 	case KindKvsSieveBindingInitializer:
 		return n.data.(*KvsSieveBindingInitializer).ForEachChild(v)
+	case KindKvsComparisonAlternativesExpression:
+		return n.data.(*KvsComparisonAlternativesExpression).ForEachChild(v)
+	case KindKvsComparisonChainExpression:
+		return n.data.(*KvsComparisonChainExpression).ForEachChild(v)
 	case KindKvsNullingExpression:
 		return n.data.(*KvsNullingExpression).ForEachChild(v)
 	case KindKvsCompactArrayExpression:
@@ -10175,6 +10284,14 @@ func (n *Node) AsKvsNullingSieveExpression() *KvsNullingSieveExpression {
 
 func (n *Node) AsKvsSieveBindingInitializer() *KvsSieveBindingInitializer {
 	return n.data.(*KvsSieveBindingInitializer)
+}
+
+func (n *Node) AsKvsComparisonAlternativesExpression() *KvsComparisonAlternativesExpression {
+	return n.data.(*KvsComparisonAlternativesExpression)
+}
+
+func (n *Node) AsKvsComparisonChainExpression() *KvsComparisonChainExpression {
+	return n.data.(*KvsComparisonChainExpression)
 }
 
 func (n *Node) AsKvsNullingExpression() *KvsNullingExpression {

@@ -50,25 +50,44 @@ if (nullableItem != null) {
 
 This shows the observable behavior for a simple variable receiver: an absent item does not create the array. A complete lowering may use hidden temporaries to evaluate the receiver and callable once, preserve `this`, and delay `!` write-backs until required arguments pass. Those mechanics are compiler work and need not dominate the source-level explanation.
 
-## Lifted operators and equality
+## Lifted arithmetic and equality
 
 ```kvs
-const result = a + 4 == b + 5;
+const result = a + 4;
 ```
 
-lowers through nullable temporaries. If either addition lacks an operand, or either equality operand is absent, `result` is null.
+lowers through nullable temporaries. If either addition operand is absent,
+`result` is null.
 
 Lifted arithmetic requires compatible numeric present types. An operand known
 to be absent is rejected rather than assigned a present type. Nullable string
 concatenation and mixed numeric and string addition are rejected; postfix `!`
 provides an explicit empty-string choice where desired.
 
-`===` and `!==` lower directly and retain exact JavaScript semantics.
+All four equality operators lower directly and retain exact JavaScript
+semantics. The checker rejects a comparison when both operand types have
+possible present and absent values. Comparison with an absence-only operand is
+allowed, whether it is a `null` / `undefined` literal, an alias, or a
+flow-narrowed expression. Loose equality treats the two absence forms alike,
+while strict equality preserves their distinction. A nullable operand may also
+be compared with a present operand.
 
 Arithmetic lowering evaluates lifted operands once, from left to right, and does not
 evaluate a later operand after an earlier required operand is absent. The
 language guarantees that order for correctness, while discouraging programs
 from using nullable operands as implicit effect guards.
+
+Finite comparison alternatives with one or two values lower to short-circuiting
+comparisons after capturing the subject once. Three or more alternatives lower
+to an array-literal `includes` call. Runtime spread alternatives lower to
+`[...(alternatives ?? [])].includes(subject)`; inequality negates the complete
+membership result. Runtime alternatives are arrays only and provide no special
+flow narrowing.
+
+Comparison chains lower to `&&`-joined adjacent comparisons. Reused middle
+operands are captured once, and each later operand remains inside the preceding
+successful branch. The chain result is always boolean; each link retains its
+ordinary checker rules.
 
 ## Presence
 

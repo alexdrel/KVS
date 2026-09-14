@@ -513,13 +513,57 @@ stops evaluation before later operands. This order is a semantic guarantee,
 but KVS discourages using it to hide effects behind nullable paths because the
 resulting code is difficult to read. Effects should be sequenced explicitly.
 
-A relational comparison performs no KVS-specific narrowing. Strict identity
-remains ordinary JavaScript. Loose equality, member and indexed access, bitwise
-and shift operators, unary operators, compound assignments, and explicit
-nulling sieve are outside this slice.
+A relational comparison performs no KVS-specific narrowing. Member and indexed
+access, bitwise and shift operators, unary operators, compound assignments, and
+the explicit nulling sieve are outside this slice.
 
 No new syntax node is needed: the checker owns the nullable result and reports
 to the KVS emitter whether an ordinary binary expression requires lifting.
+
+## Nullable equality
+
+Status: accepted.
+
+Equality does not lift: `==`, `!=`, `===`, and `!==` retain JavaScript runtime
+semantics and produce `boolean`. The checker rejects equality when both operand
+types contain possible present and absent values. This prevents two
+independently absent computations from comparing equal by accident.
+
+A nullable operand may be compared with a present or absence-only operand. The
+absence-only operand may be a literal, an alias, or an expression narrowed by
+control flow. Loose equality treats `null` and `undefined` as a check for both
+forms of absence; strict equality distinguishes them, and KVS-generated absence
+is `null`. Existing TypeScript control-flow narrowing applies unchanged.
+Equality requires no syntax node or emitter path; this is a checker diagnostic
+only.
+
+## Comparison conveniences
+
+Status: accepted.
+
+Finite `==` / `!=` alternatives evaluate the subject once. One or two
+alternatives lower to direct short-circuiting comparisons; three or more lower
+to membership in a constructed array. Direct constituent comparisons retain
+the nullable-equality restriction. Finite alternatives participate in
+TypeScript flow narrowing.
+
+Runtime spread alternatives accept arrays, including nullable arrays. They
+lower through `[...(alternatives ?? [])].includes(subject)`, so absence acts as
+an empty array; equality is false and inequality true. Runtime membership makes
+no static narrowing promise.
+
+Comparison chains compare adjacent operands, evaluate every operand at most
+once from left to right, and stop at the first false link. A chain must be
+ascending (`<` / `<=`), descending (`>` / `>=`), repeated loose equality, or
+repeated strict equality. Mixed direction, mixed comparison families, and
+inequality sequences remain ordinary nested JavaScript expressions. This
+boundary also prevents generic-looking `<...>` syntax from becoming a chain.
+A line break between an operator and its following operand likewise leaves the
+expression on the ordinary TypeScript parsing path.
+Chain results are boolean. Relational links reject nullable operands, equality
+links retain the nullable ambiguity diagnostic, and a successful chain composes
+ordinary flow narrowing from its links. Dedicated AST nodes preserve accepted
+chains until the KVS transform owns their lowering.
 
 ## Explicit nulling sieve
 

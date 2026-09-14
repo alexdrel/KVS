@@ -108,6 +108,8 @@ import type {
     KvsCollectExpression,
     KvsCompactArrayExpression,
     KvsCompactObjectExpression,
+    KvsComparisonAlternativesExpression,
+    KvsComparisonChainExpression,
     KvsConditionalElement,
     KvsDefaultExpression,
     KvsExtantAssertionExpression,
@@ -303,6 +305,8 @@ import {
     updateKvsCollectExpression,
     updateKvsCompactArrayExpression,
     updateKvsCompactObjectExpression,
+    updateKvsComparisonAlternativesExpression,
+    updateKvsComparisonChainExpression,
     updateKvsConditionalElement,
     updateKvsDefaultExpression,
     updateKvsExtantAssertionExpression,
@@ -694,6 +698,18 @@ const visitEachChildTable: Record<number, VisitEachChildFunction> = {
         const _equalsToken = visitNode(node.equalsToken, visitor, isEqualsToken);
         const _expression = visitNode(node.expression, visitor, isExpression);
         return updateKvsSieveBindingInitializer(node, _tildeToken, _equalsToken, _expression);
+    },
+    [SyntaxKind.KvsComparisonAlternativesExpression]: (node: KvsComparisonAlternativesExpression, visitor: Visitor): KvsComparisonAlternativesExpression => {
+        const _subject = visitNode(node.subject, visitor, isExpression);
+        const _operatorToken = visitNode(node.operatorToken, visitor, isBinaryOperatorToken);
+        const _spreadToken = visitNode(node.spreadToken, visitor, isDotDotDotToken);
+        const _alternatives = visitNodes(node.alternatives, visitor);
+        return updateKvsComparisonAlternativesExpression(node, _subject, _operatorToken, _spreadToken, _alternatives);
+    },
+    [SyntaxKind.KvsComparisonChainExpression]: (node: KvsComparisonChainExpression, visitor: Visitor): KvsComparisonChainExpression => {
+        const _operands = visitNodes(node.operands, visitor);
+        const _operators = visitNodes(node.operators, visitor);
+        return updateKvsComparisonChainExpression(node, _operands, _operators);
     },
     [SyntaxKind.KvsNullingExpression]: (node: KvsNullingExpression, visitor: Visitor): KvsNullingExpression => {
         const _condition = visitNode(node.condition, visitor, isExpression);

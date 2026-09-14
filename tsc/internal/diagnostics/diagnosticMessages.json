@@ -8611,5 +8611,13 @@
     "A KVS sieve binding requires a 'const' or 'let' declaration.": {
         "category": "Error",
         "code": 100076
+    },
+    "KVS equality between two values that may both be absent is not allowed; compare absence explicitly.": {
+        "category": "Error",
+        "code": 100077
+    },
+    "KVS runtime comparison alternatives must be an array.": {
+        "category": "Error",
+        "code": 100078
     }
 }

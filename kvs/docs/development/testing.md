@@ -369,6 +369,21 @@ Run it with:
 go -C ./tsc test -run='TestLocal/kvsNullingSieve' ./internal/testrunner
 ```
 
+`kvsNullableEquality.ts` verifies that all four equality operators reject two
+operands with present and absent alternatives, while comparisons with a
+present or absence-only operand remain ordinary JavaScript. Absence-only cases
+include literals, aliases, and flow-narrowed expressions. Its type baseline
+also fences the difference between loose narrowing, which removes both absence
+forms, and strict narrowing, which removes only the explicitly compared form.
+
+`kvsComparisonConveniences.ts` verifies finite equality and exclusion lists,
+the direct-comparison versus three-item `includes` threshold, nullable runtime
+array alternatives, once-only evaluation, array-only diagnostics, nullable
+equality diagnostics, monotonic relational and equality comparison chains,
+rejection of mixed and inequality chains, short-circuit lowering, generic
+syntax compatibility, and flow narrowing from finite alternatives and
+successful chains.
+
 ## Conditional-placement and compact-object slice
 
 `kvsConditionalPlacement.ts` checks conditional array elements, shorthand and

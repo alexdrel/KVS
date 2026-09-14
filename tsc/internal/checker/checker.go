@@ -8064,6 +8064,10 @@ func (c *Checker) checkExpressionWorker(node *ast.Node, checkMode CheckMode) *Ty
 		return c.checkKvsDefaultExpression(node, checkMode)
 	case ast.KindKvsNullingSieveExpression, ast.KindKvsSieveBindingInitializer:
 		return c.checkKvsNullingSieveExpression(node, checkMode)
+	case ast.KindKvsComparisonAlternativesExpression:
+		return c.checkKvsComparisonAlternativesExpression(node.AsKvsComparisonAlternativesExpression(), checkMode)
+	case ast.KindKvsComparisonChainExpression:
+		return c.checkKvsComparisonChainExpression(node.AsKvsComparisonChainExpression(), checkMode)
 	case ast.KindKvsCollectExpression:
 		return c.checkKvsCollectExpression(node)
 	case ast.KindKvsSelectExpression:
@@ -8086,6 +8090,46 @@ func (c *Checker) checkExpressionWorker(node *ast.Node, checkMode CheckMode) *Ty
 		panic("Should never directly check a JsxOpeningElement")
 	}
 	return c.errorType
+}
+
+func (c *Checker) checkKvsComparisonAlternativesExpression(node *ast.KvsComparisonAlternativesExpression, checkMode CheckMode) *Type {
+	if node.SpreadToken == nil {
+		for _, alternative := range node.Alternatives.Nodes {
+			c.checkBinaryLikeExpression(node.Subject, node.OperatorToken, alternative, checkMode, node.AsNode())
+		}
+	} else {
+		subjectType := c.checkExpressionEx(node.Subject, checkMode)
+		var arrayType *Type
+		for i, alternative := range node.Alternatives.Nodes {
+			alternativeType := c.checkExpressionEx(alternative, checkMode)
+			if i == 0 {
+				arrayType = alternativeType
+			}
+		}
+		if arrayType != nil {
+			presentArrayType := c.GetNonNullableType(arrayType)
+			if !everyType(presentArrayType, c.isArrayOrTupleType) {
+				c.error(node.Alternatives.Nodes[0], diagnostics.KVS_runtime_comparison_alternatives_must_be_an_array)
+			} else if elementType := c.getIndexTypeOfType(presentArrayType, c.numberType); elementType != nil {
+				if isKvsNullableType(subjectType) && isKvsNullableType(elementType) &&
+					!isKvsKnownAbsentType(subjectType) && !isKvsKnownAbsentType(elementType) {
+					c.error(node.OperatorToken, diagnostics.KVS_equality_between_two_values_that_may_both_be_absent_is_not_allowed_compare_absence_explicitly)
+				} else {
+					c.reportOperatorErrorUnless(subjectType, node.OperatorToken.Kind, elementType, node.AsNode(), func(left *Type, right *Type) bool {
+						return c.isTypeEqualityComparableTo(left, right) || c.isTypeEqualityComparableTo(right, left)
+					})
+				}
+			}
+		}
+	}
+	return c.booleanType
+}
+
+func (c *Checker) checkKvsComparisonChainExpression(node *ast.KvsComparisonChainExpression, checkMode CheckMode) *Type {
+	for i, operator := range node.Operators.Nodes {
+		c.checkBinaryLikeExpression(node.Operands.Nodes[i], operator, node.Operands.Nodes[i+1], checkMode, node.AsNode())
+	}
+	return c.booleanType
 }
 
 func (c *Checker) checkKvsNullingSieveExpression(node *ast.Node, checkMode CheckMode) *Type {
@@ -12919,6 +12963,11 @@ func (c *Checker) checkBinaryLikeExpression(left *ast.Node, operatorToken *ast.N
 		// control flow analysis it is possible for operands to temporarily have narrower types, and those narrower
 		// types may cause the operands to not be comparable. We don't want such errors reported (see #46475).
 		if checkMode&CheckModeTypeOnly == 0 {
+			ambiguousNullableEquality := leftNullable && rightNullable &&
+				!isKvsKnownAbsentType(leftType) && !isKvsKnownAbsentType(rightType)
+			if ambiguousNullableEquality {
+				c.error(operatorToken, diagnostics.KVS_equality_between_two_values_that_may_both_be_absent_is_not_allowed_compare_absence_explicitly)
+			}
 			if (isLiteralExpressionOfObject(left) || isLiteralExpressionOfObject(right)) &&
 				// only report for === and !== in JS, not == or !=
 				(!ast.IsInJSFile(left) || (operator == ast.KindEqualsEqualsEqualsToken || operator == ast.KindExclamationEqualsEqualsToken)) {
@@ -12926,9 +12975,11 @@ func (c *Checker) checkBinaryLikeExpression(left *ast.Node, operatorToken *ast.N
 				c.error(errorNode, diagnostics.This_condition_will_always_return_0_since_JavaScript_compares_objects_by_reference_not_value, core.IfElse(eqType, "false", "true"))
 			}
 			c.checkNaNEquality(errorNode, operator, left, right)
-			c.reportOperatorErrorUnless(leftType, operator, rightType, errorNode, func(left *Type, right *Type) bool {
-				return c.isTypeEqualityComparableTo(left, right) || c.isTypeEqualityComparableTo(right, left)
-			})
+			if !ambiguousNullableEquality {
+				c.reportOperatorErrorUnless(leftType, operator, rightType, errorNode, func(left *Type, right *Type) bool {
+					return c.isTypeEqualityComparableTo(left, right) || c.isTypeEqualityComparableTo(right, left)
+				})
+			}
 		}
 		return c.booleanType
 	case ast.KindInstanceOfKeyword:

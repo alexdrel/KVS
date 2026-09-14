@@ -4442,6 +4442,10 @@ var KVS_template_interpolation_does_not_accept_nullable_values_resolve_absence_e
 
 var A_KVS_sieve_binding_requires_a_const_or_let_declaration = &Message{code: 100076, category: CategoryError, key: "A_KVS_sieve_binding_requires_a_const_or_let_declaration_100076", text: "A KVS sieve binding requires a 'const' or 'let' declaration."}
 
+var KVS_equality_between_two_values_that_may_both_be_absent_is_not_allowed_compare_absence_explicitly = &Message{code: 100077, category: CategoryError, key: "KVS_equality_between_two_values_that_may_both_be_absent_is_not_allowed_compare_absence_explicitly_100077", text: "KVS equality between two values that may both be absent is not allowed; compare absence explicitly."}
+
+var KVS_runtime_comparison_alternatives_must_be_an_array = &Message{code: 100078, category: CategoryError, key: "KVS_runtime_comparison_alternatives_must_be_an_array_100078", text: "KVS runtime comparison alternatives must be an array."}
+
 func keyToMessage(key Key) *Message {
 	switch key {
 	case "Unterminated_string_literal_1002":
@@ -8884,6 +8888,10 @@ func keyToMessage(key Key) *Message {
 		return KVS_template_interpolation_does_not_accept_nullable_values_resolve_absence_explicitly
 	case "A_KVS_sieve_binding_requires_a_const_or_let_declaration_100076":
 		return A_KVS_sieve_binding_requires_a_const_or_let_declaration
+	case "KVS_equality_between_two_values_that_may_both_be_absent_is_not_allowed_compare_absence_explicitly_100077":
+		return KVS_equality_between_two_values_that_may_both_be_absent_is_not_allowed_compare_absence_explicitly
+	case "KVS_runtime_comparison_alternatives_must_be_an_array_100078":
+		return KVS_runtime_comparison_alternatives_must_be_an_array
 	default:
 		return nil
 	}
