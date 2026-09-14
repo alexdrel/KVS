@@ -1,0 +1,126 @@
+//// [tests/cases/conformance/kvs/kvsFailurePromotion.ts] ////
+
+=== kvsFailurePromotion.ts ===
+class UserNotFound extends Error {}
+>UserNotFound : Symbol(UserNotFound, Decl(kvsFailurePromotion.ts, 0, 0))
+>Error : Symbol(Error, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --), Decl(lib.es2022.error.d.ts, --, --))
+
+declare function findUser(id: string): { name: string }?;
+>findUser : Symbol(findUser, Decl(kvsFailurePromotion.ts, 0, 35))
+>id : Symbol(id, Decl(kvsFailurePromotion.ts, 2, 26))
+>name : Symbol(name, Decl(kvsFailurePromotion.ts, 2, 40))
+
+declare function findUserAsync(id: string): Promise<{ name: string }?>;
+>findUserAsync : Symbol(findUserAsync, Decl(kvsFailurePromotion.ts, 2, 57))
+>id : Symbol(id, Decl(kvsFailurePromotion.ts, 3, 31))
+>Promise : Symbol(Promise, Decl(lib.es5.d.ts, --, --), Decl(lib.es2015.iterable.d.ts, --, --), Decl(lib.es2015.promise.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --), Decl(lib.es2018.promise.d.ts, --, --))
+>name : Symbol(name, Decl(kvsFailurePromotion.ts, 3, 53))
+
+function missingUser(id: string): Error {
+>missingUser : Symbol(missingUser, Decl(kvsFailurePromotion.ts, 3, 71))
+>id : Symbol(id, Decl(kvsFailurePromotion.ts, 5, 21))
+>Error : Symbol(Error, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --), Decl(lib.es2022.error.d.ts, --, --))
+
+    return new UserNotFound(id);
+>UserNotFound : Symbol(UserNotFound, Decl(kvsFailurePromotion.ts, 0, 0))
+>id : Symbol(id, Decl(kvsFailurePromotion.ts, 5, 21))
+}
+
+const user = findUser("one") ~~ new UserNotFound("one");
+>user : Symbol(user, Decl(kvsFailurePromotion.ts, 9, 5))
+>findUser : Symbol(findUser, Decl(kvsFailurePromotion.ts, 0, 35))
+>UserNotFound : Symbol(UserNotFound, Decl(kvsFailurePromotion.ts, 0, 0))
+
+const userName = (findUser("two") ~~ missingUser("two")).name;
+>userName : Symbol(userName, Decl(kvsFailurePromotion.ts, 10, 5))
+>(findUser("two") ~~ missingUser("two")).name : Symbol(name, Decl(kvsFailurePromotion.ts, 2, 40))
+>findUser : Symbol(findUser, Decl(kvsFailurePromotion.ts, 0, 35))
+>missingUser : Symbol(missingUser, Decl(kvsFailurePromotion.ts, 3, 71))
+>name : Symbol(name, Decl(kvsFailurePromotion.ts, 2, 40))
+
+const builtInFactory = findUser("builtin") ~~ Error("missing");
+>builtInFactory : Symbol(builtInFactory, Decl(kvsFailurePromotion.ts, 11, 5))
+>findUser : Symbol(findUser, Decl(kvsFailurePromotion.ts, 0, 35))
+>Error : Symbol(Error, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --), Decl(lib.es2022.error.d.ts, --, --))
+
+const explicitCause = findUser("cause") ~~ new Error("missing", { cause: "explicit" });
+>explicitCause : Symbol(explicitCause, Decl(kvsFailurePromotion.ts, 12, 5))
+>findUser : Symbol(findUser, Decl(kvsFailurePromotion.ts, 0, 35))
+>Error : Symbol(Error, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --), Decl(lib.es2022.error.d.ts, --, --))
+>cause : Symbol(cause, Decl(kvsFailurePromotion.ts, 12, 65))
+
+declare function acceptsPresentUser(user: { name: string }): void;
+>acceptsPresentUser : Symbol(acceptsPresentUser, Decl(kvsFailurePromotion.ts, 12, 87))
+>user : Symbol(user, Decl(kvsFailurePromotion.ts, 14, 36))
+>name : Symbol(name, Decl(kvsFailurePromotion.ts, 14, 43))
+
+acceptsPresentUser(user);
+>acceptsPresentUser : Symbol(acceptsPresentUser, Decl(kvsFailurePromotion.ts, 12, 87))
+>user : Symbol(user, Decl(kvsFailurePromotion.ts, 9, 5))
+
+function requireUser(id: string) {
+>requireUser : Symbol(requireUser, Decl(kvsFailurePromotion.ts, 15, 25))
+>id : Symbol(id, Decl(kvsFailurePromotion.ts, 17, 21))
+
+    return findUser(id) ~~ new UserNotFound(id);
+>findUser : Symbol(findUser, Decl(kvsFailurePromotion.ts, 0, 35))
+>id : Symbol(id, Decl(kvsFailurePromotion.ts, 17, 21))
+>UserNotFound : Symbol(UserNotFound, Decl(kvsFailurePromotion.ts, 0, 0))
+>id : Symbol(id, Decl(kvsFailurePromotion.ts, 17, 21))
+}
+
+const record = {
+>record : Symbol(record, Decl(kvsFailurePromotion.ts, 21, 5))
+
+    user: findUser("three") ~~ missingUser("three"),
+>user : Symbol(user, Decl(kvsFailurePromotion.ts, 21, 16))
+>findUser : Symbol(findUser, Decl(kvsFailurePromotion.ts, 0, 35))
+>missingUser : Symbol(missingUser, Decl(kvsFailurePromotion.ts, 3, 71))
+
+};
+
+let assigned: { name: string };
+>assigned : Symbol(assigned, Decl(kvsFailurePromotion.ts, 25, 3))
+>name : Symbol(name, Decl(kvsFailurePromotion.ts, 25, 15))
+
+assigned = findUser("four") ~~ new UserNotFound("four");
+>assigned : Symbol(assigned, Decl(kvsFailurePromotion.ts, 25, 3))
+>findUser : Symbol(findUser, Decl(kvsFailurePromotion.ts, 0, 35))
+>UserNotFound : Symbol(UserNotFound, Decl(kvsFailurePromotion.ts, 0, 0))
+
+async function requireUserAsync(id: string) {
+>requireUserAsync : Symbol(requireUserAsync, Decl(kvsFailurePromotion.ts, 26, 56))
+>id : Symbol(id, Decl(kvsFailurePromotion.ts, 28, 32))
+
+    return await findUserAsync(id) ~~ new UserNotFound(id);
+>findUserAsync : Symbol(findUserAsync, Decl(kvsFailurePromotion.ts, 2, 57))
+>id : Symbol(id, Decl(kvsFailurePromotion.ts, 28, 32))
+>UserNotFound : Symbol(UserNotFound, Decl(kvsFailurePromotion.ts, 0, 0))
+>id : Symbol(id, Decl(kvsFailurePromotion.ts, 28, 32))
+}
+
+const wrongReplacement = findUser("five") ~~ "missing";
+>wrongReplacement : Symbol(wrongReplacement, Decl(kvsFailurePromotion.ts, 32, 5))
+>findUser : Symbol(findUser, Decl(kvsFailurePromotion.ts, 0, 35))
+
+consume(findUser("six") ~~ missingUser("six"));
+>consume : Symbol(consume, Decl(kvsFailurePromotion.ts, 35, 57))
+>findUser : Symbol(findUser, Decl(kvsFailurePromotion.ts, 0, 35))
+>missingUser : Symbol(missingUser, Decl(kvsFailurePromotion.ts, 3, 71))
+
+const branch = true ? findUser("seven") ~~ missingUser("seven") : user;
+>branch : Symbol(branch, Decl(kvsFailurePromotion.ts, 34, 5))
+>findUser : Symbol(findUser, Decl(kvsFailurePromotion.ts, 0, 35))
+>missingUser : Symbol(missingUser, Decl(kvsFailurePromotion.ts, 3, 71))
+>user : Symbol(user, Decl(kvsFailurePromotion.ts, 9, 5))
+
+const list = [findUser("eight") ~~ missingUser("eight")];
+>list : Symbol(list, Decl(kvsFailurePromotion.ts, 35, 5))
+>findUser : Symbol(findUser, Decl(kvsFailurePromotion.ts, 0, 35))
+>missingUser : Symbol(missingUser, Decl(kvsFailurePromotion.ts, 3, 71))
+
+declare function consume(value: { name: string }): void;
+>consume : Symbol(consume, Decl(kvsFailurePromotion.ts, 35, 57))
+>value : Symbol(value, Decl(kvsFailurePromotion.ts, 37, 25))
+>name : Symbol(name, Decl(kvsFailurePromotion.ts, 37, 33))
+

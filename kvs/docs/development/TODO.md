@@ -3,6 +3,8 @@
 This is a working implementation aid, not a language specification or feature
 order. The language documents remain authoritative for accepted semantics.
 
+Progress: **181 of 358 items complete (50.6%)**; **177 remain open**.
+
 - `[x]` means implemented with focused compiler evidence.
 - `[ ]` means unimplemented, incomplete, or not yet deliberately validated.
 - Prototype shortcuts remain open even when a narrower slice works.
@@ -34,7 +36,15 @@ Implemented vertical slices:
 - Conditional placement in array and object literals.
 - Presence-aware object literals: `?{...}`.
 - Nulling sieve: prefix `~~value`.
-- Filtered declaration bindings: `const`/`let value ~= expression`.
+- Filtered bindings and assignment: `const`/`let value ~= expression` and
+  `target ~= expression`.
+- Finite and runtime comparison alternatives, comparison chains, and nullable
+  equality diagnostics.
+- Catch-and-split bindings: `value~error` declarations and assignment.
+- Failure demotion: `expression ~ pattern` for returned sentinels and selected
+  exception types.
+- Failure promotion: `expression ~~ error`, including non-nullable results and
+  caught-cause preservation.
 
 Known semantic debts:
 
@@ -55,16 +65,26 @@ Focused conformance inputs:
 - `tsc/testdata/tests/cases/conformance/kvs/kvsSelect.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsForExpression.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsExtantAssignment.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsDefault.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsStaticNullability.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsNulling.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsNullabilityTypes.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsIfBinding.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsExtantTest.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsNullableOperators.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsNullableEquality.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsNullableIteration.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsNullingSieve.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsNullingSieveImportHelpers.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsNullingSieveNoEmitHelpers.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsCompactArray.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsConditionalPlacement.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsCompactObject.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsComparisonConveniences.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsImplicitSubject.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsCatchAndSplit.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsFailureDemotion.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsFailurePromotion.ts`
 
 Run all implemented KVS slices together:
 
@@ -86,7 +106,7 @@ them; generated example `.js` files are intentionally ignored.
 - [ ] Preserve source maps through KVS lowering
 - [ ] Handle declaration emit for KVS syntax
 - [x] Add `conformance/kvs/` test subtree
-- [ ] Add runtime/evaluation-order test mechanism
+- [x] Add runtime/evaluation-order test mechanism
 - [ ] Add language-service/Fourslash coverage
 
 ## 1. Absence and extant values
@@ -140,7 +160,7 @@ them; generated example `.js` files are intentionally ignored.
 - [x] Operand evaluated once
 - [x] Exceptions propagate
 - [x] Result adds absence without a non-empty collection type
-- [ ] Coexists with infix require/promote `~~`
+- [x] Coexists with infix require/promote `~~`
 - [x] Numeric prefix `~~` has KVS filtering semantics without a normal warning
 
 ### Default values
@@ -181,7 +201,9 @@ them; generated example `.js` files are intentionally ignored.
 - [x] Filtered RHS evaluated once
 - [x] Binding receives the original accepted value or null
 - [x] Successful branch removes absence
-- [x] No general `target ~= expression` assignment
+- [x] General `target ~= expression` assignment
+- [x] Assignment writes the filtered result, including null
+- [x] Assignment target is evaluated before the RHS
 
 ### Range expressions
 
@@ -474,33 +496,37 @@ them; generated example `.js` files are intentionally ignored.
 
 ### Catch-and-split
 
-- [ ] `const value~error = expression`
-- [ ] Successful value
-- [ ] Plain `null` is not an error
-- [ ] Preserve arbitrary thrown JavaScript value
-- [ ] Error binding type is `unknown?`
-- [ ] Assignment form
-- [ ] Async form
-- [ ] Unused error warning
+- [x] `const value~error = expression`
+- [x] Successful value
+- [x] No hidden discriminator for returned or thrown `null`
+- [x] Preserve arbitrary thrown JavaScript value
+- [x] Error binding type is `unknown?`
+- [x] Assignment form
+- [x] Async form
+- [x] Unused error warning
 
 ### Failure demotion `~`
 
-- [ ] Returned sentinel -> `null`
-- [ ] Error type -> `null`
-- [ ] Unmatched returned value survives
-- [ ] Unmatched throw propagates
-- [ ] Literal sentinel matching
-- [ ] `NaN` matching
-- [ ] Error subclass matching
+- [x] Returned sentinel -> `null`
+- [x] Error constructor -> `null`
+- [x] Unmatched returned value survives
+- [x] Unmatched throw propagates
+- [x] Value patterns use `Object.is`
+- [x] `NaN` matching
+- [x] Error subclasses match through `instanceof`
+- [x] Left-associative policy chaining
+- [x] Awaited operation remains protected
 
 ### Infix require/promote `~~`
 
-- [ ] Extant value passes through
-- [ ] Absence throws replacement
-- [ ] Thrown value becomes `.cause`
-- [ ] Replacement expression evaluated lazily
-- [ ] Explicit cause overrides automatic cause
-- [ ] Preserve thrown `null`/`undefined` as cause
+- [x] Extant value passes through
+- [x] Absence throws replacement
+- [x] Non-null thrown value becomes `.cause`
+- [x] Replacement expression evaluated lazily
+- [x] Existing cause overrides automatic cause
+- [x] Returned absence and thrown `null`/`undefined` deliberately converge
+- [x] Replacement must produce an `Error`
+- [x] Head-position lowering without an IIFE or happy-path closure
 
 ## 7. Lightweight type-system additions
 

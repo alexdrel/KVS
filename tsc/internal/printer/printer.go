@@ -1250,6 +1250,8 @@ func (p *Printer) emitBindingName(node *ast.BindingName) {
 		p.emitObjectBindingPattern(node.AsBindingPattern())
 	case ast.KindArrayBindingPattern:
 		p.emitArrayBindingPattern(node.AsBindingPattern())
+	case ast.KindKvsCatchSplitBindingPattern:
+		p.emitKvsCatchSplitBindingPattern(node.AsBindingPattern())
 	default:
 		panic(fmt.Sprintf("unexpected BindingName: %v", node.Kind))
 	}
@@ -2434,6 +2436,28 @@ func (p *Printer) emitArrayBindingPattern(node *ast.BindingPattern) {
 	p.exitNode(node.AsNode(), state)
 }
 
+func (p *Printer) emitKvsCatchSplitBindingPattern(node *ast.BindingPattern) {
+	state := p.enterNode(node.AsNode())
+	if len(node.Elements.Nodes) > 0 {
+		p.emitBindingElement(node.Elements.Nodes[0].AsBindingElement())
+	}
+	p.writePunctuation("~")
+	if len(node.Elements.Nodes) > 1 {
+		p.emitBindingElement(node.Elements.Nodes[1].AsBindingElement())
+	}
+	p.exitNode(node.AsNode(), state)
+}
+
+func (p *Printer) emitKvsCatchSplitAssignmentExpression(node *ast.KvsCatchSplitAssignmentExpression) {
+	p.emitExpression(node.ValueTarget, ast.OperatorPrecedenceAssignment)
+	p.emitTokenNode(node.TildeToken)
+	p.emitExpression(node.ErrorTarget, ast.OperatorPrecedenceAssignment)
+	p.writeSpace()
+	p.emitTokenNode(node.EqualsToken)
+	p.writeSpace()
+	p.emitExpression(node.Expression, ast.OperatorPrecedenceAssignment)
+}
+
 func (p *Printer) emitBindingElement(node *ast.BindingElement) {
 	state := p.enterNode(node.AsNode())
 	p.emitTokenNode(node.DotDotDotToken)
@@ -3372,6 +3396,16 @@ func (p *Printer) emitExpression(node *ast.Expression, precedence ast.OperatorPr
 		p.emitKvsNullingSieveExpression(node.AsKvsNullingSieveExpression())
 	case ast.KindKvsSieveBindingInitializer:
 		p.emitKvsSieveBindingInitializer(node.AsKvsSieveBindingInitializer())
+	case ast.KindKvsSieveAssignmentExpression:
+		p.emitKvsSieveAssignmentExpression(node.AsKvsSieveAssignmentExpression())
+	case ast.KindKvsFailureDemotionExpression:
+		p.emitKvsFailureDemotionExpression(node.AsKvsFailureDemotionExpression())
+	case ast.KindKvsFailurePromotionExpression:
+		p.emitKvsFailurePromotionExpression(node.AsKvsFailurePromotionExpression())
+	case ast.KindKvsCatchSplitExpression:
+		p.emitExpression(node.AsKvsCatchSplitExpression().Expression, ast.OperatorPrecedenceLowest)
+	case ast.KindKvsCatchSplitAssignmentExpression:
+		p.emitKvsCatchSplitAssignmentExpression(node.AsKvsCatchSplitAssignmentExpression())
 	case ast.KindKvsComparisonAlternativesExpression:
 		p.emitKvsComparisonAlternativesExpression(node.AsKvsComparisonAlternativesExpression())
 	case ast.KindKvsComparisonChainExpression:
@@ -3811,6 +3845,38 @@ func (p *Printer) emitKvsSieveBindingInitializer(node *ast.KvsSieveBindingInitia
 	p.emitPunctuationNode(node.EqualsToken)
 	p.writeSpace()
 	p.emitExpression(node.Expression, ast.OperatorPrecedenceAssignment)
+	p.exitNode(node.AsNode(), state)
+}
+
+func (p *Printer) emitKvsSieveAssignmentExpression(node *ast.KvsSieveAssignmentExpression) {
+	state := p.enterNode(node.AsNode())
+	p.emitExpression(node.Left, ast.OperatorPrecedenceLeftHandSide)
+	p.writeSpace()
+	p.emitPunctuationNode(node.TildeToken)
+	p.emitPunctuationNode(node.EqualsToken)
+	p.writeSpace()
+	p.emitExpression(node.Right, ast.OperatorPrecedenceAssignment)
+	p.exitNode(node.AsNode(), state)
+}
+
+func (p *Printer) emitKvsFailureDemotionExpression(node *ast.KvsFailureDemotionExpression) {
+	state := p.enterNode(node.AsNode())
+	p.emitExpression(node.Expression, ast.OperatorPrecedenceRelational)
+	p.writeSpace()
+	p.emitPunctuationNode(node.TildeToken)
+	p.writeSpace()
+	p.emitExpression(node.Pattern, ast.OperatorPrecedenceUnary)
+	p.exitNode(node.AsNode(), state)
+}
+
+func (p *Printer) emitKvsFailurePromotionExpression(node *ast.KvsFailurePromotionExpression) {
+	state := p.enterNode(node.AsNode())
+	p.emitExpression(node.Expression, ast.OperatorPrecedenceRelational)
+	p.writeSpace()
+	p.emitPunctuationNode(node.FirstTildeToken)
+	p.emitPunctuationNode(node.SecondTildeToken)
+	p.writeSpace()
+	p.emitExpression(node.Replacement, ast.OperatorPrecedenceUnary)
 	p.exitNode(node.AsNode(), state)
 }
 

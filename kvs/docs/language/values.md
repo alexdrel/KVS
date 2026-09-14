@@ -143,6 +143,17 @@ empty value into `null`.
 const items = ~~readItems();
 ```
 
+The same filter can be applied while declaring or assigning a binding:
+
+```kvs
+const items ~= readItems();
+cachedItems ~= readItems();
+```
+
+Assignment `~=` always writes the filtered value, including null. It differs
+from `?=`, which leaves the target unchanged when its right-hand value is
+absent.
+
 The operand is evaluated exactly once. A retained array, collection, record,
 or object is returned unchanged, preserving its identity. Thrown exceptions
 are not handled and propagate normally.

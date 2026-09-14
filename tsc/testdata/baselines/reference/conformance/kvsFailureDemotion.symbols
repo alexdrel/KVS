@@ -1,0 +1,85 @@
+//// [tests/cases/conformance/kvs/kvsFailureDemotion.ts] ////
+
+=== kvsFailureDemotion.ts ===
+class MathError extends Error {}
+>MathError : Symbol(MathError, Decl(kvsFailureDemotion.ts, 0, 0))
+>Error : Symbol(Error, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --), Decl(lib.es2022.error.d.ts, --, --))
+
+declare function parseNumber(): number;
+>parseNumber : Symbol(parseNumber, Decl(kvsFailureDemotion.ts, 0, 32))
+
+declare function locate(): number;
+>locate : Symbol(locate, Decl(kvsFailureDemotion.ts, 2, 39))
+
+declare function calculate(): number;
+>calculate : Symbol(calculate, Decl(kvsFailureDemotion.ts, 3, 34))
+
+declare function readToken(): object;
+>readToken : Symbol(readToken, Decl(kvsFailureDemotion.ts, 4, 37))
+
+declare function calculateAsync(): Promise<number>;
+>calculateAsync : Symbol(calculateAsync, Decl(kvsFailureDemotion.ts, 5, 37))
+>Promise : Symbol(Promise, Decl(lib.es5.d.ts, --, --), Decl(lib.es2015.iterable.d.ts, --, --), Decl(lib.es2015.promise.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --), Decl(lib.es2018.promise.d.ts, --, --))
+
+const invalidNumber = parseNumber() ~ NaN;
+>invalidNumber : Symbol(invalidNumber, Decl(kvsFailureDemotion.ts, 8, 5))
+>parseNumber : Symbol(parseNumber, Decl(kvsFailureDemotion.ts, 0, 32))
+>NaN : Symbol(NaN, Decl(lib.es5.d.ts, --, --))
+
+const missingIndex = locate() ~ -1;
+>missingIndex : Symbol(missingIndex, Decl(kvsFailureDemotion.ts, 9, 5))
+>locate : Symbol(locate, Decl(kvsFailureDemotion.ts, 2, 39))
+
+const defaultNumber = (parseNumber() ~ NaN)!;
+>defaultNumber : Symbol(defaultNumber, Decl(kvsFailureDemotion.ts, 10, 5))
+>parseNumber : Symbol(parseNumber, Decl(kvsFailureDemotion.ts, 0, 32))
+>NaN : Symbol(NaN, Decl(lib.es5.d.ts, --, --))
+
+const defaultIndex = (locate() ~ -1)!;
+>defaultIndex : Symbol(defaultIndex, Decl(kvsFailureDemotion.ts, 11, 5))
+>locate : Symbol(locate, Decl(kvsFailureDemotion.ts, 2, 39))
+
+const missingToken = {};
+>missingToken : Symbol(missingToken, Decl(kvsFailureDemotion.ts, 13, 5))
+
+const token = readToken() ~ missingToken;
+>token : Symbol(token, Decl(kvsFailureDemotion.ts, 14, 5))
+>readToken : Symbol(readToken, Decl(kvsFailureDemotion.ts, 4, 37))
+>missingToken : Symbol(missingToken, Decl(kvsFailureDemotion.ts, 13, 5))
+
+const parsed = JSON.parse("value") ~ SyntaxError;
+>parsed : Symbol(parsed, Decl(kvsFailureDemotion.ts, 16, 5))
+>JSON.parse : Symbol(JSON.parse, Decl(lib.es5.d.ts, --, --))
+>JSON : Symbol(JSON, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --))
+>parse : Symbol(JSON.parse, Decl(lib.es5.d.ts, --, --))
+>SyntaxError : Symbol(SyntaxError, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --))
+
+const calculated = calculate() ~ NaN ~ MathError;
+>calculated : Symbol(calculated, Decl(kvsFailureDemotion.ts, 17, 5))
+>calculate : Symbol(calculate, Decl(kvsFailureDemotion.ts, 3, 34))
+>NaN : Symbol(NaN, Decl(lib.es5.d.ts, --, --))
+>MathError : Symbol(MathError, Decl(kvsFailureDemotion.ts, 0, 0))
+
+async function asyncCalculation() {
+>asyncCalculation : Symbol(asyncCalculation, Decl(kvsFailureDemotion.ts, 17, 49))
+
+    const result = await calculateAsync() ~ MathError;
+>result : Symbol(result, Decl(kvsFailureDemotion.ts, 20, 9))
+>calculateAsync : Symbol(calculateAsync, Decl(kvsFailureDemotion.ts, 5, 37))
+>MathError : Symbol(MathError, Decl(kvsFailureDemotion.ts, 0, 0))
+
+    return result;
+>result : Symbol(result, Decl(kvsFailureDemotion.ts, 20, 9))
+}
+
+function returnedConstructor() {
+>returnedConstructor : Symbol(returnedConstructor, Decl(kvsFailureDemotion.ts, 22, 1))
+
+    return SyntaxError;
+>SyntaxError : Symbol(SyntaxError, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --))
+}
+const constructorValue = returnedConstructor() ~ SyntaxError;
+>constructorValue : Symbol(constructorValue, Decl(kvsFailureDemotion.ts, 27, 5))
+>returnedConstructor : Symbol(returnedConstructor, Decl(kvsFailureDemotion.ts, 22, 1))
+>SyntaxError : Symbol(SyntaxError, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --))
+

@@ -565,6 +565,28 @@ links retain the nullable ambiguity diagnostic, and a successful chain composes
 ordinary flow narrowing from its links. Dedicated AST nodes preserve accepted
 chains until the KVS transform owns their lowering.
 
+## Catch-and-split
+
+Status: implemented.
+
+Adjacent `value~error` in a variable declaration or assignment catches the
+right-hand operation and exposes its outcome as two ordinary nullable values.
+Success stores the returned value and null. Failure stores null and the exact
+caught JavaScript value. The right-hand side is evaluated once, and an `await`
+on that side remains inside the protected operation.
+
+There is deliberately no hidden success discriminator. Returning null and
+throwing null therefore produce the same pair. The error binding has source
+type `unknown?`, represented by TypeScript as `unknown`; the value binding is
+the operation's result type plus null.
+
+The compiler represents the paired name as `KvsCatchSplitBindingPattern` and
+the protected initializer as `KvsCatchSplitExpression`. Assignment uses
+`KvsCatchSplitAssignmentExpression`. JavaScript lowering uses a small
+`try`/`catch` IIFE that returns a two-element tuple, followed by ordinary array
+destructuring. Declaration emit expands a paired binding into two ordinary
+declarations so KVS syntax does not leak into `.d.ts` output.
+
 ## Explicit nulling sieve
 
 Status: accepted.
@@ -589,19 +611,64 @@ warning.
 
 Declaration initializer `~=` is the same operation expressed at the binding.
 It is represented by `KvsSieveBindingInitializer`, is restricted to `const`
-and `let`, and likewise requires its punctuation to be adjacent. It always
-binds the filtered result, including null; it is neither extant assignment
-`?=` nor a general assignment operator. Conditional binding reuses its existing
-scope and ordinary successful-condition narrowing.
+and `let`, and likewise requires its punctuation to be adjacent. Conditional
+binding reuses its existing scope and ordinary successful-condition narrowing.
+
+General `target ~= expression` assignment is represented by
+`KvsSieveAssignmentExpression` and means `target = ~~expression`. It evaluates
+the assignment target once before the right-hand expression, always writes the
+filtered result including null, and produces that result. This puts it beside
+the existing RHS-driven `?=` assignment: `?=` can skip the write, while `~=`
+cannot.
 
 The checker adds null to the operand's present value type but does not invent
 non-empty collection types. It also selects an emit strategy: primitive
 truthiness, `length`, `size`, `Object.keys`, or identity for statically known
 families. Mixed or otherwise dynamic types use a runtime-dispatch helper.
-Both spellings share these strategies. The helper follows TypeScript's normal
+All three spellings share these strategies. The helper follows TypeScript's normal
 unscoped-helper path, including `--importHelpers` and `--noEmitHelpers`.
 
 As a condition, a successful prefix filter narrows its original operand through
 TypeScript's existing truthiness analysis. The filter does not add broader
 type-predicate inference: a callback such as `value => ~~value` follows the
 same inference rules as an ordinary value-returning callback.
+
+## Failure demotion
+
+Status: implemented.
+
+`expression ~ pattern` is represented by `KvsFailureDemotionExpression` and is
+left-associative. The pattern's static type selects one of two policies. A type
+with construct signatures returning `Error` matches thrown instances through
+`instanceof`; every other type matches normally returned values through
+`Object.is`. Value patterns therefore handle `NaN` without a dedicated case
+and preserve exact object-sentinel identity.
+
+The left expression is evaluated once. Only the pattern relevant to its
+outcome is evaluated: a value pattern after return, or an error constructor
+after throw. A match produces null. An unmatched returned value survives and
+an unmatched thrown value is rethrown unchanged. Await remains within the
+protected expression for error demotion.
+
+## Failure promotion
+
+Status: implemented at statement head.
+
+`expression ~~ replacement` requires the left expression to produce a present
+value. A present value passes through with absence removed from its static type.
+Returned null or undefined, and any thrown value, lazily evaluate the single
+replacement expression and throw the resulting `Error`.
+
+The lowering reuses the collect/select statement-head boundary so the happy
+path contains neither a runtime helper nor a closure. The protected expression
+is evaluated directly in `try`; an absence check follows. On a non-null caught
+value, the compiler adds a non-enumerable `cause` with `Object.defineProperty`
+only when the replacement has no existing `cause` property. Returned absence
+and thrown null or undefined deliberately converge.
+
+The statement-head boundary supports single declaration initializers,
+assignment right-hand sides, returns and KVS yields, and object property
+initializers, including their first-evaluated member/call
+continuations. Nested argument, array-element, and conditional-branch placement
+is diagnosed. The inherited ordering debts for assignment targets and object
+fields remain accepted rather than being expanded in this slice.

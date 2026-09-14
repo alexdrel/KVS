@@ -17,8 +17,8 @@ type transformer struct {
 	producerTemporaries []*ast.IdentifierNode
 	selectProducer      bool
 	selectLabel         *ast.IdentifierNode
-	// Producers are lowered into statements before their containing value. The
-	// original producer node is then replaced by its generated result temporary
+	// Head effects are lowered into statements before their containing value. The
+	// original effect node is then replaced by its generated result temporary
 	// while the rest of that value is visited.
 	headReplacements map[*ast.Node]*ast.Node
 }
@@ -40,23 +40,35 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 	case ast.KindKvsIfBindingStatement:
 		return tx.transformIfBindingStatement(node.AsKvsIfBindingStatement())
 	case ast.KindKvsExtantReturnStatement:
-		if result := tx.lowerHeadProducers(node.Expression(), func(expression *ast.Expression) *ast.Node {
+		if result := tx.lowerHeadEffects(node.Expression(), func(expression *ast.Expression) *ast.Node {
 			return tx.transformExtantReturnValue(expression)
 		}); result != nil {
 			return result
 		}
 		return tx.transformExtantReturn(node.AsKvsExtantReturnStatement())
 	case ast.KindReturnStatement:
-		if result := tx.lowerHeadProducers(node.Expression(), func(expression *ast.Expression) *ast.Node {
+		if result := tx.lowerHeadEffects(node.Expression(), func(expression *ast.Expression) *ast.Node {
 			return tx.Factory().NewReturnStatement(expression)
 		}); result != nil {
 			return result
 		}
 	case ast.KindVariableStatement:
-		if result := tx.transformProducerVariableStatement(node.AsVariableStatement()); result != nil {
+		if result := tx.transformHeadVariableStatement(node.AsVariableStatement()); result != nil {
 			return result
 		}
 	case ast.KindVariableDeclaration:
+		if ast.IsKvsCatchSplitBindingPattern(node.AsVariableDeclaration().Name()) {
+			declaration := node.AsVariableDeclaration()
+			pattern := declaration.Name().AsBindingPattern()
+			name := tx.Factory().NewBindingPattern(ast.KindArrayBindingPattern, tx.Visitor().VisitNodes(pattern.Elements))
+			return tx.Factory().UpdateVariableDeclaration(
+				declaration,
+				name,
+				declaration.ExclamationToken,
+				tx.Visitor().VisitNode(declaration.Type),
+				tx.Visitor().VisitNode(declaration.Initializer),
+			)
+		}
 		if node.Flags&(ast.NodeFlagsKvsNullableBinding|ast.NodeFlagsKvsExtantBinding) != 0 {
 			// KVS binding suffixes affect checking but have no runtime behavior.
 			// Remove their flags (and the reused definite-assignment token for `!`)
@@ -80,18 +92,18 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 			return updated
 		}
 	case ast.KindExpressionStatement:
-		if result := tx.transformProducerExpressionStatement(node.AsExpressionStatement()); result != nil {
+		if result := tx.transformHeadExpressionStatement(node.AsExpressionStatement()); result != nil {
 			return result
 		}
 	case ast.KindKvsYieldStatement:
-		if result := tx.lowerHeadProducers(node.Expression(), func(expression *ast.Expression) *ast.Node {
+		if result := tx.lowerHeadEffects(node.Expression(), func(expression *ast.Expression) *ast.Node {
 			return tx.transformYieldValue(expression, false)
 		}); result != nil {
 			return result
 		}
 		return tx.transformYield(node.Expression(), false)
 	case ast.KindKvsExtantYieldStatement:
-		if result := tx.lowerHeadProducers(node.Expression(), func(expression *ast.Expression) *ast.Node {
+		if result := tx.lowerHeadEffects(node.Expression(), func(expression *ast.Expression) *ast.Node {
 			return tx.transformYieldValue(expression, true)
 		}); result != nil {
 			return result
@@ -107,6 +119,18 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 		return tx.transformNullingSieve(node.AsKvsNullingSieveExpression().Expression)
 	case ast.KindKvsSieveBindingInitializer:
 		return tx.transformNullingSieve(node.AsKvsSieveBindingInitializer().Expression)
+	case ast.KindKvsSieveAssignmentExpression:
+		return tx.transformSieveAssignment(node.AsKvsSieveAssignmentExpression())
+	case ast.KindKvsFailureDemotionExpression:
+		return tx.transformFailureDemotion(node.AsKvsFailureDemotionExpression())
+	case ast.KindKvsFailurePromotionExpression:
+		// Unsupported placements are diagnosed by the checker. Preserve the left
+		// expression for recovery so KVS-only syntax never reaches JavaScript emit.
+		return tx.Visitor().VisitNode(node.AsKvsFailurePromotionExpression().Expression)
+	case ast.KindKvsCatchSplitExpression:
+		return tx.transformCatchSplit(node.AsKvsCatchSplitExpression().Expression)
+	case ast.KindKvsCatchSplitAssignmentExpression:
+		return tx.transformCatchSplitAssignment(node.AsKvsCatchSplitAssignmentExpression())
 	case ast.KindKvsComparisonAlternativesExpression:
 		return tx.transformComparisonAlternatives(node.AsKvsComparisonAlternativesExpression())
 	case ast.KindKvsComparisonChainExpression:
@@ -251,6 +275,92 @@ func (tx *transformer) transformNullingSieve(expression *ast.Expression) *ast.No
 		}
 	}
 	return factory.NewConditionalExpression(test, factory.NewToken(ast.KindQuestionToken), temp, factory.NewToken(ast.KindColonToken), factory.NewKeywordExpression(ast.KindNullKeyword))
+}
+
+func (tx *transformer) transformSieveAssignment(node *ast.KvsSieveAssignmentExpression) *ast.Node {
+	return tx.Factory().NewAssignmentExpression(
+		tx.Visitor().VisitNode(node.Left),
+		tx.transformNullingSieve(node.Right),
+	)
+}
+
+func (tx *transformer) transformFailureDemotion(node *ast.KvsFailureDemotionExpression) *ast.Node {
+	factory := tx.Factory()
+	if !tx.resolver.IsKvsFailureDemotionErrorPattern(node.Pattern) {
+		value := factory.NewTempVariable()
+		tx.EmitContext().AddVariableDeclaration(value)
+		capture := factory.NewAssignmentExpression(value, tx.Visitor().VisitNode(node.Expression))
+		objectIs := factory.NewPropertyAccessExpression(factory.NewIdentifier("Object"), nil, factory.NewIdentifier("is"), ast.NodeFlagsNone)
+		matches := factory.NewCallExpression(objectIs, nil, nil, factory.NewNodeList([]*ast.Node{capture, tx.Visitor().VisitNode(node.Pattern)}), ast.NodeFlagsNone)
+		return factory.NewConditionalExpression(matches, factory.NewToken(ast.KindQuestionToken), factory.NewKeywordExpression(ast.KindNullKeyword), factory.NewToken(ast.KindColonToken), value)
+	}
+
+	caught := factory.NewTempVariable()
+	tryBlock := factory.NewBlock(factory.NewNodeList([]*ast.Node{
+		factory.NewReturnStatement(tx.Visitor().VisitNode(node.Expression)),
+	}), true)
+	matches := factory.NewBinaryExpression(nil, caught, nil, factory.NewToken(ast.KindInstanceOfKeyword), tx.Visitor().VisitNode(node.Pattern))
+	catchBlock := factory.NewBlock(factory.NewNodeList([]*ast.Node{
+		factory.NewIfStatement(matches, factory.NewReturnStatement(factory.NewKeywordExpression(ast.KindNullKeyword)), nil),
+		factory.NewThrowStatement(caught),
+	}), true)
+	catchClause := factory.NewCatchClause(factory.NewVariableDeclaration(caught, nil, nil, nil), catchBlock)
+	statements := []*ast.Node{factory.NewTryStatement(tryBlock, catchClause, nil)}
+	if node.Expression.SubtreeFacts()&ast.SubtreeContainsAwait == 0 {
+		return factory.NewImmediatelyInvokedArrowFunction(statements)
+	}
+	arrow := factory.NewArrowFunction(
+		factory.NewModifierList([]*ast.Node{factory.NewModifier(ast.KindAsyncKeyword)}),
+		nil,
+		factory.NewNodeList(nil),
+		nil,
+		nil,
+		factory.NewToken(ast.KindEqualsGreaterThanToken),
+		factory.NewBlock(factory.NewNodeList(statements), true),
+	)
+	call := factory.NewCallExpression(factory.NewParenthesizedExpression(arrow), nil, nil, factory.NewNodeList(nil), ast.NodeFlagsNone)
+	return factory.NewAwaitExpression(call)
+}
+
+func (tx *transformer) transformCatchSplit(expression *ast.Expression) *ast.Node {
+	factory := tx.Factory()
+	caught := factory.NewTempVariable()
+	valueResult := factory.NewArrayLiteralExpression(factory.NewNodeList([]*ast.Node{
+		tx.Visitor().VisitNode(expression),
+		factory.NewKeywordExpression(ast.KindNullKeyword),
+	}), false)
+	errorResult := factory.NewArrayLiteralExpression(factory.NewNodeList([]*ast.Node{
+		factory.NewKeywordExpression(ast.KindNullKeyword),
+		caught,
+	}), false)
+	tryBlock := factory.NewBlock(factory.NewNodeList([]*ast.Node{factory.NewReturnStatement(valueResult)}), true)
+	catchBlock := factory.NewBlock(factory.NewNodeList([]*ast.Node{factory.NewReturnStatement(errorResult)}), true)
+	catchClause := factory.NewCatchClause(factory.NewVariableDeclaration(caught, nil, nil, nil), catchBlock)
+	statements := []*ast.Node{factory.NewTryStatement(tryBlock, catchClause, nil)}
+	if expression.SubtreeFacts()&ast.SubtreeContainsAwait == 0 {
+		return factory.NewImmediatelyInvokedArrowFunction(statements)
+	}
+	arrow := factory.NewArrowFunction(
+		factory.NewModifierList([]*ast.Node{factory.NewModifier(ast.KindAsyncKeyword)}),
+		nil,
+		factory.NewNodeList(nil),
+		nil,
+		nil,
+		factory.NewToken(ast.KindEqualsGreaterThanToken),
+		factory.NewBlock(factory.NewNodeList(statements), true),
+	)
+	call := factory.NewCallExpression(factory.NewParenthesizedExpression(arrow), nil, nil, factory.NewNodeList(nil), ast.NodeFlagsNone)
+	return factory.NewAwaitExpression(call)
+}
+
+func (tx *transformer) transformCatchSplitAssignment(node *ast.KvsCatchSplitAssignmentExpression) *ast.Node {
+	factory := tx.Factory()
+	target := factory.NewArrayLiteralExpression(factory.NewNodeList([]*ast.Node{
+		tx.Visitor().VisitNode(node.ValueTarget),
+		tx.Visitor().VisitNode(node.ErrorTarget),
+	}), false)
+	assignment := factory.NewAssignmentExpression(target, tx.transformCatchSplit(node.Expression))
+	return factory.NewCommaExpression(assignment, tx.Visitor().VisitNode(node.ValueTarget))
 }
 
 func (tx *transformer) transformArrayExpression(node *ast.ArrayLiteralExpression) *ast.Node {
@@ -606,19 +716,19 @@ func isKvsProducer(node *ast.Node) bool {
 	return node != nil && (node.Kind == ast.KindKvsCollectExpression || node.Kind == ast.KindKvsSelectExpression || node.Kind == ast.KindKvsForExpression)
 }
 
-func (tx *transformer) transformProducerExpressionStatement(node *ast.ExpressionStatement) *ast.Node {
-	return tx.lowerHeadProducers(node.Expression, func(expression *ast.Expression) *ast.Node {
+func (tx *transformer) transformHeadExpressionStatement(node *ast.ExpressionStatement) *ast.Node {
+	return tx.lowerHeadEffects(node.Expression, func(expression *ast.Expression) *ast.Node {
 		return tx.Factory().NewExpressionStatement(expression)
 	})
 }
 
-func (tx *transformer) transformProducerVariableStatement(node *ast.VariableStatement) *ast.Node {
+func (tx *transformer) transformHeadVariableStatement(node *ast.VariableStatement) *ast.Node {
 	declarationList := node.DeclarationList.AsVariableDeclarationList()
 	if len(declarationList.Declarations.Nodes) != 1 {
 		return nil
 	}
 	declaration := declarationList.Declarations.Nodes[0].AsVariableDeclaration()
-	return tx.lowerHeadProducers(declaration.Initializer, func(result *ast.Expression) *ast.Node {
+	return tx.lowerHeadEffects(declaration.Initializer, func(result *ast.Expression) *ast.Node {
 		factory := tx.Factory()
 		updatedDeclaration := factory.UpdateVariableDeclaration(
 			declaration,
@@ -636,24 +746,23 @@ func (tx *transformer) transformProducerVariableStatement(node *ast.VariableStat
 	})
 }
 
-func (tx *transformer) lowerHeadProducers(root *ast.Expression, continuation func(*ast.Expression) *ast.Node) *ast.Node {
-	// A producer cannot remain inside a JavaScript expression because its loop
-	// lowers to statements. Find every producer that heads a permitted value
-	// path, lower those producers in source order, then resume construction of
-	// the original value with each producer replaced by its result temporary.
-	// Function bodies and nested producers start separate lowering scopes.
+func (tx *transformer) lowerHeadEffects(root *ast.Expression, continuation func(*ast.Expression) *ast.Node) *ast.Node {
+	// Producers and failure promotion require statements. Find each effect that
+	// heads a permitted value path, lower it, then resume construction of the
+	// original value with the effect replaced by its result temporary.
+	// Function bodies and nested effects start separate lowering scopes.
 	if root == nil {
 		return nil
 	}
-	var producers []*ast.Node
+	var effects []*ast.Node
 	var collect func(*ast.Node) bool
 	collect = func(node *ast.Node) bool {
 		if node != root && ast.IsFunctionLike(node) {
 			return false
 		}
-		if isKvsProducer(node) {
-			if ast.IsKvsProducerHeadPosition(node) {
-				producers = append(producers, node)
+		if isKvsProducer(node) || node.Kind == ast.KindKvsFailurePromotionExpression {
+			if ast.IsKvsStatementHeadPosition(node) {
+				effects = append(effects, node)
 			}
 			return false
 		}
@@ -661,7 +770,7 @@ func (tx *transformer) lowerHeadProducers(root *ast.Expression, continuation fun
 		return false
 	}
 	collect(root)
-	if len(producers) == 0 {
+	if len(effects) == 0 {
 		return nil
 	}
 	if tx.headReplacements == nil {
@@ -669,16 +778,71 @@ func (tx *transformer) lowerHeadProducers(root *ast.Expression, continuation fun
 	}
 	var lower func(int) *ast.Node
 	lower = func(index int) *ast.Node {
-		if index == len(producers) {
+		if index == len(effects) {
 			return continuation(tx.Visitor().VisitNode(root))
 		}
-		producer := producers[index]
-		return tx.lowerProducer(producer, func(result *ast.Expression) *ast.Node {
-			tx.headReplacements[producer] = result
+		effect := effects[index]
+		lowerEffect := tx.lowerProducer
+		if effect.Kind == ast.KindKvsFailurePromotionExpression {
+			lowerEffect = tx.lowerFailurePromotion
+		}
+		return lowerEffect(effect, func(result *ast.Expression) *ast.Node {
+			tx.headReplacements[effect] = result
 			return lower(index + 1)
 		})
 	}
 	return lower(0)
+}
+
+func (tx *transformer) lowerFailurePromotion(effect *ast.Node, continuation func(*ast.Expression) *ast.Node) *ast.Node {
+	node := effect.AsKvsFailurePromotionExpression()
+	factory := tx.Factory()
+	value := factory.NewTempVariable()
+	cause := factory.NewTempVariable()
+	caught := factory.NewTempVariable()
+	replacement := factory.NewTempVariable()
+	null := factory.NewKeywordExpression(ast.KindNullKeyword)
+
+	declarations := factory.NewVariableStatement(nil, factory.NewVariableDeclarationList(factory.NewNodeList([]*ast.Node{
+		factory.NewVariableDeclaration(value, nil, nil, null),
+		factory.NewVariableDeclaration(cause, nil, nil, factory.NewKeywordExpression(ast.KindNullKeyword)),
+	}), ast.NodeFlagsNone))
+	tryBlock := factory.NewBlock(factory.NewNodeList([]*ast.Node{
+		factory.NewExpressionStatement(factory.NewAssignmentExpression(value, tx.Visitor().VisitNode(node.Expression))),
+	}), true)
+	catchBlock := factory.NewBlock(factory.NewNodeList([]*ast.Node{
+		factory.NewExpressionStatement(factory.NewAssignmentExpression(cause, caught)),
+	}), true)
+	catchClause := factory.NewCatchClause(factory.NewVariableDeclaration(caught, nil, nil, nil), catchBlock)
+	tryStatement := factory.NewTryStatement(tryBlock, catchClause, nil)
+
+	replacementDeclaration := factory.NewVariableStatement(nil, factory.NewVariableDeclarationList(factory.NewNodeList([]*ast.Node{
+		factory.NewVariableDeclaration(replacement, nil, nil, tx.Visitor().VisitNode(node.Replacement)),
+	}), ast.NodeFlagsNone))
+	causePresent := factory.NewBinaryExpression(nil, cause, nil, factory.NewToken(ast.KindExclamationEqualsToken), factory.NewKeywordExpression(ast.KindNullKeyword))
+	hasCause := factory.NewBinaryExpression(nil, factory.NewStringLiteral("cause", ast.TokenFlagsNone), nil, factory.NewToken(ast.KindInKeyword), replacement)
+	attachCause := factory.NewBinaryExpression(nil, causePresent, nil, factory.NewToken(ast.KindAmpersandAmpersandToken), factory.NewPrefixUnaryExpression(ast.KindExclamationToken, hasCause))
+	descriptor := factory.NewObjectLiteralExpression(factory.NewNodeList([]*ast.Node{
+		factory.NewPropertyAssignment(nil, factory.NewIdentifier("value"), nil, nil, cause),
+		factory.NewPropertyAssignment(nil, factory.NewIdentifier("writable"), nil, nil, factory.NewKeywordExpression(ast.KindTrueKeyword)),
+		factory.NewPropertyAssignment(nil, factory.NewIdentifier("configurable"), nil, nil, factory.NewKeywordExpression(ast.KindTrueKeyword)),
+	}), false)
+	defineProperty := factory.NewCallExpression(
+		factory.NewPropertyAccessExpression(factory.NewIdentifier("Object"), nil, factory.NewIdentifier("defineProperty"), ast.NodeFlagsNone),
+		nil,
+		nil,
+		factory.NewNodeList([]*ast.Node{replacement, factory.NewStringLiteral("cause", ast.TokenFlagsNone), descriptor}),
+		ast.NodeFlagsNone,
+	)
+	promoteBlock := factory.NewBlock(factory.NewNodeList([]*ast.Node{
+		replacementDeclaration,
+		factory.NewIfStatement(attachCause, factory.NewExpressionStatement(defineProperty), nil),
+		factory.NewThrowStatement(replacement),
+	}), true)
+	absent := factory.NewBinaryExpression(nil, value, nil, factory.NewToken(ast.KindEqualsEqualsToken), factory.NewKeywordExpression(ast.KindNullKeyword))
+	promote := factory.NewIfStatement(absent, promoteBlock, nil)
+
+	return factory.NewSyntaxList([]*ast.Node{declarations, tryStatement, promote, continuation(value)})
 }
 
 func (tx *transformer) lowerProducer(producer *ast.Node, continuation func(*ast.Expression) *ast.Node) *ast.Node {

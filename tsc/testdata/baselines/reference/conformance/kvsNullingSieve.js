@@ -74,6 +74,26 @@ const propagated = ~~throws();
 const compact ~= nullableItems;
 let mutable ~= items;
 
+let assigned: number[]? = null;
+assigned ~= items;
+const assignedResult = assigned ~= nullableItems;
+
+let targetEvaluations = 0;
+let assignmentEvaluations = 0;
+const holder: { value: number[]? } = { value: null };
+function assignmentTarget() {
+    targetEvaluations++;
+    return holder;
+}
+function assignmentValue() {
+    assignmentEvaluations++;
+    return [] as number[];
+}
+const memberAssignmentResult = assignmentTarget().value ~= assignmentValue();
+
+let incompatibleTarget: string? = null;
+incompatibleTarget ~= items;
+
 if (const rejected ~= []) {
     rejected;
 }
@@ -99,7 +119,7 @@ var __kvsNullingSieve = (this && this.__kvsNullingSieve) || function (value) {
     if (prototype === Object.prototype || prototype === null) return Object.keys(value).length ? value : null;
     return value;
 };
-var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z;
+var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2, _3;
 if ([]) {
     console.log("ordinary array truthiness");
 }
@@ -155,19 +175,36 @@ function throws() {
 const propagated = throws();
 const compact = (_v = nullableItems) != null && _v.length ? _v : null;
 let mutable = (_w = items, _w.length) ? _w : null;
-const _0 = (_x = [], _x.length) ? _x : null;
-if (_0) {
-    const rejected = _0;
+let assigned = null;
+assigned = (_x = items, _x.length) ? _x : null;
+const assignedResult = assigned = (_y = nullableItems) != null && _y.length ? _y : null;
+let targetEvaluations = 0;
+let assignmentEvaluations = 0;
+const holder = { value: null };
+function assignmentTarget() {
+    targetEvaluations++;
+    return holder;
+}
+function assignmentValue() {
+    assignmentEvaluations++;
+    return [];
+}
+const memberAssignmentResult = assignmentTarget().value = (_z = assignmentValue(), _z.length) ? _z : null;
+let incompatibleTarget = null;
+incompatibleTarget = (_0 = items, _0.length) ? _0 : null;
+const _4 = (_1 = [], _1.length) ? _1 : null;
+if (_4) {
+    const rejected = _4;
     rejected;
 }
-const _1 = (_y = array, _y.length) ? _y : null;
-if (_1) {
-    const accepted = _1;
+const _5 = (_2 = array, _2.length) ? _2 : null;
+if (_5) {
+    const accepted = _5;
     accepted;
     accepted === array;
 }
 const javascriptDoubleNot = ~~3.7;
-var rejectedVar = (_z = items, _z.length) ? _z : null;
+var rejectedVar = (_3 = items, _3.length) ? _3 : null;
 const rejectedSpaced;
 ~;
 items;

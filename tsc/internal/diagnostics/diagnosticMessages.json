@@ -8619,5 +8619,13 @@
     "KVS runtime comparison alternatives must be an array.": {
         "category": "Error",
         "code": 100078
+    },
+    "KVS infix '~~' must be at the head of a supported value expression.": {
+        "category": "Error",
+        "code": 100079
+    },
+    "KVS infix '~~' replacement must produce an Error.": {
+        "category": "Error",
+        "code": 100080
     }
 }

@@ -1731,6 +1731,12 @@ func (b *Binder) bindChildren(node *ast.Node) {
 		b.bindBinaryExpressionFlow(node)
 	case ast.KindKvsExtantAssignmentExpression:
 		b.bindKvsExtantAssignmentExpression(node)
+	case ast.KindKvsSieveAssignmentExpression:
+		b.bindKvsSieveAssignmentExpression(node)
+	case ast.KindKvsFailureDemotionExpression, ast.KindKvsFailurePromotionExpression:
+		b.bindEachChild(node)
+	case ast.KindKvsCatchSplitAssignmentExpression:
+		b.bindKvsCatchSplitAssignmentExpression(node)
 	case ast.KindDeleteExpression:
 		b.bindDeleteExpressionFlow(node)
 	case ast.KindConditionalExpression:
@@ -1779,6 +1785,28 @@ func (b *Binder) bindKvsExtantAssignmentExpression(node *ast.Node) {
 	b.addAntecedent(postExpressionLabel, b.currentFlow)
 	b.addAntecedent(postExpressionLabel, absentFlow)
 	b.currentFlow = b.finishFlowLabel(postExpressionLabel)
+	b.hasFlowEffects = true
+}
+
+func (b *Binder) bindKvsCatchSplitAssignmentExpression(node *ast.Node) {
+	expression := node.AsKvsCatchSplitAssignmentExpression()
+	b.bind(expression.TildeToken)
+	b.bind(expression.EqualsToken)
+	b.bind(expression.Expression)
+	b.bind(expression.ValueTarget)
+	b.bindAssignmentTargetFlow(expression.ValueTarget)
+	b.bind(expression.ErrorTarget)
+	b.bindAssignmentTargetFlow(expression.ErrorTarget)
+	b.hasFlowEffects = true
+}
+
+func (b *Binder) bindKvsSieveAssignmentExpression(node *ast.Node) {
+	expression := node.AsKvsSieveAssignmentExpression()
+	b.bind(expression.Left)
+	b.bind(expression.TildeToken)
+	b.bind(expression.EqualsToken)
+	b.bind(expression.Right)
+	b.bindAssignmentTargetFlow(expression.Left)
 	b.hasFlowEffects = true
 }
 

@@ -125,6 +125,21 @@ func getChildrenPropertyMask(node *ast.Node) uint8 {
 	case ast.KindKvsSieveBindingInitializer:
 		n := node.AsKvsSieveBindingInitializer()
 		return (boolToByte(n.TildeToken != nil) << 0) | (boolToByte(n.EqualsToken != nil) << 1) | (boolToByte(n.Expression != nil) << 2)
+	case ast.KindKvsSieveAssignmentExpression:
+		n := node.AsKvsSieveAssignmentExpression()
+		return (boolToByte(n.Left != nil) << 0) | (boolToByte(n.TildeToken != nil) << 1) | (boolToByte(n.EqualsToken != nil) << 2) | (boolToByte(n.Right != nil) << 3)
+	case ast.KindKvsFailureDemotionExpression:
+		n := node.AsKvsFailureDemotionExpression()
+		return (boolToByte(n.Expression != nil) << 0) | (boolToByte(n.TildeToken != nil) << 1) | (boolToByte(n.Pattern != nil) << 2)
+	case ast.KindKvsFailurePromotionExpression:
+		n := node.AsKvsFailurePromotionExpression()
+		return (boolToByte(n.Expression != nil) << 0) | (boolToByte(n.FirstTildeToken != nil) << 1) | (boolToByte(n.SecondTildeToken != nil) << 2) | (boolToByte(n.Replacement != nil) << 3)
+	case ast.KindKvsCatchSplitExpression:
+		n := node.AsKvsCatchSplitExpression()
+		return (boolToByte(n.Expression != nil) << 0)
+	case ast.KindKvsCatchSplitAssignmentExpression:
+		n := node.AsKvsCatchSplitAssignmentExpression()
+		return (boolToByte(n.ValueTarget != nil) << 0) | (boolToByte(n.TildeToken != nil) << 1) | (boolToByte(n.ErrorTarget != nil) << 2) | (boolToByte(n.EqualsToken != nil) << 3) | (boolToByte(n.Expression != nil) << 4)
 	case ast.KindKvsComparisonAlternativesExpression:
 		n := node.AsKvsComparisonAlternativesExpression()
 		return (boolToByte(n.Subject != nil) << 0) | (boolToByte(n.OperatorToken != nil) << 1) | (boolToByte(n.SpreadToken != nil) << 2) | (boolToByte(n.Alternatives != nil) << 3)
@@ -170,7 +185,7 @@ func getChildrenPropertyMask(node *ast.Node) uint8 {
 	case ast.KindVariableDeclarationList:
 		n := node.AsVariableDeclarationList()
 		return (boolToByte(n.Declarations != nil) << 0)
-	case ast.KindObjectBindingPattern, ast.KindArrayBindingPattern:
+	case ast.KindObjectBindingPattern, ast.KindArrayBindingPattern, ast.KindKvsCatchSplitBindingPattern:
 		n := node.AsBindingPattern()
 		return (boolToByte(n.Elements != nil) << 0)
 	case ast.KindParameter:

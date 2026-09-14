@@ -8057,6 +8057,12 @@ func (c *Checker) checkExpressionWorker(node *ast.Node, checkMode CheckMode) *Ty
 		return c.checkNonNullAssertion(node)
 	case ast.KindKvsExtantAssignmentExpression:
 		return c.checkKvsExtantAssignmentExpression(node, checkMode)
+	case ast.KindKvsSieveAssignmentExpression:
+		return c.checkKvsSieveAssignmentExpression(node, checkMode)
+	case ast.KindKvsFailureDemotionExpression:
+		return c.checkKvsFailureDemotionExpression(node.AsKvsFailureDemotionExpression(), checkMode)
+	case ast.KindKvsFailurePromotionExpression:
+		return c.checkKvsFailurePromotionExpression(node.AsKvsFailurePromotionExpression(), checkMode)
 	case ast.KindKvsExtantTestExpression:
 		c.checkExpressionEx(node.Expression(), checkMode)
 		return c.booleanType
@@ -8064,6 +8070,10 @@ func (c *Checker) checkExpressionWorker(node *ast.Node, checkMode CheckMode) *Ty
 		return c.checkKvsDefaultExpression(node, checkMode)
 	case ast.KindKvsNullingSieveExpression, ast.KindKvsSieveBindingInitializer:
 		return c.checkKvsNullingSieveExpression(node, checkMode)
+	case ast.KindKvsCatchSplitExpression:
+		return c.checkKvsCatchSplitExpression(node.AsKvsCatchSplitExpression(), checkMode)
+	case ast.KindKvsCatchSplitAssignmentExpression:
+		return c.checkKvsCatchSplitAssignmentExpression(node.AsKvsCatchSplitAssignmentExpression(), checkMode)
 	case ast.KindKvsComparisonAlternativesExpression:
 		return c.checkKvsComparisonAlternativesExpression(node.AsKvsComparisonAlternativesExpression(), checkMode)
 	case ast.KindKvsComparisonChainExpression:
@@ -8136,6 +8146,8 @@ func (c *Checker) checkKvsNullingSieveExpression(node *ast.Node, checkMode Check
 	var expression *ast.Node
 	if node.Kind == ast.KindKvsNullingSieveExpression {
 		expression = node.AsKvsNullingSieveExpression().Expression
+	} else if node.Kind == ast.KindKvsSieveAssignmentExpression {
+		expression = node.AsKvsSieveAssignmentExpression().Right
 	} else {
 		expression = node.AsKvsSieveBindingInitializer().Expression
 	}
@@ -8144,6 +8156,67 @@ func (c *Checker) checkKvsNullingSieveExpression(node *ast.Node, checkMode Check
 		c.checkExternalEmitHelpers(node, ExternalEmitHelpersKvsNullingSieve)
 	}
 	return c.getNullableType(c.GetNonNullableType(operandType), TypeFlagsNull)
+}
+
+func (c *Checker) checkKvsSieveAssignmentExpression(node *ast.Node, checkMode CheckMode) *Type {
+	expression := node.AsKvsSieveAssignmentExpression()
+	assignedType := c.checkKvsNullingSieveExpression(node, checkMode)
+	if expression.Left.Kind == ast.KindObjectLiteralExpression || expression.Left.Kind == ast.KindArrayLiteralExpression {
+		c.checkDestructuringAssignment(expression.Left, assignedType, checkMode, expression.Right.Kind == ast.KindThisKeyword)
+	} else {
+		leftType := c.checkExpressionEx(expression.Left, checkMode)
+		c.checkAssignmentOperator(expression.Left, ast.KindEqualsToken, expression.Right, leftType, assignedType)
+	}
+	return assignedType
+}
+
+func (c *Checker) isKvsErrorConstructorType(t *Type) bool {
+	signatures := c.getSignaturesOfType(t, SignatureKindConstruct)
+	if len(signatures) == 0 {
+		return false
+	}
+	errorType := c.getGlobalType("Error", 0, false)
+	for _, signature := range signatures {
+		if !c.isTypeAssignableTo(c.getReturnTypeOfSignature(signature), errorType) {
+			return false
+		}
+	}
+	return true
+}
+
+func (c *Checker) checkKvsFailureDemotionExpression(node *ast.KvsFailureDemotionExpression, checkMode CheckMode) *Type {
+	valueType := c.checkExpressionEx(node.Expression, checkMode)
+	c.checkExpressionEx(node.Pattern, checkMode)
+	return c.getNullableType(valueType, TypeFlagsNull)
+}
+
+func (c *Checker) checkKvsFailurePromotionExpression(node *ast.KvsFailurePromotionExpression, checkMode CheckMode) *Type {
+	valueType := c.checkExpressionEx(node.Expression, checkMode)
+	replacementType := c.checkExpressionEx(node.Replacement, checkMode)
+	errorType := c.getGlobalType("Error", 0, false)
+	if !c.isTypeAssignableTo(replacementType, errorType) {
+		c.error(node.Replacement, diagnostics.KVS_infix_replacement_must_produce_an_Error)
+	}
+	if !ast.IsKvsStatementHeadPosition(node.AsNode()) {
+		c.error(node.AsNode(), diagnostics.KVS_infix_must_be_at_the_head_of_a_supported_value_expression)
+	}
+	return c.GetNonNullableType(valueType)
+}
+
+func (c *Checker) checkKvsCatchSplitExpression(node *ast.KvsCatchSplitExpression, checkMode CheckMode) *Type {
+	valueType := c.getNullableType(c.checkExpressionEx(node.Expression, checkMode), TypeFlagsNull)
+	errorType := c.getNullableType(c.unknownType, TypeFlagsNull)
+	return c.createTupleType([]*Type{valueType, errorType})
+}
+
+func (c *Checker) checkKvsCatchSplitAssignmentExpression(node *ast.KvsCatchSplitAssignmentExpression, checkMode CheckMode) *Type {
+	valueType := c.getNullableType(c.checkExpressionEx(node.Expression, checkMode), TypeFlagsNull)
+	errorType := c.getNullableType(c.unknownType, TypeFlagsNull)
+	valueTargetType := c.checkExpressionEx(node.ValueTarget, checkMode)
+	errorTargetType := c.checkExpressionEx(node.ErrorTarget, checkMode)
+	c.checkAssignmentOperator(node.ValueTarget, ast.KindEqualsToken, node.Expression, valueTargetType, valueType)
+	c.checkAssignmentOperator(node.ErrorTarget, ast.KindEqualsToken, node.Expression, errorTargetType, errorType)
+	return valueType
 }
 
 func (c *Checker) checkKvsDefaultExpression(node *ast.Node, checkMode CheckMode) *Type {
@@ -18594,7 +18667,7 @@ func (c *Checker) getBindingElementTypeFromParentType(declaration *ast.Node, par
 			declaredType := c.getIndexedAccessTypeEx(parentType, indexType, accessFlags, name, nil)
 			t = c.getFlowTypeOfDestructuring(declaration, declaredType)
 		}
-	case ast.KindArrayBindingPattern:
+	case ast.KindArrayBindingPattern, ast.KindKvsCatchSplitBindingPattern:
 		// This elementType will be used if the specific property corresponding to this index is not
 		// present (aka the tuple element property). This call also checks that the parentType is in
 		// fact an iterable or array (depending on target language).

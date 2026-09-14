@@ -115,6 +115,12 @@ func (r *EmitResolver) GetKvsNullingSieveKind(node *ast.Node) printer.KvsNulling
 	return r.checker.getKvsNullingSieveKind(r.checker.checkExpression(node))
 }
 
+func (r *EmitResolver) IsKvsFailureDemotionErrorPattern(node *ast.Node) bool {
+	r.checkerMu.Lock()
+	defer r.checkerMu.Unlock()
+	return r.checker.isKvsErrorConstructorType(r.checker.checkExpression(node))
+}
+
 func (c *Checker) getKvsNullingSieveKind(t *Type) printer.KvsNullingSieveKind {
 	if t.flags&TypeFlagsTypeParameter != 0 {
 		if constraint := c.getBaseConstraintOfType(t); constraint != nil {

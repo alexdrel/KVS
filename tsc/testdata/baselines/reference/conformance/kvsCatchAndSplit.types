@@ -1,0 +1,133 @@
+//// [tests/cases/conformance/kvs/kvsCatchAndSplit.ts] ////
+
+=== kvsCatchAndSplit.ts ===
+declare function maybeText(): string;
+>maybeText : () => string
+
+declare function maybeNumber(): number;
+>maybeNumber : () => number
+
+declare function maybeAsync(): Promise<boolean>;
+>maybeAsync : () => Promise<boolean>
+
+const text~textError = maybeText();
+>text : string | null
+>textError : unknown
+>~textError = maybeText() : [string | null, unknown]
+>maybeText() : string
+>maybeText : () => string
+
+text;
+>text : string | null
+
+textError;
+>textError : unknown
+
+let number~numberError = maybeNumber();
+>number : number | null
+>numberError : unknown
+>~numberError = maybeNumber() : [number | null, unknown]
+>maybeNumber() : number
+>maybeNumber : () => number
+
+number;
+>number : number | null
+
+numberError;
+>numberError : unknown
+
+number~numberError = maybeNumber();
+>number~numberError = maybeNumber() : number | null
+>number : number | null
+>numberError : unknown
+>maybeNumber() : number
+>maybeNumber : () => number
+
+async function splitAsync() {
+>splitAsync : () => Promise<void>
+
+    const value~error = await maybeAsync();
+>value : boolean | null
+>error : unknown
+>~error = await maybeAsync() : [boolean | null, unknown]
+>await maybeAsync() : boolean
+>maybeAsync() : Promise<boolean>
+>maybeAsync : () => Promise<boolean>
+
+    value;
+>value : boolean | null
+
+    error;
+>error : unknown
+}
+
+function throwsNull() {
+>throwsNull : () => void
+
+    throw null;
+}
+
+const nullable~nullableError = throwsNull();
+>nullable : void | null
+>nullableError : unknown
+>~nullableError = throwsNull() : [void | null, unknown]
+>throwsNull() : void
+>throwsNull : () => void
+
+nullable;
+>nullable : void | null
+
+nullableError;
+>nullableError : unknown
+
+function runtimeCases(shouldThrow: boolean) {
+>runtimeCases : (shouldThrow: boolean) => { result: number | null; error: unknown; calls: number; }
+>shouldThrow : boolean
+
+    let calls = 0;
+>calls : number
+>0 : 0
+
+    function operation() {
+>operation : () => number
+
+        calls++;
+>calls++ : number
+>calls : number
+
+        if (shouldThrow) throw "failure";
+>shouldThrow : boolean
+>"failure" : "failure"
+
+        return 42;
+>42 : 42
+    }
+
+    const result~error = operation();
+>result : number | null
+>error : unknown
+>~error = operation() : [number | null, unknown]
+>operation() : number
+>operation : () => number
+
+    return { result, error, calls };
+>{ result, error, calls } : { result: number | null; error: unknown; calls: number; }
+>result : number | null
+>error : unknown
+>calls : number
+}
+
+function ignoresError() {
+>ignoresError : () => string | null
+
+    const value~error = maybeText();
+>value : string | null
+>error : unknown
+>~error = maybeText() : [string | null, unknown]
+>maybeText() : string
+>maybeText : () => string
+
+    return value;
+>value : string | null
+}
+

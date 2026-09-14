@@ -191,33 +191,87 @@ let mutable ~= items;
 >mutable : Symbol(mutable, Decl(kvsNullingSieve.ts, 71, 3))
 >items : Symbol(items, Decl(kvsNullingSieve.ts, 1, 13))
 
+let assigned: number[]? = null;
+>assigned : Symbol(assigned, Decl(kvsNullingSieve.ts, 73, 3))
+
+assigned ~= items;
+>assigned : Symbol(assigned, Decl(kvsNullingSieve.ts, 73, 3))
+>items : Symbol(items, Decl(kvsNullingSieve.ts, 1, 13))
+
+const assignedResult = assigned ~= nullableItems;
+>assignedResult : Symbol(assignedResult, Decl(kvsNullingSieve.ts, 75, 5))
+>assigned : Symbol(assigned, Decl(kvsNullingSieve.ts, 73, 3))
+>nullableItems : Symbol(nullableItems, Decl(kvsNullingSieve.ts, 0, 13))
+
+let targetEvaluations = 0;
+>targetEvaluations : Symbol(targetEvaluations, Decl(kvsNullingSieve.ts, 77, 3))
+
+let assignmentEvaluations = 0;
+>assignmentEvaluations : Symbol(assignmentEvaluations, Decl(kvsNullingSieve.ts, 78, 3))
+
+const holder: { value: number[]? } = { value: null };
+>holder : Symbol(holder, Decl(kvsNullingSieve.ts, 79, 5))
+>value : Symbol(value, Decl(kvsNullingSieve.ts, 79, 15))
+>value : Symbol(value, Decl(kvsNullingSieve.ts, 79, 38))
+
+function assignmentTarget() {
+>assignmentTarget : Symbol(assignmentTarget, Decl(kvsNullingSieve.ts, 79, 53))
+
+    targetEvaluations++;
+>targetEvaluations : Symbol(targetEvaluations, Decl(kvsNullingSieve.ts, 77, 3))
+
+    return holder;
+>holder : Symbol(holder, Decl(kvsNullingSieve.ts, 79, 5))
+}
+function assignmentValue() {
+>assignmentValue : Symbol(assignmentValue, Decl(kvsNullingSieve.ts, 83, 1))
+
+    assignmentEvaluations++;
+>assignmentEvaluations : Symbol(assignmentEvaluations, Decl(kvsNullingSieve.ts, 78, 3))
+
+    return [] as number[];
+}
+const memberAssignmentResult = assignmentTarget().value ~= assignmentValue();
+>memberAssignmentResult : Symbol(memberAssignmentResult, Decl(kvsNullingSieve.ts, 88, 5))
+>assignmentTarget().value : Symbol(value, Decl(kvsNullingSieve.ts, 79, 15))
+>assignmentTarget : Symbol(assignmentTarget, Decl(kvsNullingSieve.ts, 79, 53))
+>value : Symbol(value, Decl(kvsNullingSieve.ts, 79, 15))
+>assignmentValue : Symbol(assignmentValue, Decl(kvsNullingSieve.ts, 83, 1))
+
+let incompatibleTarget: string? = null;
+>incompatibleTarget : Symbol(incompatibleTarget, Decl(kvsNullingSieve.ts, 90, 3))
+
+incompatibleTarget ~= items;
+>incompatibleTarget : Symbol(incompatibleTarget, Decl(kvsNullingSieve.ts, 90, 3))
+>items : Symbol(items, Decl(kvsNullingSieve.ts, 1, 13))
+
 if (const rejected ~= []) {
->rejected : Symbol(rejected, Decl(kvsNullingSieve.ts, 73, 9))
+>rejected : Symbol(rejected, Decl(kvsNullingSieve.ts, 93, 9))
 
     rejected;
->rejected : Symbol(rejected, Decl(kvsNullingSieve.ts, 73, 9))
+>rejected : Symbol(rejected, Decl(kvsNullingSieve.ts, 93, 9))
 }
 
 if (const accepted ~= array) {
->accepted : Symbol(accepted, Decl(kvsNullingSieve.ts, 77, 9))
+>accepted : Symbol(accepted, Decl(kvsNullingSieve.ts, 97, 9))
 >array : Symbol(array, Decl(kvsNullingSieve.ts, 36, 5))
 
     accepted;
->accepted : Symbol(accepted, Decl(kvsNullingSieve.ts, 77, 9))
+>accepted : Symbol(accepted, Decl(kvsNullingSieve.ts, 97, 9))
 
     accepted === array;
->accepted : Symbol(accepted, Decl(kvsNullingSieve.ts, 77, 9))
+>accepted : Symbol(accepted, Decl(kvsNullingSieve.ts, 97, 9))
 >array : Symbol(array, Decl(kvsNullingSieve.ts, 36, 5))
 }
 
 const javascriptDoubleNot = ~ ~3.7;
->javascriptDoubleNot : Symbol(javascriptDoubleNot, Decl(kvsNullingSieve.ts, 82, 5))
+>javascriptDoubleNot : Symbol(javascriptDoubleNot, Decl(kvsNullingSieve.ts, 102, 5))
 
 var rejectedVar ~= items;
->rejectedVar : Symbol(rejectedVar, Decl(kvsNullingSieve.ts, 83, 3))
+>rejectedVar : Symbol(rejectedVar, Decl(kvsNullingSieve.ts, 103, 3))
 >items : Symbol(items, Decl(kvsNullingSieve.ts, 1, 13))
 
 const rejectedSpaced ~ = items;
->rejectedSpaced : Symbol(rejectedSpaced, Decl(kvsNullingSieve.ts, 84, 5))
+>rejectedSpaced : Symbol(rejectedSpaced, Decl(kvsNullingSieve.ts, 104, 5))
 >items : Symbol(items, Decl(kvsNullingSieve.ts, 1, 13))
 

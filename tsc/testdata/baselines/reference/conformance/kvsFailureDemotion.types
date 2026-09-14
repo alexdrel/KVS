@@ -1,0 +1,114 @@
+//// [tests/cases/conformance/kvs/kvsFailureDemotion.ts] ////
+
+=== kvsFailureDemotion.ts ===
+class MathError extends Error {}
+>MathError : MathError
+>Error : Error
+
+declare function parseNumber(): number;
+>parseNumber : () => number
+
+declare function locate(): number;
+>locate : () => number
+
+declare function calculate(): number;
+>calculate : () => number
+
+declare function readToken(): object;
+>readToken : () => object
+
+declare function calculateAsync(): Promise<number>;
+>calculateAsync : () => Promise<number>
+
+const invalidNumber = parseNumber() ~ NaN;
+>invalidNumber : number | null
+>parseNumber() ~ NaN : number | null
+>parseNumber() : number
+>parseNumber : () => number
+>NaN : number
+
+const missingIndex = locate() ~ -1;
+>missingIndex : number | null
+>locate() ~ -1 : number | null
+>locate() : number
+>locate : () => number
+>-1 : -1
+>1 : 1
+
+const defaultNumber = (parseNumber() ~ NaN)!;
+>defaultNumber : number
+>(parseNumber() ~ NaN)! : number
+>(parseNumber() ~ NaN) : number | null
+>parseNumber() ~ NaN : number | null
+>parseNumber() : number
+>parseNumber : () => number
+>NaN : number
+
+const defaultIndex = (locate() ~ -1)!;
+>defaultIndex : number
+>(locate() ~ -1)! : number
+>(locate() ~ -1) : number | null
+>locate() ~ -1 : number | null
+>locate() : number
+>locate : () => number
+>-1 : -1
+>1 : 1
+
+const missingToken = {};
+>missingToken : {}
+>{} : {}
+
+const token = readToken() ~ missingToken;
+>token : object | null
+>readToken() ~ missingToken : object | null
+>readToken() : object
+>readToken : () => object
+>missingToken : {}
+
+const parsed = JSON.parse("value") ~ SyntaxError;
+>parsed : any
+>JSON.parse("value") ~ SyntaxError : any
+>JSON.parse("value") : any
+>JSON.parse : (text: string, reviver?: (this: any, key: string, value: any) => any) => any
+>JSON : JSON
+>parse : (text: string, reviver?: (this: any, key: string, value: any) => any) => any
+>"value" : "value"
+>SyntaxError : SyntaxErrorConstructor
+
+const calculated = calculate() ~ NaN ~ MathError;
+>calculated : number | null
+>calculate() ~ NaN ~ MathError : number | null
+>calculate() ~ NaN : number | null
+>calculate() : number
+>calculate : () => number
+>NaN : number
+>MathError : typeof MathError
+
+async function asyncCalculation() {
+>asyncCalculation : () => Promise<number | null>
+
+    const result = await calculateAsync() ~ MathError;
+>result : number | null
+>await calculateAsync() ~ MathError : number | null
+>await calculateAsync() : number
+>calculateAsync() : Promise<number>
+>calculateAsync : () => Promise<number>
+>MathError : typeof MathError
+
+    return result;
+>result : number | null
+}
+
+function returnedConstructor() {
+>returnedConstructor : () => SyntaxErrorConstructor
+
+    return SyntaxError;
+>SyntaxError : SyntaxErrorConstructor
+}
+const constructorValue = returnedConstructor() ~ SyntaxError;
+>constructorValue : SyntaxErrorConstructor | null
+>returnedConstructor() ~ SyntaxError : SyntaxErrorConstructor | null
+>returnedConstructor() : SyntaxErrorConstructor
+>returnedConstructor : () => SyntaxErrorConstructor
+>SyntaxError : SyntaxErrorConstructor
+

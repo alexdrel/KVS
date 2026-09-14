@@ -81,6 +81,7 @@ type EmitResolver interface {
 	IsKvsLiftedBinaryRightNullable(node *ast.Node) bool
 	IsKvsNullableExpression(node *ast.Node) bool
 	GetKvsNullingSieveKind(node *ast.Node) KvsNullingSieveKind
+	IsKvsFailureDemotionErrorPattern(node *ast.Node) bool
 	IsKvsNullableIterableSource(node *ast.Node) bool
 	IsKvsNullableIterableElement(node *ast.Node) bool
 	IsReferencedAliasDeclaration(node *ast.Node) bool

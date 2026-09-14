@@ -149,6 +149,9 @@ import type {
     KeywordExpressionSyntaxKind,
     KeywordTypeNode,
     KeywordTypeSyntaxKind,
+    KvsCatchSplitAssignmentExpression,
+    KvsCatchSplitBindingPattern,
+    KvsCatchSplitExpression,
     KvsCollectExpression,
     KvsCompactArrayExpression,
     KvsCompactObjectExpression,
@@ -162,6 +165,8 @@ import type {
     KvsExtantTestExpression,
     KvsExtantType,
     KvsExtantYieldStatement,
+    KvsFailureDemotionExpression,
+    KvsFailurePromotionExpression,
     KvsForExpression,
     KvsIfBindingClause,
     KvsIfBindingStatement,
@@ -170,6 +175,7 @@ import type {
     KvsNullingExpression,
     KvsNullingSieveExpression,
     KvsSelectExpression,
+    KvsSieveAssignmentExpression,
     KvsSieveBindingInitializer,
     KvsYieldStatement,
     LabeledStatement,
@@ -421,6 +427,9 @@ export class NodeObject {
     get equalsToken(): any {
         return this._data?.equalsToken;
     }
+    get errorTarget(): any {
+        return this._data?.errorTarget;
+    }
     get exclamationToken(): any {
         return this._data?.exclamationToken;
     }
@@ -598,6 +607,9 @@ export class NodeObject {
     get path(): any {
         return this._data?.path;
     }
+    get pattern(): any {
+        return this._data?.pattern;
+    }
     get phaseModifier(): any {
         return this._data?.phaseModifier;
     }
@@ -627,6 +639,9 @@ export class NodeObject {
     }
     get referencedFiles(): any {
         return this._data?.referencedFiles;
+    }
+    get replacement(): any {
+        return this._data?.replacement;
     }
     get result(): any {
         return this._data?.result;
@@ -735,6 +750,9 @@ export class NodeObject {
     }
     get value(): any {
         return this._data?.value;
+    }
+    get valueTarget(): any {
+        return this._data?.valueTarget;
     }
     get variableDeclaration(): any {
         return this._data?.variableDeclaration;
@@ -898,6 +916,16 @@ function cloneNodeData(node: Node): any {
             return { firstTildeToken: n.firstTildeToken, secondTildeToken: n.secondTildeToken, expression: n.expression };
         case SyntaxKind.KvsSieveBindingInitializer:
             return { tildeToken: n.tildeToken, equalsToken: n.equalsToken, expression: n.expression };
+        case SyntaxKind.KvsSieveAssignmentExpression:
+            return { left: n.left, tildeToken: n.tildeToken, equalsToken: n.equalsToken, right: n.right };
+        case SyntaxKind.KvsFailureDemotionExpression:
+            return { expression: n.expression, tildeToken: n.tildeToken, pattern: n.pattern };
+        case SyntaxKind.KvsFailurePromotionExpression:
+            return { expression: n.expression, firstTildeToken: n.firstTildeToken, secondTildeToken: n.secondTildeToken, replacement: n.replacement };
+        case SyntaxKind.KvsCatchSplitExpression:
+            return { expression: n.expression };
+        case SyntaxKind.KvsCatchSplitAssignmentExpression:
+            return { valueTarget: n.valueTarget, tildeToken: n.tildeToken, errorTarget: n.errorTarget, equalsToken: n.equalsToken, expression: n.expression };
         case SyntaxKind.KvsComparisonAlternativesExpression:
             return { subject: n.subject, operatorToken: n.operatorToken, spreadToken: n.spreadToken, alternatives: n.alternatives };
         case SyntaxKind.KvsComparisonChainExpression:
@@ -1246,6 +1274,8 @@ function cloneNodeData(node: Node): any {
             return { elements: n.elements };
         case SyntaxKind.ArrayBindingPattern:
             return { elements: n.elements };
+        case SyntaxKind.KvsCatchSplitBindingPattern:
+            return { elements: n.elements };
         case SyntaxKind.JSDocParameterTag:
             return { tagName: n.tagName, name: n.name, isBracketed: n.isBracketed, typeExpression: n.typeExpression, isNameFirst: n.isNameFirst, comment: n.comment };
         case SyntaxKind.JSDocPropertyTag:
@@ -1328,6 +1358,27 @@ const forEachChildTable: Record<number, ForEachChildFunction> = {
         visitNode(cbNode, data.expression),
     [SyntaxKind.KvsSieveBindingInitializer]: (data, cbNode, cbNodes) =>
         visitNode(cbNode, data.tildeToken) ||
+        visitNode(cbNode, data.equalsToken) ||
+        visitNode(cbNode, data.expression),
+    [SyntaxKind.KvsSieveAssignmentExpression]: (data, cbNode, cbNodes) =>
+        visitNode(cbNode, data.left) ||
+        visitNode(cbNode, data.tildeToken) ||
+        visitNode(cbNode, data.equalsToken) ||
+        visitNode(cbNode, data.right),
+    [SyntaxKind.KvsFailureDemotionExpression]: (data, cbNode, cbNodes) =>
+        visitNode(cbNode, data.expression) ||
+        visitNode(cbNode, data.tildeToken) ||
+        visitNode(cbNode, data.pattern),
+    [SyntaxKind.KvsFailurePromotionExpression]: (data, cbNode, cbNodes) =>
+        visitNode(cbNode, data.expression) ||
+        visitNode(cbNode, data.firstTildeToken) ||
+        visitNode(cbNode, data.secondTildeToken) ||
+        visitNode(cbNode, data.replacement),
+    [SyntaxKind.KvsCatchSplitExpression]: (data, cbNode, cbNodes) => visitNode(cbNode, data.expression),
+    [SyntaxKind.KvsCatchSplitAssignmentExpression]: (data, cbNode, cbNodes) =>
+        visitNode(cbNode, data.valueTarget) ||
+        visitNode(cbNode, data.tildeToken) ||
+        visitNode(cbNode, data.errorTarget) ||
         visitNode(cbNode, data.equalsToken) ||
         visitNode(cbNode, data.expression),
     [SyntaxKind.KvsComparisonAlternativesExpression]: (data, cbNode, cbNodes) =>
@@ -1868,6 +1919,7 @@ const forEachChildTable: Record<number, ForEachChildFunction> = {
         visitNodes(cbNode, cbNodes, data.statements),
     [SyntaxKind.ObjectBindingPattern]: (data, cbNode, cbNodes) => visitNodes(cbNode, cbNodes, data.elements),
     [SyntaxKind.ArrayBindingPattern]: (data, cbNode, cbNodes) => visitNodes(cbNode, cbNodes, data.elements),
+    [SyntaxKind.KvsCatchSplitBindingPattern]: (data, cbNode, cbNodes) => visitNodes(cbNode, cbNodes, data.elements),
     [SyntaxKind.JSDocParameterTag]: forEachChildOfJSDocParameterTag,
     [SyntaxKind.JSDocPropertyTag]: forEachChildOfJSDocPropertyTag,
     [SyntaxKind.SourceFile]: (data, cbNode, cbNodes) =>
@@ -2104,6 +2156,48 @@ export function createKvsSieveBindingInitializer(tildeToken: TildeToken, equalsT
         equalsToken,
         expression,
     }) as unknown as KvsSieveBindingInitializer;
+}
+
+export function createKvsSieveAssignmentExpression(left: Expression, tildeToken: TildeToken, equalsToken: EqualsToken, right: Expression): KvsSieveAssignmentExpression {
+    return new NodeObject(SyntaxKind.KvsSieveAssignmentExpression, {
+        left,
+        tildeToken,
+        equalsToken,
+        right,
+    }) as unknown as KvsSieveAssignmentExpression;
+}
+
+export function createKvsFailureDemotionExpression(expression: Expression, tildeToken: TildeToken, pattern: Expression): KvsFailureDemotionExpression {
+    return new NodeObject(SyntaxKind.KvsFailureDemotionExpression, {
+        expression,
+        tildeToken,
+        pattern,
+    }) as unknown as KvsFailureDemotionExpression;
+}
+
+export function createKvsFailurePromotionExpression(expression: Expression, firstTildeToken: TildeToken, secondTildeToken: TildeToken, replacement: Expression): KvsFailurePromotionExpression {
+    return new NodeObject(SyntaxKind.KvsFailurePromotionExpression, {
+        expression,
+        firstTildeToken,
+        secondTildeToken,
+        replacement,
+    }) as unknown as KvsFailurePromotionExpression;
+}
+
+export function createKvsCatchSplitExpression(expression: Expression): KvsCatchSplitExpression {
+    return new NodeObject(SyntaxKind.KvsCatchSplitExpression, {
+        expression,
+    }) as unknown as KvsCatchSplitExpression;
+}
+
+export function createKvsCatchSplitAssignmentExpression(valueTarget: Expression, tildeToken: TildeToken, errorTarget: Expression, equalsToken: EqualsToken, expression: Expression): KvsCatchSplitAssignmentExpression {
+    return new NodeObject(SyntaxKind.KvsCatchSplitAssignmentExpression, {
+        valueTarget,
+        tildeToken,
+        errorTarget,
+        equalsToken,
+        expression,
+    }) as unknown as KvsCatchSplitAssignmentExpression;
 }
 
 export function createKvsComparisonAlternativesExpression(subject: Expression, operatorToken: BinaryOperatorToken, spreadToken: DotDotDotToken | undefined, alternatives: readonly Expression[]): KvsComparisonAlternativesExpression {
@@ -3493,6 +3587,12 @@ export function createArrayBindingPattern(elements: readonly BindingElement[]): 
     }) as unknown as ArrayBindingPattern;
 }
 
+export function createKvsCatchSplitBindingPattern(elements: readonly BindingElement[]): KvsCatchSplitBindingPattern {
+    return new NodeObject(SyntaxKind.KvsCatchSplitBindingPattern, {
+        elements: createNodeArray(elements),
+    }) as unknown as KvsCatchSplitBindingPattern;
+}
+
 export function createJSDocParameterTag(tagName: Identifier, name: EntityName, isBracketed: boolean, typeExpression: TypeNode | undefined, isNameFirst: boolean, comment: readonly JSDocComment[] | undefined): JSDocParameterTag {
     return new NodeObject(SyntaxKind.JSDocParameterTag, {
         tagName,
@@ -3625,6 +3725,26 @@ export function updateKvsNullingSieveExpression(node: KvsNullingSieveExpression,
 
 export function updateKvsSieveBindingInitializer(node: KvsSieveBindingInitializer, tildeToken: TildeToken, equalsToken: EqualsToken, expression: Expression): KvsSieveBindingInitializer {
     return node.tildeToken !== tildeToken || node.equalsToken !== equalsToken || node.expression !== expression ? createKvsSieveBindingInitializer(tildeToken, equalsToken, expression) : node;
+}
+
+export function updateKvsSieveAssignmentExpression(node: KvsSieveAssignmentExpression, left: Expression, tildeToken: TildeToken, equalsToken: EqualsToken, right: Expression): KvsSieveAssignmentExpression {
+    return node.left !== left || node.tildeToken !== tildeToken || node.equalsToken !== equalsToken || node.right !== right ? createKvsSieveAssignmentExpression(left, tildeToken, equalsToken, right) : node;
+}
+
+export function updateKvsFailureDemotionExpression(node: KvsFailureDemotionExpression, expression: Expression, tildeToken: TildeToken, pattern: Expression): KvsFailureDemotionExpression {
+    return node.expression !== expression || node.tildeToken !== tildeToken || node.pattern !== pattern ? createKvsFailureDemotionExpression(expression, tildeToken, pattern) : node;
+}
+
+export function updateKvsFailurePromotionExpression(node: KvsFailurePromotionExpression, expression: Expression, firstTildeToken: TildeToken, secondTildeToken: TildeToken, replacement: Expression): KvsFailurePromotionExpression {
+    return node.expression !== expression || node.firstTildeToken !== firstTildeToken || node.secondTildeToken !== secondTildeToken || node.replacement !== replacement ? createKvsFailurePromotionExpression(expression, firstTildeToken, secondTildeToken, replacement) : node;
+}
+
+export function updateKvsCatchSplitExpression(node: KvsCatchSplitExpression, expression: Expression): KvsCatchSplitExpression {
+    return node.expression !== expression ? createKvsCatchSplitExpression(expression) : node;
+}
+
+export function updateKvsCatchSplitAssignmentExpression(node: KvsCatchSplitAssignmentExpression, valueTarget: Expression, tildeToken: TildeToken, errorTarget: Expression, equalsToken: EqualsToken, expression: Expression): KvsCatchSplitAssignmentExpression {
+    return node.valueTarget !== valueTarget || node.tildeToken !== tildeToken || node.errorTarget !== errorTarget || node.equalsToken !== equalsToken || node.expression !== expression ? createKvsCatchSplitAssignmentExpression(valueTarget, tildeToken, errorTarget, equalsToken, expression) : node;
 }
 
 export function updateKvsComparisonAlternativesExpression(node: KvsComparisonAlternativesExpression, subject: Expression, operatorToken: BinaryOperatorToken, spreadToken: DotDotDotToken | undefined, alternatives: readonly Expression[]): KvsComparisonAlternativesExpression {
@@ -4277,6 +4397,10 @@ export function updateObjectBindingPattern(node: ObjectBindingPattern, elements:
 
 export function updateArrayBindingPattern(node: ArrayBindingPattern, elements: readonly BindingElement[]): ArrayBindingPattern {
     return node.elements !== elements ? createArrayBindingPattern(elements) : node;
+}
+
+export function updateKvsCatchSplitBindingPattern(node: KvsCatchSplitBindingPattern, elements: readonly BindingElement[]): KvsCatchSplitBindingPattern {
+    return node.elements !== elements ? createKvsCatchSplitBindingPattern(elements) : node;
 }
 
 export function updateJSDocParameterTag(node: JSDocParameterTag, tagName: Identifier, name: EntityName, typeExpression: TypeNode | undefined, comment: readonly JSDocComment[] | undefined): JSDocParameterTag {

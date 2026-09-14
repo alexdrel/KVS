@@ -1,0 +1,54 @@
+kvsFailurePromotion.ts(33,46): error TS100080: KVS infix '~~' replacement must produce an Error.
+kvsFailurePromotion.ts(34,9): error TS100079: KVS infix '~~' must be at the head of a supported value expression.
+kvsFailurePromotion.ts(35,23): error TS100079: KVS infix '~~' must be at the head of a supported value expression.
+kvsFailurePromotion.ts(36,15): error TS100079: KVS infix '~~' must be at the head of a supported value expression.
+
+
+==== kvsFailurePromotion.ts (4 errors) ====
+    class UserNotFound extends Error {}
+    
+    declare function findUser(id: string): { name: string }?;
+    declare function findUserAsync(id: string): Promise<{ name: string }?>;
+    
+    function missingUser(id: string): Error {
+        return new UserNotFound(id);
+    }
+    
+    const user = findUser("one") ~~ new UserNotFound("one");
+    const userName = (findUser("two") ~~ missingUser("two")).name;
+    const builtInFactory = findUser("builtin") ~~ Error("missing");
+    const explicitCause = findUser("cause") ~~ new Error("missing", { cause: "explicit" });
+    
+    declare function acceptsPresentUser(user: { name: string }): void;
+    acceptsPresentUser(user);
+    
+    function requireUser(id: string) {
+        return findUser(id) ~~ new UserNotFound(id);
+    }
+    
+    const record = {
+        user: findUser("three") ~~ missingUser("three"),
+    };
+    
+    let assigned: { name: string };
+    assigned = findUser("four") ~~ new UserNotFound("four");
+    
+    async function requireUserAsync(id: string) {
+        return await findUserAsync(id) ~~ new UserNotFound(id);
+    }
+    
+    const wrongReplacement = findUser("five") ~~ "missing";
+                                                 ~~~~~~~~~
+!!! error TS100080: KVS infix '~~' replacement must produce an Error.
+    consume(findUser("six") ~~ missingUser("six"));
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+!!! error TS100079: KVS infix '~~' must be at the head of a supported value expression.
+    const branch = true ? findUser("seven") ~~ missingUser("seven") : user;
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+!!! error TS100079: KVS infix '~~' must be at the head of a supported value expression.
+    const list = [findUser("eight") ~~ missingUser("eight")];
+                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+!!! error TS100079: KVS infix '~~' must be at the head of a supported value expression.
+    
+    declare function consume(value: { name: string }): void;
+    

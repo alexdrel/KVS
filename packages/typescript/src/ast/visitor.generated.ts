@@ -105,6 +105,9 @@ import type {
     JsxOpeningElement,
     JsxSelfClosingElement,
     JsxSpreadAttribute,
+    KvsCatchSplitAssignmentExpression,
+    KvsCatchSplitBindingPattern,
+    KvsCatchSplitExpression,
     KvsCollectExpression,
     KvsCompactArrayExpression,
     KvsCompactObjectExpression,
@@ -118,6 +121,8 @@ import type {
     KvsExtantTestExpression,
     KvsExtantType,
     KvsExtantYieldStatement,
+    KvsFailureDemotionExpression,
+    KvsFailurePromotionExpression,
     KvsForExpression,
     KvsIfBindingClause,
     KvsIfBindingStatement,
@@ -126,6 +131,7 @@ import type {
     KvsNullingExpression,
     KvsNullingSieveExpression,
     KvsSelectExpression,
+    KvsSieveAssignmentExpression,
     KvsSieveBindingInitializer,
     KvsYieldStatement,
     LabeledStatement,
@@ -302,6 +308,9 @@ import {
     updateJsxOpeningElement,
     updateJsxSelfClosingElement,
     updateJsxSpreadAttribute,
+    updateKvsCatchSplitAssignmentExpression,
+    updateKvsCatchSplitBindingPattern,
+    updateKvsCatchSplitExpression,
     updateKvsCollectExpression,
     updateKvsCompactArrayExpression,
     updateKvsCompactObjectExpression,
@@ -315,6 +324,8 @@ import {
     updateKvsExtantTestExpression,
     updateKvsExtantType,
     updateKvsExtantYieldStatement,
+    updateKvsFailureDemotionExpression,
+    updateKvsFailurePromotionExpression,
     updateKvsForExpression,
     updateKvsIfBindingClause,
     updateKvsIfBindingStatement,
@@ -323,6 +334,7 @@ import {
     updateKvsNullingExpression,
     updateKvsNullingSieveExpression,
     updateKvsSelectExpression,
+    updateKvsSieveAssignmentExpression,
     updateKvsSieveBindingInitializer,
     updateKvsYieldStatement,
     updateLabeledStatement,
@@ -698,6 +710,38 @@ const visitEachChildTable: Record<number, VisitEachChildFunction> = {
         const _equalsToken = visitNode(node.equalsToken, visitor, isEqualsToken);
         const _expression = visitNode(node.expression, visitor, isExpression);
         return updateKvsSieveBindingInitializer(node, _tildeToken, _equalsToken, _expression);
+    },
+    [SyntaxKind.KvsSieveAssignmentExpression]: (node: KvsSieveAssignmentExpression, visitor: Visitor): KvsSieveAssignmentExpression => {
+        const _left = visitNode(node.left, visitor, isExpression);
+        const _tildeToken = visitNode(node.tildeToken, visitor, isTildeToken);
+        const _equalsToken = visitNode(node.equalsToken, visitor, isEqualsToken);
+        const _right = visitNode(node.right, visitor, isExpression);
+        return updateKvsSieveAssignmentExpression(node, _left, _tildeToken, _equalsToken, _right);
+    },
+    [SyntaxKind.KvsFailureDemotionExpression]: (node: KvsFailureDemotionExpression, visitor: Visitor): KvsFailureDemotionExpression => {
+        const _expression = visitNode(node.expression, visitor, isExpression);
+        const _tildeToken = visitNode(node.tildeToken, visitor, isTildeToken);
+        const _pattern = visitNode(node.pattern, visitor, isExpression);
+        return updateKvsFailureDemotionExpression(node, _expression, _tildeToken, _pattern);
+    },
+    [SyntaxKind.KvsFailurePromotionExpression]: (node: KvsFailurePromotionExpression, visitor: Visitor): KvsFailurePromotionExpression => {
+        const _expression = visitNode(node.expression, visitor, isExpression);
+        const _firstTildeToken = visitNode(node.firstTildeToken, visitor, isTildeToken);
+        const _secondTildeToken = visitNode(node.secondTildeToken, visitor, isTildeToken);
+        const _replacement = visitNode(node.replacement, visitor, isExpression);
+        return updateKvsFailurePromotionExpression(node, _expression, _firstTildeToken, _secondTildeToken, _replacement);
+    },
+    [SyntaxKind.KvsCatchSplitExpression]: (node: KvsCatchSplitExpression, visitor: Visitor): KvsCatchSplitExpression => {
+        const _expression = visitNode(node.expression, visitor, isExpression);
+        return updateKvsCatchSplitExpression(node, _expression);
+    },
+    [SyntaxKind.KvsCatchSplitAssignmentExpression]: (node: KvsCatchSplitAssignmentExpression, visitor: Visitor): KvsCatchSplitAssignmentExpression => {
+        const _valueTarget = visitNode(node.valueTarget, visitor, isExpression);
+        const _tildeToken = visitNode(node.tildeToken, visitor, isTildeToken);
+        const _errorTarget = visitNode(node.errorTarget, visitor, isExpression);
+        const _equalsToken = visitNode(node.equalsToken, visitor, isEqualsToken);
+        const _expression = visitNode(node.expression, visitor, isExpression);
+        return updateKvsCatchSplitAssignmentExpression(node, _valueTarget, _tildeToken, _errorTarget, _equalsToken, _expression);
     },
     [SyntaxKind.KvsComparisonAlternativesExpression]: (node: KvsComparisonAlternativesExpression, visitor: Visitor): KvsComparisonAlternativesExpression => {
         const _subject = visitNode(node.subject, visitor, isExpression);
@@ -1611,6 +1655,10 @@ const visitEachChildTable: Record<number, VisitEachChildFunction> = {
     [SyntaxKind.ArrayBindingPattern]: (node: ArrayBindingPattern, visitor: Visitor): ArrayBindingPattern => {
         const _elements = visitNodes(node.elements, visitor);
         return updateArrayBindingPattern(node, _elements);
+    },
+    [SyntaxKind.KvsCatchSplitBindingPattern]: (node: KvsCatchSplitBindingPattern, visitor: Visitor): KvsCatchSplitBindingPattern => {
+        const _elements = visitNodes(node.elements, visitor);
+        return updateKvsCatchSplitBindingPattern(node, _elements);
     },
     [SyntaxKind.JSDocParameterTag]: visitEachChildOfJSDocParameterTag,
     [SyntaxKind.JSDocPropertyTag]: visitEachChildOfJSDocPropertyTag,

@@ -261,6 +261,7 @@
             },
             "ObjectBindingPattern",
             "ArrayBindingPattern",
+            "KvsCatchSplitBindingPattern",
             "BindingElement",
             {
                 "comment": "Expression"
@@ -293,6 +294,11 @@
             "KvsDefaultExpression",
             "KvsNullingSieveExpression",
             "KvsSieveBindingInitializer",
+            "KvsSieveAssignmentExpression",
+            "KvsFailureDemotionExpression",
+            "KvsFailurePromotionExpression",
+            "KvsCatchSplitExpression",
+            "KvsCatchSplitAssignmentExpression",
             "KvsComparisonAlternativesExpression",
             "KvsComparisonChainExpression",
             "KvsNullingExpression",
@@ -1834,6 +1840,119 @@
                 ],
                 "arena": true
             },
+            "KvsSieveAssignmentExpression": {
+                "extends": [
+                    "ExpressionBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "Left",
+                        "type": "Expression"
+                    },
+                    {
+                        "name": "TildeToken",
+                        "type": "TildeToken"
+                    },
+                    {
+                        "name": "EqualsToken",
+                        "type": "EqualsToken"
+                    },
+                    {
+                        "name": "Right",
+                        "type": "Expression"
+                    }
+                ],
+                "arena": true
+            },
+            "KvsFailureDemotionExpression": {
+                "extends": [
+                    "ExpressionBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "Expression",
+                        "type": "Expression"
+                    },
+                    {
+                        "name": "TildeToken",
+                        "type": "TildeToken"
+                    },
+                    {
+                        "name": "Pattern",
+                        "type": "Expression"
+                    }
+                ],
+                "arena": true
+            },
+            "KvsFailurePromotionExpression": {
+                "extends": [
+                    "ExpressionBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "Expression",
+                        "type": "Expression"
+                    },
+                    {
+                        "name": "FirstTildeToken",
+                        "type": "TildeToken"
+                    },
+                    {
+                        "name": "SecondTildeToken",
+                        "type": "TildeToken"
+                    },
+                    {
+                        "name": "Replacement",
+                        "type": "Expression"
+                    }
+                ],
+                "arena": true
+            },
+            "KvsCatchSplitExpression": {
+                "extends": [
+                    "ExpressionBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "Expression",
+                        "type": "Expression"
+                    }
+                ],
+                "arena": true
+            },
+            "KvsCatchSplitAssignmentExpression": {
+                "extends": [
+                    "ExpressionBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "ValueTarget",
+                        "type": "Expression"
+                    },
+                    {
+                        "name": "TildeToken",
+                        "type": "TildeToken"
+                    },
+                    {
+                        "name": "ErrorTarget",
+                        "type": "Expression"
+                    },
+                    {
+                        "name": "EqualsToken",
+                        "type": "EqualsToken"
+                    },
+                    {
+                        "name": "Expression",
+                        "type": "Expression"
+                    }
+                ],
+                "arena": true
+            },
             "KvsComparisonAlternativesExpression": {
                 "generateSubtreeFacts": true,
                 "extends": [
@@ -2197,7 +2316,8 @@
                         "name": "Kind",
                         "type": [
                             "SyntaxKind.ObjectBindingPattern",
-                            "SyntaxKind.ArrayBindingPattern"
+                            "SyntaxKind.ArrayBindingPattern",
+                            "SyntaxKind.KvsCatchSplitBindingPattern"
                         ],
                         "inherited": true
                     },

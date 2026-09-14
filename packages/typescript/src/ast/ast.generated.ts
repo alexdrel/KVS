@@ -645,6 +645,38 @@ export interface KvsSieveBindingInitializer extends ExpressionBase {
     readonly equalsToken: EqualsToken;
     readonly expression: Expression;
 }
+export interface KvsSieveAssignmentExpression extends ExpressionBase {
+    readonly kind: SyntaxKind.KvsSieveAssignmentExpression;
+    readonly left: Expression;
+    readonly tildeToken: TildeToken;
+    readonly equalsToken: EqualsToken;
+    readonly right: Expression;
+}
+export interface KvsFailureDemotionExpression extends ExpressionBase {
+    readonly kind: SyntaxKind.KvsFailureDemotionExpression;
+    readonly expression: Expression;
+    readonly tildeToken: TildeToken;
+    readonly pattern: Expression;
+}
+export interface KvsFailurePromotionExpression extends ExpressionBase {
+    readonly kind: SyntaxKind.KvsFailurePromotionExpression;
+    readonly expression: Expression;
+    readonly firstTildeToken: TildeToken;
+    readonly secondTildeToken: TildeToken;
+    readonly replacement: Expression;
+}
+export interface KvsCatchSplitExpression extends ExpressionBase {
+    readonly kind: SyntaxKind.KvsCatchSplitExpression;
+    readonly expression: Expression;
+}
+export interface KvsCatchSplitAssignmentExpression extends ExpressionBase {
+    readonly kind: SyntaxKind.KvsCatchSplitAssignmentExpression;
+    readonly valueTarget: Expression;
+    readonly tildeToken: TildeToken;
+    readonly errorTarget: Expression;
+    readonly equalsToken: EqualsToken;
+    readonly expression: Expression;
+}
 export interface KvsComparisonAlternativesExpression extends ExpressionBase {
     readonly kind: SyntaxKind.KvsComparisonAlternativesExpression;
     readonly subject: Expression;
@@ -1573,6 +1605,10 @@ export interface ArrayBindingPattern extends NodeBase {
     readonly kind: SyntaxKind.ArrayBindingPattern;
     readonly elements: NodeArray<BindingElement>;
 }
+export interface KvsCatchSplitBindingPattern extends NodeBase {
+    readonly kind: SyntaxKind.KvsCatchSplitBindingPattern;
+    readonly elements: NodeArray<BindingElement>;
+}
 export interface JSDocParameterTag extends JSDocTagBase {
     readonly kind: SyntaxKind.JSDocParameterTag;
     readonly name: EntityName;
@@ -1589,7 +1625,7 @@ export interface JSDocPropertyTag extends JSDocTagBase {
 }
 export type ForInOrOfStatement = ForInStatement | ForOfStatement;
 export type CaseOrDefaultClause = CaseClause | DefaultClause;
-export type BindingPattern = ObjectBindingPattern | ArrayBindingPattern;
+export type BindingPattern = ObjectBindingPattern | ArrayBindingPattern | KvsCatchSplitBindingPattern;
 export type JSDocParameterOrPropertyTag = JSDocParameterTag | JSDocPropertyTag;
 export type EndOfFile = Token<SyntaxKind.EndOfFile>;
 export type DotToken = Token<SyntaxKind.DotToken>;

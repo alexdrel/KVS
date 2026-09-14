@@ -1,0 +1,114 @@
+//// [tests/cases/conformance/kvs/kvsCatchAndSplit.ts] ////
+
+=== kvsCatchAndSplit.ts ===
+declare function maybeText(): string;
+>maybeText : Symbol(maybeText, Decl(kvsCatchAndSplit.ts, 0, 0))
+
+declare function maybeNumber(): number;
+>maybeNumber : Symbol(maybeNumber, Decl(kvsCatchAndSplit.ts, 0, 37))
+
+declare function maybeAsync(): Promise<boolean>;
+>maybeAsync : Symbol(maybeAsync, Decl(kvsCatchAndSplit.ts, 1, 39))
+>Promise : Symbol(Promise, Decl(lib.es5.d.ts, --, --), Decl(lib.es2015.iterable.d.ts, --, --), Decl(lib.es2015.promise.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --), Decl(lib.es2018.promise.d.ts, --, --))
+
+const text~textError = maybeText();
+>text : Symbol(text, Decl(kvsCatchAndSplit.ts, 4, 5))
+>textError : Symbol(textError, Decl(kvsCatchAndSplit.ts, 4, 11))
+>maybeText : Symbol(maybeText, Decl(kvsCatchAndSplit.ts, 0, 0))
+
+text;
+>text : Symbol(text, Decl(kvsCatchAndSplit.ts, 4, 5))
+
+textError;
+>textError : Symbol(textError, Decl(kvsCatchAndSplit.ts, 4, 11))
+
+let number~numberError = maybeNumber();
+>number : Symbol(number, Decl(kvsCatchAndSplit.ts, 8, 3))
+>numberError : Symbol(numberError, Decl(kvsCatchAndSplit.ts, 8, 11))
+>maybeNumber : Symbol(maybeNumber, Decl(kvsCatchAndSplit.ts, 0, 37))
+
+number;
+>number : Symbol(number, Decl(kvsCatchAndSplit.ts, 8, 3))
+
+numberError;
+>numberError : Symbol(numberError, Decl(kvsCatchAndSplit.ts, 8, 11))
+
+number~numberError = maybeNumber();
+>number : Symbol(number, Decl(kvsCatchAndSplit.ts, 8, 3))
+>numberError : Symbol(numberError, Decl(kvsCatchAndSplit.ts, 8, 11))
+>maybeNumber : Symbol(maybeNumber, Decl(kvsCatchAndSplit.ts, 0, 37))
+
+async function splitAsync() {
+>splitAsync : Symbol(splitAsync, Decl(kvsCatchAndSplit.ts, 12, 35))
+
+    const value~error = await maybeAsync();
+>value : Symbol(value, Decl(kvsCatchAndSplit.ts, 15, 9))
+>error : Symbol(error, Decl(kvsCatchAndSplit.ts, 15, 16))
+>maybeAsync : Symbol(maybeAsync, Decl(kvsCatchAndSplit.ts, 1, 39))
+
+    value;
+>value : Symbol(value, Decl(kvsCatchAndSplit.ts, 15, 9))
+
+    error;
+>error : Symbol(error, Decl(kvsCatchAndSplit.ts, 15, 16))
+}
+
+function throwsNull() {
+>throwsNull : Symbol(throwsNull, Decl(kvsCatchAndSplit.ts, 18, 1))
+
+    throw null;
+}
+
+const nullable~nullableError = throwsNull();
+>nullable : Symbol(nullable, Decl(kvsCatchAndSplit.ts, 24, 5))
+>nullableError : Symbol(nullableError, Decl(kvsCatchAndSplit.ts, 24, 15))
+>throwsNull : Symbol(throwsNull, Decl(kvsCatchAndSplit.ts, 18, 1))
+
+nullable;
+>nullable : Symbol(nullable, Decl(kvsCatchAndSplit.ts, 24, 5))
+
+nullableError;
+>nullableError : Symbol(nullableError, Decl(kvsCatchAndSplit.ts, 24, 15))
+
+function runtimeCases(shouldThrow: boolean) {
+>runtimeCases : Symbol(runtimeCases, Decl(kvsCatchAndSplit.ts, 26, 14))
+>shouldThrow : Symbol(shouldThrow, Decl(kvsCatchAndSplit.ts, 28, 22))
+
+    let calls = 0;
+>calls : Symbol(calls, Decl(kvsCatchAndSplit.ts, 29, 7))
+
+    function operation() {
+>operation : Symbol(operation, Decl(kvsCatchAndSplit.ts, 29, 18))
+
+        calls++;
+>calls : Symbol(calls, Decl(kvsCatchAndSplit.ts, 29, 7))
+
+        if (shouldThrow) throw "failure";
+>shouldThrow : Symbol(shouldThrow, Decl(kvsCatchAndSplit.ts, 28, 22))
+
+        return 42;
+    }
+
+    const result~error = operation();
+>result : Symbol(result, Decl(kvsCatchAndSplit.ts, 36, 9))
+>error : Symbol(error, Decl(kvsCatchAndSplit.ts, 36, 17))
+>operation : Symbol(operation, Decl(kvsCatchAndSplit.ts, 29, 18))
+
+    return { result, error, calls };
+>result : Symbol(result, Decl(kvsCatchAndSplit.ts, 37, 12))
+>error : Symbol(error, Decl(kvsCatchAndSplit.ts, 37, 20))
+>calls : Symbol(calls, Decl(kvsCatchAndSplit.ts, 37, 27))
+}
+
+function ignoresError() {
+>ignoresError : Symbol(ignoresError, Decl(kvsCatchAndSplit.ts, 38, 1))
+
+    const value~error = maybeText();
+>value : Symbol(value, Decl(kvsCatchAndSplit.ts, 41, 9))
+>error : Symbol(error, Decl(kvsCatchAndSplit.ts, 41, 16))
+>maybeText : Symbol(maybeText, Decl(kvsCatchAndSplit.ts, 0, 0))
+
+    return value;
+>value : Symbol(value, Decl(kvsCatchAndSplit.ts, 41, 9))
+}
+

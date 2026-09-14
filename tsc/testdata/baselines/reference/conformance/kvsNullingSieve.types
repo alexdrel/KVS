@@ -268,6 +268,73 @@ let mutable ~= items;
 >~= items : number[] | null
 >items : number[]
 
+let assigned: number[]? = null;
+>assigned : number[] | null | undefined
+
+assigned ~= items;
+>assigned ~= items : number[] | null
+>assigned : number[] | null | undefined
+>items : number[]
+
+const assignedResult = assigned ~= nullableItems;
+>assignedResult : number[] | null
+>assigned ~= nullableItems : number[] | null
+>assigned : number[] | null | undefined
+>nullableItems : number[] | null | undefined
+
+let targetEvaluations = 0;
+>targetEvaluations : number
+>0 : 0
+
+let assignmentEvaluations = 0;
+>assignmentEvaluations : number
+>0 : 0
+
+const holder: { value: number[]? } = { value: null };
+>holder : { value: number[]?; }
+>value : number[] | null | undefined
+>{ value: null } : { value: null; }
+>value : null
+
+function assignmentTarget() {
+>assignmentTarget : () => { value: number[]?; }
+
+    targetEvaluations++;
+>targetEvaluations++ : number
+>targetEvaluations : number
+
+    return holder;
+>holder : { value: number[]?; }
+}
+function assignmentValue() {
+>assignmentValue : () => number[]
+
+    assignmentEvaluations++;
+>assignmentEvaluations++ : number
+>assignmentEvaluations : number
+
+    return [] as number[];
+>[] as number[] : number[]
+>[] : never[]
+}
+const memberAssignmentResult = assignmentTarget().value ~= assignmentValue();
+>memberAssignmentResult : number[] | null
+>assignmentTarget().value ~= assignmentValue() : number[] | null
+>assignmentTarget().value : number[] | null | undefined
+>assignmentTarget() : { value: number[]?; }
+>assignmentTarget : () => { value: number[]?; }
+>value : number[] | null | undefined
+>assignmentValue() : number[]
+>assignmentValue : () => number[]
+
+let incompatibleTarget: string? = null;
+>incompatibleTarget : string | null | undefined
+
+incompatibleTarget ~= items;
+>incompatibleTarget ~= items : number[] | null
+>incompatibleTarget : string | null | undefined
+>items : number[]
+
 if (const rejected ~= []) {
 >rejected : never[] | null
 >~= [] : never[] | null

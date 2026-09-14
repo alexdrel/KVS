@@ -843,7 +843,7 @@ func (tx *DeclarationTransformer) transformVariableDeclaration(input *ast.Variab
 	if tx.state.currentSourceFile.CommonJSModuleIndicator != nil && ast.IsVariableDeclarationInitializedToRequire(input.AsNode()) {
 		return tx.transformCjsRequireVariableDeclaration(input)
 	}
-	if ast.IsBindingPattern(input.Name()) && hasAnyBindingInitializers(input.Name().AsBindingPattern()) {
+	if ast.IsKvsCatchSplitBindingPattern(input.Name()) || ast.IsBindingPattern(input.Name()) && hasAnyBindingInitializers(input.Name().AsBindingPattern()) {
 		return tx.recreateBindingPattern(input.Name().AsBindingPattern())
 	}
 	// Variable declaration types also suppress new diagnostic contexts, provided the contexts wouldn't be made for binding pattern types
@@ -2431,7 +2431,7 @@ func (tx *DeclarationTransformer) visitBindingName(node *ast.Node) *ast.Node {
 	switch node.Kind {
 	case ast.KindIdentifier, ast.KindOmittedExpression:
 		return node
-	case ast.KindArrayBindingPattern, ast.KindObjectBindingPattern:
+	case ast.KindArrayBindingPattern, ast.KindObjectBindingPattern, ast.KindKvsCatchSplitBindingPattern:
 		return node.VisitEachChild(tx.bindingNameVisitor)
 	case ast.KindBindingElement:
 		if node.PropertyName() != nil && ast.IsComputedPropertyName(node.PropertyName()) && ast.IsEntityNameExpression(node.PropertyName().Expression()) {

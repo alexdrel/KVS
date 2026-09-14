@@ -164,7 +164,7 @@ func IsArrayBindingOrAssignmentElement(node *Node) bool {
 }
 
 func IsBindingPattern(node *Node) bool {
-	return node.Kind == KindObjectBindingPattern || node.Kind == KindArrayBindingPattern
+	return node.Kind == KindObjectBindingPattern || node.Kind == KindArrayBindingPattern || node.Kind == KindKvsCatchSplitBindingPattern
 }
 
 func IsForInOrOfStatement(node *Node) bool {
@@ -187,6 +187,17 @@ func GetAssignmentTarget(node *Node) *Node {
 		switch parent.Kind {
 		case KindKvsExtantAssignmentExpression:
 			if parent.AsKvsExtantAssignmentExpression().Left == node {
+				return parent
+			}
+			return nil
+		case KindKvsSieveAssignmentExpression:
+			if parent.AsKvsSieveAssignmentExpression().Left == node {
+				return parent
+			}
+			return nil
+		case KindKvsCatchSplitAssignmentExpression:
+			expression := parent.AsKvsCatchSplitAssignmentExpression()
+			if expression.ValueTarget == node || expression.ErrorTarget == node {
 				return parent
 			}
 			return nil
@@ -442,6 +453,10 @@ func isExpressionKind(kind Kind) bool {
 		KindKvsNullableAssertionExpression,
 		KindKvsExtantAssertionExpression,
 		KindKvsExtantAssignmentExpression,
+		KindKvsSieveAssignmentExpression,
+		KindKvsFailureDemotionExpression, KindKvsFailurePromotionExpression,
+		KindKvsCatchSplitExpression,
+		KindKvsCatchSplitAssignmentExpression,
 		KindKvsExtantTestExpression,
 		KindKvsDefaultExpression,
 		KindKvsNullingExpression,
@@ -2022,7 +2037,7 @@ func IsExpressionNode(node *Node) bool {
 		KindCallExpression, KindNewExpression, KindTaggedTemplateExpression, KindAsExpression, KindTypeAssertionExpression,
 		KindSatisfiesExpression, KindNonNullExpression, KindParenthesizedExpression, KindFunctionExpression,
 		KindClassExpression, KindArrowFunction, KindVoidExpression, KindDeleteExpression, KindTypeOfExpression,
-		KindPrefixUnaryExpression, KindPostfixUnaryExpression, KindBinaryExpression, KindConditionalExpression, KindKvsExtantTestExpression, KindKvsDefaultExpression, KindKvsNullingSieveExpression, KindKvsSieveBindingInitializer, KindKvsNullingExpression, KindKvsConditionalElement,
+		KindPrefixUnaryExpression, KindPostfixUnaryExpression, KindBinaryExpression, KindConditionalExpression, KindKvsExtantTestExpression, KindKvsDefaultExpression, KindKvsNullingSieveExpression, KindKvsSieveBindingInitializer, KindKvsSieveAssignmentExpression, KindKvsFailureDemotionExpression, KindKvsFailurePromotionExpression, KindKvsCatchSplitExpression, KindKvsCatchSplitAssignmentExpression, KindKvsNullingExpression, KindKvsConditionalElement,
 		KindSpreadElement, KindTemplateExpression, KindOmittedExpression, KindJsxElement, KindJsxSelfClosingElement,
 		KindJsxFragment, KindYieldExpression, KindKvsNullableAssertionExpression, KindKvsExtantAssertionExpression, KindKvsExtantAssignmentExpression, KindKvsCollectExpression, KindKvsSelectExpression, KindKvsForExpression, KindAwaitExpression:
 		return true
@@ -2062,6 +2077,10 @@ func IsKvsConditionalObjectProperty(node *Node) bool {
 }
 
 func IsKvsProducerHeadPosition(node *Node) bool {
+	return IsKvsStatementHeadPosition(node)
+}
+
+func IsKvsStatementHeadPosition(node *Node) bool {
 	current := node
 	for current.Parent != nil {
 		parent := current.Parent

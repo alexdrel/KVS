@@ -1,11 +1,13 @@
 kvsNullingSieve.ts(5,5): error TS2872: This kind of expression is always truthy.
 kvsNullingSieve.ts(9,5): error TS2872: This kind of expression is always truthy.
-kvsNullingSieve.ts(85,7): error TS7005: Variable 'rejectedSpaced' implicitly has an 'any' type.
-kvsNullingSieve.ts(85,22): error TS1005: ',' expected.
-kvsNullingSieve.ts(85,24): error TS1109: Expression expected.
+kvsNullingSieve.ts(92,1): error TS2322: Type 'number[] | null' is not assignable to type 'string | null | undefined'.
+  Type 'number[]' is not assignable to type 'string'.
+kvsNullingSieve.ts(105,7): error TS7005: Variable 'rejectedSpaced' implicitly has an 'any' type.
+kvsNullingSieve.ts(105,22): error TS1005: ',' expected.
+kvsNullingSieve.ts(105,24): error TS1109: Expression expected.
 
 
-==== kvsNullingSieve.ts (5 errors) ====
+==== kvsNullingSieve.ts (6 errors) ====
     declare const nullableItems: number[]?;
     declare const items: number[];
     declare const dynamic: unknown;
@@ -82,6 +84,29 @@ kvsNullingSieve.ts(85,24): error TS1109: Expression expected.
     
     const compact ~= nullableItems;
     let mutable ~= items;
+    
+    let assigned: number[]? = null;
+    assigned ~= items;
+    const assignedResult = assigned ~= nullableItems;
+    
+    let targetEvaluations = 0;
+    let assignmentEvaluations = 0;
+    const holder: { value: number[]? } = { value: null };
+    function assignmentTarget() {
+        targetEvaluations++;
+        return holder;
+    }
+    function assignmentValue() {
+        assignmentEvaluations++;
+        return [] as number[];
+    }
+    const memberAssignmentResult = assignmentTarget().value ~= assignmentValue();
+    
+    let incompatibleTarget: string? = null;
+    incompatibleTarget ~= items;
+    ~~~~~~~~~~~~~~~~~~
+!!! error TS2322: Type 'number[] | null' is not assignable to type 'string | null | undefined'.
+!!! error TS2322:   Type 'number[]' is not assignable to type 'string'.
     
     if (const rejected ~= []) {
         rejected;

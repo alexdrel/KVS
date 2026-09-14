@@ -234,6 +234,7 @@ const (
 	// Binding patterns
 	KindObjectBindingPattern
 	KindArrayBindingPattern
+	KindKvsCatchSplitBindingPattern
 	KindBindingElement
 	// Expression
 	KindArrayLiteralExpression
@@ -264,6 +265,11 @@ const (
 	KindKvsDefaultExpression
 	KindKvsNullingSieveExpression
 	KindKvsSieveBindingInitializer
+	KindKvsSieveAssignmentExpression
+	KindKvsFailureDemotionExpression
+	KindKvsFailurePromotionExpression
+	KindKvsCatchSplitExpression
+	KindKvsCatchSplitAssignmentExpression
 	KindKvsComparisonAlternativesExpression
 	KindKvsComparisonChainExpression
 	KindKvsNullingExpression

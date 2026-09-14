@@ -1683,7 +1683,20 @@ func (p *Parser) parseVariableDeclarationWorker(allowExclamation bool) *ast.Node
 	nameEnd := p.scanner.TokenEnd()
 	name := p.parseIdentifierOrPatternWithDiagnostic(diagnostics.Private_identifiers_are_not_allowed_in_variable_declarations)
 	var filteredInitializer *ast.Node
-	if name.Kind == ast.KindIdentifier && p.isKvsSieveBindingInitializer() {
+	if name.Kind == ast.KindIdentifier && p.isKvsCatchSplit(nameEnd) {
+		valueElement := p.finishNode(p.factory.NewBindingElement(nil, nil, name, nil), name.Pos())
+		tildeToken := p.parseTokenNode()
+		errorPos := p.nodePos()
+		errorName := p.parseBindingIdentifier()
+		errorElement := p.finishNode(p.factory.NewBindingElement(nil, nil, errorName, nil), errorPos)
+		name = p.finishNode(p.factory.NewBindingPattern(
+			ast.KindKvsCatchSplitBindingPattern,
+			p.factory.NewNodeList([]*ast.Node{valueElement, errorElement}),
+		), pos)
+		p.parseExpected(ast.KindEqualsToken)
+		expression := p.parseAssignmentExpressionOrHigher()
+		filteredInitializer = p.finishNode(p.factory.NewKvsCatchSplitExpression(expression), tildeToken.Pos())
+	} else if name.Kind == ast.KindIdentifier && p.isKvsSieveBindingInitializer() {
 		tildeToken := p.parseTokenNode()
 		equalsToken := p.parseTokenNode()
 		expression := p.parseAssignmentExpressionOrHigher()
@@ -1725,6 +1738,19 @@ func (p *Parser) isKvsSieveBindingInitializer() bool {
 	tildeEnd := p.scanner.TokenEnd()
 	return p.lookAhead(func(p *Parser) bool {
 		return p.nextToken() == ast.KindEqualsToken && p.scanner.TokenStart() == tildeEnd
+	})
+}
+
+func (p *Parser) isKvsCatchSplit(nameEnd int) bool {
+	if p.token != ast.KindTildeToken || p.scanner.TokenStart() != nameEnd {
+		return false
+	}
+	tildeEnd := p.scanner.TokenEnd()
+	return p.lookAhead(func(p *Parser) bool {
+		if p.nextToken() != ast.KindIdentifier || p.scanner.TokenStart() != tildeEnd {
+			return false
+		}
+		return p.nextToken() == ast.KindEqualsToken
 	})
 }
 
@@ -4338,11 +4364,39 @@ func (p *Parser) parseAssignmentExpressionOrHigherWorker(allowReturnTypeInArrowF
 	if expr.Kind == ast.KindIdentifier && p.token == ast.KindEqualsGreaterThanToken {
 		return p.parseSimpleArrowFunctionExpression(pos, expr, allowReturnTypeInArrowFunction, jsdoc, nil /*asyncModifier*/)
 	}
+	for {
+		if p.isKvsFailurePromotion() {
+			firstTildeToken := p.parseTokenNode()
+			secondTildeToken := p.parseTokenNode()
+			replacement := p.parseUnaryExpressionOrHigher()
+			expr = p.finishNode(p.factory.NewKvsFailurePromotionExpression(expr, firstTildeToken, secondTildeToken, replacement), pos)
+			continue
+		}
+		if !p.isKvsFailureDemotion(expr.End()) {
+			break
+		}
+		tildeToken := p.parseTokenNode()
+		pattern := p.parseUnaryExpressionOrHigher()
+		expr = p.finishNode(p.factory.NewKvsFailureDemotionExpression(expr, tildeToken, pattern), pos)
+	}
 	if ast.IsLeftHandSideExpression(expr) && p.isKvsExtantAssignment() {
 		questionToken := p.parseTokenNode()
 		equalsToken := p.parseTokenNode()
 		right := p.parseAssignmentExpressionOrHigherWorker(allowReturnTypeInArrowFunction)
 		return p.finishNode(p.factory.NewKvsExtantAssignmentExpression(expr, questionToken, equalsToken, right), pos)
+	}
+	if ast.IsLeftHandSideExpression(expr) && p.isKvsSieveAssignment() {
+		tildeToken := p.parseTokenNode()
+		equalsToken := p.parseTokenNode()
+		right := p.parseAssignmentExpressionOrHigherWorker(allowReturnTypeInArrowFunction)
+		return p.finishNode(p.factory.NewKvsSieveAssignmentExpression(expr, tildeToken, equalsToken, right), pos)
+	}
+	if expr.Kind == ast.KindIdentifier && p.isKvsCatchSplit(expr.End()) {
+		tildeToken := p.parseTokenNode()
+		errorTarget := p.parseIdentifier()
+		equalsToken := p.parseExpectedToken(ast.KindEqualsToken)
+		right := p.parseAssignmentExpressionOrHigherWorker(allowReturnTypeInArrowFunction)
+		return p.finishNode(p.factory.NewKvsCatchSplitAssignmentExpression(expr, tildeToken, errorTarget, equalsToken, right), pos)
 	}
 	// Now see if we might be in cases '2' or '3'.
 	// If the expression was a LHS expression, and we have an assignment operator, then
@@ -4357,6 +4411,20 @@ func (p *Parser) parseAssignmentExpressionOrHigherWorker(allowReturnTypeInArrowF
 	return p.parseConditionalExpressionRest(expr, pos, allowReturnTypeInArrowFunction)
 }
 
+func (p *Parser) isKvsFailurePromotion() bool {
+	if p.token != ast.KindTildeToken || p.hasPrecedingLineBreak() {
+		return false
+	}
+	firstTildeEnd := p.scanner.TokenEnd()
+	return p.lookAhead(func(p *Parser) bool {
+		if p.nextToken() != ast.KindTildeToken || p.scanner.TokenStart() != firstTildeEnd {
+			return false
+		}
+		p.nextToken()
+		return p.isStartOfExpression()
+	})
+}
+
 func (p *Parser) isKvsExtantAssignment() bool {
 	if p.token != ast.KindQuestionToken {
 		return false
@@ -4364,6 +4432,26 @@ func (p *Parser) isKvsExtantAssignment() bool {
 	questionEnd := p.scanner.TokenEnd()
 	return p.lookAhead(func(p *Parser) bool {
 		return p.nextToken() == ast.KindEqualsToken && p.scanner.TokenStart() == questionEnd
+	})
+}
+
+func (p *Parser) isKvsSieveAssignment() bool {
+	if p.token != ast.KindTildeToken {
+		return false
+	}
+	tildeEnd := p.scanner.TokenEnd()
+	return p.lookAhead(func(p *Parser) bool {
+		return p.nextToken() == ast.KindEqualsToken && p.scanner.TokenStart() == tildeEnd
+	})
+}
+
+func (p *Parser) isKvsFailureDemotion(leftEnd int) bool {
+	if p.token != ast.KindTildeToken || p.hasPrecedingLineBreak() || p.isKvsFailurePromotion() || p.isKvsSieveAssignment() || p.isKvsCatchSplit(leftEnd) {
+		return false
+	}
+	return p.lookAhead(func(p *Parser) bool {
+		p.nextToken()
+		return p.isStartOfExpression()
 	})
 }
 

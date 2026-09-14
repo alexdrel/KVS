@@ -1,0 +1,191 @@
+//// [tests/cases/conformance/kvs/kvsFailurePromotion.ts] ////
+
+=== kvsFailurePromotion.ts ===
+class UserNotFound extends Error {}
+>UserNotFound : UserNotFound
+>Error : Error
+
+declare function findUser(id: string): { name: string }?;
+>findUser : (id: string) => { name: string; }?
+>id : string
+>name : string
+
+declare function findUserAsync(id: string): Promise<{ name: string }?>;
+>findUserAsync : (id: string) => Promise<{ name: string; }?>
+>id : string
+>name : string
+
+function missingUser(id: string): Error {
+>missingUser : (id: string) => Error
+>id : string
+
+    return new UserNotFound(id);
+>new UserNotFound(id) : UserNotFound
+>UserNotFound : typeof UserNotFound
+>id : string
+}
+
+const user = findUser("one") ~~ new UserNotFound("one");
+>user : { name: string; }
+>findUser("one") ~~ new UserNotFound("one") : { name: string; }
+>findUser("one") : { name: string; } | null | undefined
+>findUser : (id: string) => { name: string; }?
+>"one" : "one"
+>new UserNotFound("one") : UserNotFound
+>UserNotFound : typeof UserNotFound
+>"one" : "one"
+
+const userName = (findUser("two") ~~ missingUser("two")).name;
+>userName : string
+>(findUser("two") ~~ missingUser("two")).name : string
+>(findUser("two") ~~ missingUser("two")) : { name: string; }
+>findUser("two") ~~ missingUser("two") : { name: string; }
+>findUser("two") : { name: string; } | null | undefined
+>findUser : (id: string) => { name: string; }?
+>"two" : "two"
+>missingUser("two") : Error
+>missingUser : (id: string) => Error
+>"two" : "two"
+>name : string
+
+const builtInFactory = findUser("builtin") ~~ Error("missing");
+>builtInFactory : { name: string; }
+>findUser("builtin") ~~ Error("missing") : { name: string; }
+>findUser("builtin") : { name: string; } | null | undefined
+>findUser : (id: string) => { name: string; }?
+>"builtin" : "builtin"
+>Error("missing") : Error
+>Error : ErrorConstructor
+>"missing" : "missing"
+
+const explicitCause = findUser("cause") ~~ new Error("missing", { cause: "explicit" });
+>explicitCause : { name: string; }
+>findUser("cause") ~~ new Error("missing", { cause: "explicit" }) : { name: string; }
+>findUser("cause") : { name: string; } | null | undefined
+>findUser : (id: string) => { name: string; }?
+>"cause" : "cause"
+>new Error("missing", { cause: "explicit" }) : Error
+>Error : ErrorConstructor
+>"missing" : "missing"
+>{ cause: "explicit" } : { cause: string; }
+>cause : string
+>"explicit" : "explicit"
+
+declare function acceptsPresentUser(user: { name: string }): void;
+>acceptsPresentUser : (user: { name: string; }) => void
+>user : { name: string; }
+>name : string
+
+acceptsPresentUser(user);
+>acceptsPresentUser(user) : void
+>acceptsPresentUser : (user: { name: string; }) => void
+>user : { name: string; }
+
+function requireUser(id: string) {
+>requireUser : (id: string) => { name: string; }
+>id : string
+
+    return findUser(id) ~~ new UserNotFound(id);
+>findUser(id) ~~ new UserNotFound(id) : { name: string; }
+>findUser(id) : { name: string; } | null | undefined
+>findUser : (id: string) => { name: string; }?
+>id : string
+>new UserNotFound(id) : UserNotFound
+>UserNotFound : typeof UserNotFound
+>id : string
+}
+
+const record = {
+>record : { user: { name: string; }; }
+>{    user: findUser("three") ~~ missingUser("three"),} : { user: { name: string; }; }
+
+    user: findUser("three") ~~ missingUser("three"),
+>user : { name: string; }
+>findUser("three") ~~ missingUser("three") : { name: string; }
+>findUser("three") : { name: string; } | null | undefined
+>findUser : (id: string) => { name: string; }?
+>"three" : "three"
+>missingUser("three") : Error
+>missingUser : (id: string) => Error
+>"three" : "three"
+
+};
+
+let assigned: { name: string };
+>assigned : { name: string; }
+>name : string
+
+assigned = findUser("four") ~~ new UserNotFound("four");
+>assigned = findUser("four") ~~ new UserNotFound("four") : { name: string; }
+>assigned : { name: string; }
+>findUser("four") ~~ new UserNotFound("four") : { name: string; }
+>findUser("four") : { name: string; } | null | undefined
+>findUser : (id: string) => { name: string; }?
+>"four" : "four"
+>new UserNotFound("four") : UserNotFound
+>UserNotFound : typeof UserNotFound
+>"four" : "four"
+
+async function requireUserAsync(id: string) {
+>requireUserAsync : (id: string) => Promise<{ name: string; }>
+>id : string
+
+    return await findUserAsync(id) ~~ new UserNotFound(id);
+>await findUserAsync(id) ~~ new UserNotFound(id) : { name: string; }
+>await findUserAsync(id) : { name: string; } | null | undefined
+>findUserAsync(id) : Promise<{ name: string; } | null | undefined>
+>findUserAsync : (id: string) => Promise<{ name: string; }?>
+>id : string
+>new UserNotFound(id) : UserNotFound
+>UserNotFound : typeof UserNotFound
+>id : string
+}
+
+const wrongReplacement = findUser("five") ~~ "missing";
+>wrongReplacement : { name: string; }
+>findUser("five") ~~ "missing" : { name: string; }
+>findUser("five") : { name: string; } | null | undefined
+>findUser : (id: string) => { name: string; }?
+>"five" : "five"
+>"missing" : "missing"
+
+consume(findUser("six") ~~ missingUser("six"));
+>consume(findUser("six") ~~ missingUser("six")) : void
+>consume : (value: { name: string; }) => void
+>findUser("six") ~~ missingUser("six") : { name: string; }
+>findUser("six") : { name: string; } | null | undefined
+>findUser : (id: string) => { name: string; }?
+>"six" : "six"
+>missingUser("six") : Error
+>missingUser : (id: string) => Error
+>"six" : "six"
+
+const branch = true ? findUser("seven") ~~ missingUser("seven") : user;
+>branch : { name: string; }
+>true ? findUser("seven") ~~ missingUser("seven") : user : { name: string; }
+>true : true
+>findUser("seven") ~~ missingUser("seven") : { name: string; }
+>findUser("seven") : { name: string; } | null | undefined
+>findUser : (id: string) => { name: string; }?
+>"seven" : "seven"
+>missingUser("seven") : Error
+>missingUser : (id: string) => Error
+>"seven" : "seven"
+>user : { name: string; }
+
+const list = [findUser("eight") ~~ missingUser("eight")];
+>list : { name: string; }[]
+>[findUser("eight") ~~ missingUser("eight")] : { name: string; }[]
+>findUser("eight") ~~ missingUser("eight") : { name: string; }
+>findUser("eight") : { name: string; } | null | undefined
+>findUser : (id: string) => { name: string; }?
+>"eight" : "eight"
+>missingUser("eight") : Error
+>missingUser : (id: string) => Error
+>"eight" : "eight"
+
+declare function consume(value: { name: string }): void;
+>consume : (value: { name: string; }) => void
+>value : { name: string; }
+>name : string
+

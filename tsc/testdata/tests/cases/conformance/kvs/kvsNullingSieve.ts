@@ -74,6 +74,26 @@ const propagated = ~~throws();
 const compact ~= nullableItems;
 let mutable ~= items;
 
+let assigned: number[]? = null;
+assigned ~= items;
+const assignedResult = assigned ~= nullableItems;
+
+let targetEvaluations = 0;
+let assignmentEvaluations = 0;
+const holder: { value: number[]? } = { value: null };
+function assignmentTarget() {
+    targetEvaluations++;
+    return holder;
+}
+function assignmentValue() {
+    assignmentEvaluations++;
+    return [] as number[];
+}
+const memberAssignmentResult = assignmentTarget().value ~= assignmentValue();
+
+let incompatibleTarget: string? = null;
+incompatibleTarget ~= items;
+
 if (const rejected ~= []) {
     rejected;
 }

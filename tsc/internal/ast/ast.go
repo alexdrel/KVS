@@ -1138,7 +1138,7 @@ func (n *Node) ElementList() *NodeList {
 		return n.AsNamedImports().Elements
 	case KindNamedExports:
 		return n.AsNamedExports().Elements
-	case KindObjectBindingPattern, KindArrayBindingPattern:
+	case KindObjectBindingPattern, KindArrayBindingPattern, KindKvsCatchSplitBindingPattern:
 		return n.AsBindingPattern().Elements
 	case KindArrayLiteralExpression:
 		return n.AsArrayLiteralExpression().Elements
@@ -1830,7 +1830,7 @@ func (node *BindingPattern) computeSubtreeFacts() SubtreeFacts {
 	switch node.Kind {
 	case KindObjectBindingPattern:
 		return propagateNodeListSubtreeFacts(node.Elements, propagateObjectBindingElementSubtreeFacts)
-	case KindArrayBindingPattern:
+	case KindArrayBindingPattern, KindKvsCatchSplitBindingPattern:
 		return propagateNodeListSubtreeFacts(node.Elements, propagateBindingElementSubtreeFacts)
 	default:
 		return SubtreeFactsNone
@@ -2279,6 +2279,14 @@ func (node *NonNullExpression) computeSubtreeFacts() SubtreeFacts {
 
 func (node *KvsDefaultExpression) computeSubtreeFacts() SubtreeFacts {
 	return propagateSubtreeFacts(node.Expression)
+}
+
+func (node *KvsFailureDemotionExpression) computeSubtreeFacts() SubtreeFacts {
+	return propagateSubtreeFacts(node.Expression) | propagateSubtreeFacts(node.Pattern)
+}
+
+func (node *KvsFailurePromotionExpression) computeSubtreeFacts() SubtreeFacts {
+	return propagateSubtreeFacts(node.Expression) | propagateSubtreeFacts(node.Replacement)
 }
 
 func (node *SpreadElement) computeSubtreeFacts() SubtreeFacts {

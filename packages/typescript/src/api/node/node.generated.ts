@@ -706,6 +706,9 @@ export class RemoteNode extends RemoteNodeBase implements Node {
     get equalsToken(): RemoteNode | undefined {
         return this.getNamedChild("equalsToken") as RemoteNode;
     }
+    get errorTarget(): RemoteNode | undefined {
+        return this.getNamedChild("errorTarget") as RemoteNode;
+    }
     get exclamationToken(): RemoteNode | undefined {
         return this.getNamedChild("exclamationToken") as RemoteNode;
     }
@@ -817,6 +820,9 @@ export class RemoteNode extends RemoteNodeBase implements Node {
     get parameters(): RemoteNodeList | undefined {
         return this.getNamedChild("parameters") as RemoteNodeList;
     }
+    get pattern(): RemoteNode | undefined {
+        return this.getNamedChild("pattern") as RemoteNode;
+    }
     get postfixToken(): RemoteNode | undefined {
         return this.getNamedChild("postfixToken") as RemoteNode;
     }
@@ -837,6 +843,9 @@ export class RemoteNode extends RemoteNodeBase implements Node {
     }
     get readonlyToken(): RemoteNode | undefined {
         return this.getNamedChild("readonlyToken") as RemoteNode;
+    }
+    get replacement(): RemoteNode | undefined {
+        return this.getNamedChild("replacement") as RemoteNode;
     }
     get result(): RemoteNode | undefined {
         return this.getNamedChild("result") as RemoteNode;
@@ -915,6 +924,9 @@ export class RemoteNode extends RemoteNodeBase implements Node {
     }
     get value(): RemoteNode | undefined {
         return this.getNamedChild("value") as RemoteNode;
+    }
+    get valueTarget(): RemoteNode | undefined {
+        return this.getNamedChild("valueTarget") as RemoteNode;
     }
     get variableDeclaration(): RemoteNode | undefined {
         return this.getNamedChild("variableDeclaration") as RemoteNode;

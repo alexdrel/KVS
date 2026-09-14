@@ -110,6 +110,26 @@ The inferred binding suffixes on `let value?`, `const value!`, and
 
 KVS callable types use the ordinary `=>` form. Closures retain, suspend, forward, and capture context according to the ordinary callback and context rules.
 
+## Catch-and-split
+
+```kvs
+const value~error = operation();
+```
+
+evaluates the operation once under an ordinary `try`/`catch` and initializes
+both bindings from that single outcome. Success stores the returned value and
+null; failure stores null and the caught JavaScript value. Assignment form uses
+the same operation:
+
+```kvs
+value~error = retry();
+```
+
+The lowering does not carry a hidden success bit. Consequently, returning null
+and throwing null both leave the two bindings null. Await remains inside the
+protected operation, so a rejected promise is split like a synchronous throw.
+The caught value is neither wrapped nor normalized.
+
 ## Terminal defaults
 
 ```kvs
@@ -143,13 +163,16 @@ strategy, such as `unknown` or a mixed union.
 ```kvs
 const items = ~~readItems();
 if (const usable ~= readItems()) process(usable);
+cachedItems ~= readItems();
 ```
 
 Every lowering evaluates the operand once, preserves the identity of an
 accepted value, normalizes a rejected value to null, and lets exceptions
-propagate. Declaration `~=` lowers through the same operation. No non-empty
-array or record type is introduced; normal successful-condition narrowing only
-removes absence from the filtered result.
+propagate. Declaration and assignment `~=` lower through the same operation.
+Assignment evaluates its target before the right-hand expression and always
+writes the filtered result, including null. No non-empty array or record type
+is introduced; normal successful-condition narrowing only removes absence from
+the filtered result.
 
 Conditional placement likewise evaluates once, in order:
 
@@ -304,7 +327,21 @@ const error = $error;
 
 ## Outcome conversion
 
-Value sentinels lower to checks; exception patterns lower to selective catches. `expression ~~ replacement` lowers to a catch plus an absence check. Absence throws the replacement without a cause; a caught value is supplied as `.cause` unless construction explicitly provided a cause. The caught value is never normalized and may have any JavaScript type.
+Failure demotion classifies its pattern statically. Non-error-constructor
+patterns lower to `Object.is` checks over a once-only captured value. Error
+constructors lower to selective `try`/`catch` with `instanceof`; unmatched
+throws are rethrown unchanged. Chained `~` operations lower left-associatively.
+
+`expression ~~ replacement` lowers to a catch plus an absence check. Absence
+throws the replacement without a cause; a caught value is supplied as `.cause`
+unless the replacement already has a `cause` property. Returned absence and
+thrown null or undefined deliberately converge. The replacement is constructed
+only on the failure path and must have an `Error` type.
+
+Promotion reuses the statement-head lowering boundary established by
+collect/select. Its happy path is a direct expression inside `try`, with no
+runtime helper, IIFE, or closure. This inherits that boundary's documented
+ordering debts for assignment targets and object fields.
 
 ## JavaScript interoperation
 

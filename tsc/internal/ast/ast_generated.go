@@ -43,6 +43,8 @@ type NodeFactory struct {
 	jsdocUnknownTagArena                     core.Arena[JSDocUnknownTag]
 	keywordExpressionArena                   core.Arena[KeywordExpression]
 	keywordTypeNodeArena                     core.Arena[KeywordTypeNode]
+	kvsCatchSplitAssignmentExpressionArena   core.Arena[KvsCatchSplitAssignmentExpression]
+	kvsCatchSplitExpressionArena             core.Arena[KvsCatchSplitExpression]
 	kvsCollectExpressionArena                core.Arena[KvsCollectExpression]
 	kvsComparisonAlternativesExpressionArena core.Arena[KvsComparisonAlternativesExpression]
 	kvsComparisonChainExpressionArena        core.Arena[KvsComparisonChainExpression]
@@ -53,6 +55,8 @@ type NodeFactory struct {
 	kvsExtantTestExpressionArena             core.Arena[KvsExtantTestExpression]
 	kvsExtantTypeArena                       core.Arena[KvsExtantType]
 	kvsExtantYieldStatementArena             core.Arena[KvsExtantYieldStatement]
+	kvsFailureDemotionExpressionArena        core.Arena[KvsFailureDemotionExpression]
+	kvsFailurePromotionExpressionArena       core.Arena[KvsFailurePromotionExpression]
 	kvsForExpressionArena                    core.Arena[KvsForExpression]
 	kvsIfBindingClauseArena                  core.Arena[KvsIfBindingClause]
 	kvsIfBindingStatementArena               core.Arena[KvsIfBindingStatement]
@@ -61,6 +65,7 @@ type NodeFactory struct {
 	kvsNullingExpressionArena                core.Arena[KvsNullingExpression]
 	kvsNullingSieveExpressionArena           core.Arena[KvsNullingSieveExpression]
 	kvsSelectExpressionArena                 core.Arena[KvsSelectExpression]
+	kvsSieveAssignmentExpressionArena        core.Arena[KvsSieveAssignmentExpression]
 	kvsSieveBindingInitializerArena          core.Arena[KvsSieveBindingInitializer]
 	kvsYieldStatementArena                   core.Arena[KvsYieldStatement]
 	literalTypeNodeArena                     core.Arena[LiteralTypeNode]
@@ -304,6 +309,11 @@ type (
 	KvsDefaultExpressionNode                = Node
 	KvsNullingSieveExpressionNode           = Node
 	KvsSieveBindingInitializerNode          = Node
+	KvsSieveAssignmentExpressionNode        = Node
+	KvsFailureDemotionExpressionNode        = Node
+	KvsFailurePromotionExpressionNode       = Node
+	KvsCatchSplitExpressionNode             = Node
+	KvsCatchSplitAssignmentExpressionNode   = Node
 	KvsComparisonAlternativesExpressionNode = Node
 	KvsComparisonChainExpressionNode        = Node
 	KvsNullingExpressionNode                = Node
@@ -2059,6 +2069,235 @@ func IsKvsSieveBindingInitializer(node *Node) bool {
 }
 
 // ──────────────────────────────────────────────────────────────────────
+// KvsSieveAssignmentExpression
+// ──────────────────────────────────────────────────────────────────────
+
+type KvsSieveAssignmentExpression struct {
+	ExpressionBase
+	CompositeBase
+	Left        *Expression
+	TildeToken  *TildeToken
+	EqualsToken *EqualsToken
+	Right       *Expression
+}
+
+func (f *NodeFactory) NewKvsSieveAssignmentExpression(left *Expression, tildeToken *TildeToken, equalsToken *EqualsToken, right *Expression) *Node {
+	data := f.kvsSieveAssignmentExpressionArena.New()
+	data.Left = left
+	data.TildeToken = tildeToken
+	data.EqualsToken = equalsToken
+	data.Right = right
+	return f.newNode(KindKvsSieveAssignmentExpression, data)
+}
+
+func (f *NodeFactory) UpdateKvsSieveAssignmentExpression(node *KvsSieveAssignmentExpression, left *Expression, tildeToken *TildeToken, equalsToken *EqualsToken, right *Expression) *Node {
+	if left != node.Left || tildeToken != node.TildeToken || equalsToken != node.EqualsToken || right != node.Right {
+		return updateNode(f.NewKvsSieveAssignmentExpression(left, tildeToken, equalsToken, right), node.AsNode(), f.hooks)
+	}
+	return node.AsNode()
+}
+
+func (node *KvsSieveAssignmentExpression) ForEachChild(v Visitor) bool {
+	return visit(v, node.Left) ||
+		visit(v, node.TildeToken) ||
+		visit(v, node.EqualsToken) ||
+		visit(v, node.Right)
+}
+
+func (node *KvsSieveAssignmentExpression) VisitEachChild(v *NodeVisitor) *Node {
+	return v.Factory.UpdateKvsSieveAssignmentExpression(node, v.visitNode(node.Left), v.visitNode(node.TildeToken), v.visitNode(node.EqualsToken), v.visitNode(node.Right))
+}
+
+func (node *KvsSieveAssignmentExpression) Clone(f NodeFactoryCoercible) *Node {
+	return cloneNode(f.AsNodeFactory().NewKvsSieveAssignmentExpression(node.Left, node.TildeToken, node.EqualsToken, node.Right), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func IsKvsSieveAssignmentExpression(node *Node) bool {
+	return node.Kind == KindKvsSieveAssignmentExpression
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// KvsFailureDemotionExpression
+// ──────────────────────────────────────────────────────────────────────
+
+type KvsFailureDemotionExpression struct {
+	ExpressionBase
+	CompositeBase
+	Expression *Expression
+	TildeToken *TildeToken
+	Pattern    *Expression
+}
+
+func (f *NodeFactory) NewKvsFailureDemotionExpression(expression *Expression, tildeToken *TildeToken, pattern *Expression) *Node {
+	data := f.kvsFailureDemotionExpressionArena.New()
+	data.Expression = expression
+	data.TildeToken = tildeToken
+	data.Pattern = pattern
+	return f.newNode(KindKvsFailureDemotionExpression, data)
+}
+
+func (f *NodeFactory) UpdateKvsFailureDemotionExpression(node *KvsFailureDemotionExpression, expression *Expression, tildeToken *TildeToken, pattern *Expression) *Node {
+	if expression != node.Expression || tildeToken != node.TildeToken || pattern != node.Pattern {
+		return updateNode(f.NewKvsFailureDemotionExpression(expression, tildeToken, pattern), node.AsNode(), f.hooks)
+	}
+	return node.AsNode()
+}
+
+func (node *KvsFailureDemotionExpression) ForEachChild(v Visitor) bool {
+	return visit(v, node.Expression) || visit(v, node.TildeToken) || visit(v, node.Pattern)
+}
+
+func (node *KvsFailureDemotionExpression) VisitEachChild(v *NodeVisitor) *Node {
+	return v.Factory.UpdateKvsFailureDemotionExpression(node, v.visitNode(node.Expression), v.visitNode(node.TildeToken), v.visitNode(node.Pattern))
+}
+
+func (node *KvsFailureDemotionExpression) Clone(f NodeFactoryCoercible) *Node {
+	return cloneNode(f.AsNodeFactory().NewKvsFailureDemotionExpression(node.Expression, node.TildeToken, node.Pattern), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func IsKvsFailureDemotionExpression(node *Node) bool {
+	return node.Kind == KindKvsFailureDemotionExpression
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// KvsFailurePromotionExpression
+// ──────────────────────────────────────────────────────────────────────
+
+type KvsFailurePromotionExpression struct {
+	ExpressionBase
+	CompositeBase
+	Expression       *Expression
+	FirstTildeToken  *TildeToken
+	SecondTildeToken *TildeToken
+	Replacement      *Expression
+}
+
+func (f *NodeFactory) NewKvsFailurePromotionExpression(expression *Expression, firstTildeToken *TildeToken, secondTildeToken *TildeToken, replacement *Expression) *Node {
+	data := f.kvsFailurePromotionExpressionArena.New()
+	data.Expression = expression
+	data.FirstTildeToken = firstTildeToken
+	data.SecondTildeToken = secondTildeToken
+	data.Replacement = replacement
+	return f.newNode(KindKvsFailurePromotionExpression, data)
+}
+
+func (f *NodeFactory) UpdateKvsFailurePromotionExpression(node *KvsFailurePromotionExpression, expression *Expression, firstTildeToken *TildeToken, secondTildeToken *TildeToken, replacement *Expression) *Node {
+	if expression != node.Expression || firstTildeToken != node.FirstTildeToken || secondTildeToken != node.SecondTildeToken || replacement != node.Replacement {
+		return updateNode(f.NewKvsFailurePromotionExpression(expression, firstTildeToken, secondTildeToken, replacement), node.AsNode(), f.hooks)
+	}
+	return node.AsNode()
+}
+
+func (node *KvsFailurePromotionExpression) ForEachChild(v Visitor) bool {
+	return visit(v, node.Expression) ||
+		visit(v, node.FirstTildeToken) ||
+		visit(v, node.SecondTildeToken) ||
+		visit(v, node.Replacement)
+}
+
+func (node *KvsFailurePromotionExpression) VisitEachChild(v *NodeVisitor) *Node {
+	return v.Factory.UpdateKvsFailurePromotionExpression(node, v.visitNode(node.Expression), v.visitNode(node.FirstTildeToken), v.visitNode(node.SecondTildeToken), v.visitNode(node.Replacement))
+}
+
+func (node *KvsFailurePromotionExpression) Clone(f NodeFactoryCoercible) *Node {
+	return cloneNode(f.AsNodeFactory().NewKvsFailurePromotionExpression(node.Expression, node.FirstTildeToken, node.SecondTildeToken, node.Replacement), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func IsKvsFailurePromotionExpression(node *Node) bool {
+	return node.Kind == KindKvsFailurePromotionExpression
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// KvsCatchSplitExpression
+// ──────────────────────────────────────────────────────────────────────
+
+type KvsCatchSplitExpression struct {
+	ExpressionBase
+	CompositeBase
+	Expression *Expression
+}
+
+func (f *NodeFactory) NewKvsCatchSplitExpression(expression *Expression) *Node {
+	data := f.kvsCatchSplitExpressionArena.New()
+	data.Expression = expression
+	return f.newNode(KindKvsCatchSplitExpression, data)
+}
+
+func (f *NodeFactory) UpdateKvsCatchSplitExpression(node *KvsCatchSplitExpression, expression *Expression) *Node {
+	if expression != node.Expression {
+		return updateNode(f.NewKvsCatchSplitExpression(expression), node.AsNode(), f.hooks)
+	}
+	return node.AsNode()
+}
+
+func (node *KvsCatchSplitExpression) ForEachChild(v Visitor) bool {
+	return visit(v, node.Expression)
+}
+
+func (node *KvsCatchSplitExpression) VisitEachChild(v *NodeVisitor) *Node {
+	return v.Factory.UpdateKvsCatchSplitExpression(node, v.visitNode(node.Expression))
+}
+
+func (node *KvsCatchSplitExpression) Clone(f NodeFactoryCoercible) *Node {
+	return cloneNode(f.AsNodeFactory().NewKvsCatchSplitExpression(node.Expression), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func IsKvsCatchSplitExpression(node *Node) bool {
+	return node.Kind == KindKvsCatchSplitExpression
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// KvsCatchSplitAssignmentExpression
+// ──────────────────────────────────────────────────────────────────────
+
+type KvsCatchSplitAssignmentExpression struct {
+	ExpressionBase
+	CompositeBase
+	ValueTarget *Expression
+	TildeToken  *TildeToken
+	ErrorTarget *Expression
+	EqualsToken *EqualsToken
+	Expression  *Expression
+}
+
+func (f *NodeFactory) NewKvsCatchSplitAssignmentExpression(valueTarget *Expression, tildeToken *TildeToken, errorTarget *Expression, equalsToken *EqualsToken, expression *Expression) *Node {
+	data := f.kvsCatchSplitAssignmentExpressionArena.New()
+	data.ValueTarget = valueTarget
+	data.TildeToken = tildeToken
+	data.ErrorTarget = errorTarget
+	data.EqualsToken = equalsToken
+	data.Expression = expression
+	return f.newNode(KindKvsCatchSplitAssignmentExpression, data)
+}
+
+func (f *NodeFactory) UpdateKvsCatchSplitAssignmentExpression(node *KvsCatchSplitAssignmentExpression, valueTarget *Expression, tildeToken *TildeToken, errorTarget *Expression, equalsToken *EqualsToken, expression *Expression) *Node {
+	if valueTarget != node.ValueTarget || tildeToken != node.TildeToken || errorTarget != node.ErrorTarget || equalsToken != node.EqualsToken || expression != node.Expression {
+		return updateNode(f.NewKvsCatchSplitAssignmentExpression(valueTarget, tildeToken, errorTarget, equalsToken, expression), node.AsNode(), f.hooks)
+	}
+	return node.AsNode()
+}
+
+func (node *KvsCatchSplitAssignmentExpression) ForEachChild(v Visitor) bool {
+	return visit(v, node.ValueTarget) ||
+		visit(v, node.TildeToken) ||
+		visit(v, node.ErrorTarget) ||
+		visit(v, node.EqualsToken) ||
+		visit(v, node.Expression)
+}
+
+func (node *KvsCatchSplitAssignmentExpression) VisitEachChild(v *NodeVisitor) *Node {
+	return v.Factory.UpdateKvsCatchSplitAssignmentExpression(node, v.visitNode(node.ValueTarget), v.visitNode(node.TildeToken), v.visitNode(node.ErrorTarget), v.visitNode(node.EqualsToken), v.visitNode(node.Expression))
+}
+
+func (node *KvsCatchSplitAssignmentExpression) Clone(f NodeFactoryCoercible) *Node {
+	return cloneNode(f.AsNodeFactory().NewKvsCatchSplitAssignmentExpression(node.ValueTarget, node.TildeToken, node.ErrorTarget, node.EqualsToken, node.Expression), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func IsKvsCatchSplitAssignmentExpression(node *Node) bool {
+	return node.Kind == KindKvsCatchSplitAssignmentExpression
+}
+
+// ──────────────────────────────────────────────────────────────────────
 // KvsComparisonAlternativesExpression
 // ──────────────────────────────────────────────────────────────────────
 
@@ -2812,6 +3051,10 @@ func IsObjectBindingPattern(node *Node) bool {
 
 func IsArrayBindingPattern(node *Node) bool {
 	return node.Kind == KindArrayBindingPattern
+}
+
+func IsKvsCatchSplitBindingPattern(node *Node) bool {
+	return node.Kind == KindKvsCatchSplitBindingPattern
 }
 
 // ──────────────────────────────────────────────────────────────────────
@@ -9817,6 +10060,16 @@ func (n *Node) ForEachChild(v Visitor) bool {
 		return n.data.(*KvsNullingSieveExpression).ForEachChild(v)
 	case KindKvsSieveBindingInitializer:
 		return n.data.(*KvsSieveBindingInitializer).ForEachChild(v)
+	case KindKvsSieveAssignmentExpression:
+		return n.data.(*KvsSieveAssignmentExpression).ForEachChild(v)
+	case KindKvsFailureDemotionExpression:
+		return n.data.(*KvsFailureDemotionExpression).ForEachChild(v)
+	case KindKvsFailurePromotionExpression:
+		return n.data.(*KvsFailurePromotionExpression).ForEachChild(v)
+	case KindKvsCatchSplitExpression:
+		return n.data.(*KvsCatchSplitExpression).ForEachChild(v)
+	case KindKvsCatchSplitAssignmentExpression:
+		return n.data.(*KvsCatchSplitAssignmentExpression).ForEachChild(v)
 	case KindKvsComparisonAlternativesExpression:
 		return n.data.(*KvsComparisonAlternativesExpression).ForEachChild(v)
 	case KindKvsComparisonChainExpression:
@@ -9847,7 +10100,7 @@ func (n *Node) ForEachChild(v Visitor) bool {
 		return n.data.(*VariableDeclaration).ForEachChild(v)
 	case KindVariableDeclarationList:
 		return n.data.(*VariableDeclarationList).ForEachChild(v)
-	case KindObjectBindingPattern, KindArrayBindingPattern:
+	case KindObjectBindingPattern, KindArrayBindingPattern, KindKvsCatchSplitBindingPattern:
 		return n.data.(*BindingPattern).ForEachChild(v)
 	case KindParameter:
 		return n.data.(*ParameterDeclaration).ForEachChild(v)
@@ -10284,6 +10537,26 @@ func (n *Node) AsKvsNullingSieveExpression() *KvsNullingSieveExpression {
 
 func (n *Node) AsKvsSieveBindingInitializer() *KvsSieveBindingInitializer {
 	return n.data.(*KvsSieveBindingInitializer)
+}
+
+func (n *Node) AsKvsSieveAssignmentExpression() *KvsSieveAssignmentExpression {
+	return n.data.(*KvsSieveAssignmentExpression)
+}
+
+func (n *Node) AsKvsFailureDemotionExpression() *KvsFailureDemotionExpression {
+	return n.data.(*KvsFailureDemotionExpression)
+}
+
+func (n *Node) AsKvsFailurePromotionExpression() *KvsFailurePromotionExpression {
+	return n.data.(*KvsFailurePromotionExpression)
+}
+
+func (n *Node) AsKvsCatchSplitExpression() *KvsCatchSplitExpression {
+	return n.data.(*KvsCatchSplitExpression)
+}
+
+func (n *Node) AsKvsCatchSplitAssignmentExpression() *KvsCatchSplitAssignmentExpression {
+	return n.data.(*KvsCatchSplitAssignmentExpression)
 }
 
 func (n *Node) AsKvsComparisonAlternativesExpression() *KvsComparisonAlternativesExpression {

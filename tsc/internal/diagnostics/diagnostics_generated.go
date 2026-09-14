@@ -4446,6 +4446,10 @@ var KVS_equality_between_two_values_that_may_both_be_absent_is_not_allowed_compa
 
 var KVS_runtime_comparison_alternatives_must_be_an_array = &Message{code: 100078, category: CategoryError, key: "KVS_runtime_comparison_alternatives_must_be_an_array_100078", text: "KVS runtime comparison alternatives must be an array."}
 
+var KVS_infix_must_be_at_the_head_of_a_supported_value_expression = &Message{code: 100079, category: CategoryError, key: "KVS_infix_must_be_at_the_head_of_a_supported_value_expression_100079", text: "KVS infix '~~' must be at the head of a supported value expression."}
+
+var KVS_infix_replacement_must_produce_an_Error = &Message{code: 100080, category: CategoryError, key: "KVS_infix_replacement_must_produce_an_Error_100080", text: "KVS infix '~~' replacement must produce an Error."}
+
 func keyToMessage(key Key) *Message {
 	switch key {
 	case "Unterminated_string_literal_1002":
@@ -8892,6 +8896,10 @@ func keyToMessage(key Key) *Message {
 		return KVS_equality_between_two_values_that_may_both_be_absent_is_not_allowed_compare_absence_explicitly
 	case "KVS_runtime_comparison_alternatives_must_be_an_array_100078":
 		return KVS_runtime_comparison_alternatives_must_be_an_array
+	case "KVS_infix_must_be_at_the_head_of_a_supported_value_expression_100079":
+		return KVS_infix_must_be_at_the_head_of_a_supported_value_expression
+	case "KVS_infix_replacement_must_produce_an_Error_100080":
+		return KVS_infix_replacement_must_produce_an_Error
 	default:
 		return nil
 	}

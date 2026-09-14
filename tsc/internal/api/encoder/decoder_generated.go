@@ -343,6 +343,36 @@ func (d *astDecoder) createChildrenNode(kind ast.Kind, data uint32, childIndices
 		equalsToken := d.nodeAt(it.nextIf(mask, 1))
 		expression := d.nodeAt(it.nextIf(mask, 2))
 		return d.factory.NewKvsSieveBindingInitializer(tildeToken, equalsToken, expression), nil
+	case ast.KindKvsSieveAssignmentExpression:
+		it := newChildIter(childIndices)
+		left := d.nodeAt(it.nextIf(mask, 0))
+		tildeToken := d.nodeAt(it.nextIf(mask, 1))
+		equalsToken := d.nodeAt(it.nextIf(mask, 2))
+		right := d.nodeAt(it.nextIf(mask, 3))
+		return d.factory.NewKvsSieveAssignmentExpression(left, tildeToken, equalsToken, right), nil
+	case ast.KindKvsFailureDemotionExpression:
+		it := newChildIter(childIndices)
+		expression := d.nodeAt(it.nextIf(mask, 0))
+		tildeToken := d.nodeAt(it.nextIf(mask, 1))
+		pattern := d.nodeAt(it.nextIf(mask, 2))
+		return d.factory.NewKvsFailureDemotionExpression(expression, tildeToken, pattern), nil
+	case ast.KindKvsFailurePromotionExpression:
+		it := newChildIter(childIndices)
+		expression := d.nodeAt(it.nextIf(mask, 0))
+		firstTildeToken := d.nodeAt(it.nextIf(mask, 1))
+		secondTildeToken := d.nodeAt(it.nextIf(mask, 2))
+		replacement := d.nodeAt(it.nextIf(mask, 3))
+		return d.factory.NewKvsFailurePromotionExpression(expression, firstTildeToken, secondTildeToken, replacement), nil
+	case ast.KindKvsCatchSplitExpression:
+		return d.factory.NewKvsCatchSplitExpression(d.singleChild(childIndices)), nil
+	case ast.KindKvsCatchSplitAssignmentExpression:
+		it := newChildIter(childIndices)
+		valueTarget := d.nodeAt(it.nextIf(mask, 0))
+		tildeToken := d.nodeAt(it.nextIf(mask, 1))
+		errorTarget := d.nodeAt(it.nextIf(mask, 2))
+		equalsToken := d.nodeAt(it.nextIf(mask, 3))
+		expression := d.nodeAt(it.nextIf(mask, 4))
+		return d.factory.NewKvsCatchSplitAssignmentExpression(valueTarget, tildeToken, errorTarget, equalsToken, expression), nil
 	case ast.KindKvsComparisonAlternativesExpression:
 		it := newChildIter(childIndices)
 		subject := d.nodeAt(it.nextIf(mask, 0))
@@ -432,7 +462,7 @@ func (d *astDecoder) createChildrenNode(kind ast.Kind, data uint32, childIndices
 		return d.factory.NewVariableDeclaration(name, exclamationToken, typeNode, initializer), nil
 	case ast.KindVariableDeclarationList:
 		return d.factory.NewVariableDeclarationList(d.singleNodeListChild(childIndices), 0), nil
-	case ast.KindObjectBindingPattern, ast.KindArrayBindingPattern:
+	case ast.KindObjectBindingPattern, ast.KindArrayBindingPattern, ast.KindKvsCatchSplitBindingPattern:
 		return d.factory.NewBindingPattern(kind, d.singleNodeListChild(childIndices)), nil
 	case ast.KindParameter:
 		it := newChildIter(childIndices)

@@ -308,6 +308,42 @@ Run it with:
 go -C ./tsc test -run='TestLocal/kvsDefault' ./internal/testrunner
 ```
 
+## Catch-and-split slice
+
+`kvsCatchAndSplit.ts` checks `const` and `let` paired bindings, assignment,
+synchronous and awaited operations, nullable value inference, `unknown` error
+inference, exact caught-value transport, and once-only RHS evaluation. Its
+JavaScript baseline verifies ordinary `try`/`catch` lowering with no hidden
+success discriminator; returning null and throwing null are intentionally
+indistinguishable in the resulting pair.
+
+The same test verifies that both names are ordinary local bindings for
+unused-local analysis: with `noUnusedLocals`, an ignored error binding receives
+the standard TS6133 diagnostic, while read error bindings do not.
+
+Run it with:
+
+```sh
+go -C ./tsc test -run='TestLocal/kvsCatchAndSplit' ./internal/testrunner
+```
+
+## Failure-demotion slice
+
+`kvsFailureDemotion.ts` checks returned sentinels, `NaN`, object identity
+sentinels, error constructors, left-associative chaining, returned constructor
+values, awaited operations, and terminal `!` applied to demoted numeric
+sentinels. Its type baseline records nullable results before `!` and plain
+`number` afterward.
+Its JavaScript baseline verifies `Object.is` value matching, selective
+`instanceof` catches with unchanged rethrow, nested policy composition, and an
+async catch boundary around awaited work.
+
+Run it with:
+
+```sh
+go -C ./tsc test -run='TestLocal/kvsFailureDemotion' ./internal/testrunner
+```
+
 ## Nullable-operator slice
 
 `kvsNullableOperators.ts` checks lifted number and bigint operations, including
@@ -344,13 +380,14 @@ go -C ./tsc test -run='TestLocal/kvsCompactArray' ./internal/testrunner
 
 `kvsNullingSieve.ts` checks ordinary JavaScript truthiness for empty arrays and
 objects, identity-preserving `||`, prefix `~~` across primitive values, arrays,
-typed arrays, maps, sets, records, nullable operands, and class instances, and
-the `const`/`let` filtered-binding form `~=`. Its type baseline verifies that
+typed arrays, maps, sets, records, nullable operands, and class instances, the
+`const`/`let` filtered-binding form `~=`, and general filtered assignment. Its type baseline verifies that
 the result adds null without introducing a non-empty collection type. Its
 JavaScript baseline verifies type-directed primitive, `length`, `size`,
 `Object.keys`, and identity lowering; dynamic-helper fallback; once-only
-operand evaluation; identity preservation; exception propagation; and reuse
-of the same lowering for `~=`. It also verifies that `if (~~value)` narrows the
+operand evaluation; identity preservation; exception propagation; reuse of the
+same lowering for `~=`; and ordinary target-before-RHS assignment order. It
+also verifies that `if (~~value)` narrows the
 original operand through TypeScript's existing truthiness analysis.
 `kvsNullingSieveImportHelpers.ts` and
 `kvsNullingSieveNoEmitHelpers.ts` fence the helper's standard TypeScript flag
@@ -358,7 +395,7 @@ behavior.
 
 The test also fences syntax compatibility: contiguous `~~` has KVS filtering
 semantics, spaced `~ ~` remains JavaScript bitwise NOT, contiguous `~=` is a
-sieve binding, spaced `~ =` is rejected, and `var` sieve bindings are
+sieve binding or assignment, spaced `~ =` is rejected, and `var` sieve bindings are
 rejected. Existing TypeScript bitwise-NOT cases use spaced `~ ~` and `~ ~ ~`
 spellings so they continue to test ordinary JavaScript operators independently;
 contiguous KVS semantics are owned by the KVS conformance case.
@@ -367,6 +404,22 @@ Run it with:
 
 ```sh
 go -C ./tsc test -run='TestLocal/kvsNullingSieve' ./internal/testrunner
+```
+
+## Failure-promotion slice
+
+`kvsFailurePromotion.ts` verifies present-value pass-through and narrowing,
+lazy `Error` replacement for returned absence, caught-cause attachment that
+preserves an existing cause, awaited operations, and the supported declaration,
+assignment, return, property, and member-continuation heads. It also diagnoses
+non-`Error` replacements and placement in call
+arguments, conditional branches, and array elements. Its JavaScript baseline
+fences the direct `try` lowering and absence of a helper or closure.
+
+Run it with:
+
+```sh
+go -C ./tsc test -run='TestLocal/kvsFailurePromotion' ./internal/testrunner
 ```
 
 `kvsNullableEquality.ts` verifies that all four equality operators reject two

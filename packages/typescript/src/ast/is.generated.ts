@@ -184,6 +184,9 @@ import type {
     KeywordExpressionSyntaxKind,
     KeywordTypeNode,
     KeywordTypeSyntaxKind,
+    KvsCatchSplitAssignmentExpression,
+    KvsCatchSplitBindingPattern,
+    KvsCatchSplitExpression,
     KvsCollectExpression,
     KvsCompactArrayExpression,
     KvsCompactObjectExpression,
@@ -197,6 +200,8 @@ import type {
     KvsExtantTestExpression,
     KvsExtantType,
     KvsExtantYieldStatement,
+    KvsFailureDemotionExpression,
+    KvsFailurePromotionExpression,
     KvsForExpression,
     KvsIfBindingClause,
     KvsIfBindingStatement,
@@ -205,6 +210,7 @@ import type {
     KvsNullingExpression,
     KvsNullingSieveExpression,
     KvsSelectExpression,
+    KvsSieveAssignmentExpression,
     KvsSieveBindingInitializer,
     KvsYieldStatement,
     LabeledStatement,
@@ -651,6 +657,51 @@ export declare namespace isKvsSieveBindingInitializer {
     function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsSieveBindingInitializer>;
 }
 isKvsSieveBindingInitializer.Handle = isKvsSieveBindingInitializer as any;
+
+export function isKvsSieveAssignmentExpression(node: Node): node is KvsSieveAssignmentExpression {
+    return node.kind === SyntaxKind.KvsSieveAssignmentExpression;
+}
+
+export declare namespace isKvsSieveAssignmentExpression {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsSieveAssignmentExpression>;
+}
+isKvsSieveAssignmentExpression.Handle = isKvsSieveAssignmentExpression as any;
+
+export function isKvsFailureDemotionExpression(node: Node): node is KvsFailureDemotionExpression {
+    return node.kind === SyntaxKind.KvsFailureDemotionExpression;
+}
+
+export declare namespace isKvsFailureDemotionExpression {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsFailureDemotionExpression>;
+}
+isKvsFailureDemotionExpression.Handle = isKvsFailureDemotionExpression as any;
+
+export function isKvsFailurePromotionExpression(node: Node): node is KvsFailurePromotionExpression {
+    return node.kind === SyntaxKind.KvsFailurePromotionExpression;
+}
+
+export declare namespace isKvsFailurePromotionExpression {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsFailurePromotionExpression>;
+}
+isKvsFailurePromotionExpression.Handle = isKvsFailurePromotionExpression as any;
+
+export function isKvsCatchSplitExpression(node: Node): node is KvsCatchSplitExpression {
+    return node.kind === SyntaxKind.KvsCatchSplitExpression;
+}
+
+export declare namespace isKvsCatchSplitExpression {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsCatchSplitExpression>;
+}
+isKvsCatchSplitExpression.Handle = isKvsCatchSplitExpression as any;
+
+export function isKvsCatchSplitAssignmentExpression(node: Node): node is KvsCatchSplitAssignmentExpression {
+    return node.kind === SyntaxKind.KvsCatchSplitAssignmentExpression;
+}
+
+export declare namespace isKvsCatchSplitAssignmentExpression {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsCatchSplitAssignmentExpression>;
+}
+isKvsCatchSplitAssignmentExpression.Handle = isKvsCatchSplitAssignmentExpression as any;
 
 export function isKvsComparisonAlternativesExpression(node: Node): node is KvsComparisonAlternativesExpression {
     return node.kind === SyntaxKind.KvsComparisonAlternativesExpression;
@@ -2320,6 +2371,15 @@ export declare namespace isArrayBindingPattern {
 }
 isArrayBindingPattern.Handle = isArrayBindingPattern as any;
 
+export function isKvsCatchSplitBindingPattern(node: Node): node is KvsCatchSplitBindingPattern {
+    return node.kind === SyntaxKind.KvsCatchSplitBindingPattern;
+}
+
+export declare namespace isKvsCatchSplitBindingPattern {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsCatchSplitBindingPattern>;
+}
+isKvsCatchSplitBindingPattern.Handle = isKvsCatchSplitBindingPattern as any;
+
 export function isJSDocParameterTag(node: Node): node is JSDocParameterTag {
     return node.kind === SyntaxKind.JSDocParameterTag;
 }
@@ -2360,7 +2420,7 @@ isAccessExpression.Handle = isAccessExpression as any;
 
 export function isDeclarationName(node: Node): node is DeclarationName {
     const kind = node.kind;
-    return kind === SyntaxKind.Identifier || kind === SyntaxKind.PrivateIdentifier || kind === SyntaxKind.StringLiteral || kind === SyntaxKind.NumericLiteral || kind === SyntaxKind.BigIntLiteral || kind === SyntaxKind.NoSubstitutionTemplateLiteral || kind === SyntaxKind.ComputedPropertyName || kind === SyntaxKind.ObjectBindingPattern || kind === SyntaxKind.ArrayBindingPattern || kind === SyntaxKind.ElementAccessExpression;
+    return kind === SyntaxKind.Identifier || kind === SyntaxKind.PrivateIdentifier || kind === SyntaxKind.StringLiteral || kind === SyntaxKind.NumericLiteral || kind === SyntaxKind.BigIntLiteral || kind === SyntaxKind.NoSubstitutionTemplateLiteral || kind === SyntaxKind.ComputedPropertyName || kind === SyntaxKind.ObjectBindingPattern || kind === SyntaxKind.ArrayBindingPattern || kind === SyntaxKind.KvsCatchSplitBindingPattern || kind === SyntaxKind.ElementAccessExpression;
 }
 
 export declare namespace isDeclarationName {
@@ -2471,7 +2531,8 @@ export declare namespace isEntityName {
 isEntityName.Handle = isEntityName as any;
 
 export function isBindingName(node: Node): node is BindingName {
-    return node.kind === SyntaxKind.Identifier || node.kind === SyntaxKind.ObjectBindingPattern || node.kind === SyntaxKind.ArrayBindingPattern;
+    const kind = node.kind;
+    return kind === SyntaxKind.Identifier || kind === SyntaxKind.ObjectBindingPattern || kind === SyntaxKind.ArrayBindingPattern || kind === SyntaxKind.KvsCatchSplitBindingPattern;
 }
 
 export declare namespace isBindingName {
@@ -2782,7 +2843,8 @@ export declare namespace isCallOrNewExpression {
 isCallOrNewExpression.Handle = isCallOrNewExpression as any;
 
 export function isImportClauseOrBindingPattern(node: Node): node is ImportClauseOrBindingPattern {
-    return node.kind === SyntaxKind.ImportClause || node.kind === SyntaxKind.ObjectBindingPattern || node.kind === SyntaxKind.ArrayBindingPattern;
+    const kind = node.kind;
+    return kind === SyntaxKind.ImportClause || kind === SyntaxKind.ObjectBindingPattern || kind === SyntaxKind.ArrayBindingPattern || kind === SyntaxKind.KvsCatchSplitBindingPattern;
 }
 
 export declare namespace isImportClauseOrBindingPattern {

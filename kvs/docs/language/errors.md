@@ -76,9 +76,27 @@ This unifies two common JavaScript conventions:
 - sentinel results such as `NaN` or `-1`;
 - exceptions such as `SyntaxError` from `JSON.parse`.
 
-Patterns use type-appropriate exact matching. Literals and distinguished constants match returned sentinel values. A distinguished constant may require an intrinsic runtime check: `NaN`, for example, behaves like a singleton or `as const` pattern even though JavaScript requires `Number.isNaN` to recognize it.
+The static type of the pattern determines which outcome it matches. An `Error`
+constructor matches a thrown instance of that constructor, including
+subclasses, using JavaScript `instanceof`. Every other pattern matches only a
+normally returned value, using `Object.is`. Thus `NaN` works without a special
+case, object sentinels use identity, and `0` and `-0` remain distinct.
 
-An error-type pattern matches a thrown instance of that type, including subclasses. Unmatched returned values remain values, and unmatched thrown values propagate unchanged. The transpiler's emitted checks are an implementation detail.
+The left expression is evaluated once. A value pattern is evaluated once after
+the left expression returns; an error-constructor pattern is evaluated once
+after the left expression throws. A pattern is not evaluated for an outcome it
+cannot match. Unmatched returned values remain values, and unmatched thrown
+values propagate unchanged.
+
+`~` is left-associative, so policies compose without pattern-list syntax:
+
+```kvs
+const result = operation() ~ NaN ~ MathError;
+```
+
+This means `(operation() ~ NaN) ~ MathError`. Consequently the outer policy
+also sees a matching error thrown while evaluating the complete inner
+operation.
 
 ## Infix promotion of absence or failure
 
@@ -94,21 +112,37 @@ const user = find_user(id) ~~ UserNotFound(id);
 | null or undefined | throw the supplied exception |
 | thrown value | throw the supplied replacement error with the thrown value as `.cause` |
 
-An absent result throws the replacement error without a cause. A caught value is installed automatically as the replacement error's `.cause`; it may be any JavaScript value, including null or undefined:
+The result type is the left expression's non-nullable type. Code after `~~`
+therefore uses the promoted value directly, without another presence check.
+
+An absent result throws the replacement error without a cause. A non-null
+caught value is installed automatically as the replacement error's `.cause`:
 
 ```kvs
 const config = parse_config(text)
     ~~ InvalidConfiguration("Unable to parse configuration");
 ```
 
-If the error construction API supports an explicit cause, a supplied cause overrides automatic propagation. Explicit null therefore suppresses a caught cause:
+If the replacement already has a `cause` property, that explicit cause wins:
 
 ```kvs
 const config = parse_config(text)
-    ~~ InvalidConfiguration("Unable to parse configuration", { cause: null });
+    ~~ new Error("Unable to parse configuration", { cause: upstreamError });
 ```
 
-The replacement expression is evaluated only after absence or a thrown value. KVS preserves whether it is handling absence or a catch even when the caught value itself is null.
+The replacement expression must produce an `Error` and is evaluated only after
+absence or a thrown value. A class constructor still requires `new`; the plain
+call above denotes an ordinary factory function returning an error. KVS does
+not preserve a distinction between returned absence and `throw null` or
+`throw undefined`, so those unusual throws do not acquire an automatic cause.
+
+This operation currently lowers only at the head of a statement-owned value
+path: a single declaration initializer, assignment right-hand side, return or
+KVS yield, or object property initializer. Member and
+call continuations along the first-evaluated path are supported. Placement in
+a call argument, array element, conditional branch, or other nested expression
+is rejected because the protected operation lowers directly to statements,
+without an IIFE or happy-path closure.
 
 This infix failure-policy operation is distinct from
 [prefix `~~value`](values.md#filtering-truthy-and-non-empty-values), which

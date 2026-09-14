@@ -457,9 +457,19 @@ if (const items ~= getItems()) {
 
 `const value ~= expression` and `let value ~= expression` mean the same as
 binding `~~expression`. The right-hand expression is evaluated once, and the
-binding receives either the original value or null. This is declaration syntax,
-not a general compound assignment and not `?=`: `~=` always binds its filtered
-result, including null.
+binding receives either the original value or null.
+
+The same spelling is available as assignment:
+
+```kvs
+cachedItems ~= readItems();
+```
+
+This means `cachedItems = ~~readItems()`. Unlike `?=`, which skips the write
+when its right-hand value is absent, `~=` always writes its filtered result,
+including null. The assignment target is evaluated once before the right-hand
+expression, following ordinary JavaScript assignment order, and the whole
+expression produces the assigned filtered value.
 
 ### Nulling operator `?:`
 

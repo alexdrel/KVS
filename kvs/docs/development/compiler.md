@@ -82,6 +82,11 @@ and mutates the target only on the present path. The checker separately treats
 the left expression as an assignment target and checks the non-nullable part of
 the right type against it.
 
+Sieve assignment likewise remains a dedicated
+`KvsSieveAssignmentExpression`. Unlike extant assignment, it always writes, so
+its lowering can preserve ordinary JavaScript assignment order directly:
+evaluate the target reference, filter the right-hand value, then assign it.
+
 ### Return-like traversal
 
 `ast.ForEachReturnStatement` is used beyond ordinary statement traversal: by
