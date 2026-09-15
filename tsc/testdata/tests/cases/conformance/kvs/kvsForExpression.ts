@@ -82,6 +82,12 @@ function explicitNullableSource(entries: Entry[]?) {
     };
 }
 
+async function awaitedBody(entries: Entry[]) {
+    return for (const entry of entries; total = 0) {
+        total += await Promise.resolve(entry.value);
+    };
+}
+
 const total = 100;
 const shadowed = for (const entry of [] as Entry[]; total = 0) {
     total += entry.value;

@@ -1,4 +1,5 @@
 // @strict: true
+// @target: es2020
 
 interface Item {
     value: string;
@@ -16,4 +17,20 @@ function iterateOptionalItems() {
 
 for (const absentItem of undefined) {
     absentItem;
+}
+
+declare function getOptionalAsyncItems(): AsyncIterable<Item>?;
+
+async function iterateOptionalAsyncItems() {
+    const values: string[] = [];
+    for await (const item of getOptionalAsyncItems()) {
+        values.push(item.value);
+    }
+    return values;
+}
+
+async function iterateAbsentAsyncItems() {
+    for await (const absentItem of undefined) {
+        absentItem;
+    }
 }

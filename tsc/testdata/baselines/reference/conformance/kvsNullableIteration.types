@@ -42,3 +42,43 @@ for (const absentItem of undefined) {
 >absentItem : never
 }
 
+declare function getOptionalAsyncItems(): AsyncIterable<Item>?;
+>getOptionalAsyncItems : () => AsyncIterable<Item>?
+
+async function iterateOptionalAsyncItems() {
+>iterateOptionalAsyncItems : () => Promise<string[]>
+
+    const values: string[] = [];
+>values : string[]
+>[] : never[]
+
+    for await (const item of getOptionalAsyncItems()) {
+>item : Item
+>getOptionalAsyncItems() : AsyncIterable<Item> | null | undefined
+>getOptionalAsyncItems : () => AsyncIterable<Item>?
+
+        values.push(item.value);
+>values.push(item.value) : number
+>values.push : (...items: string[]) => number
+>values : string[]
+>push : (...items: string[]) => number
+>item.value : string
+>item : Item
+>value : string
+    }
+    return values;
+>values : string[]
+}
+
+async function iterateAbsentAsyncItems() {
+>iterateAbsentAsyncItems : () => Promise<void>
+
+    for await (const absentItem of undefined) {
+>absentItem : never
+>undefined : undefined
+
+        absentItem;
+>absentItem : never
+    }
+}
+

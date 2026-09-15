@@ -3,7 +3,7 @@
 This is a working implementation aid, not a language specification or feature
 order. The language documents remain authoritative for accepted semantics.
 
-Progress: **212 of 357 items complete (59.4%)**; **145 remain open**.
+Progress: **217 of 357 items complete (60.8%)**; **140 remain open**.
 
 - `[x]` means implemented with focused compiler evidence.
 - `[ ]` means unimplemented, incomplete, or not yet deliberately validated.
@@ -236,13 +236,13 @@ them; generated example `.js` files are intentionally ignored.
 - [x] `_` current subject
 - [x] Nearest-subject scoping
 - [x] Explicit iteration remains unchanged
-- [ ] Nested `%` callbacks preserve outer `_`
+- [x] Nested `%` callbacks preserve outer `_`
 
 ### Shared iteration
 
 - [x] Synchronous `for...of` skips an absent source
 - [x] Nullable source is evaluated once
-- [ ] Nullable `for await...of`
+- [x] Nullable `for await...of`
 
 ### Expression-valued `for`
 
@@ -259,7 +259,7 @@ them; generated example `.js` files are intentionally ignored.
 - [x] No-iteration result is initial value
 - [x] `continue`
 - [x] Ordinary function `return`
-- [ ] `await` inside loop
+- [x] `await` inside loop
 
 ### `collect`
 
@@ -307,7 +307,7 @@ them; generated example `.js` files are intentionally ignored.
 - [x] Producer as `return` value
 - [x] Producer as `yield` value
 - [x] Producer as object field initializer
-- [ ] Producer as typed-object field initializer
+- [x] Producer as typed-object field initializer
 - [x] Producer may be first/head of a larger expression
 - [x] Parentheses on the producer head path
 - [x] Member access after producer
@@ -345,7 +345,7 @@ them; generated example `.js` files are intentionally ignored.
 - [x] Absent value continues execution
 - [x] Extant falsy values return normally
 - [x] Containing-function semantics
-- [ ] Async behavior
+- [x] Async behavior
 - [x] Reachability/control-flow analysis
 
 ### Extant yield

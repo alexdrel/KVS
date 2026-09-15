@@ -200,8 +200,10 @@ incompatible extant type.
 
 The same file proves that whitespace or a comment between `return` and `?` does
 not form the KVS construct. These are compile and baseline tests; they inspect
-generated JavaScript and do not execute it. KVS test basenames use a `kvs`
-prefix because conformance baselines are stored in one flat directory.
+generated JavaScript and do not execute it. An async case verifies that an
+awaited nullable value is resolved once before the same presence test and early
+return. KVS test basenames use a `kvs` prefix because conformance baselines are
+stored in one flat directory.
 
 ## Eager collect slice
 
@@ -252,10 +254,10 @@ go -C ./tsc test -run='TestLocal/kvsSelect' ./internal/testrunner
 `kvsForExpression.ts` covers synchronous explicit and implicit `for...of`,
 explicit `for...in`, and C-style loops. Scalar, tuple, and object result cases
 verify inferred result types and block-scoped mutable bindings. Control-flow
-cases cover `continue`, bare `break`, no-iteration initial state, and ordinary
-containing-function `return`; a head-tail case exercises tuple indexing after
-the loop producer. Nullable explicit and implicit sources verify zero-iteration
-initial-state results.
+cases cover `continue`, bare `break`, no-iteration initial state, ordinary
+containing-function `return`, and `await` in an async function; a head-tail case
+exercises tuple indexing after the loop producer. Nullable explicit and
+implicit sources verify zero-iteration initial-state results.
 
 The JavaScript baseline verifies the single carrier temporary, block-local
 authored bindings, ordinary loop forms, and final scalar/array/object transfer.
@@ -268,10 +270,11 @@ go -C ./tsc test -run='TestLocal/kvsForExpression' ./internal/testrunner
 
 ## Nullable ordinary-iteration slice
 
-`kvsNullableIteration.ts` checks that synchronous `for...of` derives its loop
-binding from the present iterable type and lowers a nullable source to
-`source ?? []`, preserving once-only evaluation. Async iteration is not part
-of this slice.
+`kvsNullableIteration.ts` checks that synchronous `for...of` and asynchronous
+`for await...of` derive their loop bindings from the present iterable type and
+lower a nullable source to `source ?? []`, preserving once-only evaluation.
+The absent fallback is a synchronous empty iterable, which `for await...of`
+accepts normally.
 
 Run it with:
 
@@ -409,8 +412,10 @@ fresh mutable literals.
 
 `kvsTypedConstruction.ts` additionally checks that Map/Set, Date, and ordinary
 constructor defaults participate recursively in POD fields and emit fresh
-construction inline. `kvsDefaultConstructorImports.ts` verifies that an aliased
-import retains its runtime module reference.
+construction inline. A typed field initialized by `collect` verifies that
+producer placement composes with typed construction. The
+`kvsDefaultConstructorImports.ts` case verifies that an aliased import retains
+its runtime module reference.
 
 Run it with:
 

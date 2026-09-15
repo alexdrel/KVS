@@ -65,3 +65,19 @@ function rejectSpacedReturn(arg?: string): string {
 >"fallback" : "fallback"
 }
 
+async function resolveAsync(arg?: string): Promise<string> {
+>resolveAsync : (arg?: string) => Promise<string>
+>arg : string | undefined
+
+    return? await Promise.resolve(arg);
+>await Promise.resolve(arg) : string | undefined
+>Promise.resolve(arg) : Promise<string | undefined>
+>Promise.resolve : { (): Promise<void>; <T>(value: T): Promise<Awaited<T>>; <T>(value: T | PromiseLike<T>): Promise<Awaited<T>>; }
+>Promise : PromiseConstructor
+>resolve : { (): Promise<void>; <T>(value: T): Promise<Awaited<T>>; <T>(value: T | PromiseLike<T>): Promise<Awaited<T>>; }
+>arg : string | undefined
+
+    return "fallback";
+>"fallback" : "fallback"
+}
+

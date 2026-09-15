@@ -26,3 +26,8 @@ function rejectSpacedReturn(arg?: string): string {
     return ? arg;
     return "fallback";
 }
+
+async function resolveAsync(arg?: string): Promise<string> {
+    return? await Promise.resolve(arg);
+    return "fallback";
+}

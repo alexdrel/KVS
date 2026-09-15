@@ -629,8 +629,8 @@ func (tx *transformer) transformForOfStatement(node *ast.ForInOrOfStatement) *as
 	// emit-resolver query here could introduce diagnostics after the pre-emit
 	// snapshot.
 	validInitializer := !ast.IsVariableDeclarationList(node.Initializer) || len(node.Initializer.AsVariableDeclarationList().Declarations.Nodes) != 0
-	nullableSource := validInitializer && node.AwaitModifier == nil && tx.resolver.IsKvsNullableIterableSource(node.Expression)
-	if node.AwaitModifier != nil || !implicitSubject && !nullableSource {
+	nullableSource := validInitializer && tx.resolver.IsKvsNullableIterableSource(node.Expression)
+	if !implicitSubject && !nullableSource {
 		return tx.Visitor().VisitEachChild(node.AsNode())
 	}
 	factory := tx.Factory()

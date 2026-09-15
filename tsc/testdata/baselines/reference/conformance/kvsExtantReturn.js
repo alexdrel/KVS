@@ -28,6 +28,11 @@ function rejectSpacedReturn(arg?: string): string {
     return "fallback";
 }
 
+async function resolveAsync(arg?: string): Promise<string> {
+    return? await Promise.resolve(arg);
+    return "fallback";
+}
+
 
 //// [kvsExtantReturn.js]
 "use strict";
@@ -59,5 +64,11 @@ function rejectWrongExtantType(arg) {
 }
 function rejectSpacedReturn(arg) {
     return  ? arg : ;
+    return "fallback";
+}
+async function resolveAsync(arg) {
+    var _a;
+    if ((_a = await Promise.resolve(arg)) != null)
+        return _a;
     return "fallback";
 }

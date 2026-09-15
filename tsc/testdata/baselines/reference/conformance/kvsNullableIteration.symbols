@@ -42,3 +42,42 @@ for (const absentItem of undefined) {
 >absentItem : Symbol(absentItem, Decl(kvsNullableIteration.ts, 14, 10))
 }
 
+declare function getOptionalAsyncItems(): AsyncIterable<Item>?;
+>getOptionalAsyncItems : Symbol(getOptionalAsyncItems, Decl(kvsNullableIteration.ts, 16, 1))
+>AsyncIterable : Symbol(AsyncIterable, Decl(lib.es2018.asynciterable.d.ts, --, --))
+>Item : Symbol(Item, Decl(kvsNullableIteration.ts, 0, 0))
+
+async function iterateOptionalAsyncItems() {
+>iterateOptionalAsyncItems : Symbol(iterateOptionalAsyncItems, Decl(kvsNullableIteration.ts, 18, 63))
+
+    const values: string[] = [];
+>values : Symbol(values, Decl(kvsNullableIteration.ts, 21, 9))
+
+    for await (const item of getOptionalAsyncItems()) {
+>item : Symbol(item, Decl(kvsNullableIteration.ts, 22, 20))
+>getOptionalAsyncItems : Symbol(getOptionalAsyncItems, Decl(kvsNullableIteration.ts, 16, 1))
+
+        values.push(item.value);
+>values.push : Symbol(Array.push, Decl(lib.es5.d.ts, --, --))
+>values : Symbol(values, Decl(kvsNullableIteration.ts, 21, 9))
+>push : Symbol(Array.push, Decl(lib.es5.d.ts, --, --))
+>item.value : Symbol(Item.value, Decl(kvsNullableIteration.ts, 0, 16))
+>item : Symbol(item, Decl(kvsNullableIteration.ts, 22, 20))
+>value : Symbol(Item.value, Decl(kvsNullableIteration.ts, 0, 16))
+    }
+    return values;
+>values : Symbol(values, Decl(kvsNullableIteration.ts, 21, 9))
+}
+
+async function iterateAbsentAsyncItems() {
+>iterateAbsentAsyncItems : Symbol(iterateAbsentAsyncItems, Decl(kvsNullableIteration.ts, 26, 1))
+
+    for await (const absentItem of undefined) {
+>absentItem : Symbol(absentItem, Decl(kvsNullableIteration.ts, 29, 20))
+>undefined : Symbol(undefined)
+
+        absentItem;
+>absentItem : Symbol(absentItem, Decl(kvsNullableIteration.ts, 29, 20))
+    }
+}
+

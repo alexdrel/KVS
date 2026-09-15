@@ -42,3 +42,8 @@ kvsExtantReturn.ts(24,17): error TS1005: ':' expected.
         return "fallback";
     }
     
+    async function resolveAsync(arg?: string): Promise<string> {
+        return? await Promise.resolve(arg);
+        return "fallback";
+    }
+    

@@ -47,6 +47,12 @@ interface Link {
     next: Link?;
 }
 
+interface Report {
+    names: string[];
+}
+
+declare const entities: Entity[];
+
 declare const maybeName: string?;
 declare const maybeTheme: string?;
 declare const note: string?;
@@ -69,6 +75,11 @@ const spacedBox = Box<string> {};
 const pair = Pair<number>{};
 const fresh = [Profile{}, Profile{}];
 const link = Link{};
+const report = Report{
+    names: collect (const entity of entities) {
+        yield entity.id;
+    },
+};
 
 Profile{ id: maybeName };
 Profile{ unknown: 1 };
@@ -150,6 +161,13 @@ const spacedBox = { value: "", values: [] };
 const pair = { left: 0, right: [] };
 const fresh = [{ enabled: false, tags: [], settings: { retries: 0, labels: [], aliases: new Map(), visited: new Set(), created: new Date(), clock: new Clock() }, "display-name": "", id: "" }, { enabled: false, tags: [], settings: { retries: 0, labels: [], aliases: new Map(), visited: new Set(), created: new Date(), clock: new Clock() }, "display-name": "", id: "" }];
 const link = { label: "" };
+var _b = [];
+for (const entity of entities) {
+    _b.push(entity.id);
+}
+const report = {
+    names: _b
+};
 ({ enabled: false, tags: [], settings: { retries: 0, labels: [], aliases: new Map(), visited: new Set(), created: new Date(), clock: new Clock() }, "display-name": "", id: maybeName });
 ({ enabled: false, tags: [], settings: { retries: 0, labels: [], aliases: new Map(), visited: new Set(), created: new Date(), clock: new Clock() }, "display-name": "", id: "", unknown: 1 });
 class Model {

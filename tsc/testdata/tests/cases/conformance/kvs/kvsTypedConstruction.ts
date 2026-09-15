@@ -47,6 +47,12 @@ interface Link {
     next: Link?;
 }
 
+interface Report {
+    names: string[];
+}
+
+declare const entities: Entity[];
+
 declare const maybeName: string?;
 declare const maybeTheme: string?;
 declare const note: string?;
@@ -69,6 +75,11 @@ const spacedBox = Box<string> {};
 const pair = Pair<number>{};
 const fresh = [Profile{}, Profile{}];
 const link = Link{};
+const report = Report{
+    names: collect (const entity of entities) {
+        yield entity.id;
+    },
+};
 
 Profile{ id: maybeName };
 Profile{ unknown: 1 };

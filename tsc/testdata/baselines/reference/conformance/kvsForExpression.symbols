@@ -259,25 +259,47 @@ function explicitNullableSource(entries: Entry[]?) {
     };
 }
 
+async function awaitedBody(entries: Entry[]) {
+>awaitedBody : Symbol(awaitedBody, Decl(kvsForExpression.ts, 79, 1))
+>entries : Symbol(entries, Decl(kvsForExpression.ts, 81, 27))
+>Entry : Symbol(Entry, Decl(kvsForExpression.ts, 0, 0))
+
+    return for (const entry of entries; total = 0) {
+>entry : Symbol(entry, Decl(kvsForExpression.ts, 82, 21))
+>entries : Symbol(entries, Decl(kvsForExpression.ts, 81, 27))
+>total : Symbol(total, Decl(kvsForExpression.ts, 82, 39))
+
+        total += await Promise.resolve(entry.value);
+>total : Symbol(total, Decl(kvsForExpression.ts, 82, 39))
+>Promise.resolve : Symbol(PromiseConstructor.resolve, Decl(lib.es2015.promise.d.ts, --, --), Decl(lib.es2015.promise.d.ts, --, --), Decl(lib.es2015.promise.d.ts, --, --))
+>Promise : Symbol(Promise, Decl(lib.es5.d.ts, --, --), Decl(lib.es2015.iterable.d.ts, --, --), Decl(lib.es2015.promise.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --), Decl(lib.es2018.promise.d.ts, --, --))
+>resolve : Symbol(PromiseConstructor.resolve, Decl(lib.es2015.promise.d.ts, --, --), Decl(lib.es2015.promise.d.ts, --, --), Decl(lib.es2015.promise.d.ts, --, --))
+>entry.value : Symbol(Entry.value, Decl(kvsForExpression.ts, 0, 17))
+>entry : Symbol(entry, Decl(kvsForExpression.ts, 82, 21))
+>value : Symbol(Entry.value, Decl(kvsForExpression.ts, 0, 17))
+
+    };
+}
+
 const total = 100;
->total : Symbol(total, Decl(kvsForExpression.ts, 81, 5))
+>total : Symbol(total, Decl(kvsForExpression.ts, 87, 5))
 
 const shadowed = for (const entry of [] as Entry[]; total = 0) {
->shadowed : Symbol(shadowed, Decl(kvsForExpression.ts, 82, 5))
->entry : Symbol(entry, Decl(kvsForExpression.ts, 82, 27))
+>shadowed : Symbol(shadowed, Decl(kvsForExpression.ts, 88, 5))
+>entry : Symbol(entry, Decl(kvsForExpression.ts, 88, 27))
 >Entry : Symbol(Entry, Decl(kvsForExpression.ts, 0, 0))
->total : Symbol(total, Decl(kvsForExpression.ts, 82, 51))
+>total : Symbol(total, Decl(kvsForExpression.ts, 88, 51))
 
     total += entry.value;
->total : Symbol(total, Decl(kvsForExpression.ts, 82, 51))
+>total : Symbol(total, Decl(kvsForExpression.ts, 88, 51))
 >entry.value : Symbol(Entry.value, Decl(kvsForExpression.ts, 0, 17))
->entry : Symbol(entry, Decl(kvsForExpression.ts, 82, 27))
+>entry : Symbol(entry, Decl(kvsForExpression.ts, 88, 27))
 >value : Symbol(Entry.value, Decl(kvsForExpression.ts, 0, 17))
 
 };
 total;
->total : Symbol(total, Decl(kvsForExpression.ts, 81, 5))
+>total : Symbol(total, Decl(kvsForExpression.ts, 87, 5))
 
 shadowed;
->shadowed : Symbol(shadowed, Decl(kvsForExpression.ts, 82, 5))
+>shadowed : Symbol(shadowed, Decl(kvsForExpression.ts, 88, 5))
 

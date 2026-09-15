@@ -93,6 +93,14 @@ interface Link {
 >next : Link | null | undefined
 }
 
+interface Report {
+    names: string[];
+>names : string[]
+}
+
+declare const entities: Entity[];
+>entities : Entity[]
+
 declare const maybeName: string?;
 >maybeName : string | null | undefined
 
@@ -177,6 +185,24 @@ const fresh = [Profile{}, Profile{}];
 const link = Link{};
 >link : Link
 >Link{} : Link
+
+const report = Report{
+>report : Report
+>Report{    names: collect (const entity of entities) {        yield entity.id;    },} : Report
+
+    names: collect (const entity of entities) {
+>names : string[]
+>collect (const entity of entities) {        yield entity.id;    } : string[]
+>entity : Entity
+>entities : Entity[]
+
+        yield entity.id;
+>entity.id : string
+>entity : Entity
+>id : string
+
+    },
+};
 
 Profile{ id: maybeName };
 >Profile{ id: maybeName } : Profile

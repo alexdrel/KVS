@@ -299,6 +299,32 @@ function explicitNullableSource(entries: Entry[]?) {
     };
 }
 
+async function awaitedBody(entries: Entry[]) {
+>awaitedBody : (entries: Entry[]) => Promise<number>
+>entries : Entry[]
+
+    return for (const entry of entries; total = 0) {
+>for (const entry of entries; total = 0) {        total += await Promise.resolve(entry.value);    } : number
+>entry : Entry
+>entries : Entry[]
+>total : number
+>0 : 0
+
+        total += await Promise.resolve(entry.value);
+>total += await Promise.resolve(entry.value) : number
+>total : number
+>await Promise.resolve(entry.value) : number
+>Promise.resolve(entry.value) : Promise<number>
+>Promise.resolve : { (): Promise<void>; <T>(value: T): Promise<Awaited<T>>; <T>(value: T | PromiseLike<T>): Promise<Awaited<T>>; }
+>Promise : PromiseConstructor
+>resolve : { (): Promise<void>; <T>(value: T): Promise<Awaited<T>>; <T>(value: T | PromiseLike<T>): Promise<Awaited<T>>; }
+>entry.value : number
+>entry : Entry
+>value : number
+
+    };
+}
+
 const total = 100;
 >total : 100
 >100 : 100

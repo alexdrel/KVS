@@ -6098,7 +6098,7 @@ func (c *Checker) checkVariableLikeDeclaration(node *ast.Node) {
 			if needCheckWidenedType {
 				if ast.IsArrayBindingPattern(name) {
 					parent := node.Parent.Parent
-					absenceOnlyForOf := ast.IsForOfStatement(parent) && parent.AsForInOrOfStatement().AwaitModifier == nil &&
+					absenceOnlyForOf := ast.IsForOfStatement(parent) &&
 						c.isKvsAbsenceOnlyType(c.checkExpression(parent.Expression()))
 					if !absenceOnlyForOf {
 						c.checkIteratedTypeOrElementType(IterationUseDestructuring, widenedType, c.undefinedType, node)
@@ -18750,7 +18750,7 @@ func (c *Checker) checkRightHandSideOfForOf(statement *ast.Node) *Type {
 		}
 		return c.checkIteratedTypeOrElementType(use, sourceType, c.undefinedType, statement.Expression())
 	}
-	if use == IterationUseForOf {
+	if use == IterationUseForOf || use == IterationUseForAwaitOf {
 		absenceOnly := c.isKvsAbsenceOnlyType(sourceType)
 		sourceType = c.GetNonNullableType(sourceType)
 		if absenceOnly {
