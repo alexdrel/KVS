@@ -261,6 +261,7 @@ const (
 	KindKvsNullableAssertionExpression
 	KindKvsExtantAssertionExpression
 	KindKvsExtantAssignmentExpression
+	KindKvsTypedSpreadAssignmentExpression
 	KindKvsExtantTestExpression
 	KindKvsDefaultExpression
 	KindKvsNullingSieveExpression

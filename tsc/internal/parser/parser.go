@@ -4391,6 +4391,12 @@ func (p *Parser) parseAssignmentExpressionOrHigherWorker(allowReturnTypeInArrowF
 		right := p.parseAssignmentExpressionOrHigherWorker(allowReturnTypeInArrowFunction)
 		return p.finishNode(p.factory.NewKvsSieveAssignmentExpression(expr, tildeToken, equalsToken, right), pos)
 	}
+	if ast.IsLeftHandSideExpression(expr) && p.isKvsTypedSpreadAssignment() {
+		dotDotDotToken := p.parseTokenNode()
+		equalsToken := p.parseTokenNode()
+		right := p.parseAssignmentExpressionOrHigherWorker(allowReturnTypeInArrowFunction)
+		return p.finishNode(p.factory.NewKvsTypedSpreadAssignmentExpression(expr, dotDotDotToken, equalsToken, right), pos)
+	}
 	if expr.Kind == ast.KindIdentifier && p.isKvsCatchSplit(expr.End()) {
 		tildeToken := p.parseTokenNode()
 		errorTarget := p.parseIdentifier()
@@ -4442,6 +4448,16 @@ func (p *Parser) isKvsSieveAssignment() bool {
 	tildeEnd := p.scanner.TokenEnd()
 	return p.lookAhead(func(p *Parser) bool {
 		return p.nextToken() == ast.KindEqualsToken && p.scanner.TokenStart() == tildeEnd
+	})
+}
+
+func (p *Parser) isKvsTypedSpreadAssignment() bool {
+	if p.token != ast.KindDotDotDotToken {
+		return false
+	}
+	spreadEnd := p.scanner.TokenEnd()
+	return p.lookAhead(func(p *Parser) bool {
+		return p.nextToken() == ast.KindEqualsToken && p.scanner.TokenStart() == spreadEnd
 	})
 }
 

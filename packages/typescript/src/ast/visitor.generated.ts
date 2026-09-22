@@ -135,6 +135,7 @@ import type {
     KvsSieveAssignmentExpression,
     KvsSieveBindingInitializer,
     KvsTypedObjectExpression,
+    KvsTypedSpreadAssignmentExpression,
     KvsYieldStatement,
     LabeledStatement,
     LiteralTypeNode,
@@ -340,6 +341,7 @@ import {
     updateKvsSieveAssignmentExpression,
     updateKvsSieveBindingInitializer,
     updateKvsTypedObjectExpression,
+    updateKvsTypedSpreadAssignmentExpression,
     updateKvsYieldStatement,
     updateLabeledStatement,
     updateLiteralTypeNode,
@@ -694,6 +696,13 @@ const visitEachChildTable: Record<number, VisitEachChildFunction> = {
         const _equalsToken = visitNode(node.equalsToken, visitor, isEqualsToken);
         const _right = visitNode(node.right, visitor, isExpression);
         return updateKvsExtantAssignmentExpression(node, _left, _questionToken, _equalsToken, _right);
+    },
+    [SyntaxKind.KvsTypedSpreadAssignmentExpression]: (node: KvsTypedSpreadAssignmentExpression, visitor: Visitor): KvsTypedSpreadAssignmentExpression => {
+        const _left = visitNode(node.left, visitor, isExpression);
+        const _dotDotDotToken = visitNode(node.dotDotDotToken, visitor, isDotDotDotToken);
+        const _equalsToken = visitNode(node.equalsToken, visitor, isEqualsToken);
+        const _right = visitNode(node.right, visitor, isExpression);
+        return updateKvsTypedSpreadAssignmentExpression(node, _left, _dotDotDotToken, _equalsToken, _right);
     },
     [SyntaxKind.KvsExtantTestExpression]: (node: KvsExtantTestExpression, visitor: Visitor): KvsExtantTestExpression => {
         const _expression = visitNode(node.expression, visitor, isExpression);

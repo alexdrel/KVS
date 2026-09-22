@@ -290,6 +290,7 @@
             "KvsNullableAssertionExpression",
             "KvsExtantAssertionExpression",
             "KvsExtantAssignmentExpression",
+            "KvsTypedSpreadAssignmentExpression",
             "KvsExtantTestExpression",
             "KvsDefaultExpression",
             "KvsNullingSieveExpression",
@@ -1758,6 +1759,31 @@
                     {
                         "name": "QuestionToken",
                         "type": "QuestionToken"
+                    },
+                    {
+                        "name": "EqualsToken",
+                        "type": "EqualsToken"
+                    },
+                    {
+                        "name": "Right",
+                        "type": "Expression"
+                    }
+                ],
+                "arena": true
+            },
+            "KvsTypedSpreadAssignmentExpression": {
+                "extends": [
+                    "ExpressionBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "Left",
+                        "type": "Expression"
+                    },
+                    {
+                        "name": "DotDotDotToken",
+                        "type": "DotDotDotToken"
                     },
                     {
                         "name": "EqualsToken",

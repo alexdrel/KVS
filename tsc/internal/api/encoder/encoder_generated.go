@@ -113,6 +113,9 @@ func getChildrenPropertyMask(node *ast.Node) uint8 {
 	case ast.KindKvsExtantAssignmentExpression:
 		n := node.AsKvsExtantAssignmentExpression()
 		return (boolToByte(n.Left != nil) << 0) | (boolToByte(n.QuestionToken != nil) << 1) | (boolToByte(n.EqualsToken != nil) << 2) | (boolToByte(n.Right != nil) << 3)
+	case ast.KindKvsTypedSpreadAssignmentExpression:
+		n := node.AsKvsTypedSpreadAssignmentExpression()
+		return (boolToByte(n.Left != nil) << 0) | (boolToByte(n.DotDotDotToken != nil) << 1) | (boolToByte(n.EqualsToken != nil) << 2) | (boolToByte(n.Right != nil) << 3)
 	case ast.KindKvsExtantTestExpression:
 		n := node.AsKvsExtantTestExpression()
 		return (boolToByte(n.Expression != nil) << 0) | (boolToByte(n.QuestionToken != nil) << 1)

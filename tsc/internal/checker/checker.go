@@ -8064,6 +8064,8 @@ func (c *Checker) checkExpressionWorker(node *ast.Node, checkMode CheckMode) *Ty
 		return c.checkKvsExtantAssignmentExpression(node, checkMode)
 	case ast.KindKvsSieveAssignmentExpression:
 		return c.checkKvsSieveAssignmentExpression(node, checkMode)
+	case ast.KindKvsTypedSpreadAssignmentExpression:
+		return c.checkKvsTypedSpreadAssignmentExpression(node.AsKvsTypedSpreadAssignmentExpression(), checkMode)
 	case ast.KindKvsFailureDemotionExpression:
 		return c.checkKvsFailureDemotionExpression(node.AsKvsFailureDemotionExpression(), checkMode)
 	case ast.KindKvsFailurePromotionExpression:
@@ -8282,10 +8284,18 @@ func (c *Checker) checkKvsTypedObjectExpression(node *ast.KvsTypedObjectExpressi
 	}
 	links.kvsTypedObjectDefaults = defaults
 
+	for _, member := range node.Properties.Nodes {
+		if ast.IsSpreadAssignment(member) {
+			c.checkKvsTypedProjection(member, member.Expression(), target, checkMode, false)
+		}
+	}
 	c.pushContextualType(node.AsNode(), target, false /*isCache*/)
 	bodyType := c.checkObjectLiteral(node.AsNode(), checkMode)
 	c.popContextualType()
 	for _, member := range node.Properties.Nodes {
+		if ast.IsSpreadAssignment(member) {
+			continue
+		}
 		if !ast.IsPropertyAssignment(member) && !ast.IsShorthandPropertyAssignment(member) {
 			continue
 		}
@@ -8301,6 +8311,68 @@ func (c *Checker) checkKvsTypedObjectExpression(node *ast.KvsTypedObjectExpressi
 		}
 	}
 	return target
+}
+
+func (c *Checker) checkKvsTypedSpreadAssignmentExpression(node *ast.KvsTypedSpreadAssignmentExpression, checkMode CheckMode) *Type {
+	target := c.getReducedType(c.checkExpressionEx(node.Left, checkMode))
+	if c.isErrorType(target) {
+		if symbol := c.getResolvedSymbolOrNil(ast.SkipParentheses(node.Left)); symbol != nil && symbol != c.unknownSymbol {
+			target = c.getReducedType(c.getTypeOfSymbol(symbol))
+		}
+	}
+	c.checkReferenceExpression(node.Left, diagnostics.The_left_hand_side_of_an_assignment_expression_must_be_a_variable_or_a_property_access, diagnostics.The_left_hand_side_of_an_assignment_expression_may_not_be_an_optional_property_access)
+	if !c.isKvsTypedSpreadTargetType(target) {
+		c.error(node.Left, diagnostics.KVS_typed_in_place_spread_requires_a_concrete_interface_or_object_type_alias_target)
+		c.checkExpressionEx(node.Right, checkMode&CheckModeInferential)
+		return target
+	}
+	c.checkKvsTypedProjection(node.AsNode(), node.Right, target, checkMode, true)
+	return target
+}
+
+func (c *Checker) isKvsTypedSpreadTargetType(t *Type) bool {
+	return t.flags&TypeFlagsObject != 0 &&
+		t.objectFlags&ObjectFlagsClass == 0 &&
+		len(c.getIndexInfosOfType(t)) == 0 &&
+		len(c.getSignaturesOfType(t, SignatureKindCall)) == 0 &&
+		len(c.getSignaturesOfType(t, SignatureKindConstruct)) == 0 &&
+		c.isKvsNamedStructuralObjectType(t)
+}
+
+func (c *Checker) checkKvsTypedProjection(node *ast.Node, sourceExpression *ast.Node, target *Type, checkMode CheckMode, rejectReadonly bool) {
+	source := c.getReducedType(c.checkExpressionEx(sourceExpression, checkMode&CheckModeInferential))
+	presentSource := c.GetNonNullableType(source)
+	targetProperties := c.getPropertiesOfType(target)
+	projected := make([]string, 0, len(targetProperties))
+
+	if source.flags&TypeFlagsAny != 0 {
+		for _, targetProperty := range targetProperties {
+			projected = append(projected, targetProperty.Name)
+			if rejectReadonly && c.isReadonlySymbol(targetProperty) {
+				c.error(sourceExpression, diagnostics.Cannot_assign_to_0_because_it_is_a_read_only_property, c.symbolToString(targetProperty))
+			}
+		}
+	} else if source.flags&TypeFlagsUnknown != 0 {
+		c.error(node, diagnostics.Spread_types_may_only_be_created_from_object_types)
+	} else if presentSource.flags&TypeFlagsNever == 0 && c.isValidSpreadType(presentSource) {
+		for _, targetProperty := range targetProperties {
+			sourceProperty := c.getPropertyOfType(presentSource, targetProperty.Name)
+			if sourceProperty == nil {
+				continue
+			}
+			projected = append(projected, targetProperty.Name)
+			if rejectReadonly && c.isReadonlySymbol(targetProperty) {
+				c.error(sourceExpression, diagnostics.Cannot_assign_to_0_because_it_is_a_read_only_property, c.symbolToString(targetProperty))
+			}
+			sourcePropertyType := c.getTypeWithFacts(c.getTypeOfSymbol(sourceProperty), TypeFactsNEUndefined)
+			c.checkTypeAssignableTo(sourcePropertyType, c.getTypeOfSymbol(targetProperty), sourceExpression, nil)
+		}
+	}
+
+	if len(projected) == 0 && presentSource.flags&TypeFlagsNever == 0 && !c.isErrorType(source) && source.flags&TypeFlagsUnknown == 0 {
+		c.error(node, diagnostics.Type_0_has_no_properties_in_common_with_type_1, c.TypeToString(source), c.TypeToString(target))
+	}
+	c.nodeLinks.Get(node).kvsTypedSpreadProperties = projected
 }
 
 func (c *Checker) getKvsTypedObjectDefaults(t *Type, visiting map[*Type]bool) ([]kvsTypedObjectDefault, bool) {
@@ -14166,6 +14238,11 @@ func (c *Checker) checkObjectLiteral(node *ast.Node, checkMode CheckMode) *Type 
 				hasComputedSymbolProperty = false
 			}
 			t := c.getReducedType(c.checkExpressionEx(memberDecl.Expression(), checkMode&CheckModeInferential))
+			if node.Kind == ast.KindKvsTypedObjectExpression {
+				// Typed spreads are checked against their target POD after the body.
+				// Their wider source shape is not part of the constructed value.
+				continue
+			}
 			if compact {
 				t = c.getKvsCompactObjectSpreadType(t, inConstContext)
 			}

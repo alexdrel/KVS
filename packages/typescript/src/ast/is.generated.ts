@@ -214,6 +214,7 @@ import type {
     KvsSieveAssignmentExpression,
     KvsSieveBindingInitializer,
     KvsTypedObjectExpression,
+    KvsTypedSpreadAssignmentExpression,
     KvsYieldStatement,
     LabeledStatement,
     LiteralExpression,
@@ -623,6 +624,15 @@ export declare namespace isKvsExtantAssignmentExpression {
     function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsExtantAssignmentExpression>;
 }
 isKvsExtantAssignmentExpression.Handle = isKvsExtantAssignmentExpression as any;
+
+export function isKvsTypedSpreadAssignmentExpression(node: Node): node is KvsTypedSpreadAssignmentExpression {
+    return node.kind === SyntaxKind.KvsTypedSpreadAssignmentExpression;
+}
+
+export declare namespace isKvsTypedSpreadAssignmentExpression {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsTypedSpreadAssignmentExpression>;
+}
+isKvsTypedSpreadAssignmentExpression.Handle = isKvsTypedSpreadAssignmentExpression as any;
 
 export function isKvsExtantTestExpression(node: Node): node is KvsExtantTestExpression {
     return node.kind === SyntaxKind.KvsExtantTestExpression;

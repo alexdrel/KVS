@@ -6274,6 +6274,24 @@ test("SpreadAssignment roundtrip", async () => {
     assert.equal(sourceFile.text, printed);
 });
 
+test("KVS typed in-place spread roundtrip", async () => {
+    await using api = spawnAPI({
+        "/tsconfig.json": "{}",
+        "/src/index.ts": `profile ...= patch;\n`,
+    });
+
+    const snapshot = await api.updateSnapshot({ openProject: "/tsconfig.json" });
+    const project = snapshot.getProject("/tsconfig.json")!;
+    const sourceFile = await project.program.getSourceFile("/src/index.ts");
+    assert(sourceFile);
+    const stmt = sourceFile.statements[0] as import("@typescript/typescript/unstable/ast").ExpressionStatement;
+    const assignment = stmt.expression as import("@typescript/typescript/unstable/ast").KvsTypedSpreadAssignmentExpression;
+    assert.equal(assignment.kind, SyntaxKind.KvsTypedSpreadAssignmentExpression);
+    assert.equal(assignment.left.kind, SyntaxKind.Identifier);
+    assert.equal(assignment.right.kind, SyntaxKind.Identifier);
+    assert.equal(await project.emitter.printNode(sourceFile), sourceFile.text);
+});
+
 test("VariableDeclarationList const flag clone", async () => {
     await using api = spawnAPI({
         "/tsconfig.json": "{}",

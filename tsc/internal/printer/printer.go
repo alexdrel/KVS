@@ -3419,6 +3419,8 @@ func (p *Printer) emitExpression(node *ast.Expression, precedence ast.OperatorPr
 		p.emitKvsSieveBindingInitializer(node.AsKvsSieveBindingInitializer())
 	case ast.KindKvsSieveAssignmentExpression:
 		p.emitKvsSieveAssignmentExpression(node.AsKvsSieveAssignmentExpression())
+	case ast.KindKvsTypedSpreadAssignmentExpression:
+		p.emitKvsTypedSpreadAssignmentExpression(node.AsKvsTypedSpreadAssignmentExpression())
 	case ast.KindKvsFailureDemotionExpression:
 		p.emitKvsFailureDemotionExpression(node.AsKvsFailureDemotionExpression())
 	case ast.KindKvsFailurePromotionExpression:
@@ -3834,6 +3836,17 @@ func (p *Printer) emitKvsExtantAssignmentExpression(node *ast.KvsExtantAssignmen
 	p.emitExpression(node.Left, ast.OperatorPrecedenceLeftHandSide)
 	p.writeSpace()
 	p.emitPunctuationNode(node.QuestionToken)
+	p.emitPunctuationNode(node.EqualsToken)
+	p.writeSpace()
+	p.emitExpression(node.Right, ast.OperatorPrecedenceAssignment)
+	p.exitNode(node.AsNode(), state)
+}
+
+func (p *Printer) emitKvsTypedSpreadAssignmentExpression(node *ast.KvsTypedSpreadAssignmentExpression) {
+	state := p.enterNode(node.AsNode())
+	p.emitExpression(node.Left, ast.OperatorPrecedenceLeftHandSide)
+	p.writeSpace()
+	p.emitPunctuationNode(node.DotDotDotToken)
 	p.emitPunctuationNode(node.EqualsToken)
 	p.writeSpace()
 	p.emitExpression(node.Right, ast.OperatorPrecedenceAssignment)

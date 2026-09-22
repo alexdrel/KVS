@@ -87,6 +87,17 @@ func (r *EmitResolver) GetKvsTypedObjectDefaults(node *ast.Node) []printer.KvsTy
 	return convert(defaults)
 }
 
+func (r *EmitResolver) GetKvsTypedSpreadProperties(node *ast.Node) []string {
+	r.checkerMu.Lock()
+	defer r.checkerMu.Unlock()
+	if ast.IsKvsTypedSpreadAssignmentExpression(node) {
+		r.checker.checkExpression(node)
+	} else {
+		r.checker.checkExpression(node.Parent)
+	}
+	return r.checker.nodeLinks.Get(node).kvsTypedSpreadProperties
+}
+
 func (r *EmitResolver) CreateKvsDefaultConstructor(emitContext *printer.EmitContext, node *ast.Node, symbol *ast.Symbol) *ast.Node {
 	r.checkerMu.Lock()
 	defer r.checkerMu.Unlock()

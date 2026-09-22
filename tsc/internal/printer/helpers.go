@@ -45,6 +45,19 @@ var KvsNullingSieveHelper = &EmitHelper{
 };`,
 }
 
+var KvsProjectHelper = &EmitHelper{
+	Name:       "kvs:project",
+	ImportName: "__kvsProject",
+	Scoped:     false,
+	Text: `var __kvsProject = (this && this.__kvsProject) || function (target, source, fields) {
+    if (source != null) for (var i = 0; i < fields.length; i++) {
+        var field = fields[i], value = source[field];
+        if (value !== void 0) target[field] = value;
+    }
+    return target;
+};`,
+}
+
 // TypeScript Helpers
 
 var decorateHelper = &EmitHelper{

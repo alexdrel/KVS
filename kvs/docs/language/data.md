@@ -296,13 +296,34 @@ profile ...= source; // typed spread into the existing profile
 For both `Point{ ...rect }` and `point ...= rect`, where `point` has type `Point`, the static target type controls the operation:
 
 1. Consider only fields declared by the target POD type.
-2. Require the present type of every matching source field to be statically assignable to the target field.
-3. Copy matching own enumerable source properties when their values are present.
+2. Remove `undefined` from each matching source field's type, then require the
+   remaining type to be statically assignable to the target field.
+3. Read each matching field through ordinary property access. Copy its value
+   unless that value is `undefined`.
 4. Ignore extra source fields.
 
-A source with no statically projectable fields is an error. A matching field with an incompatible present type is also an error; it is not silently filtered out. A wider structural source is valid when its shared fields satisfy these rules.
+A source with no statically projectable fields is an error. A matching field
+whose type remains incompatible after removing `undefined` is also an error; it
+is not silently filtered out. A wider structural source is valid when its
+shared fields satisfy these rules.
 
-Nullable source fields contribute nothing when absent, including when the target field is nullable. The target field retains its current value. During construction, that value comes from its initial default or an earlier construction entry.
+This gives typed spread update semantics rather than object-enumeration
+semantics. A missing field or a field whose value is `undefined` contributes
+nothing, so the target field retains its current value. A field whose value is
+`null` is copied: for a nullable target it explicitly clears the previous
+value, while for a required target it is rejected statically. During
+construction, the retained value comes from its initial default or an earlier
+construction entry.
+
+```kvs
+interface ProfilePatch {
+    name?: string;  // missing or undefined: retain the current name
+    theme: Theme?;  // null: explicitly clear the theme
+}
+```
+
+When a nullable computation should mean "do not update" rather than "clear",
+use a conditional field to omit it from the patch.
 
 Typed spread is shallow. Nested objects and arrays are copied as values/references, with compatibility protected by the source's static type. Their contents are neither recursively filtered nor cloned. `unknown` must be narrowed or validated before typed spread; it does not enable dynamic projection. As in TypeScript, `any` remains an explicitly unsound escape hatch.
 
@@ -312,7 +333,8 @@ const profile = Profile{ ...externalProfile };
 
 If `externalProfile` contains extra top-level fields, they are not present in `profile` at runtime.
 
-An absent source contributes nothing. A nullable source is checked using its present type; a literal null or undefined spread is a no-op:
+An absent source contributes nothing. A nullable source is checked using its
+present object type; a literal null or undefined spread is a no-op:
 
 ```kvs
 const profile = Profile{ ...null }; // same value as Profile{}
@@ -338,7 +360,7 @@ const profile = Profile{
 };
 ```
 
-The POD type contextually checks the body. A direct field follows ordinary assignment rules: its full value type must be assignable to the declared field. A nullable value is therefore rejected for a required non-nullable field, while a nullable field may receive explicit null or undefined. To omit an absent value and retain the generated default, use a conditional field. Spread sources follow the [typed spread rules](#typed-spread), skipping absent values and discarding extra fields.
+The POD type contextually checks the body. A direct field follows ordinary assignment rules: its full value type must be assignable to the declared field. A nullable value is therefore rejected for a required non-nullable field, while a nullable field may receive explicit null or undefined. To omit an absent value and retain the generated default, use a conditional field. Spread sources follow the [typed spread rules](#typed-spread), skipping missing or `undefined` values, copying `null`, and discarding extra fields.
 
 An explicitly written unknown field is a compile-time error:
 
@@ -372,6 +394,11 @@ const alias = profile;
 profile ...= patch;
 // alias observes the same mutations
 ```
+
+The left side follows ordinary compound-assignment eligibility: it must be a
+writable variable or property. The operation does not assign the object back;
+it mutates that object directly. A property target is read once and its setter
+is not invoked.
 
 Readonly fields are rejected. A nullable target can be materialized explicitly before mutation:
 

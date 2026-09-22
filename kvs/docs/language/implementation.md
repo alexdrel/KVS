@@ -426,9 +426,29 @@ For a type-only interface name, `Profile{...}` has no current TypeScript meaning
 
 The proposal does not require interfaces to acquire runtime constructors or prototypes. The compiler can inline concrete field lists and defaults at every typed spread site.
 
-The compiler may combine default construction and typed spread into one allocation, while preserving source-order evaluation. For `profile ...= patch`, it emits field assignments into the existing target object, preserving identity. Both forms copy only matching own enumerable properties with present values; absent sources and absent field values contribute nothing. Nested objects and arrays are assigned by reference.
+The compiler may combine default construction and typed spread into one allocation, while preserving source-order evaluation. One shared lowering primitive can project a source into either a fresh temporary object or an existing target:
 
-Static checking rejects sources with no projectable fields and incompatible matching field types. `unknown` requires prior narrowing or validation; the lowering does not generate structural validation. `profile! ...= patch` first materializes an absent target, then applies these same assignments.
+```js
+function __kvsProject(target, source, fields) {
+    if (source != null) for (const field of fields) {
+        const value = source[field];
+        if (value !== undefined) target[field] = value;
+    }
+    return target;
+}
+```
+
+For `profile ...= patch`, the target is `profile`, preserving identity, and the
+helper call itself is the complete lowering: there is no assignment back to
+`profile`. The left side is nevertheless checked using ordinary compound-
+assignment target eligibility. Typed
+construction passes a fresh temporary object and spreads the projected result
+at the corresponding source position. Both forms use ordinary property access,
+so a statically selected inherited or non-enumerable property is still read.
+An absent source and a missing or `undefined` field contribute nothing; `null`
+is copied. Nested objects and arrays are assigned by reference.
+
+Static checking rejects sources with no projectable fields and incompatible matching field types. Compatibility removes only `undefined` from a source field's type, matching the runtime omission rule; it retains `null`. `unknown` requires prior narrowing or validation; the lowering does not generate structural validation. `profile! ...= patch` first materializes an absent target, then applies these same assignments.
 
 ## Context frame lowering
 

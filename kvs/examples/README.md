@@ -27,5 +27,6 @@ runnable `.ts` file must have a matching `.stdout` file.
 - [Failure promotion](failure-promotion.ts)
 - [Presence-aware arrays](presence-aware-arrays.ts)
 - [Presence-aware objects](presence-aware-objects.ts)
+- [Typed construction and projection](typed-construction.ts)
 - [Goalposts](goalposts/README.md)
 - [Working showcase](showcase/README.md)

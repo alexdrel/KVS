@@ -4452,6 +4452,8 @@ var KVS_infix_replacement_must_produce_an_Error = &Message{code: 100080, categor
 
 var KVS_typed_construction_requires_a_concrete_defaultable_interface_or_object_type_alias = &Message{code: 100081, category: CategoryError, key: "KVS_typed_construction_requires_a_concrete_defaultable_interface_or_object_type_alias_100081", text: "KVS typed construction requires a concrete defaultable interface or object type alias."}
 
+var KVS_typed_in_place_spread_requires_a_concrete_interface_or_object_type_alias_target = &Message{code: 100082, category: CategoryError, key: "KVS_typed_in_place_spread_requires_a_concrete_interface_or_object_type_alias_target_100082", text: "KVS typed in-place spread requires a concrete interface or object type alias target."}
+
 func keyToMessage(key Key) *Message {
 	switch key {
 	case "Unterminated_string_literal_1002":
@@ -8904,6 +8906,8 @@ func keyToMessage(key Key) *Message {
 		return KVS_infix_replacement_must_produce_an_Error
 	case "KVS_typed_construction_requires_a_concrete_defaultable_interface_or_object_type_alias_100081":
 		return KVS_typed_construction_requires_a_concrete_defaultable_interface_or_object_type_alias
+	case "KVS_typed_in_place_spread_requires_a_concrete_interface_or_object_type_alias_target_100082":
+		return KVS_typed_in_place_spread_requires_a_concrete_interface_or_object_type_alias_target
 	default:
 		return nil
 	}

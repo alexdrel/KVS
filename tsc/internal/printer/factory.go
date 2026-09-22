@@ -609,6 +609,17 @@ func (f *NodeFactory) NewKvsNullingSieveHelper(value *ast.Expression) *ast.Expre
 	)
 }
 
+func (f *NodeFactory) NewKvsProjectHelper(target *ast.Expression, source *ast.Expression, fields []*ast.Node) *ast.Expression {
+	f.emitContext.RequestEmitHelper(KvsProjectHelper)
+	return f.NewCallExpression(
+		f.NewUnscopedHelperName("__kvsProject"),
+		nil,
+		nil,
+		f.NewNodeList([]*ast.Node{target, source, f.NewArrayLiteralExpression(f.NewNodeList(fields), false)}),
+		ast.NodeFlagsNone,
+	)
+}
+
 func (f *NodeFactory) NewDecorateHelper(decoratorExpressions []*ast.Node, target *ast.Node, memberName *ast.Node, descriptor *ast.Node) *ast.Expression {
 	f.emitContext.RequestEmitHelper(decorateHelper)
 

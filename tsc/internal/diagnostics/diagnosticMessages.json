@@ -8631,5 +8631,9 @@
     "KVS typed construction requires a concrete defaultable interface or object type alias.": {
         "category": "Error",
         "code": 100081
+    },
+    "KVS typed in-place spread requires a concrete interface or object type alias target.": {
+        "category": "Error",
+        "code": 100082
     }
 }

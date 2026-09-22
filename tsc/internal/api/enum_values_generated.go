@@ -563,6 +563,7 @@ func main() {
 			"KvsNullableAssertionExpression":               toInt32(ast.KindKvsNullableAssertionExpression),
 			"KvsExtantAssertionExpression":                 toInt32(ast.KindKvsExtantAssertionExpression),
 			"KvsExtantAssignmentExpression":                toInt32(ast.KindKvsExtantAssignmentExpression),
+			"KvsTypedSpreadAssignmentExpression":           toInt32(ast.KindKvsTypedSpreadAssignmentExpression),
 			"KvsExtantTestExpression":                      toInt32(ast.KindKvsExtantTestExpression),
 			"KvsDefaultExpression":                         toInt32(ast.KindKvsDefaultExpression),
 			"KvsNullingSieveExpression":                    toInt32(ast.KindKvsNullingSieveExpression),

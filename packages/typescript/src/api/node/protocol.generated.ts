@@ -31,6 +31,7 @@ export const childProperties: Readonly<Partial<Record<SyntaxKind, readonly (stri
     [SyntaxKind.KvsNullableAssertionExpression]: ["expression", "questionToken"],
     [SyntaxKind.KvsExtantAssertionExpression]: ["expression", "exclamationToken"],
     [SyntaxKind.KvsExtantAssignmentExpression]: ["left", "questionToken", "equalsToken", "right"],
+    [SyntaxKind.KvsTypedSpreadAssignmentExpression]: ["left", "dotDotDotToken", "equalsToken", "right"],
     [SyntaxKind.KvsExtantTestExpression]: ["expression", "questionToken"],
     [SyntaxKind.KvsDefaultExpression]: ["expression"],
     [SyntaxKind.KvsNullingSieveExpression]: ["firstTildeToken", "secondTildeToken", "expression"],

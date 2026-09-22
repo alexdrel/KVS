@@ -137,6 +137,8 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 		return tx.transformNullingSieve(node.AsKvsSieveBindingInitializer().Expression)
 	case ast.KindKvsSieveAssignmentExpression:
 		return tx.transformSieveAssignment(node.AsKvsSieveAssignmentExpression())
+	case ast.KindKvsTypedSpreadAssignmentExpression:
+		return tx.transformTypedSpreadAssignment(node.AsKvsTypedSpreadAssignmentExpression())
 	case ast.KindKvsFailureDemotionExpression:
 		return tx.transformFailureDemotion(node.AsKvsFailureDemotionExpression())
 	case ast.KindKvsFailurePromotionExpression:
@@ -313,6 +315,20 @@ func (tx *transformer) transformSieveAssignment(node *ast.KvsSieveAssignmentExpr
 	return tx.Factory().NewAssignmentExpression(
 		tx.Visitor().VisitNode(node.Left),
 		tx.transformNullingSieve(node.Right),
+	)
+}
+
+func (tx *transformer) transformTypedSpreadAssignment(node *ast.KvsTypedSpreadAssignmentExpression) *ast.Node {
+	factory := tx.Factory()
+	names := tx.resolver.GetKvsTypedSpreadProperties(node.AsNode())
+	fields := make([]*ast.Node, 0, len(names))
+	for _, name := range names {
+		fields = append(fields, factory.NewStringLiteral(name, ast.TokenFlagsNone))
+	}
+	return factory.NewKvsProjectHelper(
+		tx.Visitor().VisitNode(node.Left),
+		tx.Visitor().VisitNode(node.Right),
+		fields,
 	)
 }
 
@@ -537,8 +553,28 @@ func (tx *transformer) transformTypedObjectExpression(node *ast.KvsTypedObjectEx
 		}
 		properties = append(properties, factory.NewPropertyAssignment(nil, tx.makeTypedObjectPropertyName(item.Name), nil, nil, tx.makeTypedObjectDefault(item)))
 	}
-	properties = append(properties, node.Properties.Nodes...)
+	for _, property := range node.Properties.Nodes {
+		if ast.IsSpreadAssignment(property) {
+			properties = append(properties, tx.makeTypedObjectSpread(property))
+		} else {
+			properties = append(properties, property)
+		}
+	}
 	return tx.transformObjectExpression(node.AsNode(), properties, node.MultiLine, false)
+}
+
+func (tx *transformer) makeTypedObjectSpread(node *ast.Node) *ast.Node {
+	factory := tx.Factory()
+	names := tx.resolver.GetKvsTypedSpreadProperties(node)
+	fields := make([]*ast.Node, 0, len(names))
+	for _, name := range names {
+		fields = append(fields, factory.NewStringLiteral(name, ast.TokenFlagsNone))
+	}
+	return factory.NewSpreadAssignment(factory.NewKvsProjectHelper(
+		factory.NewObjectLiteralExpression(nil, false),
+		tx.Visitor().VisitNode(node.Expression()),
+		fields,
+	))
 }
 
 func (tx *transformer) makeTypedObjectDefault(item printer.KvsTypedObjectDefault) *ast.Node {

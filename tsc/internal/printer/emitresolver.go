@@ -77,6 +77,7 @@ type EmitResolver interface {
 	binder.ReferenceResolver
 	GetKvsDefaultKind(node *ast.Node) ast.KvsDefaultKind
 	GetKvsTypedObjectDefaults(node *ast.Node) []KvsTypedObjectDefault
+	GetKvsTypedSpreadProperties(node *ast.Node) []string
 	CreateKvsDefaultConstructor(emitContext *EmitContext, node *ast.Node, symbol *ast.Symbol) *ast.Node
 	IsKvsLiftedBinaryExpression(node *ast.Node) bool
 	IsKvsPlaceholderBoundary(node *ast.Node) bool

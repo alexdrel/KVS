@@ -3,7 +3,7 @@
 This is a working implementation aid, not a language specification or feature
 order. The language documents remain authoritative for accepted semantics.
 
-Progress: **217 of 357 items complete (60.8%)**; **140 remain open**.
+Progress: **234 of 357 items complete (65.5%)**; **123 remain open**.
 
 - `[x]` means implemented with focused compiler evidence.
 - `[ ]` means unimplemented, incomplete, or not yet deliberately validated.
@@ -48,6 +48,8 @@ Implemented vertical slices:
 - Placeholder lambdas in contextual callback arguments: `%`.
 - Typed construction for concrete defaultable interfaces and object type aliases,
   including inherited fields and closed generic instantiations.
+- Typed spread during construction, with target-selected fields, presence-aware
+  copying, and wider-source projection.
 - Terminal structural defaults for the same concrete POD types: `maybeProfile!`.
 
 Known semantic debts:
@@ -418,26 +420,26 @@ them; generated example `.js` files are intentionally ignored.
 
 ### Typed spread / projection
 
-- [ ] `Point{ ...rect }`
-- [ ] Target type selects fields
-- [ ] Extra source fields discarded at runtime
-- [ ] Incompatible shared field diagnostic
-- [ ] No-common-fields diagnostic
-- [ ] Absent source is a no-op
-- [ ] Nullable source checked using present type
-- [ ] Absent source field skips copy
-- [ ] Shallow copy
-- [ ] `unknown` rejected without narrowing/validation
-- [ ] `any` remains unsound escape hatch
-- [ ] Left-to-right spread precedence
+- [x] `Point{ ...rect }`
+- [x] Target type selects fields
+- [x] Extra source fields discarded at runtime
+- [x] Incompatible shared field diagnostic
+- [x] No-common-fields diagnostic
+- [x] Absent source is a no-op
+- [x] Nullable source checked using present type
+- [x] Missing or `undefined` source field skips; `null` copies into nullable target
+- [x] Shallow copy
+- [x] `unknown` rejected without narrowing/validation
+- [x] `any` remains unsound escape hatch
+- [x] Left-to-right spread precedence
 
 ### Typed in-place spread
 
-- [ ] `profile ...= patch`
-- [ ] Same projection rules as construction
-- [ ] Preserve target identity
-- [ ] Preserve alias visibility
-- [ ] Reject readonly fields
+- [x] `profile ...= patch`
+- [x] Same projection rules as construction
+- [x] Preserve target identity
+- [x] Preserve alias visibility
+- [x] Reject readonly fields
 - [ ] Nullable/materialized target
 
 ### Writable nullable paths

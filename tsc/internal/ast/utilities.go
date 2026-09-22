@@ -195,6 +195,11 @@ func GetAssignmentTarget(node *Node) *Node {
 				return parent
 			}
 			return nil
+		case KindKvsTypedSpreadAssignmentExpression:
+			if parent.AsKvsTypedSpreadAssignmentExpression().Left == node {
+				return parent
+			}
+			return nil
 		case KindKvsCatchSplitAssignmentExpression:
 			expression := parent.AsKvsCatchSplitAssignmentExpression()
 			if expression.ValueTarget == node || expression.ErrorTarget == node {

@@ -156,19 +156,38 @@ Run it with:
 go -C ./tsc test -run='TestLocal/kvsPlaceholderLambda' ./internal/testrunner
 ```
 
-## Typed-construction slice
+## Typed-construction and projection slice
 
 `kvsTypedConstruction.ts` checks default construction and written fields for
 concrete interfaces and object type aliases. It covers inherited and nested
 required fields, fresh mutable defaults, closed generic instantiations,
 contextual field checking, both conditional-field spellings, explicit absence
-for nullable fields, and quoted property names.
+for nullable fields, and quoted property names. Its projection cases verify
+wider, nullable, absent, and `any` sources; optional fields omitted through
+`undefined`; nullable fields copied into nullable targets but rejected for
+required targets; incompatible shared fields, sources with no common fields,
+and `unknown`; and left-to-right combinations of direct fields and multiple
+spreads. The JavaScript baseline verifies that lowering evaluates a spread
+source once, selects only target fields, reads each selected value once through
+ordinary property access, skips `undefined`, copies `null`, and preserves
+shallow values.
 
 The same case rejects unknown fields, nullable values assigned directly to
 required fields, classes, non-object aliases, required functions, literal
 unions without their generated primitive default, required recursion, and open
 generic shapes. A line break before `{}` also remains an ordinary TypeScript
 statement boundary rather than forming typed construction.
+
+The runnable `typed-construction.ts` example tells a small geometry story: it
+projects a rectangle to a point, builds a marker rectangle from a point, and
+combines projections left-to-right. It then moves an existing rectangle with
+`...=` and shows that an alias observes the same mutation. Every logged result
+is followed by its expected output comment; detailed boundary coverage remains
+in the conformance case rather than the example.
+
+The in-place cases additionally verify ordinary compound-assignment target
+eligibility, property targets without writeback, readonly projected fields,
+nullable targets, and reuse of the same projection diagnostics and helper.
 
 Run it with:
 

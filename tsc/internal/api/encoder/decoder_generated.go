@@ -324,6 +324,13 @@ func (d *astDecoder) createChildrenNode(kind ast.Kind, data uint32, childIndices
 		equalsToken := d.nodeAt(it.nextIf(mask, 2))
 		right := d.nodeAt(it.nextIf(mask, 3))
 		return d.factory.NewKvsExtantAssignmentExpression(left, questionToken, equalsToken, right), nil
+	case ast.KindKvsTypedSpreadAssignmentExpression:
+		it := newChildIter(childIndices)
+		left := d.nodeAt(it.nextIf(mask, 0))
+		dotDotDotToken := d.nodeAt(it.nextIf(mask, 1))
+		equalsToken := d.nodeAt(it.nextIf(mask, 2))
+		right := d.nodeAt(it.nextIf(mask, 3))
+		return d.factory.NewKvsTypedSpreadAssignmentExpression(left, dotDotDotToken, equalsToken, right), nil
 	case ast.KindKvsExtantTestExpression:
 		it := newChildIter(childIndices)
 		expression := d.nodeAt(it.nextIf(mask, 0))

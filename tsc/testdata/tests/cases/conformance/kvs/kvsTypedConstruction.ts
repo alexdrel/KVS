@@ -57,6 +57,38 @@ declare const maybeName: string?;
 declare const maybeTheme: string?;
 declare const note: string?;
 
+interface Coordinates {
+    x: number;
+}
+
+interface Point extends Coordinates {
+    y: number;
+}
+
+interface Rectangle {
+    x: number;
+    y: number;
+    width: number;
+    label: string;
+}
+
+interface NullablePoint {
+    x: number?;
+    y: number;
+}
+
+declare const rectangle: Rectangle;
+declare const maybeRectangle: Rectangle?;
+declare const incompatible: { x: string };
+declare const maybeIncompatible: { x: string }?;
+declare const unrelated: { width: number };
+declare const unknownSource: unknown;
+declare const anySource: any;
+declare const optionalPoint: { x?: number; y?: number };
+declare const nullablePoint: { x: number?; y: number };
+declare function getRectangle(): Rectangle?;
+declare function getPoint(): Point;
+
 const empty = Profile{};
 const spaced = Profile { enabled: true };
 const written = Profile{
@@ -80,6 +112,57 @@ const report = Report{
         yield entity.id;
     },
 };
+
+const projected = Point{ ...rectangle };
+const projectedNullable = Point{ ...maybeRectangle };
+const projectedAbsent = Point{ ...null };
+const projectedAny = Point{ ...anySource };
+const projectedInOrder = Point{ x: 1, ...rectangle, y: 2 };
+const projectedTwice = Point{ ...rectangle, ...maybeRectangle };
+const projectedOnce = Point{ ...getRectangle() };
+const projectedOptional = Point{ ...optionalPoint };
+const projectedNull = NullablePoint{ ...nullablePoint };
+
+let updated = Point{};
+const updatedAlias = updated;
+const updateResult = updated ...= rectangle;
+updated ...= optionalPoint;
+updated ...= incompatible;
+updated ...= nullablePoint;
+updated ...= unrelated;
+updated ...= unknownSource;
+
+interface PointHolder {
+    point: Point;
+}
+let holder = PointHolder{};
+holder.point ...= rectangle;
+
+interface ReadonlyPointHolder {
+    readonly point: Point;
+}
+let readonlyHolder = ReadonlyPointHolder{};
+readonlyHolder.point ...= rectangle;
+
+const constantPoint = Point{};
+constantPoint ...= rectangle;
+getPoint() ...= rectangle;
+
+interface ReadonlyPoint {
+    readonly x: number;
+    y: number;
+}
+let readonlyPoint = ReadonlyPoint{};
+readonlyPoint ...= rectangle;
+
+let maybePoint: Point?;
+maybePoint ...= rectangle;
+
+Point{ ...incompatible };
+Point{ ...maybeIncompatible };
+Point{ ...nullablePoint };
+Point{ ...unrelated };
+Point{ ...unknownSource };
 
 Profile{ id: maybeName };
 Profile{ unknown: 1 };

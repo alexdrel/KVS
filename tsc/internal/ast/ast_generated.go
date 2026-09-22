@@ -68,6 +68,7 @@ type NodeFactory struct {
 	kvsSelectExpressionArena                 core.Arena[KvsSelectExpression]
 	kvsSieveAssignmentExpressionArena        core.Arena[KvsSieveAssignmentExpression]
 	kvsSieveBindingInitializerArena          core.Arena[KvsSieveBindingInitializer]
+	kvsTypedSpreadAssignmentExpressionArena  core.Arena[KvsTypedSpreadAssignmentExpression]
 	kvsYieldStatementArena                   core.Arena[KvsYieldStatement]
 	literalTypeNodeArena                     core.Arena[LiteralTypeNode]
 	methodSignatureDeclarationArena          core.Arena[MethodSignatureDeclaration]
@@ -306,6 +307,7 @@ type (
 	KvsNullableAssertionExpressionNode      = Node
 	KvsExtantAssertionExpressionNode        = Node
 	KvsExtantAssignmentExpressionNode       = Node
+	KvsTypedSpreadAssignmentExpressionNode  = Node
 	KvsExtantTestExpressionNode             = Node
 	KvsDefaultExpressionNode                = Node
 	KvsNullingSieveExpressionNode           = Node
@@ -1903,6 +1905,54 @@ func (node *KvsExtantAssignmentExpression) Clone(f NodeFactoryCoercible) *Node {
 
 func IsKvsExtantAssignmentExpression(node *Node) bool {
 	return node.Kind == KindKvsExtantAssignmentExpression
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// KvsTypedSpreadAssignmentExpression
+// ──────────────────────────────────────────────────────────────────────
+
+type KvsTypedSpreadAssignmentExpression struct {
+	ExpressionBase
+	CompositeBase
+	Left           *Expression
+	DotDotDotToken *DotDotDotToken
+	EqualsToken    *EqualsToken
+	Right          *Expression
+}
+
+func (f *NodeFactory) NewKvsTypedSpreadAssignmentExpression(left *Expression, dotDotDotToken *DotDotDotToken, equalsToken *EqualsToken, right *Expression) *Node {
+	data := f.kvsTypedSpreadAssignmentExpressionArena.New()
+	data.Left = left
+	data.DotDotDotToken = dotDotDotToken
+	data.EqualsToken = equalsToken
+	data.Right = right
+	return f.newNode(KindKvsTypedSpreadAssignmentExpression, data)
+}
+
+func (f *NodeFactory) UpdateKvsTypedSpreadAssignmentExpression(node *KvsTypedSpreadAssignmentExpression, left *Expression, dotDotDotToken *DotDotDotToken, equalsToken *EqualsToken, right *Expression) *Node {
+	if left != node.Left || dotDotDotToken != node.DotDotDotToken || equalsToken != node.EqualsToken || right != node.Right {
+		return updateNode(f.NewKvsTypedSpreadAssignmentExpression(left, dotDotDotToken, equalsToken, right), node.AsNode(), f.hooks)
+	}
+	return node.AsNode()
+}
+
+func (node *KvsTypedSpreadAssignmentExpression) ForEachChild(v Visitor) bool {
+	return visit(v, node.Left) ||
+		visit(v, node.DotDotDotToken) ||
+		visit(v, node.EqualsToken) ||
+		visit(v, node.Right)
+}
+
+func (node *KvsTypedSpreadAssignmentExpression) VisitEachChild(v *NodeVisitor) *Node {
+	return v.Factory.UpdateKvsTypedSpreadAssignmentExpression(node, v.visitNode(node.Left), v.visitNode(node.DotDotDotToken), v.visitNode(node.EqualsToken), v.visitNode(node.Right))
+}
+
+func (node *KvsTypedSpreadAssignmentExpression) Clone(f NodeFactoryCoercible) *Node {
+	return cloneNode(f.AsNodeFactory().NewKvsTypedSpreadAssignmentExpression(node.Left, node.DotDotDotToken, node.EqualsToken, node.Right), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func IsKvsTypedSpreadAssignmentExpression(node *Node) bool {
+	return node.Kind == KindKvsTypedSpreadAssignmentExpression
 }
 
 // ──────────────────────────────────────────────────────────────────────
@@ -10143,6 +10193,8 @@ func (n *Node) ForEachChild(v Visitor) bool {
 		return n.data.(*KvsExtantAssertionExpression).ForEachChild(v)
 	case KindKvsExtantAssignmentExpression:
 		return n.data.(*KvsExtantAssignmentExpression).ForEachChild(v)
+	case KindKvsTypedSpreadAssignmentExpression:
+		return n.data.(*KvsTypedSpreadAssignmentExpression).ForEachChild(v)
 	case KindKvsExtantTestExpression:
 		return n.data.(*KvsExtantTestExpression).ForEachChild(v)
 	case KindKvsDefaultExpression:
@@ -10616,6 +10668,10 @@ func (n *Node) AsKvsExtantAssertionExpression() *KvsExtantAssertionExpression {
 
 func (n *Node) AsKvsExtantAssignmentExpression() *KvsExtantAssignmentExpression {
 	return n.data.(*KvsExtantAssignmentExpression)
+}
+
+func (n *Node) AsKvsTypedSpreadAssignmentExpression() *KvsTypedSpreadAssignmentExpression {
+	return n.data.(*KvsTypedSpreadAssignmentExpression)
 }
 
 func (n *Node) AsKvsExtantTestExpression() *KvsExtantTestExpression {

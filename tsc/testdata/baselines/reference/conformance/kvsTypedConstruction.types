@@ -110,6 +110,78 @@ declare const maybeTheme: string?;
 declare const note: string?;
 >note : string | null | undefined
 
+interface Coordinates {
+    x: number;
+>x : number
+}
+
+interface Point extends Coordinates {
+    y: number;
+>y : number
+}
+
+interface Rectangle {
+    x: number;
+>x : number
+
+    y: number;
+>y : number
+
+    width: number;
+>width : number
+
+    label: string;
+>label : string
+}
+
+interface NullablePoint {
+    x: number?;
+>x : number | null | undefined
+
+    y: number;
+>y : number
+}
+
+declare const rectangle: Rectangle;
+>rectangle : Rectangle
+
+declare const maybeRectangle: Rectangle?;
+>maybeRectangle : Rectangle | null | undefined
+
+declare const incompatible: { x: string };
+>incompatible : { x: string; }
+>x : string
+
+declare const maybeIncompatible: { x: string }?;
+>maybeIncompatible : { x: string; } | null | undefined
+>x : string
+
+declare const unrelated: { width: number };
+>unrelated : { width: number; }
+>width : number
+
+declare const unknownSource: unknown;
+>unknownSource : unknown
+
+declare const anySource: any;
+>anySource : any
+
+declare const optionalPoint: { x?: number; y?: number };
+>optionalPoint : { x?: number; y?: number; }
+>x : number | undefined
+>y : number | undefined
+
+declare const nullablePoint: { x: number?; y: number };
+>nullablePoint : { x: number?; y: number; }
+>x : number | null | undefined
+>y : number
+
+declare function getRectangle(): Rectangle?;
+>getRectangle : () => Rectangle?
+
+declare function getPoint(): Point;
+>getPoint : () => Point
+
 const empty = Profile{};
 >empty : Profile
 >Profile{} : Profile
@@ -203,6 +275,172 @@ const report = Report{
 
     },
 };
+
+const projected = Point{ ...rectangle };
+>projected : Point
+>Point{ ...rectangle } : Point
+>rectangle : Rectangle
+
+const projectedNullable = Point{ ...maybeRectangle };
+>projectedNullable : Point
+>Point{ ...maybeRectangle } : Point
+>maybeRectangle : Rectangle | null | undefined
+
+const projectedAbsent = Point{ ...null };
+>projectedAbsent : Point
+>Point{ ...null } : Point
+
+const projectedAny = Point{ ...anySource };
+>projectedAny : Point
+>Point{ ...anySource } : Point
+>anySource : any
+
+const projectedInOrder = Point{ x: 1, ...rectangle, y: 2 };
+>projectedInOrder : Point
+>Point{ x: 1, ...rectangle, y: 2 } : Point
+>x : number
+>1 : 1
+>rectangle : Rectangle
+>y : number
+>2 : 2
+
+const projectedTwice = Point{ ...rectangle, ...maybeRectangle };
+>projectedTwice : Point
+>Point{ ...rectangle, ...maybeRectangle } : Point
+>rectangle : Rectangle
+>maybeRectangle : Rectangle | null | undefined
+
+const projectedOnce = Point{ ...getRectangle() };
+>projectedOnce : Point
+>Point{ ...getRectangle() } : Point
+>getRectangle() : Rectangle | null | undefined
+>getRectangle : () => Rectangle?
+
+const projectedOptional = Point{ ...optionalPoint };
+>projectedOptional : Point
+>Point{ ...optionalPoint } : Point
+>optionalPoint : { x?: number; y?: number; }
+
+const projectedNull = NullablePoint{ ...nullablePoint };
+>projectedNull : NullablePoint
+>NullablePoint{ ...nullablePoint } : NullablePoint
+>nullablePoint : { x: number?; y: number; }
+
+let updated = Point{};
+>updated : Point
+>Point{} : Point
+
+const updatedAlias = updated;
+>updatedAlias : Point
+>updated : Point
+
+const updateResult = updated ...= rectangle;
+>updateResult : Point
+>updated : any
+>rectangle : any
+
+updated ...= optionalPoint;
+>updated : any
+>optionalPoint : any
+
+updated ...= incompatible;
+>updated : any
+>incompatible : any
+
+updated ...= nullablePoint;
+>updated : any
+>nullablePoint : any
+
+updated ...= unrelated;
+>updated : any
+>unrelated : any
+
+updated ...= unknownSource;
+>updated : any
+>unknownSource : any
+
+interface PointHolder {
+    point: Point;
+>point : Point
+}
+let holder = PointHolder{};
+>holder : PointHolder
+>PointHolder{} : PointHolder
+
+holder.point ...= rectangle;
+>holder.point : Point
+>holder : PointHolder
+>point : Point
+>rectangle : any
+
+interface ReadonlyPointHolder {
+    readonly point: Point;
+>point : Point
+}
+let readonlyHolder = ReadonlyPointHolder{};
+>readonlyHolder : ReadonlyPointHolder
+>ReadonlyPointHolder{} : ReadonlyPointHolder
+
+readonlyHolder.point ...= rectangle;
+>readonlyHolder.point : any
+>readonlyHolder : ReadonlyPointHolder
+>point : any
+>rectangle : any
+
+const constantPoint = Point{};
+>constantPoint : Point
+>Point{} : Point
+
+constantPoint ...= rectangle;
+>constantPoint : any
+>rectangle : any
+
+getPoint() ...= rectangle;
+>getPoint() : Point
+>getPoint : () => Point
+>rectangle : any
+
+interface ReadonlyPoint {
+    readonly x: number;
+>x : number
+
+    y: number;
+>y : number
+}
+let readonlyPoint = ReadonlyPoint{};
+>readonlyPoint : ReadonlyPoint
+>ReadonlyPoint{} : ReadonlyPoint
+
+readonlyPoint ...= rectangle;
+>readonlyPoint : any
+>rectangle : any
+
+let maybePoint: Point?;
+>maybePoint : Point | null | undefined
+
+maybePoint ...= rectangle;
+>maybePoint : any
+>rectangle : any
+
+Point{ ...incompatible };
+>Point{ ...incompatible } : Point
+>incompatible : { x: string; }
+
+Point{ ...maybeIncompatible };
+>Point{ ...maybeIncompatible } : Point
+>maybeIncompatible : { x: string; } | null | undefined
+
+Point{ ...nullablePoint };
+>Point{ ...nullablePoint } : Point
+>nullablePoint : { x: number?; y: number; }
+
+Point{ ...unrelated };
+>Point{ ...unrelated } : Point
+>unrelated : { width: number; }
+
+Point{ ...unknownSource };
+>Point{ ...unknownSource } : Point
+>unknownSource : unknown
 
 Profile{ id: maybeName };
 >Profile{ id: maybeName } : Profile

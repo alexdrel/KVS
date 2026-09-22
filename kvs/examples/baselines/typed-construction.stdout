@@ -1,9 +1,5 @@
-{"roles":[],"preferences":{"darkMode":false,"shortcuts":[]},"id":"user-7","name":"Alex"}
-alex
-{"history":[],"value":"ready"}
-{"name":"","roles":[],"preferences":{"darkMode":false,"shortcuts":[]},"id":""}
+{ x: 12, y: 8 }
+{ x: 40, y: 25, width: 1, height: 1 }
+{ x: 12, y: 6 }
+{ width: 120, height: 60, x: 20, y: 10 }
 true
-guest
-0 1
-admin 0
-search 0

@@ -1733,6 +1733,8 @@ func (b *Binder) bindChildren(node *ast.Node) {
 		b.bindKvsExtantAssignmentExpression(node)
 	case ast.KindKvsSieveAssignmentExpression:
 		b.bindKvsSieveAssignmentExpression(node)
+	case ast.KindKvsTypedSpreadAssignmentExpression:
+		b.bindEachChild(node)
 	case ast.KindKvsFailureDemotionExpression, ast.KindKvsFailurePromotionExpression:
 		b.bindEachChild(node)
 	case ast.KindKvsCatchSplitAssignmentExpression:
