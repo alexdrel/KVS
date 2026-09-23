@@ -635,11 +635,6 @@ export interface KvsTypedSpreadAssignmentExpression extends ExpressionBase {
     readonly equalsToken: EqualsToken;
     readonly right: Expression;
 }
-export interface KvsExtantTestExpression extends ExpressionBase {
-    readonly kind: SyntaxKind.KvsExtantTestExpression;
-    readonly expression: Expression;
-    readonly questionToken: QuestionToken;
-}
 export interface KvsDefaultExpression extends ExpressionBase {
     readonly kind: SyntaxKind.KvsDefaultExpression;
     readonly expression: Expression;

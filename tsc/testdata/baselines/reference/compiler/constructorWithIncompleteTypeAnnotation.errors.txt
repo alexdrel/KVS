@@ -51,7 +51,7 @@ constructorWithIncompleteTypeAnnotation.ts(205,28): error TS1109: Expression exp
 constructorWithIncompleteTypeAnnotation.ts(213,16): error TS2304: Cannot find name 'bool'.
 constructorWithIncompleteTypeAnnotation.ts(218,10): error TS1068: Unexpected token. A constructor, method, accessor, or property was expected.
 constructorWithIncompleteTypeAnnotation.ts(223,23): error TS2304: Cannot find name 'bool'.
-constructorWithIncompleteTypeAnnotation.ts(227,13): error TS1005: ':' expected.
+constructorWithIncompleteTypeAnnotation.ts(227,13): error TS1109: Expression expected.
 constructorWithIncompleteTypeAnnotation.ts(234,14): error TS1005: '{' expected.
 constructorWithIncompleteTypeAnnotation.ts(235,9): error TS1128: Declaration or statement expected.
 constructorWithIncompleteTypeAnnotation.ts(235,16): error TS2304: Cannot find name 'method1'.
@@ -431,10 +431,10 @@ constructorWithIncompleteTypeAnnotation.ts(261,1): error TS1128: Declaration or 
 !!! error TS2304: Cannot find name 'bool'.
                 var myEvent = () => { return 1; };
                 if (myEvent() == 1)
-                    return true ? false
+                    return true ? 
                 else
                 ~~~~
-!!! error TS1005: ':' expected.
+!!! error TS1109: Expression expected.
                     return false;
             }
         }

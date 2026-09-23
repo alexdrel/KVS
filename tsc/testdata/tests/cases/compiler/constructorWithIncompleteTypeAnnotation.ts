@@ -227,7 +227,7 @@ namespace TypeScriptAllInOne {
         public Foo(): bool {
             var myEvent = () => { return 1; };
             if (myEvent() == 1)
-                return true ? false
+                return true ? 
             else
                 return false;
         }

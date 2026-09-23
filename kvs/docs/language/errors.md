@@ -6,15 +6,10 @@ Handling a failed operation often requires moving a variable declaration outside
 const config = JSON.parse(text) ~ SyntaxError;
 ```
 
-Here a syntax error produces absence, which the following code can handle like any other missing value. Other exceptions propagate normally. For more involved recovery, ordinary `try`/`catch` remains available.
-
-## Why ordinary exceptions?
-
-KVS keeps the JavaScript exception model so that ordinary computations and library calls compose directly. Synchronous exceptions propagate normally, and exceptions from asynchronous operations reject their promises. Local error policy does not require a `Result<T, E>` carrier throughout the call chain.
-
-Exceptions are not part of KVS's static function types, and callers are not required to declare or handle them. Documentation and tooling may describe expected exceptions, as they do for JavaScript APIs, but that information does not participate in type checking.
-
-Demoting a selected failure with `~` means choosing absence as sufficient information for subsequent computation. When the reason matters, retain the exception or inspect it with a catch-and-split binding. `~~` establishes a boundary that requires a value and preserves an underlying thrown cause.
+Here a syntax error becomes absence. KVS adds local failure policies without
+checked exceptions or a `Result<T, E>` carrier: unmatched exceptions continue
+to propagate. Use catch-and-split when the reason matters, or `~~` to require a
+value while preserving an underlying cause.
 
 ## Catch and split: `const value~error = expression`
 
@@ -32,7 +27,8 @@ This catches an exception from the right-hand expression and separates its outco
 
 The error binding has type `unknown?` because JavaScript permits throwing arbitrary values. KVS preserves the caught value exactly and does not wrap or normalize non-`Error` throws.
 
-The value binding is nullable because an exception leaves it absent. Ordinary declaration and assignment forms apply to the pair:
+The value binding is nullable because an exception leaves it absent. The pair
+supports both declaration and assignment:
 
 ```kvs
 let value~error = firstAttempt();
@@ -46,14 +42,14 @@ const invoice~error = await create_invoice(id);
 
 await Audit.invoice_failure?(id, error)
 
-if (error?) {
+if (error != null) {
     throw error;
 }
 
 return invoice
 ```
 
-The `?` explicitly permits the audit call to be skipped when `error` is absent. Forwarding uses ordinary `throw` and `return`; KVS has no special fallible return or forwarding rule.
+The `?` permits the audit call to be skipped when `error` is absent.
 
 The compiler should warn when a captured error binding is unused.
 
@@ -82,11 +78,10 @@ subclasses, using JavaScript `instanceof`. Every other pattern matches only a
 normally returned value, using `Object.is`. Thus `NaN` works without a special
 case, object sentinels use identity, and `0` and `-0` remain distinct.
 
-The left expression is evaluated once. A value pattern is evaluated once after
-the left expression returns; an error-constructor pattern is evaluated once
-after the left expression throws. A pattern is not evaluated for an outcome it
-cannot match. Unmatched returned values remain values, and unmatched thrown
-values propagate unchanged.
+A value pattern is evaluated only after the left expression returns; an
+error-constructor pattern only after it throws. A pattern is not evaluated for
+an outcome it cannot match. Unmatched returned values remain values, and
+unmatched thrown values propagate unchanged.
 
 `~` is left-associative, so policies compose without pattern-list syntax:
 
@@ -131,10 +126,9 @@ const config = parse_config(text)
 ```
 
 The replacement expression must produce an `Error` and is evaluated only after
-absence or a thrown value. A class constructor still requires `new`; the plain
-call above denotes an ordinary factory function returning an error. KVS does
-not preserve a distinction between returned absence and `throw null` or
-`throw undefined`, so those unusual throws do not acquire an automatic cause.
+absence or a thrown value. KVS does not preserve a distinction between returned
+absence and `throw null` or `throw undefined`, so those unusual throws do not
+acquire an automatic cause.
 
 This operation currently lowers only at the head of a statement-owned value
 path: a single declaration initializer, assignment right-hand side, return or
@@ -166,7 +160,8 @@ The current proposal does not include:
 - special return forwarding;
 - transparent propagation of captured errors into derived values.
 
-The direct binding form handles local inspection, and ordinary `throw` handles forwarding, without introducing another value category.
+The direct binding form handles local inspection without introducing another
+value category.
 
 ---
 

@@ -3407,8 +3407,6 @@ func (p *Printer) emitExpression(node *ast.Expression, precedence ast.OperatorPr
 		p.emitKvsExtantAssertionExpression(node.AsKvsExtantAssertionExpression())
 	case ast.KindKvsExtantAssignmentExpression:
 		p.emitKvsExtantAssignmentExpression(node.AsKvsExtantAssignmentExpression())
-	case ast.KindKvsExtantTestExpression:
-		p.emitKvsExtantTestExpression(node.AsKvsExtantTestExpression())
 	case ast.KindKvsDefaultExpression:
 		p.emitKvsDefaultExpression(node.AsKvsDefaultExpression())
 	case ast.KindKvsSieveExpression:
@@ -3880,13 +3878,6 @@ func (p *Printer) emitKvsTypedSpreadAssignmentExpression(node *ast.KvsTypedSprea
 	p.emitPunctuationNode(node.EqualsToken)
 	p.writeSpace()
 	p.emitExpression(node.Right, ast.OperatorPrecedenceAssignment)
-	p.exitNode(node.AsNode(), state)
-}
-
-func (p *Printer) emitKvsExtantTestExpression(node *ast.KvsExtantTestExpression) {
-	state := p.enterNode(node.AsNode())
-	p.emitExpression(node.Expression, ast.OperatorPrecedenceUpdate)
-	p.emitPunctuationNode(node.QuestionToken)
 	p.exitNode(node.AsNode(), state)
 }
 

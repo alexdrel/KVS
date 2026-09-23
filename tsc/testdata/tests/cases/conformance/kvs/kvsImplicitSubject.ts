@@ -39,7 +39,7 @@ function nestedSubjects(groups: Group[]) {
 function explicitLoopKeepsOuterSubject(groups: Group[]) {
     return collect (groups) {
         for (const value of _.values) {
-            if (value?) yield _.name;
+            if (value != null) yield _.name;
         }
     };
 }

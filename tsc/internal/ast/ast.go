@@ -369,8 +369,6 @@ func (n *Node) Expression() *Node {
 		return n.AsKvsNullableAssertionExpression().Expression
 	case KindKvsExtantAssertionExpression:
 		return n.AsKvsExtantAssertionExpression().Expression
-	case KindKvsExtantTestExpression:
-		return n.AsKvsExtantTestExpression().Expression
 	case KindKvsDefaultExpression:
 		return n.AsKvsDefaultExpression().Expression
 	case KindKvsSieveExpression:
@@ -482,8 +480,6 @@ func (m *MutableNode) SetExpression(expr *Node) {
 		n.AsKvsNullableAssertionExpression().Expression = expr
 	case KindKvsExtantAssertionExpression:
 		n.AsKvsExtantAssertionExpression().Expression = expr
-	case KindKvsExtantTestExpression:
-		n.AsKvsExtantTestExpression().Expression = expr
 	case KindKvsDefaultExpression:
 		n.AsKvsDefaultExpression().Expression = expr
 	case KindKvsSieveExpression:

@@ -100,8 +100,6 @@ func IsIdentifierReference(name *ast.IdentifierNode, parent *ast.Node) bool {
 	case ast.KindKvsNullingExpression:
 		return parent.AsKvsNullingExpression().Condition == name ||
 			parent.AsKvsNullingExpression().WhenTrue == name
-	case ast.KindKvsExtantTestExpression:
-		return parent.AsKvsExtantTestExpression().Expression == name
 	case ast.KindCallExpression, ast.KindNewExpression:
 		return parent.Expression() == name ||
 			slices.Contains(parent.Arguments(), name)

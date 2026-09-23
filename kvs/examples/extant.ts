@@ -37,9 +37,9 @@ const missionDuration = possibleFlightHours as! + 2;
 const possibleDestinations = [destination, activeDestination as?];
 console.log(launchSite, missionDuration, possibleDestinations);
 
-// Extant test: test presence and narrow the successful branch.
+// An explicit nullish comparison tests presence and narrows the successful branch.
 function announceLaunchWindow(launchWindow: string | number | undefined) {
-    if (launchWindow ?) {
+    if (launchWindow != null) {
         const displayWindow = typeof launchWindow === "string"
             ? launchWindow.toUpperCase()
             : launchWindow.toFixed(1);

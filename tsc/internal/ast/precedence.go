@@ -237,7 +237,7 @@ func GetOperatorPrecedence(nodeKind Kind, operatorKind Kind, flags OperatorPrece
 		return OperatorPrecedenceAssignment
 	case KindKvsFailureDemotionExpression, KindKvsFailurePromotionExpression:
 		return OperatorPrecedenceRelational
-	case KindKvsExtantTestExpression, KindKvsDefaultExpression:
+	case KindKvsDefaultExpression:
 		return OperatorPrecedenceUpdate
 	case KindKvsSieveExpression:
 		return OperatorPrecedenceUnary
@@ -405,9 +405,6 @@ func GetLeftmostExpression(node *Expression, stopAtCallExpressions bool) *Expres
 		switch node.Kind {
 		case KindPostfixUnaryExpression:
 			node = node.AsPostfixUnaryExpression().Operand
-			continue
-		case KindKvsExtantTestExpression:
-			node = node.AsKvsExtantTestExpression().Expression
 			continue
 		case KindKvsDefaultExpression:
 			node = node.AsKvsDefaultExpression().Expression

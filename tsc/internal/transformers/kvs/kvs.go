@@ -130,8 +130,6 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 		return tx.transformYield(node.Expression(), true)
 	case ast.KindKvsExtantAssignmentExpression:
 		return tx.transformExtantAssignment(node.AsKvsExtantAssignmentExpression())
-	case ast.KindKvsExtantTestExpression:
-		return tx.transformExtantTest(node.AsKvsExtantTestExpression())
 	case ast.KindKvsDefaultExpression:
 		return tx.transformDefault(node.AsKvsDefaultExpression())
 	case ast.KindKvsSieveExpression:
@@ -836,19 +834,6 @@ func (tx *transformer) makeTypedObjectDefaults(items []printer.KvsTypedObjectDef
 		properties = append(properties, tx.Factory().NewPropertyAssignment(nil, tx.makeTypedObjectPropertyName(item.Name), nil, nil, tx.makeTypedObjectDefault(item)))
 	}
 	return tx.Factory().NewObjectLiteralExpression(tx.Factory().NewNodeList(properties), false)
-}
-
-func (tx *transformer) transformExtantTest(node *ast.KvsExtantTestExpression) *ast.Node {
-	// `value?` is a boolean presence test. Loose null inequality excludes both
-	// null and undefined while preserving every present falsy value.
-	factory := tx.Factory()
-	return factory.NewBinaryExpression(
-		nil,
-		tx.Visitor().VisitNode(node.Expression),
-		nil,
-		factory.NewToken(ast.KindExclamationEqualsToken),
-		factory.NewKeywordExpression(ast.KindNullKeyword),
-	)
 }
 
 func (tx *transformer) transformIfBindingStatement(node *ast.KvsIfBindingStatement) *ast.Node {

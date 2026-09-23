@@ -102,7 +102,7 @@ function explicitLoopKeepsOuterSubject(groups: Group[]) {
 >groups : Group[]
 
     return collect (groups) {
->collect (groups) {        for (const value of _.values) {            if (value?) yield _.name;        }    } : string[]
+>collect (groups) {        for (const value of _.values) {            if (value != null) yield _.name;        }    } : string[]
 >groups : Group[]
 
         for (const value of _.values) {
@@ -111,8 +111,8 @@ function explicitLoopKeepsOuterSubject(groups: Group[]) {
 >_ : Group
 >values : (number | null)[]
 
-            if (value?) yield _.name;
->value? : boolean
+            if (value != null) yield _.name;
+>value != null : boolean
 >value : number | null
 >_.name : string
 >_ : Group

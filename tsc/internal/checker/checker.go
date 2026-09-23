@@ -8088,9 +8088,6 @@ func (c *Checker) checkExpressionWorker(node *ast.Node, checkMode CheckMode) *Ty
 		return c.checkKvsFailureDemotionExpression(node.AsKvsFailureDemotionExpression(), checkMode)
 	case ast.KindKvsFailurePromotionExpression:
 		return c.checkKvsFailurePromotionExpression(node.AsKvsFailurePromotionExpression(), checkMode)
-	case ast.KindKvsExtantTestExpression:
-		c.checkExpressionEx(node.Expression(), checkMode)
-		return c.booleanType
 	case ast.KindKvsDefaultExpression:
 		return c.checkKvsDefaultExpression(node, checkMode)
 	case ast.KindKvsSieveExpression, ast.KindKvsSieveBindingInitializer:

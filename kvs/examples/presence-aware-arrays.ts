@@ -6,7 +6,7 @@ function buildArgs(
     return ?[
         "build",
         watch === true ?: "--watch",
-        output? ?: `--out=${output}`,
+        output != null ?: `--out=${output}`,
         ...extra,
     ];
 }

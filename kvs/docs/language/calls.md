@@ -96,12 +96,6 @@ The operation expression may select a callable dynamically:
 value.(descending ? goDown : goUp, distance)
 ```
 
-This is equivalent to:
-
-```kvs
-(descending ? goDown : goUp)(value, distance)
-```
-
 The computed form is useful when a fluent computation reaches an operation that cannot be expressed as a named, subject-first call.
 
 ## Placeholder operations
@@ -149,16 +143,6 @@ const encoded = document
     .(encodeText(encoding, %))
     .compress("LZ", compressionLevel)
     .toBase64();
-```
-
-Conceptually, this performs:
-
-```kvs
-const normalized = normalize(document);
-const terminated = normalized + "\n";
-const bytes = encodeText(encoding, terminated);
-const compressed = compress(bytes, "LZ", compressionLevel);
-const encoded = toBase64(compressed);
 ```
 
 `%` retains one meaning in both callback and computed-operation positions: it creates a placeholder lambda. The anonymous dot step immediately applies that callable to its receiver.

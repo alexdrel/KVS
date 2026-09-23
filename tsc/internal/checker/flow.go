@@ -402,8 +402,6 @@ func (c *Checker) narrowType(f *FlowState, t *Type, expr *ast.Node, assumeTrue b
 		return c.narrowTypeByCallExpression(f, t, expr, assumeTrue)
 	case ast.KindParenthesizedExpression, ast.KindNonNullExpression, ast.KindKvsExtantAssertionExpression, ast.KindSatisfiesExpression:
 		return c.narrowType(f, t, expr.Expression(), assumeTrue)
-	case ast.KindKvsExtantTestExpression:
-		return c.narrowTypeByOptionality(f, t, expr.Expression(), assumeTrue)
 	case ast.KindKvsSieveExpression:
 		return c.narrowType(f, t, expr.Expression(), assumeTrue)
 	case ast.KindKvsComparisonAlternativesExpression:

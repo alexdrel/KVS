@@ -1,31 +1,35 @@
 # Lowering, Evaluation, and JavaScript Interop
 
-This is reference material for possible implementations, outside the main reading path. The thematic chapters define source-level behavior; this chapter describes how that behavior can map to JavaScript.
+This is reference material for the current compiler, outside the main reading
+path. The thematic chapters define source-level behavior; this chapter records
+the lowering currently performed, its known limitations, and prospective
+implementation sketches separately.
 
-KVS should generate unsurprising JavaScript or TypeScript. Native exceptions and rejected promises remain its runtime failure mechanism; nullable features should normally lower to branches, temporaries, and ordinary assignments.
+KVS generates JavaScript or TypeScript using branches, temporaries, ordinary
+assignments, and a small set of emitted helpers.
 
-## Nullable member access
+## Implemented lowering
+
+### Nullable member access
 
 ```kvs
 const name = user.profile.displayName;
 ```
 
-can lower approximately to:
+lowers approximately to:
 
 ```ts
 const $profile = user.profile;
 const name = $profile == null ? null : $profile.displayName;
 ```
 
-Generated code must evaluate each receiver once.
-
-## Explicit optional calls
+### Explicit optional calls
 
 ```kvs
 const normalized = normalize?(user.profile.displayName);
 ```
 
-can lower to:
+lowers to:
 
 ```ts
 const $profile = user.profile;
@@ -48,9 +52,11 @@ if (nullableItem != null) {
 }
 ```
 
-This shows the observable behavior for a simple variable receiver: an absent item does not create the array. A complete lowering may use hidden temporaries to evaluate the receiver and callable once, preserve `this`, and delay `!` write-backs until required arguments pass. Those mechanics are compiler work and need not dominate the source-level explanation.
+This shows the observable behavior for a simple variable receiver: an absent
+item does not create the array. The compiler uses hidden temporaries as needed
+to preserve `this` and delay `!` write-backs until required arguments pass.
 
-## Lifted arithmetic and equality
+### Lifted arithmetic and equality
 
 ```kvs
 const result = a + 4;
@@ -64,80 +70,100 @@ to be absent is rejected rather than assigned a present type. Nullable string
 concatenation and mixed numeric and string addition are rejected; postfix `!`
 provides an explicit empty-string choice where desired.
 
-All four equality operators lower directly and retain exact JavaScript
-semantics. The checker rejects a comparison when both operand types have
-possible present and absent values. Comparison with an absence-only operand is
-allowed, whether it is a `null` / `undefined` literal, an alias, or a
-flow-narrowed expression. Loose equality treats the two absence forms alike,
-while strict equality preserves their distinction. A nullable operand may also
-be compared with a present operand.
+Equality operators lower directly. The checker rejects a comparison when both
+operand types have possible present and absent values. Comparison with an
+absence-only or present operand is allowed.
 
-Arithmetic lowering evaluates lifted operands once, from left to right, and does not
-evaluate a later operand after an earlier required operand is absent. The
-language guarantees that order for correctness, while discouraging programs
-from using nullable operands as implicit effect guards.
+Arithmetic lowering proceeds from left to right and skips later operands after
+an earlier required operand is absent.
 
 Finite comparison alternatives with one or two values lower to short-circuiting
-comparisons after capturing the subject once. Three or more alternatives lower
-to an array-literal `includes` call. Runtime spread alternatives lower to
+comparisons. Three or more alternatives lower to an array-literal `includes`
+call. Runtime spread alternatives lower to
 `[...(alternatives ?? [])].includes(subject)`; inequality negates the complete
 membership result. Runtime alternatives are arrays only and provide no special
 flow narrowing.
 
-Comparison chains lower to `&&`-joined adjacent comparisons. Reused middle
-operands are captured once, and each later operand remains inside the preceding
-successful branch. The chain result is always boolean; each link retains its
-ordinary checker rules.
+Comparison chains lower to `&&`-joined adjacent comparisons, with reused middle
+operands captured in temporaries. Each later operand remains inside the
+preceding successful branch.
 
-## Presence
+### Type-only syntax
 
-```kvs
-value?
-```
+Presence tests use `value != null`; TypeScript flow analysis narrows `T?` to `T`
+on the successful branch.
 
-can lower to:
-
-```ts
-value != null
-```
-
-In a branch, the KVS type checker narrows `T?` to `T`.
+`T?` and `T!` affect checking and declaration output but are erased from
+JavaScript emit.
 
 `as?` and `as!` affect only type checking and are erased like ordinary `as` assertions. They add or remove top-level nullability without inserting evaluation, checks, or defaults; `as!` is unchecked.
 
 The inferred binding suffixes on `let value?`, `const value!`, and
 `let value!` are likewise erased and insert no runtime operation.
 
-KVS callable types use the ordinary `=>` form. Closures retain, suspend, forward, and capture context according to the ordinary callback and context rules.
+### Placeholder lambdas
 
-## Catch-and-split
+A placeholder expression lowers to an arrow function with a generated
+parameter:
+
+```kvs
+items.map(%.price + tax)
+```
+
+```ts
+items.map($arg => $arg.price + tax)
+```
+
+The transformer assigns a separate parameter to each nested placeholder
+boundary. `%` inside nested ordinary closures continues to refer to the nearest
+enclosing placeholder boundary.
+
+### Catch-and-split
 
 ```kvs
 const value~error = operation();
 ```
 
-evaluates the operation once under an ordinary `try`/`catch` and initializes
-both bindings from that single outcome. Success stores the returned value and
-null; failure stores null and the caught JavaScript value. Assignment form uses
-the same operation:
+lowers through `try`/`catch`. Success stores the returned value and null;
+failure stores null and the caught JavaScript value. Assignment form uses the
+same operation:
 
 ```kvs
 value~error = retry();
 ```
+
+Assignment writes both targets and produces the assigned value target.
 
 The lowering does not carry a hidden success bit. Consequently, returning null
 and throwing null both leave the two bindings null. Await remains inside the
 protected operation, so a rejected promise is split like a synchronous throw.
 The caught value is neither wrapped nor normalized.
 
-## Terminal defaults
+For an awaited operation, the same pair is produced through an async
+`try`/`catch`:
+
+```kvs
+const value~error = await operation();
+```
+
+```ts
+const [value, error] = await (async () => {
+    try {
+        return [await operation(), null];
+    } catch ($caught) {
+        return [null, $caught];
+    }
+})();
+```
+
+### Terminal defaults
 
 ```kvs
 const tax = order.taxRate!;
 const items = response.items!;
 ```
 
-can lower according to statically known defaults:
+lowers according to statically known defaults:
 
 ```ts
 const tax = order?.taxRate ?? 0;
@@ -146,14 +172,10 @@ const items = response?.items ?? [];
 
 Structural defaults may require emitted POD factories. Mutable defaults must be freshly allocated.
 
-## Explicit value filtering and presence-aware construction
+### Sieve
 
-Ordinary conditions, boolean operators, and `||` retain JavaScript/TypeScript
-truthiness and require no special lowering. Empty arrays, maps, sets, typed
-arrays, and records therefore remain truthy in ordinary expressions.
-
-Prefix `~~expression` evaluates its operand once and returns either the original
-value or null. It rejects absence, `NaN`, and empty strings, tests arrays and
+Prefix `~~expression` returns either the original value or null. It rejects
+absence, `NaN`, and empty strings, tests arrays and
 typed arrays through `length`, maps and sets through `size`, and record-like
 objects through `Object.keys(value).length`. Ordinary class instances pass
 through unchanged. The compiler inlines a statically known test and uses its
@@ -166,9 +188,8 @@ if (const usable ~= readItems()) process(usable);
 cachedItems ~= readItems();
 ```
 
-Every lowering evaluates the operand once, preserves the identity of an
-accepted value, normalizes a rejected value to null, and lets exceptions
-propagate. Declaration and assignment `~=` lower through the same operation.
+The lowering preserves the identity of an accepted value and normalizes a
+rejected value to null. Declaration and assignment `~=` use the same operation.
 In a conditional binding, the branch tests whether the sieved result is extant,
 so accepted zero and false values enter the successful branch. Conceptually:
 
@@ -186,13 +207,46 @@ expression and always writes the filtered result, including null. No non-empty
 array or record type is introduced; normal successful-condition narrowing only
 removes absence from the filtered result.
 
-Conditional placement likewise evaluates once, in order:
+### Conditional bindings and return
+
+An `if` binding captures its initializer outside the branch and introduces the
+authored binding only inside the successful block:
+
+```kvs
+if (const user = findUser()) use(user);
+```
+
+```ts
+const $value = findUser();
+if ($value) {
+    const user = $value;
+    use(user);
+}
+```
+
+A sieve binding first applies `~~` and tests the filtered result with
+`$value != null`, allowing accepted zero and false values into the branch.
+
+`return?` lowers to the same presence test around a return:
+
+```kvs
+return? findCached();
+```
+
+```ts
+const $value = findCached();
+if ($value != null) return $value;
+```
+
+### Presence-aware construction and assignment
+
+Conditional placement lowers through a temporary:
 
 ```kvs
 const children = [?: makeHeader(), body];
 ```
 
-can lower to:
+lowers to:
 
 ```ts
 const $children = [];
@@ -202,7 +256,9 @@ $children.push(body);
 const children = $children;
 ```
 
-Nullable iterable spread, such as `[...children]`, contributes no elements when its source is null or undefined. Lowering must preserve source evaluation order and evaluate each spread source once.
+Nullable iterable spread, such as `[...children]`, contributes no elements when
+its source is null or undefined. Lowering must preserve source evaluation
+order.
 
 Compact literals apply the same test to every constructed entry:
 
@@ -211,7 +267,9 @@ const children = ?[makeHeader(), body, footer];
 const options = ?{ title, query, ...overrides };
 ```
 
-They can lower to ordinary array pushes and conditional property assignments. For `?{...source}`, the lowering enumerates the source's own enumerable properties and copies only present values. Every source expression and property access is evaluated once in JavaScript order.
+They lower to ordinary array pushes and conditional property assignments.
+For `?{...source}`, the lowering enumerates the source's own enumerable
+properties and copies only present values.
 
 The implemented `?[...]` slice lowers each nullable direct element to a
 conditional spread, reusing one temporary for direct elements in that literal.
@@ -222,10 +280,7 @@ filtered by `value != null`. Nested compact arrays own separate temporaries.
 The implemented conditional-placement and `?{...}` slice uses the same
 zero-or-one spread pattern for direct object properties. Computed keys are
 captured before their values. Compact object spreads currently use
-`Object.fromEntries(Object.entries(source ?? {}).filter(...))`; this prototype
-lowering handles enumerable string keys only, allocates intermediate arrays,
-and assumes an ES2019-or-newer runtime. These are implementation limitations,
-not restrictions on KVS object-spread semantics.
+`Object.fromEntries(Object.entries(source ?? {}).filter(...))`.
 
 The nulling operator lowers directly:
 
@@ -237,24 +292,27 @@ const footer = showFooter ?: renderFooter();
 const footer = showFooter ? renderFooter() : null;
 ```
 
-Extant assignment evaluates the target path and right-hand side once, returns the right-hand value, and commits the write only when that value is present:
+Extant assignment returns the right-hand value and commits the write only when
+that value is present:
 
 ```kvs
 profile.nickname ?= patch.nickname;
 ```
 
 ```ts
-const $profile = profile;
-const $nickname = patch.nickname;
-if ($nickname != null) $profile.nickname = $nickname;
+($nickname = patch.nickname) != null
+    ? profile.nickname = $nickname
+    : $nickname;
 ```
 
-A complete lowering preserves ordinary target-path evaluation and delays any staged `!` write-backs until the right-hand value passes the presence test. This is separate from JavaScript `??=`, which tests the current left-hand value. There is no conditional compound-assignment family.
+This is separate from JavaScript `??=`, which tests the current left-hand
+value. There is no conditional compound-assignment family. The current
+target-order limitation is recorded below.
 
-## Numeric ranges
+### Numeric ranges
 
-`lower..upper` and `lower..=upper` evaluate both numeric bounds once and return
-a reusable lazy iterable. Each iteration starts at the captured lower bound,
+`lower..upper` and `lower..=upper` capture their numeric bounds when created and
+return a reusable lazy iterable. Each iteration starts at the lower bound,
 advances by `+1`, and stops before or at the upper bound respectively. A lower
 bound above the upper bound therefore produces no values.
 
@@ -264,9 +322,30 @@ The helper captures the two bounds and returns an object whose
 file, so each range remains a compact call while creation stays lazy and
 repeatable.
 
-## Producing and result loops
+### Producing and result loops
 
 `collect` lowers to an eager loop that appends each `yield`; `select` lowers to a zero-or-one producer boundary that exits on the first `yield` and produces null when none is reached. A `yield?` adds a presence guard and otherwise continues execution. Ordinary loops nested inside `select` do not intercept production.
+
+`collect*` lowers to an immediately invoked generator function. Its parameter
+captures the source when the iterator is created, while the loop body remains
+deferred until consumption:
+
+```kvs
+const values = collect* (source) yield transform(_);
+```
+
+```ts
+const values = function* ($source) {
+    for (const $item of $source ?? []) yield transform($item);
+}(source);
+```
+
+Nullable sources lower through `source ?? []` for ordinary `for...of`, eager
+producers, and `collect*`.
+
+Because `collect*` uses a generator, its emitted `yield` participates in
+JavaScript iterator resumption. Values passed to `iterator.next(value)` are not
+part of KVS production semantics and are ignored by ordinary iteration.
 
 An iterable-only header lowers with a generated lexical `_` binding. When a
 nested header source refers to an enclosing `_`, that source is evaluated into
@@ -278,14 +357,6 @@ lifted into the surrounding scope and its generated result temporary replaces
 the loop at the start of the ordinary expression tail. This does not require a
 synthetic function boundary.
 
-The current eager prototype does not yet spill evaluation outside the
-producer's value position. Assignment targets therefore run after the producer.
-For a producer in an object field, all lifted producers run in field source
-order before the containing object initializer; earlier property values,
-computed names, and spreads consequently run later than their final semantics
-require. These are implementation limitations, not changes to language
-evaluation order.
-
 For an expression-valued `for`, the final header slot lowers to block-scoped
 mutable bindings initialized before the ordinary `for`, `for...of`, or
 `for...in` loop. Normal completion and bare `break` produce their current
@@ -295,11 +366,9 @@ number of bindings. A generated carrier moves that result across the block
 boundary into the surrounding value expression without exposing the authored
 bindings.
 
-Header expressions are evaluated once. KVS code should not use effects to
-depend on their relative evaluation order; the straightforward lowering
-initializes result state before beginning the ordinary loop.
+The lowering initializes result state before beginning the loop.
 
-## Path materialization
+### Path materialization
 
 ```kvs
 user.profile!.theme = dark;
@@ -307,7 +376,7 @@ users![index()]!.theme = dark;
 arr!.push(value);
 ```
 
-can lower approximately to:
+lowers approximately to:
 
 ```ts
 user.profile ??= makeDefaultProfile();
@@ -324,36 +393,16 @@ arr.push(value);
 
 Here `makeDefaultProfile` and `makeDefaultUser` stand for functions that construct default POD values.
 
-The compiler rejects intermediate materialization when the preceding expression is not writable. Terminal defaulting merely produces a value and accepts non-writable operands, including call results. Computed receivers and indexes are evaluated once.
+The compiler rejects intermediate materialization when the preceding expression
+is not writable. Terminal defaulting merely produces a value and accepts
+non-writable operands, including call results.
 
 Optional writes lower to guarded assignments whose right-hand side runs only when the path exists.
 
-## Dual error binding
-
-```kvs
-const value~error = await operation();
-```
-
-can lower to:
-
-```ts
-let $value = null;
-let $error: unknown = null;
-
-try {
-    $value = await operation();
-} catch ($caught) {
-    $error = $caught;
-}
-
-const value = $value;
-const error = $error;
-```
-
-## Outcome conversion
+### Outcome conversion
 
 Failure demotion classifies its pattern statically. Non-error-constructor
-patterns lower to `Object.is` checks over a once-only captured value. Error
+patterns lower to `Object.is` checks over a captured value. Error
 constructors lower to selective `try`/`catch` with `instanceof`; unmatched
 throws are rethrown unchanged. Chained `~` operations lower left-associatively.
 
@@ -365,22 +414,18 @@ only on the failure path and must have an `Error` type.
 
 Promotion reuses the statement-head lowering boundary established by
 collect/select. Its happy path is a direct expression inside `try`, with no
-runtime helper, IIFE, or closure. This inherits that boundary's documented
-ordering debts for assignment targets and object fields.
+runtime helper, IIFE, or closure.
 
-## JavaScript interoperation
+### JavaScript interoperation
 
-An omitted JavaScript argument arrives as `undefined`; an explicitly passed `null` remains `null`. Both count as absence for propagation and optional-call eligibility.
+JavaScript's observable distinctions between `null`, `undefined`, and omission
+remain intact, but all three participate as absence where applicable.
 
-KVS preserves distinctions and behavior that matter at runtime: omitted arguments, `undefined` versus `null`, exact identity, JSON serialization, arbitrary thrown values, array holes, and proxies. Both null and undefined nevertheless count as absence for propagation, postfix `?`, presence-aware operations, and `!`.
+### Call evaluation and dispatch
 
-## Tooling requirements
-
-Editors should reveal inferred nullability, skipped operations, path materialization, default values, and documented exceptions. Diagnostics should explain which nullable input requires a `?` call and which path segment requires `?` or `!`.
-
-## Call evaluation and dispatch
-
-For a computed operation, KVS evaluates the receiver once, then the operation expression once, then additional arguments from left to right. It invokes the selected callable once with the receiver followed by those arguments.
+For a computed operation, KVS evaluates the receiver, then the operation
+expression, then additional arguments from left to right. It invokes the
+selected callable with the receiver followed by those arguments.
 
 The promoted receiver is an ordinary first argument; it is not installed as the callable's `this`. If the operation expression is itself a member reference, its normal JavaScript receiver behavior is retained.
 
@@ -400,7 +445,7 @@ Accessibility, overload, and nullable-call rules remain the normal KVS and TypeS
 A newly available real member supersedes method-to-function fallback when the code is recompiled. Lexical function calls are unaffected because they never use fallback dispatch.
 
 
-## Optional-call evaluation
+### Optional-call evaluation
 
 An optional call guards the whole operation, including receiver-path materialization:
 
@@ -410,14 +455,16 @@ arr!.push?(nullableItem)
 
 The evaluation order is:
 
-1. Evaluate the receiver and resolve the callable exactly once, preserving the receiver for `this`.
+1. Evaluate the receiver and resolve the callable, preserving the receiver for `this`.
 2. When an intermediate `!` encounters absence, continue through a temporary default value and stage—but do not yet perform—the write-back.
 3. If the callable is absent, discard staged materializations and produce null without evaluating arguments.
 4. Evaluate arguments left-to-right.
 5. Stop at the first absent argument corresponding to a required parameter. Discard staged materializations, produce null, and do not evaluate later arguments.
 6. Commit staged `!` write-backs in path order, then invoke the callable with its original receiver.
 
-Therefore an absent `nullableItem` does not create an empty array, while an absent method prevents argument evaluation just as an optional JavaScript call does. Argument effects before a blocking absence remain observable. Every receiver, property key, callable, and argument is evaluated at most once.
+Therefore an absent `nullableItem` does not create an empty array, while an
+absent method prevents argument evaluation just as an optional JavaScript call
+does. Argument effects before a blocking absence remain observable.
 
 ```kvs
 object.method?(argument())
@@ -431,9 +478,9 @@ arr!.push?(nullableItem)
 
 an absent array is represented temporarily while `push` is resolved; assignment of the new array to `arr` occurs only after `nullableItem` passes the required-argument check.
 
-## POD construction and typed spread lowering
+### POD construction and typed spread lowering
 
-This feature could theoretically be explored as a TypeScript extension rather than requiring a complete new language:
+Typed POD construction and in-place spread are implemented compiler lowerings:
 
 ```ts
 interface Profile {
@@ -447,11 +494,10 @@ const profile = Profile{ ...externalProfile };
 profile ...= patch;
 ```
 
-For a type-only interface name, `Profile{...}` has no current TypeScript meaning. A dialect or transformer can recognize it as typed POD construction and emit a default-initialized plain object followed by filtered field copies.
-
-The proposal does not require interfaces to acquire runtime constructors or prototypes. The compiler can inline concrete field lists and defaults at every typed spread site.
-
-The compiler may combine default construction and typed spread into one allocation, while preserving source-order evaluation. One shared lowering primitive can project a source into either a fresh temporary object or an existing target:
+The compiler emits a default-initialized plain object for `Profile{...}` and
+projects statically selected fields from each spread source. Interfaces acquire
+no runtime constructors or prototypes. A shared helper projects into either a
+fresh object or an existing target:
 
 ```js
 function __kvsProject(target, source, fields) {
@@ -475,7 +521,29 @@ is copied. Nested objects and arrays are assigned by reference.
 
 Static checking rejects sources with no projectable fields and incompatible matching field types. Compatibility removes only `undefined` from a source field's type, matching the runtime omission rule; it retains `null`. `unknown` requires prior narrowing or validation; the lowering does not generate structural validation. `profile! ...= patch` first materializes an absent target, then applies these same assignments.
 
-## Context frame lowering
+## Known lowering limitations
+
+- Extant assignment currently captures its right-hand value before evaluating a
+  nontrivial assignment target. Target spilling is still needed to preserve the
+  final target-before-value order and to stage intermediate `!` write-backs.
+- Eager producers do not yet spill evaluation outside their value position. An
+  assignment target therefore runs after the producer; producers lifted from
+  object fields can also run before earlier property values, computed names,
+  and spreads.
+- Failure promotion inherits the same statement-head placement and ordering
+  limitations as eager producers.
+- Compact object spread uses
+  `Object.fromEntries(Object.entries(source ?? {}).filter(...))`. It handles
+  enumerable string keys only, allocates intermediate arrays, and requires an
+  ES2019-or-newer runtime.
+
+These are implementation debts, not source-language semantics.
+
+## Prospective implementation sketches
+
+The following lowering is not implemented by the current compiler.
+
+### Context frame lowering
 
 One representative lowering uses a hidden first parameter:
 
@@ -504,9 +572,5 @@ async function checkout($context: KvsContext, id: string) {
 A context statement creates an immutable derived frame and uses that frame for calls in its body. The frame needs only unique key tokens, lookup, and extension. It is one compiler-owned structure, not an authored application type and not one argument per key.
 
 An implementation may use a mutable stack to optimize synchronous context calls, or combine a stack with explicit frames. Such choices must preserve the parameter-passing semantics and are not observable language behavior.
-
-## Lazy iterator resumption
-
-As a low-level JavaScript compatibility detail, `yield` expressions in `collect*` may receive values supplied by `iterator.next(value)`. Ordinary iteration supplies undefined. This resumption channel is not part of the common collection model; eager `collect` uses `yield` only for production.
 
 [Back to the reading guide](README.md#reading-guide)

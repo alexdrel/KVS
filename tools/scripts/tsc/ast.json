@@ -293,7 +293,6 @@
             "KvsExtantAssertionExpression",
             "KvsExtantAssignmentExpression",
             "KvsTypedSpreadAssignmentExpression",
-            "KvsExtantTestExpression",
             "KvsDefaultExpression",
             "KvsSieveExpression",
             "KvsPlaceholderLambdaExpression",
@@ -1798,23 +1797,6 @@
                     {
                         "name": "Right",
                         "type": "Expression"
-                    }
-                ],
-                "arena": true
-            },
-            "KvsExtantTestExpression": {
-                "extends": [
-                    "ExpressionBase",
-                    "CompositeBase"
-                ],
-                "members": [
-                    {
-                        "name": "Expression",
-                        "type": "Expression"
-                    },
-                    {
-                        "name": "QuestionToken",
-                        "type": "QuestionToken"
                     }
                 ],
                 "arena": true

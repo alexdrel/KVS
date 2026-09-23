@@ -264,7 +264,6 @@ const (
 	KindKvsExtantAssertionExpression
 	KindKvsExtantAssignmentExpression
 	KindKvsTypedSpreadAssignmentExpression
-	KindKvsExtantTestExpression
 	KindKvsDefaultExpression
 	KindKvsSieveExpression
 	KindKvsPlaceholderLambdaExpression

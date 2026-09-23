@@ -566,7 +566,6 @@ func main() {
 			"KvsExtantAssertionExpression":                 toInt32(ast.KindKvsExtantAssertionExpression),
 			"KvsExtantAssignmentExpression":                toInt32(ast.KindKvsExtantAssignmentExpression),
 			"KvsTypedSpreadAssignmentExpression":           toInt32(ast.KindKvsTypedSpreadAssignmentExpression),
-			"KvsExtantTestExpression":                      toInt32(ast.KindKvsExtantTestExpression),
 			"KvsDefaultExpression":                         toInt32(ast.KindKvsDefaultExpression),
 			"KvsSieveExpression":                           toInt32(ast.KindKvsSieveExpression),
 			"KvsPlaceholderLambdaExpression":               toInt32(ast.KindKvsPlaceholderLambdaExpression),

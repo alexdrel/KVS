@@ -118,7 +118,6 @@ import type {
     KvsExtantAssertionExpression,
     KvsExtantAssignmentExpression,
     KvsExtantReturnStatement,
-    KvsExtantTestExpression,
     KvsExtantType,
     KvsExtantYieldStatement,
     KvsFailureDemotionExpression,
@@ -326,7 +325,6 @@ import {
     updateKvsExtantAssertionExpression,
     updateKvsExtantAssignmentExpression,
     updateKvsExtantReturnStatement,
-    updateKvsExtantTestExpression,
     updateKvsExtantType,
     updateKvsExtantYieldStatement,
     updateKvsFailureDemotionExpression,
@@ -707,11 +705,6 @@ const visitEachChildTable: Record<number, VisitEachChildFunction> = {
         const _equalsToken = visitNode(node.equalsToken, visitor, isEqualsToken);
         const _right = visitNode(node.right, visitor, isExpression);
         return updateKvsTypedSpreadAssignmentExpression(node, _left, _dotDotDotToken, _equalsToken, _right);
-    },
-    [SyntaxKind.KvsExtantTestExpression]: (node: KvsExtantTestExpression, visitor: Visitor): KvsExtantTestExpression => {
-        const _expression = visitNode(node.expression, visitor, isExpression);
-        const _questionToken = visitNode(node.questionToken, visitor, isQuestionToken);
-        return updateKvsExtantTestExpression(node, _expression, _questionToken);
     },
     [SyntaxKind.KvsDefaultExpression]: (node: KvsDefaultExpression, visitor: Visitor): KvsDefaultExpression => {
         const _expression = visitNode(node.expression, visitor, isExpression);

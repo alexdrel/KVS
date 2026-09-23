@@ -52,7 +52,6 @@ type NodeFactory struct {
 	kvsExtantAssertionExpressionArena        core.Arena[KvsExtantAssertionExpression]
 	kvsExtantAssignmentExpressionArena       core.Arena[KvsExtantAssignmentExpression]
 	kvsExtantReturnStatementArena            core.Arena[KvsExtantReturnStatement]
-	kvsExtantTestExpressionArena             core.Arena[KvsExtantTestExpression]
 	kvsExtantTypeArena                       core.Arena[KvsExtantType]
 	kvsExtantYieldStatementArena             core.Arena[KvsExtantYieldStatement]
 	kvsFailureDemotionExpressionArena        core.Arena[KvsFailureDemotionExpression]
@@ -310,7 +309,6 @@ type (
 	KvsExtantAssertionExpressionNode        = Node
 	KvsExtantAssignmentExpressionNode       = Node
 	KvsTypedSpreadAssignmentExpressionNode  = Node
-	KvsExtantTestExpressionNode             = Node
 	KvsDefaultExpressionNode                = Node
 	KvsSieveExpressionNode                  = Node
 	KvsPlaceholderLambdaExpressionNode      = Node
@@ -1959,47 +1957,6 @@ func (node *KvsTypedSpreadAssignmentExpression) Clone(f NodeFactoryCoercible) *N
 
 func IsKvsTypedSpreadAssignmentExpression(node *Node) bool {
 	return node.Kind == KindKvsTypedSpreadAssignmentExpression
-}
-
-// ──────────────────────────────────────────────────────────────────────
-// KvsExtantTestExpression
-// ──────────────────────────────────────────────────────────────────────
-
-type KvsExtantTestExpression struct {
-	ExpressionBase
-	CompositeBase
-	Expression    *Expression
-	QuestionToken *QuestionToken
-}
-
-func (f *NodeFactory) NewKvsExtantTestExpression(expression *Expression, questionToken *QuestionToken) *Node {
-	data := f.kvsExtantTestExpressionArena.New()
-	data.Expression = expression
-	data.QuestionToken = questionToken
-	return f.newNode(KindKvsExtantTestExpression, data)
-}
-
-func (f *NodeFactory) UpdateKvsExtantTestExpression(node *KvsExtantTestExpression, expression *Expression, questionToken *QuestionToken) *Node {
-	if expression != node.Expression || questionToken != node.QuestionToken {
-		return updateNode(f.NewKvsExtantTestExpression(expression, questionToken), node.AsNode(), f.hooks)
-	}
-	return node.AsNode()
-}
-
-func (node *KvsExtantTestExpression) ForEachChild(v Visitor) bool {
-	return visit(v, node.Expression) || visit(v, node.QuestionToken)
-}
-
-func (node *KvsExtantTestExpression) VisitEachChild(v *NodeVisitor) *Node {
-	return v.Factory.UpdateKvsExtantTestExpression(node, v.visitNode(node.Expression), v.visitNode(node.QuestionToken))
-}
-
-func (node *KvsExtantTestExpression) Clone(f NodeFactoryCoercible) *Node {
-	return cloneNode(f.AsNodeFactory().NewKvsExtantTestExpression(node.Expression, node.QuestionToken), node.AsNode(), f.AsNodeFactory().hooks)
-}
-
-func IsKvsExtantTestExpression(node *Node) bool {
-	return node.Kind == KindKvsExtantTestExpression
 }
 
 // ──────────────────────────────────────────────────────────────────────
@@ -10294,8 +10251,6 @@ func (n *Node) ForEachChild(v Visitor) bool {
 		return n.data.(*KvsExtantAssignmentExpression).ForEachChild(v)
 	case KindKvsTypedSpreadAssignmentExpression:
 		return n.data.(*KvsTypedSpreadAssignmentExpression).ForEachChild(v)
-	case KindKvsExtantTestExpression:
-		return n.data.(*KvsExtantTestExpression).ForEachChild(v)
 	case KindKvsDefaultExpression:
 		return n.data.(*KvsDefaultExpression).ForEachChild(v)
 	case KindKvsSieveExpression:
@@ -10775,10 +10730,6 @@ func (n *Node) AsKvsExtantAssignmentExpression() *KvsExtantAssignmentExpression 
 
 func (n *Node) AsKvsTypedSpreadAssignmentExpression() *KvsTypedSpreadAssignmentExpression {
 	return n.data.(*KvsTypedSpreadAssignmentExpression)
-}
-
-func (n *Node) AsKvsExtantTestExpression() *KvsExtantTestExpression {
-	return n.data.(*KvsExtantTestExpression)
 }
 
 func (n *Node) AsKvsDefaultExpression() *KvsDefaultExpression {

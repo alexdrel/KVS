@@ -10,7 +10,7 @@ function histogram(downloads: Download[], precision: number) {
     const histo: number?[] = [];
 
     for (const download of downloads) {
-        if (download.bytes?) {
+        if (download.bytes != null) {
             const i = Math.floor((download.ts - start) / precision);
             histo[i] = histo[i]! + download.bytes;
         }

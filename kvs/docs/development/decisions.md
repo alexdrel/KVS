@@ -266,21 +266,15 @@ Lowering produces the ordinary JavaScript conditional
 once-only condition evaluation, and the accepted ordinary JavaScript
 truthiness rule.
 
-## First extant-test slice
+## Explicit presence tests
 
-Status: accepted.
+Status: accepted; the earlier postfix extant-test prototype was removed.
 
-Postfix `expression?` is represented by a dedicated
-`KvsExtantTestExpression`. Unlike compound forms such as `return?`, this is an
-expression operator, so whitespace between the operand and `?` is allowed.
-The parser treats `?` followed by a true expression and `:` as TypeScript's
-ordinary ternary; otherwise it forms the postfix presence test. Adjacent `?:`
-and `?=` retain their dedicated KVS meanings.
-
-The expression always has type `boolean`. In control flow, its successful path
-removes `null` and `undefined` from a referenced operand, while its unsuccessful
-path retains only those absent alternatives. Lowering emits `operand != null`,
-which evaluates the operand once and preserves present falsy values.
+Presence testing uses ordinary `expression != null`. It already narrows null
+and undefined through TypeScript flow analysis, preserves present falsy values,
+and avoids claiming postfix `?` syntax that interferes with TypeScript parser
+recovery. Compound forms such as `return?`, `yield?`, and `?=` remain distinct
+KVS operations.
 
 ## First conditional-binding slice
 

@@ -8,7 +8,8 @@ Optional fields and children often turn a literal into several statements: creat
 
 ### Conditional placement
 
-Prefix `?:` conditionally places one value in an array or object. The expression is evaluated once in source order; absence contributes no element or property:
+Prefix `?:` conditionally places one value in an array or object. Absence
+contributes no element or property:
 
 ```kvs
 const children = [
@@ -56,7 +57,9 @@ const options = ?{
 
 `?[` and `?{` are compound literal openers; no whitespace is allowed between `?` and the bracket or brace.
 
-This is a property of the whole literal. Every element, property, and spread is evaluated once in normal source order. Object spread still copies own enumerable properties, but absent property values from a spread are omitted as well. Array spread of an absent iterable contributes zero elements.
+This is a property of the whole literal. Object spread copies own enumerable
+properties but omits absent property values. Array spread of an absent iterable
+contributes zero elements.
 
 The resulting type excludes absence from array elements. Object properties whose source may be absent become optional and exclude absence from their value type:
 
@@ -229,7 +232,7 @@ user.profile!.theme = dark;        // materialize profile; write-back
 const storedTheme = user.profile!.theme; // materialize profile, then read theme
 ```
 
-Arrays follow the same rules and retain ordinary JavaScript indexing behavior:
+Arrays use the same path operators:
 
 ```kvs
 arr![i] = value;
@@ -247,12 +250,12 @@ The expression immediately before an intermediate `!` must be a writable assignm
 ```kvs
 getProfile()!.theme           // error: call result is not assignable
 readonlyUser.profile!.theme   // error: profile is readonly
-users[index()]!.theme = dark  // valid; index() runs once
-getUser().profile!.theme      // valid if profile is writable; getUser() runs once
+users[index()]!.theme = dark  // valid
+getUser().profile!.theme      // valid if profile is writable
 const profile = getProfile()! // valid terminal defaulting
 ```
 
-Known getter-only properties are rejected. Proxies cannot generally be recognized statically, so normal JavaScript runtime assignment behavior applies.
+Known getter-only properties are rejected.
 
 A plain write through a nullable path is an error:
 
@@ -396,9 +399,8 @@ profile ...= patch;
 // alias observes the same mutations
 ```
 
-The left side follows ordinary compound-assignment eligibility: it must be a
-writable variable or property. The operation does not assign the object back;
-it mutates that object directly. A property target is read once and its setter
+The left side must be a writable variable or property. The operation mutates
+the object directly rather than assigning it back. A property target's setter
 is not invoked.
 
 Readonly fields are rejected. A nullable target can be materialized explicitly before mutation:
@@ -421,7 +423,8 @@ const updated = Profile{
 };
 ```
 
-This constructs a fresh `Profile`, then applies the two typed spreads in order. The original `profile` remains unchanged. Assigning the new value back to `profile` replaces the binding's value; aliases still refer to the old object. Using `profile ...= patch` updates the existing object instead.
+This constructs a fresh `Profile` and applies the two typed spreads in order;
+`profile ...= patch` instead updates the existing object.
 
 The two forms share one typed spread model:
 

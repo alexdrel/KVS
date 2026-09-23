@@ -81,7 +81,7 @@ nickname ?= suggestion  // assign when present
 const usable = ~~value  // preserve a usable value, otherwise null
 ```
 
-Presence has its own direct test, `value?`. Ordinary conditions and boolean
+Test presence explicitly with `value != null`. Ordinary conditions and boolean
 operators retain JavaScript/TypeScript truthiness, so empty collections remain
 truthy. Prefix `~~value` explicitly sieves absence, `NaN`, empty strings, and
 empty collections to null when that distinction is wanted. Zero and false pass.
@@ -183,12 +183,11 @@ The same practical approach extends to primitive `distinct` domains for catching
 
 Read the core chapters in order, or start with [whole programs](examples.md) to see the ideas together.
 
-1. [Nullable Types](nullability.md) — `T?` adds absence and `T!` removes it.
-2. [Values, Absence, and Defaults](values.md) — what happens when data is missing, how presence differs from truthiness, and how static assertions and defaults work.
-3. [Structured Production and Decisions](flow.md) — final state, every result, first result, and selected results using familiar control flow.
-4. [Constructing and Shaping Data](data.md) — presence-aware literals, POD construction, writable paths, and typed spread.
-5. [Calls, Composition, and Callbacks](calls.md) — optional invocation, fluent functions, computed operations, and concise callbacks.
-6. [Failure Policy](errors.md) — expose failure, demote it to absence, or raise an exception at a boundary.
+1. [Nullability, Values, and Defaults](values.md) — nullable types, what happens when data is missing, and how static assertions and defaults work.
+2. [Structured Production and Decisions](flow.md) — final state, every result, first result, and selected results using familiar control flow.
+3. [Constructing and Shaping Data](data.md) — presence-aware literals, POD construction, writable paths, and typed spread.
+4. [Calls, Composition, and Callbacks](calls.md) — optional invocation, fluent functions, computed operations, and concise callbacks.
+5. [Failure Policy](errors.md) — expose failure, demote it to absence, or raise an exception at a boundary.
 
 Two independent themes can be read as needed:
 

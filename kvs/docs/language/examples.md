@@ -56,7 +56,7 @@ async function auditedInvoice(id: OrderId): Invoice? {
 
     await Audit.invoiceFailure?(id, error);
 
-    if (error?) {
+    if (error != null) {
         throw error;
     }
 
@@ -220,7 +220,9 @@ async function greetingEndpoint(request: GreetingRequest): string {
 }
 ```
 
-The entry point establishes request information once. The operation supplies a fallback for a missing translation and reports an unavailable user at its own boundary.
+The entry point establishes request information. The operation supplies a
+fallback for a missing translation and reports an unavailable user at its own
+boundary.
 
 See [typed context](context.md) and [failure policy](errors.md).
 

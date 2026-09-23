@@ -360,19 +360,6 @@ Run it with:
 go -C ./tsc test -run='TestLocal/kvsNulling' ./internal/testrunner
 ```
 
-## Extant-test slice
-
-`kvsExtantTest.ts` checks true- and false-path presence narrowing, the boolean
-result outside control flow, whitespace before postfix `?`, a parenthesized
-operand, and preservation of an ordinary ternary. Its JavaScript baseline
-verifies direct `value != null` lowering.
-
-Run it with:
-
-```sh
-go -C ./tsc test -run='TestLocal/kvsExtantTest' ./internal/testrunner
-```
-
 ## Conditional-binding slice
 
 `kvsIfBinding.ts` checks successful-branch truthy narrowing and verifies that

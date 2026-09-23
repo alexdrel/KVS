@@ -3,7 +3,7 @@
 This is a working implementation aid, not a language specification or feature
 order. The language documents remain authoritative for accepted semantics.
 
-Progress: **234 of 357 items complete (65.5%)**; **123 remain open**.
+Progress: **249 of 357 items complete (69.7%)**; **108 remain open**.
 
 - `[x]` means implemented with focused compiler evidence.
 - `[ ]` means unimplemented, incomplete, or not yet deliberately validated.
@@ -26,7 +26,6 @@ Implemented vertical slices:
 - Nulling operator: `condition ?: expression`.
 - Nullability type operators: `T?` and `T!`.
 - Successful-branch binding: `if (const value = expression)`.
-- Extant test: postfix `value?`, including presence narrowing.
 - Terminal defaults for strings, numbers, booleans, bigints, and ordinary
   arrays: postfix `value!`.
 - Nullable sources for synchronous `for...of`, eager `collect`, and `select`.
@@ -77,7 +76,6 @@ Focused conformance inputs:
 - `tsc/testdata/tests/cases/conformance/kvs/kvsNulling.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsNullabilityTypes.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsIfBinding.ts`
-- `tsc/testdata/tests/cases/conformance/kvs/kvsExtantTest.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsNullableOperators.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsNullableEquality.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsNullableIteration.ts`
@@ -138,10 +136,8 @@ them; generated example `.js` files are intentionally ignored.
 - [ ] Explicit nullable uninitialized binding
 - [ ] Destructuring propagates source nullability
 
-### Extant test and conditions
+### Conditions
 
-- [x] Postfix `value?`
-- [x] Flow narrowing after `value?`
 - [x] Nullable boolean condition: only `true` enters branch
 - [x] Relational comparisons require resolved operands
 

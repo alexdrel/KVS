@@ -5188,29 +5188,12 @@ func (p *Parser) parseUpdateExpression() *ast.Expression {
 		return p.parseJsxElementOrSelfClosingElementOrFragment(true /*inExpressionContext*/, -1 /*topInvalidNodePosition*/, nil /*openingTag*/, false /*mustBeUnary*/)
 	}
 	expression := p.parseLeftHandSideExpressionOrHigher()
-	if p.isKvsExtantTest() {
-		questionToken := p.parseTokenNode()
-		expression = p.finishNode(p.factory.NewKvsExtantTestExpression(expression, questionToken), pos)
-	}
 	if (p.token == ast.KindPlusPlusToken || p.token == ast.KindMinusMinusToken) && !p.hasPrecedingLineBreak() {
 		operator := p.token
 		p.nextToken()
 		return p.finishNode(p.factory.NewPostfixUnaryExpression(expression, operator), pos)
 	}
 	return expression
-}
-
-func (p *Parser) isKvsExtantTest() bool {
-	if p.token != ast.KindQuestionToken {
-		return false
-	}
-	return p.lookAhead(func(p *Parser) bool {
-		p.nextToken()
-		if p.token == ast.KindColonToken || p.token == ast.KindEqualsToken {
-			return false
-		}
-		return !p.isStartOfExpression()
-	})
 }
 
 func (p *Parser) parseJsxElementOrSelfClosingElementOrFragment(inExpressionContext bool, topInvalidNodePosition int, openingTag *ast.Node, mustBeUnary bool) *ast.Expression {

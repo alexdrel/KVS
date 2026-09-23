@@ -16,7 +16,7 @@ These forms use the [value and absence rules](values.md).
 
 ## Implicit subject `_`
 
-Ordinary `for...of`, `collect`, `collect*`, and `select` retain their explicit form:
+The explicit iteration form remains available:
 
 ```kvs
 for (const user of users) process(user);
@@ -38,8 +38,6 @@ const parent = select (nodes) {
     if (_.visible) yield? _.parent;
 };
 ```
-
-The shorthand retains normal `break`, `continue`, `return`, `await`, exception, and context behavior and works with any iterable.
 
 `_` means the current value of the nearest implicit iteration or subject-form `when`. Iterators that produce tuples need no special index feature:
 
@@ -83,7 +81,8 @@ const years = collect (const year of 2000..=2026) {
 
 Ranges advance by one and do not infer direction from their endpoints. A range whose upper bound precedes its lower bound is empty.
 
-A range is lazy and may be used anywhere an ordinary iterable is accepted, including `for`, `collect`, and `select`. Its bounds are evaluated once when the range is created.
+A range is lazy and may be used anywhere an ordinary iterable is accepted,
+including `for`, `collect`, and `select`. It captures its bounds when created.
 
 Range precedence is deliberately low: arithmetic and other value operations
 bind within each endpoint, while comparisons apply to the completed range.
@@ -99,7 +98,10 @@ const total = for (orders; total = 0) {
 };
 ```
 
-The final slot is declaration syntax even though it does not use `let`. Each initializer declares a mutable loop-local result binding and determines its inferred type. On normal completion or bare `break`, the loop returns the current result state. `continue` and `return` keep their ordinary meanings; `return` exits the containing function.
+The final slot is declaration syntax even though it does not use `let`. Each
+initializer declares a mutable loop-local result binding and determines its
+inferred type. Normal completion or bare `break` returns the current result
+state.
 
 The result slot follows the ordinary iteration syntax. It works with explicit `for...of`:
 
@@ -146,11 +148,6 @@ The structured forms expose mutable bindings with the declared names inside the 
 A nullable `for...of` source performs no iterations when absent, so the loop
 returns its initialized result state. This applies to both explicit and
 implicit-subject forms.
-
-Result bindings are initialized before the ordinary loop begins. Header
-expressions are evaluated once, but code should not use side effects to depend
-on their relative evaluation order; such dependencies make accumulator loops
-needlessly difficult to read and lower.
 
 Result headers belong only to `for`. `collect` and `select` produce values through `yield` and do not accept result declarations.
 
@@ -226,8 +223,8 @@ for (const region of regions) {
 
 An empty lazy result is an empty iterator, not null. Eager `collect` remains useful for immediate execution, indexing, repeated traversal, and small collections where iterator bookkeeping is unnecessary.
 
-The source expression is evaluated exactly once when the iterator is created.
-Iteration and the collector body remain deferred until the iterator is consumed.
+The source is captured when the iterator is created. Iteration and the
+collector body remain deferred until the iterator is consumed.
 
 The iterator follows the [JavaScript resumption rules](implementation.md#lazy-iterator-resumption).
 
@@ -335,7 +332,7 @@ belongs outside such a boundary retains its ordinary language order.
 
 ### Subject form
 
-A subject form evaluates its subject once and exposes it as `_`:
+A subject form exposes its subject as `_`:
 
 ```kvs
 const grade = when (score) {
@@ -413,8 +410,6 @@ The result type combines the result types of its arms under normal inference. Ar
 
 An absent iterable requires no guard. It leaves a `for` result at its initial value, produces null for eager `collect` and `select`, and produces an empty iterator for `collect*`. A present iterable that performs zero iterations or reaches no `yield` produces an empty array from `collect`; `select` still produces null because it received no value.
 
-The source expression is evaluated once. Iteration order, `continue`, `break`, exceptions, and iterator closing otherwise follow JavaScript `for...of` behavior.
-
 `yield` targets the closest enclosing `collect`, `collect*`, or `select`. It cannot cross a real function or callback boundary. Ordinary loops do not establish a production boundary, so `yield` inside a nested ordinary loop still targets the enclosing `select` or collector. Nested value-producing loops establish nearer targets and do not flatten their results into an outer collector.
 
 Eager `collect` and `select` execute inline, so `return` retains its ordinary meaning of returning from the containing function. `collect*` is deferred: when it is consumed, the surrounding function activation may no longer be running. Consequently, `return` and labeled jumps to targets outside `collect*` are prohibited. Local loops and labels inside it remain ordinary JavaScript control flow.
@@ -434,19 +429,12 @@ if (const user = users.find(%.id == requestedId)) {
 }
 ```
 
-The initializer is evaluated once, and its value is tested using ordinary
-JavaScript/TypeScript truthiness. **The successful condition narrows the
-binding's type:** although the lookup can produce absence, `user` has type
-`User` inside the body, so it can be passed directly to a function requiring a
-non-nullable `User`.
+The initializer is tested using ordinary JavaScript/TypeScript truthiness.
+**The successful condition narrows the binding's type:** although the lookup
+can produce absence, `user` has type `User` inside the body, so it can be passed
+directly to a function requiring a non-nullable `User`.
 
 The binding exists only in the successful branch, where it is narrowed to its truthy type. It is not in scope in `else` or after the `if` statement.
-
-This keeps the lookup, test, and use together. As with a loop-header binding,
-the surrounding scope does not need a variable whose only purpose is to
-support this operation. The declaration does not change the condition into a
-presence-only test: primitive falsy values fail, while empty collections remain
-truthy as they are in JavaScript.
 
 A **sieve binding** applies the sieve to the initializer before binding
 it:
@@ -459,8 +447,7 @@ if (const items ~= getItems()) {
 ```
 
 `const value ~= expression` and `let value ~= expression` mean the same as
-binding `~~expression`. The right-hand expression is evaluated once, and the
-binding receives either the original value or null.
+binding `~~expression`, producing either the original value or null.
 
 In an `if`, the condition succeeds when that sieved result is extant rather
 than when it is JavaScript-truthy. Accepted values such as zero and false
@@ -474,9 +461,8 @@ cachedItems ~= readItems();
 
 This means `cachedItems = ~~readItems()`. Unlike `?=`, which skips the write
 when its right-hand value is absent, `~=` always writes its filtered result,
-including null. The assignment target is evaluated once before the right-hand
-expression, following ordinary JavaScript assignment order, and the whole
-expression produces the assigned filtered value.
+including null. The assignment target precedes the right-hand expression, and
+the whole expression produces the assigned filtered value.
 
 ### Nulling operator `?:`
 
@@ -493,8 +479,7 @@ It is equivalent to:
 const footer = showFooter ? renderFooter(data) : null;
 ```
 
-The condition uses ordinary JavaScript/TypeScript truthiness. The right operand
-is evaluated only when the condition succeeds.
+The condition uses ordinary JavaScript/TypeScript truthiness.
 
 ### Extant assignment
 
@@ -507,7 +492,7 @@ profile.nickname ?= patch.nickname;
 It replaces the common guarded form:
 
 ```kvs
-if (patch.nickname?) {
+if (patch.nickname != null) {
     profile.nickname = patch.nickname;
 }
 ```
@@ -525,7 +510,8 @@ Only plain extant assignment exists. There are no extant compound assignments su
 
 ### Conditional return
 
-`return? expression` evaluates its expression once and performs an ordinary `return` only when the result is present. Otherwise execution continues. In a function body:
+`return? expression` returns when its result is present; otherwise execution
+continues:
 
 ```kvs
 return? lookup();
@@ -539,4 +525,4 @@ These presence-aware forms remain deliberately specific. KVS does not add `conti
 
 ---
 
-[← Values, absence, and defaults](values.md) · [Contents](README.md#reading-guide) · [Next: Constructing and shaping data →](data.md)
+[← Nullability, values, and defaults](values.md) · [Contents](README.md#reading-guide) · [Next: Constructing and shaping data →](data.md)

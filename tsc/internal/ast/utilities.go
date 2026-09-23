@@ -462,7 +462,6 @@ func isExpressionKind(kind Kind) bool {
 		KindKvsFailureDemotionExpression, KindKvsFailurePromotionExpression,
 		KindKvsCatchSplitExpression,
 		KindKvsCatchSplitAssignmentExpression,
-		KindKvsExtantTestExpression,
 		KindKvsDefaultExpression,
 		KindKvsNullingExpression,
 		KindKvsConditionalElement,
@@ -2045,7 +2044,7 @@ func IsExpressionNode(node *Node) bool {
 		KindCallExpression, KindNewExpression, KindTaggedTemplateExpression, KindAsExpression, KindTypeAssertionExpression,
 		KindSatisfiesExpression, KindNonNullExpression, KindParenthesizedExpression, KindFunctionExpression,
 		KindClassExpression, KindArrowFunction, KindVoidExpression, KindDeleteExpression, KindTypeOfExpression,
-		KindPrefixUnaryExpression, KindPostfixUnaryExpression, KindBinaryExpression, KindConditionalExpression, KindKvsExtantTestExpression, KindKvsDefaultExpression, KindKvsSieveExpression, KindKvsSieveBindingInitializer, KindKvsSieveAssignmentExpression, KindKvsFailureDemotionExpression, KindKvsFailurePromotionExpression, KindKvsCatchSplitExpression, KindKvsCatchSplitAssignmentExpression, KindKvsNullingExpression, KindKvsConditionalElement, KindKvsRangeExpression,
+		KindPrefixUnaryExpression, KindPostfixUnaryExpression, KindBinaryExpression, KindConditionalExpression, KindKvsDefaultExpression, KindKvsSieveExpression, KindKvsSieveBindingInitializer, KindKvsSieveAssignmentExpression, KindKvsFailureDemotionExpression, KindKvsFailurePromotionExpression, KindKvsCatchSplitExpression, KindKvsCatchSplitAssignmentExpression, KindKvsNullingExpression, KindKvsConditionalElement, KindKvsRangeExpression,
 		KindSpreadElement, KindTemplateExpression, KindOmittedExpression, KindJsxElement, KindJsxSelfClosingElement,
 		KindJsxFragment, KindYieldExpression, KindKvsNullableAssertionExpression, KindKvsExtantAssertionExpression, KindKvsExtantAssignmentExpression, KindKvsCollectExpression, KindKvsLazyCollectExpression, KindKvsSelectExpression, KindKvsForExpression, KindAwaitExpression:
 		return true

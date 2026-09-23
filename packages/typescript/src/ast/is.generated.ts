@@ -199,7 +199,6 @@ import type {
     KvsExtantAssertionExpression,
     KvsExtantAssignmentExpression,
     KvsExtantReturnStatement,
-    KvsExtantTestExpression,
     KvsExtantType,
     KvsExtantYieldStatement,
     KvsFailureDemotionExpression,
@@ -637,15 +636,6 @@ export declare namespace isKvsTypedSpreadAssignmentExpression {
     function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsTypedSpreadAssignmentExpression>;
 }
 isKvsTypedSpreadAssignmentExpression.Handle = isKvsTypedSpreadAssignmentExpression as any;
-
-export function isKvsExtantTestExpression(node: Node): node is KvsExtantTestExpression {
-    return node.kind === SyntaxKind.KvsExtantTestExpression;
-}
-
-export declare namespace isKvsExtantTestExpression {
-    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsExtantTestExpression>;
-}
-isKvsExtantTestExpression.Handle = isKvsExtantTestExpression as any;
 
 export function isKvsDefaultExpression(node: Node): node is KvsDefaultExpression {
     return node.kind === SyntaxKind.KvsDefaultExpression;

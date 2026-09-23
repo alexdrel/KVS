@@ -47,11 +47,11 @@ TypeScript API. `return?` now uses the accepted `KvsExtantReturnStatement` node.
 
 ### Binding-suffix token retention
 
-The static-nullability prototype stores the `value?` distinction as a flag on
-the ordinary variable declaration rather than retaining a question-token
-child. This is sufficient for checking and JavaScript emission. Precise source
-maps and language-service behavior for that suffix still need deliberate
-coverage and may require retaining its source token later.
+The static-nullability prototype stores the `let value?` binding suffix as a
+flag on the ordinary variable declaration rather than retaining a
+question-token child. This is sufficient for checking and JavaScript emission.
+Precise source maps and language-service behavior for that suffix still need
+deliberate coverage and may require retaining its source token later.
 
 ### Statement-kind range constraint
 

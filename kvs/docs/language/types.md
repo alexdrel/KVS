@@ -2,7 +2,8 @@
 
 KVS adds inexpensive static information where it can remain compatible with ordinary JavaScript values. The main addition here is `distinct`: a primitive value can carry a domain without a runtime wrapper.
 
-Nullable type operators are covered in [Nullable Types](nullability.md); expression inference and assertions are covered in [Values, Absence, and Defaults](values.md).
+Nullable type operators, expression inference, and assertions are covered in
+[Nullability, Values, and Defaults](values.md).
 
 ## Distinct primitive domains
 
@@ -16,14 +17,15 @@ const screenRect: Rect<Pixel>;
 const gridRect: Rect<Cell>;
 ```
 
-Both domains remain ordinary numbers at runtime, but KVS rejects accidentally passing cell coordinates where pixels are expected. The same distinction is useful for strings:
+KVS rejects accidentally passing cell coordinates where pixels are expected.
+The same distinction is useful for strings:
 
 ```kvs
 type OrderId = distinct string;
 type Email = distinct string;
 ```
 
-Distinct domains prevent accidental mixing. They do not validate values, introduce runtime wrappers, or model physical units.
+Distinct domains do not validate values or model physical units.
 
 ## Declaration
 
@@ -112,8 +114,6 @@ email == orderId            // error
 Math.min(celsius, kelvin)   // error
 ```
 
-The result type of the operation does not weaken this rule. Comparisons still reject mixed domains even though they return booleans.
-
 Bare unions of distinct domains are not supported. Their runtime representations provide no discriminator with which to narrow the union:
 
 ```kvs
@@ -153,8 +153,6 @@ A signature that names a distinct domain may explicitly return its neutral base 
 function temperatureRatio(value: Kelvin): number;
 function emailDomain(value: Email): string;
 ```
-
-Those calls return `number` and `string`, respectively. If their return types were inferred from ordinary domain-preserving operations instead, the results would retain the input domains.
 
 ## Explicit conversion
 

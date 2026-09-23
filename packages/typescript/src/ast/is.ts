@@ -137,7 +137,6 @@ export function isExpression(node: Node): node is Expression {
         || kind === SyntaxKind.KvsNullableAssertionExpression
         || kind === SyntaxKind.KvsExtantAssertionExpression
         || kind === SyntaxKind.KvsExtantAssignmentExpression
-        || kind === SyntaxKind.KvsExtantTestExpression
         || kind === SyntaxKind.KvsDefaultExpression
         || kind === SyntaxKind.KvsNullingExpression
         || kind === SyntaxKind.KvsCollectExpression

@@ -1,19 +1,64 @@
-# Values, Absence, and Defaults
+# Nullability, Values, and Defaults
 
-KVS lets missing data flow through a computation without repeating guards at every step. This chapter establishes absence, presence, truthiness, and default values—the foundation for the operations in the following chapters.
+KVS lets missing data flow through a computation without repeating guards at
+every step. This chapter establishes nullable types, absence, nullable
+dataflow, and default values—the foundation for the operations in the following
+chapters.
 
-## Nullable values
+## Nullable types
 
-The [`T?` type operator](nullability.md) makes `T` nullable.
-
-JavaScript commonly uses `undefined` for structural omission and `null` for explicit absence. KVS preserves that runtime distinction for interoperation, but treats both as **absent** during ordinary nullable computation. KVS-produced absence normally uses `null`.
-
-Exact JavaScript identity remains unchanged:
+KVS adds two postfix operators to TypeScript's type algebra:
 
 ```kvs
-value === null
-value === undefined
+T? // add absence
+T! // remove absence
 ```
+
+`T?` includes both `null` and `undefined`. `T!` removes them from the top level
+of a type and is the direct counterpart of TypeScript's `NonNullable<T>`:
+
+```kvs
+type OptionalItem<T> = T?;
+type PresentItem<T> = T!;
+```
+
+Both operations are idempotent and compose predictably:
+
+```text
+(T?)? = T?
+(T!)! = T!
+(T?)! = T!
+(T!)? = T?
+```
+
+They distribute over unions by adding or removing the absent members. They do
+not recursively change fields or other types nested inside `T`.
+
+In a tuple, trailing nullable elements may be omitted:
+
+```kvs
+type Entry = [string, boolean?];
+
+const pending: Entry = ["pending"];
+const visible: Entry = ["visible", true];
+const unknown: Entry = ["unknown", null];
+```
+
+Reading the second element always has type `boolean?`. KVS does not make a
+static distinction between an omitted trailing slot and a slot containing
+`undefined`; JavaScript operations that observe tuple length or keys still see
+the representation that was actually supplied. A nullable element followed by
+a required element is not trailing and therefore cannot be omitted.
+
+These are type operations, not value operations. The related expression forms
+are described under [static nullability assertions](#static-nullability-assertions)
+and [default values](#default-values).
+
+## Absence
+
+KVS treats both `null` and `undefined` as **absent** during nullable computation
+while preserving their runtime identity for JavaScript interoperation.
+KVS-produced absence normally uses `null`.
 
 ## Nullable dataflow
 
@@ -42,11 +87,10 @@ const area = metadata.width * metadata.height;
 
 If a required operand is absent, the arithmetic result is null.
 
-Equality does not lift. `==`, `!=`, `===`, and `!==` retain their JavaScript
-semantics and always produce booleans. Comparing two operands whose types may
-both be present or absent is an error: two computations do not count as equal
-merely because neither produced a value. Resolve one operand first or compare
-with an absence-only value.
+Equality does not lift. Comparing two operands whose types may both be present
+or absent is an error: two computations do not count as equal merely because
+neither produced a value. Resolve one operand first or compare with an
+absence-only value.
 
 ```kvs
 nullable == present
@@ -56,11 +100,8 @@ nullable === null
 nullable === undefined
 ```
 
-Loose comparison with either `null` or `undefined` tests both forms of absence.
-Strict comparison preserves their runtime distinction. KVS-produced absence
-normally uses `null`, while JavaScript interoperation may still produce
-`undefined`. An expression narrowed or declared to contain only `null` or
-`undefined` is likewise an explicit absence comparison.
+An expression narrowed or declared to contain only `null` or `undefined` is
+likewise an explicit absence comparison.
 
 Lifted arithmetic is numeric. Operands must belong to the same numeric family,
 and an operand whose type is known to be only `null` or `undefined` is an error
@@ -75,64 +116,14 @@ Tagged templates accept nullable substitutions because the tag defines how
 each substitution is interpreted.
 
 The relational operators `<`, `<=`, `>`, and `>=` do not lift. Nullable
-operands are errors and must be resolved explicitly before comparison. Their
-result remains ordinary binary `boolean`; KVS does not introduce a nullable
-third result for ordering. Use `!` or another explicit absence choice before
-comparing.
+operands are errors and must be resolved explicitly before comparison. Use `!`
+or another explicit absence choice before comparing.
 
 Lifted operators evaluate required operands from left to right and stop at the
 first absent operand. This is a safety guarantee, not an effect-control idiom.
 Code should not rely on an optional path to suppress effects in a later
 operand: such expressions become difficult to read as soon as several values
 may be absent. Make effectful sequencing explicit with statements.
-
-## Presence and ordinary truthiness
-
-Postfix `?` tests presence without changing or unwrapping the value:
-
-```kvs
-if (value?) {
-    // value is neither null nor undefined
-    // T? is narrowed to T here
-}
-```
-
-It is an expression operator, not a compound keyword, so whitespace before
-`?` is insignificant. Parenthesized and spaced forms are ordinary:
-
-```kvs
-if ((left ?? right) ?) use(left ?? right);
-```
-
-When `?` is followed by a true expression and `:`, it remains the ordinary
-ternary operator rather than an extant test.
-
-It is a total boolean test:
-
-```text
-null?       false
-undefined?  false
-false?      true
-0?          true
-""?         true
-[]?         true
-{}?         true
-```
-
-Ordinary conditions and boolean operators use JavaScript/TypeScript truthiness.
-Objects and collections are therefore truthy even when empty:
-
-```kvs
-if ([])       // true
-if ([0])      // true
-if ({})       // true
-if ({ x: 0 }) // true
-```
-
-Logical `!`, `&&`, and `||` retain their ordinary JavaScript behavior. In
-particular, `arr || []` preserves an existing empty array and its identity.
-The condition of the KVS nulling operator `?:` uses the same ordinary
-truthiness.
 
 ## Sieve
 
@@ -153,9 +144,8 @@ Assignment `~=` always writes the filtered value, including null. It differs
 from `?=`, which leaves the target unchanged when its right-hand value is
 absent.
 
-The operand is evaluated exactly once. A retained array, collection, record,
-or object is returned unchanged, preserving its identity. Thrown exceptions
-are not handled and propagate normally.
+A retained array, collection, record, or object is returned unchanged,
+preserving its identity.
 
 The sieve rejects absence, `NaN`, empty strings, and empty collections. Zero
 and false pass unchanged. Arrays and typed arrays
@@ -184,21 +174,6 @@ necessary; it does not introduce non-empty collection types.
 
 This prefix operation is distinct from infix `expression ~~ error`, which
 [promotes absence or failure to an exception](errors.md#infix-promotion-of-absence-or-failure).
-
-## Conditions
-
-A nullable boolean satisfies a condition only when it is `true`:
-
-```kvs
-const renderLarge: boolean? = metadata.renderLarge;
-if (renderLarge) {
-    renderLargePhoto();
-}
-```
-
-The branch is not taken when the condition is false or absent. Inside the
-successful branch, the condition is narrowed to `true` by ordinary TypeScript
-truthiness analysis.
 
 ## Binding inference
 
@@ -272,7 +247,7 @@ use(item); // still nullable
 (user.profile as!).name
 ```
 
-`as!` is the local escape hatch when flow analysis cannot preserve a narrowing, such as inside an ordinary callback. It inserts no check or default, so an incorrect assertion leaves the actual runtime value unchanged. Neither form changes nested types; the corresponding type operations are [`T?` and `T!`](nullability.md).
+`as!` is the local escape hatch when flow analysis cannot preserve a narrowing, such as inside an ordinary callback. It inserts no check or default, so an incorrect assertion leaves the actual runtime value unchanged. Neither form changes nested types; the corresponding type operations are [`T?` and `T!`](#nullable-types).
 
 An `as!` assertion preserves an underlying writable target. Parenthesized forms
 can therefore be assigned to or used with increment and decrement operators:
@@ -301,7 +276,7 @@ function render({ title, metadata }: Card?) {
 }
 ```
 
-A rest binding is absent when its source is absent. Pattern default initializers retain JavaScript semantics: they apply to `undefined`, including an omitted property, but not to explicit `null`.
+A rest binding is absent when its source is absent.
 
 ## Default values
 
@@ -335,17 +310,11 @@ const name = user.profile.name!;
 const items = response.items!;
 ```
 
-The operation is rejected when the type has no default value. Arbitrary fallback remains explicit:
-
-```kvs
-const user = possibleUser ?? guest;
-```
+The operation is rejected when the type has no default value.
 
 An absence-only expression has no result type from which to obtain a default,
 so `null!` and `undefined!` are errors. Use `null as!` or `undefined as!` when
 an unchecked impossible-value placeholder is needed.
-
-Writing `!` chooses the type's default value in one place. Use `??` to select another fallback, or `~~` when absence should raise an error. Once the choice is made, the language supplies its mechanics.
 
 This runtime policy is distinct from the static assertion:
 
@@ -377,10 +346,8 @@ if (type != "circle" | "oval") {
 }
 ```
 
-The left operand is evaluated once. One or two alternatives use direct
-comparisons, tested from left to right with short-circuiting. Three or more
-alternatives use membership in a constructed array. `!=` negates membership in
-the complete set.
+Alternatives are tested from left to right with short-circuiting. `!=` negates
+membership in the complete set.
 
 Each direct comparison follows the nullable-equality rule: it is an error when
 both sides have present and absent alternatives. Union alternatives are syntax
@@ -399,12 +366,13 @@ if (type != ...blockedTypes) {
 }
 ```
 
-Runtime alternatives are limited to arrays. The array expression is evaluated
-once. An absent array contributes no alternatives, consistent with other
-nullable array spreads; equality is then false and inequality true. Runtime
-membership does not provide static narrowing.
+Runtime alternatives are limited to arrays. An absent array contributes no
+alternatives, consistent with other nullable array spreads; equality is then
+false and inequality true. Runtime membership does not provide static
+narrowing.
 
-Alternative syntax is exclusive to `==` and `!=`. It is not available for `===`, `!==`, `<`, `>`, `<=`, or `>=`; those operators retain their ordinary binary meanings.
+Alternative syntax is exclusive to `==` and `!=`; it is not available for
+`===`, `!==`, `<`, `>`, `<=`, or `>=`.
 
 ### Comparison chains
 
@@ -416,19 +384,10 @@ if (min <= value < max) {
 }
 ```
 
-Each operand is evaluated at most once. Evaluation proceeds from left to right
-and stops when a comparison is false. For example:
+Comparisons proceed from left to right and stop when one is false. For example:
 
 ```kvs
 lower() < value() <= upper()
-```
-
-behaves conceptually like:
-
-```kvs
-const first = lower();
-const middle = value();
-first < middle && middle <= upper()
 ```
 
 `upper()` is evaluated only if the first comparison succeeds. A false
@@ -446,13 +405,12 @@ min <= value < max
 a == b == c
 ```
 
-The equality chain means `a == b && b == c`, with `b` evaluated once. Mixed
-directions, equality/relational mixtures, strictness mixtures, and `!=` / `!==`
-sequences retain their ordinary nested JavaScript interpretation. A line break
-between a comparison operator and its following operand also prevents chain
-formation, preserving TypeScript's incomplete-generic parsing and recovery.
+An equality chain requires every adjacent pair to be equal. Mixed directions,
+equality/relational mixtures, strictness mixtures, and `!=` / `!==` sequences
+do not form chains. Neither does a line break between a comparison operator and
+its following operand.
 
 
 ---
 
-[← Nullable types](nullability.md) · [Contents](README.md#reading-guide) · [Next: Structured production and decisions →](flow.md)
+[← Why KVS](README.md) · [Contents](README.md#reading-guide) · [Next: Structured production and decisions →](flow.md)

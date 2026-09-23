@@ -110,7 +110,7 @@ function explicitLoopKeepsOuterSubject(groups: Group[]) {
 >_ : Symbol(_, Decl(kvsImplicitSubject.ts, 38, 27))
 >values : Symbol(Group.values, Decl(kvsImplicitSubject.ts, 1, 17))
 
-            if (value?) yield _.name;
+            if (value != null) yield _.name;
 >value : Symbol(value, Decl(kvsImplicitSubject.ts, 38, 18))
 >_.name : Symbol(Group.name, Decl(kvsImplicitSubject.ts, 0, 17))
 >_ : Symbol(_, Decl(kvsImplicitSubject.ts, 38, 27))

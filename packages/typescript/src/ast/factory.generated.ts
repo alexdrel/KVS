@@ -162,7 +162,6 @@ import type {
     KvsExtantAssertionExpression,
     KvsExtantAssignmentExpression,
     KvsExtantReturnStatement,
-    KvsExtantTestExpression,
     KvsExtantType,
     KvsExtantYieldStatement,
     KvsFailureDemotionExpression,
@@ -924,8 +923,6 @@ function cloneNodeData(node: Node): any {
             return { left: n.left, questionToken: n.questionToken, equalsToken: n.equalsToken, right: n.right };
         case SyntaxKind.KvsTypedSpreadAssignmentExpression:
             return { left: n.left, dotDotDotToken: n.dotDotDotToken, equalsToken: n.equalsToken, right: n.right };
-        case SyntaxKind.KvsExtantTestExpression:
-            return { expression: n.expression, questionToken: n.questionToken };
         case SyntaxKind.KvsDefaultExpression:
             return { expression: n.expression };
         case SyntaxKind.KvsSieveExpression:
@@ -1377,9 +1374,6 @@ const forEachChildTable: Record<number, ForEachChildFunction> = {
         visitNode(cbNode, data.dotDotDotToken) ||
         visitNode(cbNode, data.equalsToken) ||
         visitNode(cbNode, data.right),
-    [SyntaxKind.KvsExtantTestExpression]: (data, cbNode, cbNodes) =>
-        visitNode(cbNode, data.expression) ||
-        visitNode(cbNode, data.questionToken),
     [SyntaxKind.KvsDefaultExpression]: (data, cbNode, cbNodes) => visitNode(cbNode, data.expression),
     [SyntaxKind.KvsSieveExpression]: (data, cbNode, cbNodes) =>
         visitNode(cbNode, data.firstTildeToken) ||
@@ -2177,13 +2171,6 @@ export function createKvsTypedSpreadAssignmentExpression(left: Expression, dotDo
         equalsToken,
         right,
     }) as unknown as KvsTypedSpreadAssignmentExpression;
-}
-
-export function createKvsExtantTestExpression(expression: Expression, questionToken: QuestionToken): KvsExtantTestExpression {
-    return new NodeObject(SyntaxKind.KvsExtantTestExpression, {
-        expression,
-        questionToken,
-    }) as unknown as KvsExtantTestExpression;
 }
 
 export function createKvsDefaultExpression(expression: Expression): KvsDefaultExpression {
@@ -3793,10 +3780,6 @@ export function updateKvsExtantAssignmentExpression(node: KvsExtantAssignmentExp
 
 export function updateKvsTypedSpreadAssignmentExpression(node: KvsTypedSpreadAssignmentExpression, left: Expression, dotDotDotToken: DotDotDotToken, equalsToken: EqualsToken, right: Expression): KvsTypedSpreadAssignmentExpression {
     return node.left !== left || node.dotDotDotToken !== dotDotDotToken || node.equalsToken !== equalsToken || node.right !== right ? createKvsTypedSpreadAssignmentExpression(left, dotDotDotToken, equalsToken, right) : node;
-}
-
-export function updateKvsExtantTestExpression(node: KvsExtantTestExpression, expression: Expression, questionToken: QuestionToken): KvsExtantTestExpression {
-    return node.expression !== expression || node.questionToken !== questionToken ? createKvsExtantTestExpression(expression, questionToken) : node;
 }
 
 export function updateKvsDefaultExpression(node: KvsDefaultExpression, expression: Expression): KvsDefaultExpression {
