@@ -1,0 +1,10 @@
+//// [tests/cases/conformance/kvs/kvsSieveNoEmitHelpers.ts] ////
+
+=== kvsSieveNoEmitHelpers.ts ===
+declare const dynamic: unknown;
+>dynamic : Symbol(dynamic, Decl(kvsSieveNoEmitHelpers.ts, 0, 13))
+
+const filtered = ~~dynamic;
+>filtered : Symbol(filtered, Decl(kvsSieveNoEmitHelpers.ts, 1, 5))
+>dynamic : Symbol(dynamic, Decl(kvsSieveNoEmitHelpers.ts, 0, 13))
+

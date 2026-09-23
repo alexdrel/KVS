@@ -134,8 +134,8 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 		return tx.transformExtantTest(node.AsKvsExtantTestExpression())
 	case ast.KindKvsDefaultExpression:
 		return tx.transformDefault(node.AsKvsDefaultExpression())
-	case ast.KindKvsNullingSieveExpression:
-		return tx.transformNullingSieve(node.AsKvsNullingSieveExpression().Expression)
+	case ast.KindKvsSieveExpression:
+		return tx.transformSieve(node.AsKvsSieveExpression().Expression)
 	case ast.KindKvsPlaceholderLambdaExpression:
 		placeholder := node.AsKvsPlaceholderLambdaExpression()
 		if tx.resolver.IsKvsPlaceholderBoundary(node) {
@@ -143,7 +143,7 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 		}
 		return tx.Visitor().VisitNode(placeholder.Arrow.AsArrowFunction().Body)
 	case ast.KindKvsSieveBindingInitializer:
-		return tx.transformNullingSieve(node.AsKvsSieveBindingInitializer().Expression)
+		return tx.transformSieve(node.AsKvsSieveBindingInitializer().Expression)
 	case ast.KindKvsSieveAssignmentExpression:
 		return tx.transformSieveAssignment(node.AsKvsSieveAssignmentExpression())
 	case ast.KindKvsTypedSpreadAssignmentExpression:
@@ -336,14 +336,14 @@ func (tx *transformer) transformComparisonChain(node *ast.KvsComparisonChainExpr
 	return result
 }
 
-func (tx *transformer) transformNullingSieve(expression *ast.Expression) *ast.Node {
+func (tx *transformer) transformSieve(expression *ast.Expression) *ast.Node {
 	factory := tx.Factory()
-	kind := tx.resolver.GetKvsNullingSieveKind(expression)
+	kind := tx.resolver.GetKvsSieveKind(expression)
 	value := tx.Visitor().VisitNode(expression)
-	if kind == printer.KvsNullingSieveDynamic {
-		return factory.NewKvsNullingSieveHelper(value)
+	if kind == printer.KvsSieveDynamic {
+		return factory.NewKvsSieveHelper(value)
 	}
-	if kind == printer.KvsNullingSieveIdentity {
+	if kind == printer.KvsSieveIdentity {
 		if tx.resolver.IsKvsNullableExpression(expression) {
 			return factory.NewBinaryExpression(nil, value, nil, factory.NewToken(ast.KindQuestionQuestionToken), factory.NewKeywordExpression(ast.KindNullKeyword))
 		}
@@ -354,11 +354,19 @@ func (tx *transformer) transformNullingSieve(expression *ast.Expression) *ast.No
 	assigned := factory.NewAssignmentExpression(temp, value)
 	var test *ast.Node
 	switch kind {
-	case printer.KvsNullingSievePrimitive:
+	case printer.KvsSieveString:
 		test = assigned
-	case printer.KvsNullingSieveLength, printer.KvsNullingSieveSize:
+	case printer.KvsSieveNumber:
+		notNaN := factory.NewBinaryExpression(nil, temp, nil, factory.NewToken(ast.KindEqualsEqualsEqualsToken), temp)
+		if tx.resolver.IsKvsNullableExpression(expression) {
+			present := factory.NewBinaryExpression(nil, assigned, nil, factory.NewToken(ast.KindExclamationEqualsToken), factory.NewKeywordExpression(ast.KindNullKeyword))
+			test = factory.NewBinaryExpression(nil, present, nil, factory.NewToken(ast.KindAmpersandAmpersandToken), notNaN)
+		} else {
+			test = factory.NewCommaExpression(assigned, notNaN)
+		}
+	case printer.KvsSieveLength, printer.KvsSieveSize:
 		property := "length"
-		if kind == printer.KvsNullingSieveSize {
+		if kind == printer.KvsSieveSize {
 			property = "size"
 		}
 		member := factory.NewPropertyAccessExpression(temp, nil, factory.NewIdentifier(property), ast.NodeFlagsNone)
@@ -368,7 +376,7 @@ func (tx *transformer) transformNullingSieve(expression *ast.Expression) *ast.No
 		} else {
 			test = factory.NewCommaExpression(assigned, member)
 		}
-	case printer.KvsNullingSieveRecord:
+	case printer.KvsSieveRecord:
 		keys := factory.NewCallExpression(factory.NewPropertyAccessExpression(factory.NewIdentifier("Object"), nil, factory.NewIdentifier("keys"), ast.NodeFlagsNone), nil, nil, factory.NewNodeList([]*ast.Node{temp}), ast.NodeFlagsNone)
 		length := factory.NewPropertyAccessExpression(keys, nil, factory.NewIdentifier("length"), ast.NodeFlagsNone)
 		if tx.resolver.IsKvsNullableExpression(expression) {
@@ -384,7 +392,7 @@ func (tx *transformer) transformNullingSieve(expression *ast.Expression) *ast.No
 func (tx *transformer) transformSieveAssignment(node *ast.KvsSieveAssignmentExpression) *ast.Node {
 	return tx.Factory().NewAssignmentExpression(
 		tx.Visitor().VisitNode(node.Left),
-		tx.transformNullingSieve(node.Right),
+		tx.transformSieve(node.Right),
 	)
 }
 
@@ -851,10 +859,12 @@ func (tx *transformer) transformIfBindingStatement(node *ast.KvsIfBindingStateme
 	//
 	// The temporary evaluates the initializer once. Keeping the source binding
 	// inside the successful block preserves its intentionally one-sided scope.
-	// The condition deliberately uses JavaScript truthiness in this prototype.
+	// Ordinary bindings use JavaScript truthiness. Sieve bindings instead test
+	// the sieved result for presence, so accepted zero and false values succeed.
 	factory := tx.Factory()
 	clause := node.Clause.AsKvsIfBindingClause()
 	declaration := clause.DeclarationList.AsVariableDeclarationList().Declarations.Nodes[0].AsVariableDeclaration()
+	sieveBinding := declaration.Initializer != nil && declaration.Initializer.Kind == ast.KindKvsSieveBindingInitializer
 	temp := factory.NewTempVariable()
 	tempDeclaration := factory.NewVariableDeclaration(temp, nil, nil, tx.Visitor().VisitNode(declaration.Initializer))
 	tempStatement := factory.NewVariableStatement(nil, factory.NewVariableDeclarationList(factory.NewNodeList([]*ast.Node{tempDeclaration}), ast.NodeFlagsConst))
@@ -874,7 +884,11 @@ func (tx *transformer) transformIfBindingStatement(node *ast.KvsIfBindingStateme
 		statements = append(statements, body)
 	}
 	thenBlock := factory.NewBlock(factory.NewNodeList(statements), true)
-	ifStatement := factory.NewIfStatement(temp, thenBlock, tx.Visitor().VisitNode(node.ElseStatement))
+	condition := temp.AsNode()
+	if sieveBinding {
+		condition = factory.NewBinaryExpression(nil, temp, nil, factory.NewToken(ast.KindExclamationEqualsToken), factory.NewKeywordExpression(ast.KindNullKeyword))
+	}
+	ifStatement := factory.NewIfStatement(condition, thenBlock, tx.Visitor().VisitNode(node.ElseStatement))
 	return factory.NewSyntaxList([]*ast.Node{tempStatement, ifStatement})
 }
 

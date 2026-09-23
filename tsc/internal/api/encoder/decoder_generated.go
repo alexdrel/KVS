@@ -340,12 +340,12 @@ func (d *astDecoder) createChildrenNode(kind ast.Kind, data uint32, childIndices
 		return d.factory.NewKvsExtantTestExpression(expression, questionToken), nil
 	case ast.KindKvsDefaultExpression:
 		return d.factory.NewKvsDefaultExpression(d.singleChild(childIndices)), nil
-	case ast.KindKvsNullingSieveExpression:
+	case ast.KindKvsSieveExpression:
 		it := newChildIter(childIndices)
 		firstTildeToken := d.nodeAt(it.nextIf(mask, 0))
 		secondTildeToken := d.nodeAt(it.nextIf(mask, 1))
 		expression := d.nodeAt(it.nextIf(mask, 2))
-		return d.factory.NewKvsNullingSieveExpression(firstTildeToken, secondTildeToken, expression), nil
+		return d.factory.NewKvsSieveExpression(firstTildeToken, secondTildeToken, expression), nil
 	case ast.KindKvsPlaceholderLambdaExpression:
 		return d.factory.NewKvsPlaceholderLambdaExpression(d.singleChild(childIndices)), nil
 	case ast.KindKvsSieveBindingInitializer:

@@ -1,6 +1,6 @@
-//// [tests/cases/conformance/kvs/kvsNullingSieve.ts] ////
+//// [tests/cases/conformance/kvs/kvsSieve.ts] ////
 
-=== kvsNullingSieve.ts ===
+=== kvsSieve.ts ===
 declare const nullableItems: number[]?;
 >nullableItems : number[] | null | undefined
 
@@ -59,6 +59,11 @@ const zero = ~~0;
 >zero : 0 | null
 >~~0 : 0 | null
 >0 : 0
+
+const zeroBigInt = ~~0n;
+>zeroBigInt : 0n | null
+>~~0n : 0n | null
+>0n : 0n
 
 const notANumber = ~~NaN;
 >notANumber : number | null
@@ -356,6 +361,36 @@ if (const accepted ~= array) {
 >accepted === array : boolean
 >accepted : number[]
 >array : number[]
+}
+
+if (const acceptedZero ~= 0) {
+>acceptedZero : 0 | null
+>~= 0 : 0 | null
+>0 : 0
+
+    const stillZero: 0 = acceptedZero;
+>stillZero : 0
+>acceptedZero : 0
+}
+
+if (const acceptedFalse ~= false) {
+>acceptedFalse : false | null
+>~= false : false | null
+>false : false
+
+    const stillFalse: false = acceptedFalse;
+>stillFalse : false
+>false : false
+>acceptedFalse : false
+}
+
+if (const rejectedNaN ~= NaN) {
+>rejectedNaN : number | null
+>~= NaN : number | null
+>NaN : number
+
+    rejectedNaN;
+>rejectedNaN : number
 }
 
 const javascriptDoubleNot = ~ ~3.7;

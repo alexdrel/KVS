@@ -6,7 +6,7 @@
 {"name":"tslib","typings":"tslib.d.ts"}
 
 // @filename: /node_modules/tslib/tslib.d.ts
-export declare function __kvsNullingSieve(value: unknown): unknown;
+export declare function __kvsSieve(value: unknown): unknown;
 
 // @filename: /index.ts
 export {};

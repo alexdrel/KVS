@@ -34,7 +34,7 @@ export const childProperties: Readonly<Partial<Record<SyntaxKind, readonly (stri
     [SyntaxKind.KvsTypedSpreadAssignmentExpression]: ["left", "dotDotDotToken", "equalsToken", "right"],
     [SyntaxKind.KvsExtantTestExpression]: ["expression", "questionToken"],
     [SyntaxKind.KvsDefaultExpression]: ["expression"],
-    [SyntaxKind.KvsNullingSieveExpression]: ["firstTildeToken", "secondTildeToken", "expression"],
+    [SyntaxKind.KvsSieveExpression]: ["firstTildeToken", "secondTildeToken", "expression"],
     [SyntaxKind.KvsPlaceholderLambdaExpression]: ["arrow"],
     [SyntaxKind.KvsSieveBindingInitializer]: ["tildeToken", "equalsToken", "expression"],
     [SyntaxKind.KvsSieveAssignmentExpression]: ["left", "tildeToken", "equalsToken", "right"],

@@ -153,7 +153,7 @@ truthiness and require no special lowering. Empty arrays, maps, sets, typed
 arrays, and records therefore remain truthy in ordinary expressions.
 
 Prefix `~~expression` evaluates its operand once and returns either the original
-value or null. It rejects absence and primitive falsy values, tests arrays and
+value or null. It rejects absence, `NaN`, and empty strings, tests arrays and
 typed arrays through `length`, maps and sets through `size`, and record-like
 objects through `Object.keys(value).length`. Ordinary class instances pass
 through unchanged. The compiler inlines a statically known test and uses its
@@ -169,10 +169,22 @@ cachedItems ~= readItems();
 Every lowering evaluates the operand once, preserves the identity of an
 accepted value, normalizes a rejected value to null, and lets exceptions
 propagate. Declaration and assignment `~=` lower through the same operation.
-Assignment evaluates its target before the right-hand expression and always
-writes the filtered result, including null. No non-empty array or record type
-is introduced; normal successful-condition narrowing only removes absence from
-the filtered result.
+In a conditional binding, the branch tests whether the sieved result is extant,
+so accepted zero and false values enter the successful branch. Conceptually:
+
+```js
+const _value = __kvsSieve(readItems());
+if (_value != null) {
+    const usable = _value;
+    process(usable);
+}
+```
+
+The actual lowering may inline the type-specific sieve instead of calling the
+dynamic helper. Assignment evaluates its target before the right-hand
+expression and always writes the filtered result, including null. No non-empty
+array or record type is introduced; normal successful-condition narrowing only
+removes absence from the filtered result.
 
 Conditional placement likewise evaluates once, in order:
 

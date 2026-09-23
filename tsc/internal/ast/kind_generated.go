@@ -266,7 +266,7 @@ const (
 	KindKvsTypedSpreadAssignmentExpression
 	KindKvsExtantTestExpression
 	KindKvsDefaultExpression
-	KindKvsNullingSieveExpression
+	KindKvsSieveExpression
 	KindKvsPlaceholderLambdaExpression
 	KindKvsSieveBindingInitializer
 	KindKvsSieveAssignmentExpression

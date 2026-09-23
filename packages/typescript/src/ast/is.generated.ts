@@ -211,12 +211,12 @@ import type {
     KvsNullableAssertionExpression,
     KvsNullableType,
     KvsNullingExpression,
-    KvsNullingSieveExpression,
     KvsPlaceholderLambdaExpression,
     KvsRangeExpression,
     KvsSelectExpression,
     KvsSieveAssignmentExpression,
     KvsSieveBindingInitializer,
+    KvsSieveExpression,
     KvsTypedObjectExpression,
     KvsTypedSpreadAssignmentExpression,
     KvsYieldStatement,
@@ -656,14 +656,14 @@ export declare namespace isKvsDefaultExpression {
 }
 isKvsDefaultExpression.Handle = isKvsDefaultExpression as any;
 
-export function isKvsNullingSieveExpression(node: Node): node is KvsNullingSieveExpression {
-    return node.kind === SyntaxKind.KvsNullingSieveExpression;
+export function isKvsSieveExpression(node: Node): node is KvsSieveExpression {
+    return node.kind === SyntaxKind.KvsSieveExpression;
 }
 
-export declare namespace isKvsNullingSieveExpression {
-    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsNullingSieveExpression>;
+export declare namespace isKvsSieveExpression {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsSieveExpression>;
 }
-isKvsNullingSieveExpression.Handle = isKvsNullingSieveExpression as any;
+isKvsSieveExpression.Handle = isKvsSieveExpression as any;
 
 export function isKvsPlaceholderLambdaExpression(node: Node): node is KvsPlaceholderLambdaExpression {
     return node.kind === SyntaxKind.KvsPlaceholderLambdaExpression;

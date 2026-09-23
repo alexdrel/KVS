@@ -30,12 +30,14 @@ func compareEmitHelpers(x *EmitHelper, y *EmitHelper) int {
 	return x.Priority.Value - y.Priority.Value
 }
 
-var KvsNullingSieveHelper = &EmitHelper{
-	Name:       "kvs:nullingSieve",
-	ImportName: "__kvsNullingSieve",
+var KvsSieveHelper = &EmitHelper{
+	Name:       "kvs:sieve",
+	ImportName: "__kvsSieve",
 	Scoped:     false,
-	Text: `var __kvsNullingSieve = (this && this.__kvsNullingSieve) || function (value) {
-    if (!value) return null;
+	Text: `var __kvsSieve = (this && this.__kvsSieve) || function (value) {
+    if (value == null) return null;
+    if (typeof value === "number") return value === value ? value : null;
+    if (typeof value === "string") return value.length ? value : null;
     if (typeof value !== "object") return value;
     if (Array.isArray(value) || typeof ArrayBuffer !== "undefined" && ArrayBuffer.isView(value) && typeof value.length === "number") return value.length ? value : null;
     if (typeof Map !== "undefined" && value instanceof Map || typeof Set !== "undefined" && value instanceof Set) return value.size ? value : null;

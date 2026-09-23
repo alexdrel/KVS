@@ -26,8 +26,9 @@ const options = {
 In an object, `?: name` is shorthand for `name?: name` and therefore requires a simple identifier from which to obtain the property name. The explicit `name?: expression` form allows the key and expression to differ.
 
 Conditional placement omits only null and undefined. It preserves false, zero,
-empty strings, and empty collections. Prefix `~~` can first convert a primitive
-falsy or empty value to absence:
+empty strings, and empty collections. Prefix `~~` can first convert absence,
+`NaN`, an empty string, or an empty collection to null. Zero and false pass
+through unchanged:
 
 ```kvs
 const children = [?: ~~header, body, ?: footer];

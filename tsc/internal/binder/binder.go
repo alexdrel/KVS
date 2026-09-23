@@ -2145,8 +2145,15 @@ func (b *Binder) bindKvsIfBindingStatement(node *ast.Node) {
 	condition.Loc = name.Loc
 	condition.Flags |= ast.NodeFlagsSynthesized
 	condition.Parent = clause.AsNode()
-	clause.Condition = condition
-	b.bindCondition(condition, thenLabel, elseLabel)
+	var conditionExpression *ast.Node = condition
+	declaration := clause.DeclarationList.AsVariableDeclarationList().Declarations.Nodes[0].AsVariableDeclaration()
+	if declaration.Initializer != nil && declaration.Initializer.Kind == ast.KindKvsSieveBindingInitializer {
+		conditionExpression = b.flowFactory.NewKvsExtantTestExpression(condition, b.flowFactory.NewToken(ast.KindQuestionToken))
+		conditionExpression.Flags |= ast.NodeFlagsSynthesized
+		conditionExpression.Parent = clause.AsNode()
+	}
+	clause.Condition = conditionExpression
+	b.bindCondition(conditionExpression, thenLabel, elseLabel)
 	b.currentFlow = b.finishFlowLabel(thenLabel)
 	b.bind(clause.Statement)
 	b.addAntecedent(postIfLabel, b.currentFlow)
@@ -2880,7 +2887,7 @@ func isNarrowingExpression(expr *ast.Node) bool {
 		return containsNarrowableReference(expr)
 	case ast.KindCallExpression:
 		return hasNarrowableArgument(expr)
-	case ast.KindParenthesizedExpression, ast.KindNonNullExpression, ast.KindKvsExtantAssertionExpression, ast.KindTypeOfExpression, ast.KindKvsExtantTestExpression, ast.KindKvsNullingSieveExpression:
+	case ast.KindParenthesizedExpression, ast.KindNonNullExpression, ast.KindKvsExtantAssertionExpression, ast.KindTypeOfExpression, ast.KindKvsExtantTestExpression, ast.KindKvsSieveExpression:
 		return isNarrowingExpression(expr.Expression())
 	case ast.KindKvsComparisonAlternativesExpression:
 		return isNarrowingExpression(expr.AsKvsComparisonAlternativesExpression().Subject)

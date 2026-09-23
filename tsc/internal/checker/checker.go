@@ -8093,8 +8093,8 @@ func (c *Checker) checkExpressionWorker(node *ast.Node, checkMode CheckMode) *Ty
 		return c.booleanType
 	case ast.KindKvsDefaultExpression:
 		return c.checkKvsDefaultExpression(node, checkMode)
-	case ast.KindKvsNullingSieveExpression, ast.KindKvsSieveBindingInitializer:
-		return c.checkKvsNullingSieveExpression(node, checkMode)
+	case ast.KindKvsSieveExpression, ast.KindKvsSieveBindingInitializer:
+		return c.checkKvsSieveExpression(node, checkMode)
 	case ast.KindKvsPlaceholderLambdaExpression:
 		return c.checkKvsPlaceholderLambdaExpression(node.AsKvsPlaceholderLambdaExpression(), checkMode)
 	case ast.KindKvsCatchSplitExpression:
@@ -8173,25 +8173,25 @@ func (c *Checker) checkKvsComparisonChainExpression(node *ast.KvsComparisonChain
 	return c.booleanType
 }
 
-func (c *Checker) checkKvsNullingSieveExpression(node *ast.Node, checkMode CheckMode) *Type {
+func (c *Checker) checkKvsSieveExpression(node *ast.Node, checkMode CheckMode) *Type {
 	var expression *ast.Node
-	if node.Kind == ast.KindKvsNullingSieveExpression {
-		expression = node.AsKvsNullingSieveExpression().Expression
+	if node.Kind == ast.KindKvsSieveExpression {
+		expression = node.AsKvsSieveExpression().Expression
 	} else if node.Kind == ast.KindKvsSieveAssignmentExpression {
 		expression = node.AsKvsSieveAssignmentExpression().Right
 	} else {
 		expression = node.AsKvsSieveBindingInitializer().Expression
 	}
 	operandType := c.checkExpressionEx(expression, checkMode)
-	if c.getKvsNullingSieveKind(operandType) == printer.KvsNullingSieveDynamic {
-		c.checkExternalEmitHelpers(node, ExternalEmitHelpersKvsNullingSieve)
+	if c.getKvsSieveKind(operandType) == printer.KvsSieveDynamic {
+		c.checkExternalEmitHelpers(node, ExternalEmitHelpersKvsSieve)
 	}
 	return c.getNullableType(c.GetNonNullableType(operandType), TypeFlagsNull)
 }
 
 func (c *Checker) checkKvsSieveAssignmentExpression(node *ast.Node, checkMode CheckMode) *Type {
 	expression := node.AsKvsSieveAssignmentExpression()
-	assignedType := c.checkKvsNullingSieveExpression(node, checkMode)
+	assignedType := c.checkKvsSieveExpression(node, checkMode)
 	if expression.Left.Kind == ast.KindObjectLiteralExpression || expression.Left.Kind == ast.KindArrayLiteralExpression {
 		c.checkDestructuringAssignment(expression.Left, assignedType, checkMode, expression.Right.Kind == ast.KindThisKeyword)
 	} else {
@@ -30127,8 +30127,8 @@ func (c *Checker) getHelperNames(helper ExternalEmitHelpers) []string {
 		return []string{"__addDisposableResource", "__disposeResources"}
 	case ExternalEmitHelpersRewriteRelativeImportExtension:
 		return []string{"__rewriteRelativeImportExtension"}
-	case ExternalEmitHelpersKvsNullingSieve:
-		return []string{"__kvsNullingSieve"}
+	case ExternalEmitHelpersKvsSieve:
+		return []string{"__kvsSieve"}
 	default:
 		panic("Unrecognized helper")
 	}

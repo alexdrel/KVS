@@ -1,8 +1,8 @@
-//// [tests/cases/conformance/kvs/kvsNullingSieveImportHelpers.ts] ////
+//// [tests/cases/conformance/kvs/kvsSieveImportHelpers.ts] ////
 
 === /node_modules/tslib/tslib.d.ts ===
-export declare function __kvsNullingSieve(value: unknown): unknown;
->__kvsNullingSieve : (value: unknown) => unknown
+export declare function __kvsSieve(value: unknown): unknown;
+>__kvsSieve : (value: unknown) => unknown
 >value : unknown
 
 === /index.ts ===

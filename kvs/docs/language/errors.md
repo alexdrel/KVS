@@ -100,7 +100,7 @@ operation.
 
 ## Infix promotion of absence or failure
 
-Infix `~~` requires a usable value:
+Infix `~~` requires an extant value:
 
 ```kvs
 const user = find_user(id) ~~ UserNotFound(id);
@@ -145,8 +145,9 @@ is rejected because the protected operation lowers directly to statements,
 without an IIFE or happy-path closure.
 
 This infix failure-policy operation is distinct from
-[prefix `~~value`](values.md#filtering-truthy-and-non-empty-values), which
-converts primitive falsy and empty values to null and does not catch exceptions.
+[prefix `~~value`](values.md#sieve), which
+converts absence, `NaN`, empty strings, and empty collections to null and does
+not catch exceptions.
 
 The two forms are complementary:
 

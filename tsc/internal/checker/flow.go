@@ -404,7 +404,7 @@ func (c *Checker) narrowType(f *FlowState, t *Type, expr *ast.Node, assumeTrue b
 		return c.narrowType(f, t, expr.Expression(), assumeTrue)
 	case ast.KindKvsExtantTestExpression:
 		return c.narrowTypeByOptionality(f, t, expr.Expression(), assumeTrue)
-	case ast.KindKvsNullingSieveExpression:
+	case ast.KindKvsSieveExpression:
 		return c.narrowType(f, t, expr.Expression(), assumeTrue)
 	case ast.KindKvsComparisonAlternativesExpression:
 		return c.narrowTypeByKvsComparisonAlternatives(f, t, expr.AsKvsComparisonAlternativesExpression(), assumeTrue)

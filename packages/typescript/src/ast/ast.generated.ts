@@ -644,8 +644,8 @@ export interface KvsDefaultExpression extends ExpressionBase {
     readonly kind: SyntaxKind.KvsDefaultExpression;
     readonly expression: Expression;
 }
-export interface KvsNullingSieveExpression extends ExpressionBase {
-    readonly kind: SyntaxKind.KvsNullingSieveExpression;
+export interface KvsSieveExpression extends ExpressionBase {
+    readonly kind: SyntaxKind.KvsSieveExpression;
     readonly firstTildeToken: TildeToken;
     readonly secondTildeToken: TildeToken;
     readonly expression: Expression;

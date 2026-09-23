@@ -35,7 +35,7 @@ Implemented vertical slices:
 - Presence-aware array literals: `?[...]`.
 - Conditional placement in array and object literals.
 - Presence-aware object literals: `?{...}`.
-- Nulling sieve: prefix `~~value`.
+- Sieve: prefix `~~value`.
 - Filtered bindings and assignment: `const`/`let value ~= expression` and
   `target ~= expression`.
 - Finite and runtime comparison alternatives, comparison chains, and nullable
@@ -81,9 +81,9 @@ Focused conformance inputs:
 - `tsc/testdata/tests/cases/conformance/kvs/kvsNullableOperators.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsNullableEquality.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsNullableIteration.ts`
-- `tsc/testdata/tests/cases/conformance/kvs/kvsNullingSieve.ts`
-- `tsc/testdata/tests/cases/conformance/kvs/kvsNullingSieveImportHelpers.ts`
-- `tsc/testdata/tests/cases/conformance/kvs/kvsNullingSieveNoEmitHelpers.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsSieve.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsSieveImportHelpers.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsSieveNoEmitHelpers.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsTypedConstruction.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsCompactArray.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsConditionalPlacement.ts`
@@ -157,10 +157,11 @@ them; generated example `.js` files are intentionally ignored.
 - [x] Equality rejects operands that both have present and absent alternatives
 - [x] Equality with literal, aliased, or flow-narrowed absence remains available
 
-### Nulling sieve
+### Sieve
 
 - [x] Prefix `~~value`
-- [x] Primitive falsy values become null
+- [x] `NaN` and empty strings become null
+- [x] Zero and false pass unchanged
 - [x] Absence normalizes to null
 - [x] Empty arrays and typed arrays become null via `length`
 - [x] Empty maps and sets become null via `size`
@@ -217,7 +218,7 @@ them; generated example `.js` files are intentionally ignored.
 - [x] `let value ~= expression`
 - [x] Filtered RHS evaluated once
 - [x] Binding receives the original accepted value or null
-- [x] Successful branch removes absence
+- [x] Successful branch tests presence and removes absence
 - [x] General `target ~= expression` assignment
 - [x] Assignment writes the filtered result, including null
 - [x] Assignment target is evaluated before the RHS

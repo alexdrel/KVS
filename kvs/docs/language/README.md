@@ -78,13 +78,13 @@ normalize?(name)        // call when the value is present
 return? cached          // return when present
 yield? candidate        // produce when present
 nickname ?= suggestion  // assign when present
-const usable = ~~value  // preserve a truthy/non-empty value, otherwise null
+const usable = ~~value  // preserve a usable value, otherwise null
 ```
 
 Presence has its own direct test, `value?`. Ordinary conditions and boolean
 operators retain JavaScript/TypeScript truthiness, so empty collections remain
-truthy. Prefix `~~value` explicitly filters primitive falsy values and empty
-collections to null when that distinction is wanted.
+truthy. Prefix `~~value` explicitly sieves absence, `NaN`, empty strings, and
+empty collections to null when that distinction is wanted. Zero and false pass.
 
 When flow analysis needs an explicit escape hatch, `as!` asserts that one expression is present. It is static only; runtime `!` instead resolves absence using the type's default value.
 

@@ -17,7 +17,7 @@ runnable `.ts` file must have a matching `.stdout` file.
 - [Eager collection](collect.ts)
 - [First production](select.ts)
 - [Accumulator-producing loops](accumulating-loops.ts)
-- [Nulling operator](nulling.ts)
+- [Sieve and nulling](sieve-and-nulling.ts)
 - [Binding in an `if` condition](if-binding.ts)
 - [Implicit iteration subjects](implicit-subject.ts)
 - [Nullable operators](nullable-operators.ts)

@@ -243,7 +243,7 @@ export enum SyntaxKind {
     KvsTypedSpreadAssignmentExpression = 239,
     KvsExtantTestExpression = 240,
     KvsDefaultExpression = 241,
-    KvsNullingSieveExpression = 242,
+    KvsSieveExpression = 242,
     KvsPlaceholderLambdaExpression = 243,
     KvsSieveBindingInitializer = 244,
     KvsSieveAssignmentExpression = 245,

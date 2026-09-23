@@ -186,10 +186,10 @@ func (r *EmitResolver) IsKvsNullableExpression(node *ast.Node) bool {
 	return isKvsNullableType(r.checker.checkExpression(node))
 }
 
-func (r *EmitResolver) GetKvsNullingSieveKind(node *ast.Node) printer.KvsNullingSieveKind {
+func (r *EmitResolver) GetKvsSieveKind(node *ast.Node) printer.KvsSieveKind {
 	r.checkerMu.Lock()
 	defer r.checkerMu.Unlock()
-	return r.checker.getKvsNullingSieveKind(r.checker.checkExpression(node))
+	return r.checker.getKvsSieveKind(r.checker.checkExpression(node))
 }
 
 func (r *EmitResolver) IsKvsFailureDemotionErrorPattern(node *ast.Node) bool {
@@ -198,43 +198,49 @@ func (r *EmitResolver) IsKvsFailureDemotionErrorPattern(node *ast.Node) bool {
 	return r.checker.isKvsErrorConstructorType(r.checker.checkExpression(node))
 }
 
-func (c *Checker) getKvsNullingSieveKind(t *Type) printer.KvsNullingSieveKind {
+func (c *Checker) getKvsSieveKind(t *Type) printer.KvsSieveKind {
 	if t.flags&TypeFlagsTypeParameter != 0 {
 		if constraint := c.getBaseConstraintOfType(t); constraint != nil {
-			return c.getKvsNullingSieveKind(constraint)
+			return c.getKvsSieveKind(constraint)
 		}
-		return printer.KvsNullingSieveDynamic
+		return printer.KvsSieveDynamic
 	}
 	if t.flags&TypeFlagsUnion != 0 {
-		kind := printer.KvsNullingSieveIdentity
+		kind := printer.KvsSieveIdentity
 		found := false
 		for _, part := range t.Types() {
 			if part.flags&TypeFlagsNullable != 0 {
 				continue
 			}
-			partKind := c.getKvsNullingSieveKind(part)
+			partKind := c.getKvsSieveKind(part)
 			if !found {
 				kind, found = partKind, true
 			} else if kind != partKind {
-				return printer.KvsNullingSieveDynamic
+				return printer.KvsSieveDynamic
 			}
 		}
 		return kind
 	}
 	if t.flags&(TypeFlagsNullable|TypeFlagsNever) != 0 {
-		return printer.KvsNullingSieveIdentity
+		return printer.KvsSieveIdentity
 	}
 	if t.flags&(TypeFlagsAny|TypeFlagsUnknown) != 0 {
-		return printer.KvsNullingSieveDynamic
+		return printer.KvsSieveDynamic
 	}
-	if t.flags&(TypeFlagsStringLike|TypeFlagsNumberLike|TypeFlagsBigIntLike|TypeFlagsBooleanLike|TypeFlagsESSymbolLike) != 0 {
-		return printer.KvsNullingSievePrimitive
+	if t.flags&TypeFlagsNumberLike != 0 {
+		return printer.KvsSieveNumber
+	}
+	if t.flags&TypeFlagsStringLike != 0 {
+		return printer.KvsSieveString
+	}
+	if t.flags&(TypeFlagsBigIntLike|TypeFlagsBooleanLike|TypeFlagsESSymbolLike) != 0 {
+		return printer.KvsSieveIdentity
 	}
 	if c.isArrayOrTupleType(t) {
-		return printer.KvsNullingSieveLength
+		return printer.KvsSieveLength
 	}
 	if t.flags&TypeFlagsObject == 0 {
-		return printer.KvsNullingSieveDynamic
+		return printer.KvsSieveDynamic
 	}
 	object := t.AsObjectType()
 	symbol := object.symbol
@@ -246,21 +252,21 @@ func (c *Checker) getKvsNullingSieveKind(t *Type) printer.KvsNullingSieveKind {
 	if symbol != nil && c.getSymbolIfSameReference(symbol, c.globals[symbol.Name]) != nil {
 		switch symbol.Name {
 		case "Int8Array", "Uint8Array", "Uint8ClampedArray", "Int16Array", "Uint16Array", "Int32Array", "Uint32Array", "Float32Array", "Float64Array", "BigInt64Array", "BigUint64Array":
-			return printer.KvsNullingSieveLength
+			return printer.KvsSieveLength
 		case "Map", "ReadonlyMap", "Set", "ReadonlySet":
-			return printer.KvsNullingSieveSize
+			return printer.KvsSieveSize
 		}
 	}
 	if objectFlags&ObjectFlagsClass != 0 || len(c.getSignaturesOfType(t, SignatureKindCall)) != 0 || len(c.getSignaturesOfType(t, SignatureKindConstruct)) != 0 {
-		return printer.KvsNullingSieveIdentity
+		return printer.KvsSieveIdentity
 	}
 	if object.objectFlags&ObjectFlagsObjectLiteral != 0 {
-		return printer.KvsNullingSieveRecord
+		return printer.KvsSieveRecord
 	}
 	if object.objectFlags&ObjectFlagsAnonymous != 0 {
-		return printer.KvsNullingSieveRecord
+		return printer.KvsSieveRecord
 	}
-	return printer.KvsNullingSieveDynamic
+	return printer.KvsSieveDynamic
 }
 
 func (r *EmitResolver) IsKvsNullableIterableSource(node *ast.Node) bool {

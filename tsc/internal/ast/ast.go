@@ -373,8 +373,8 @@ func (n *Node) Expression() *Node {
 		return n.AsKvsExtantTestExpression().Expression
 	case KindKvsDefaultExpression:
 		return n.AsKvsDefaultExpression().Expression
-	case KindKvsNullingSieveExpression:
-		return n.AsKvsNullingSieveExpression().Expression
+	case KindKvsSieveExpression:
+		return n.AsKvsSieveExpression().Expression
 	case KindKvsSieveBindingInitializer:
 		return n.AsKvsSieveBindingInitializer().Expression
 	case KindKvsConditionalElement:
@@ -486,8 +486,8 @@ func (m *MutableNode) SetExpression(expr *Node) {
 		n.AsKvsExtantTestExpression().Expression = expr
 	case KindKvsDefaultExpression:
 		n.AsKvsDefaultExpression().Expression = expr
-	case KindKvsNullingSieveExpression:
-		n.AsKvsNullingSieveExpression().Expression = expr
+	case KindKvsSieveExpression:
+		n.AsKvsSieveExpression().Expression = expr
 	case KindKvsSieveBindingInitializer:
 		n.AsKvsSieveBindingInitializer().Expression = expr
 	case KindKvsCollectExpression:

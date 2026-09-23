@@ -3411,8 +3411,8 @@ func (p *Printer) emitExpression(node *ast.Expression, precedence ast.OperatorPr
 		p.emitKvsExtantTestExpression(node.AsKvsExtantTestExpression())
 	case ast.KindKvsDefaultExpression:
 		p.emitKvsDefaultExpression(node.AsKvsDefaultExpression())
-	case ast.KindKvsNullingSieveExpression:
-		p.emitKvsNullingSieveExpression(node.AsKvsNullingSieveExpression())
+	case ast.KindKvsSieveExpression:
+		p.emitKvsSieveExpression(node.AsKvsSieveExpression())
 	case ast.KindKvsPlaceholderLambdaExpression:
 		p.emitExpression(node.AsKvsPlaceholderLambdaExpression().Arrow.AsArrowFunction().Body, ast.OperatorPrecedenceLowest)
 	case ast.KindKvsSieveBindingInitializer:
@@ -3897,7 +3897,7 @@ func (p *Printer) emitKvsDefaultExpression(node *ast.KvsDefaultExpression) {
 	p.exitNode(node.AsNode(), state)
 }
 
-func (p *Printer) emitKvsNullingSieveExpression(node *ast.KvsNullingSieveExpression) {
+func (p *Printer) emitKvsSieveExpression(node *ast.KvsSieveExpression) {
 	state := p.enterNode(node.AsNode())
 	p.emitPunctuationNode(node.FirstTildeToken)
 	p.emitPunctuationNode(node.SecondTildeToken)

@@ -19,6 +19,7 @@ const absent = ~~null;
 const undefinedValue = ~~undefined;
 const falseValue = ~~false;
 const zero = ~~0;
+const zeroBigInt = ~~0n;
 const notANumber = ~~NaN;
 const emptyString = ~~"";
 const emptyArray = ~~[];
@@ -101,6 +102,18 @@ if (const rejected ~= []) {
 if (const accepted ~= array) {
     accepted;
     accepted === array;
+}
+
+if (const acceptedZero ~= 0) {
+    const stillZero: 0 = acceptedZero;
+}
+
+if (const acceptedFalse ~= false) {
+    const stillFalse: false = acceptedFalse;
+}
+
+if (const rejectedNaN ~= NaN) {
+    rejectedNaN;
 }
 
 const javascriptDoubleNot = ~ ~3.7;

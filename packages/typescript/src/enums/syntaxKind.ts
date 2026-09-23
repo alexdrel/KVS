@@ -243,7 +243,7 @@ export var SyntaxKind: any;
     SyntaxKind[SyntaxKind["KvsTypedSpreadAssignmentExpression"] = 239] = "KvsTypedSpreadAssignmentExpression";
     SyntaxKind[SyntaxKind["KvsExtantTestExpression"] = 240] = "KvsExtantTestExpression";
     SyntaxKind[SyntaxKind["KvsDefaultExpression"] = 241] = "KvsDefaultExpression";
-    SyntaxKind[SyntaxKind["KvsNullingSieveExpression"] = 242] = "KvsNullingSieveExpression";
+    SyntaxKind[SyntaxKind["KvsSieveExpression"] = 242] = "KvsSieveExpression";
     SyntaxKind[SyntaxKind["KvsPlaceholderLambdaExpression"] = 243] = "KvsPlaceholderLambdaExpression";
     SyntaxKind[SyntaxKind["KvsSieveBindingInitializer"] = 244] = "KvsSieveBindingInitializer";
     SyntaxKind[SyntaxKind["KvsSieveAssignmentExpression"] = 245] = "KvsSieveAssignmentExpression";

@@ -448,12 +448,12 @@ support this operation. The declaration does not change the condition into a
 presence-only test: primitive falsy values fail, while empty collections remain
 truthy as they are in JavaScript.
 
-A **sieve binding** applies the nulling sieve to the initializer before binding
+A **sieve binding** applies the sieve to the initializer before binding
 it:
 
 ```kvs
 if (const items ~= getItems()) {
-    // items is present and passed the explicit nulling sieve
+    // items is present and passed the sieve
     process(items);
 }
 ```
@@ -461,6 +461,10 @@ if (const items ~= getItems()) {
 `const value ~= expression` and `let value ~= expression` mean the same as
 binding `~~expression`. The right-hand expression is evaluated once, and the
 binding receives either the original value or null.
+
+In an `if`, the condition succeeds when that sieved result is extant rather
+than when it is JavaScript-truthy. Accepted values such as zero and false
+therefore bind and enter the successful branch.
 
 The same spelling is available as assignment:
 

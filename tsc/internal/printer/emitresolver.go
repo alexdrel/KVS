@@ -84,7 +84,7 @@ type EmitResolver interface {
 	IsKvsLiftedBinaryLeftNullable(node *ast.Node) bool
 	IsKvsLiftedBinaryRightNullable(node *ast.Node) bool
 	IsKvsNullableExpression(node *ast.Node) bool
-	GetKvsNullingSieveKind(node *ast.Node) KvsNullingSieveKind
+	GetKvsSieveKind(node *ast.Node) KvsSieveKind
 	IsKvsFailureDemotionErrorPattern(node *ast.Node) bool
 	IsKvsNullableIterableSource(node *ast.Node) bool
 	IsKvsNullableIterableElement(node *ast.Node) bool
@@ -146,13 +146,14 @@ type KvsTypedObjectDefault struct {
 	ConstructorSymbol *ast.Symbol
 }
 
-type KvsNullingSieveKind uint8
+type KvsSieveKind uint8
 
 const (
-	KvsNullingSieveDynamic KvsNullingSieveKind = iota
-	KvsNullingSievePrimitive
-	KvsNullingSieveLength
-	KvsNullingSieveSize
-	KvsNullingSieveRecord
-	KvsNullingSieveIdentity
+	KvsSieveDynamic KvsSieveKind = iota
+	KvsSieveNumber
+	KvsSieveString
+	KvsSieveLength
+	KvsSieveSize
+	KvsSieveRecord
+	KvsSieveIdentity
 )

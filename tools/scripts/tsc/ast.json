@@ -295,7 +295,7 @@
             "KvsTypedSpreadAssignmentExpression",
             "KvsExtantTestExpression",
             "KvsDefaultExpression",
-            "KvsNullingSieveExpression",
+            "KvsSieveExpression",
             "KvsPlaceholderLambdaExpression",
             "KvsSieveBindingInitializer",
             "KvsSieveAssignmentExpression",
@@ -1832,7 +1832,7 @@
                 ],
                 "arena": true
             },
-            "KvsNullingSieveExpression": {
+            "KvsSieveExpression": {
                 "extends": [
                     "ExpressionBase",
                     "CompositeBase"

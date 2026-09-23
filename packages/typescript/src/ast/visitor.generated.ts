@@ -130,12 +130,12 @@ import type {
     KvsNullableAssertionExpression,
     KvsNullableType,
     KvsNullingExpression,
-    KvsNullingSieveExpression,
     KvsPlaceholderLambdaExpression,
     KvsRangeExpression,
     KvsSelectExpression,
     KvsSieveAssignmentExpression,
     KvsSieveBindingInitializer,
+    KvsSieveExpression,
     KvsTypedObjectExpression,
     KvsTypedSpreadAssignmentExpression,
     KvsYieldStatement,
@@ -338,12 +338,12 @@ import {
     updateKvsNullableAssertionExpression,
     updateKvsNullableType,
     updateKvsNullingExpression,
-    updateKvsNullingSieveExpression,
     updateKvsPlaceholderLambdaExpression,
     updateKvsRangeExpression,
     updateKvsSelectExpression,
     updateKvsSieveAssignmentExpression,
     updateKvsSieveBindingInitializer,
+    updateKvsSieveExpression,
     updateKvsTypedObjectExpression,
     updateKvsTypedSpreadAssignmentExpression,
     updateKvsYieldStatement,
@@ -717,11 +717,11 @@ const visitEachChildTable: Record<number, VisitEachChildFunction> = {
         const _expression = visitNode(node.expression, visitor, isExpression);
         return updateKvsDefaultExpression(node, _expression);
     },
-    [SyntaxKind.KvsNullingSieveExpression]: (node: KvsNullingSieveExpression, visitor: Visitor): KvsNullingSieveExpression => {
+    [SyntaxKind.KvsSieveExpression]: (node: KvsSieveExpression, visitor: Visitor): KvsSieveExpression => {
         const _firstTildeToken = visitNode(node.firstTildeToken, visitor, isTildeToken);
         const _secondTildeToken = visitNode(node.secondTildeToken, visitor, isTildeToken);
         const _expression = visitNode(node.expression, visitor, isExpression);
-        return updateKvsNullingSieveExpression(node, _firstTildeToken, _secondTildeToken, _expression);
+        return updateKvsSieveExpression(node, _firstTildeToken, _secondTildeToken, _expression);
     },
     [SyntaxKind.KvsPlaceholderLambdaExpression]: (node: KvsPlaceholderLambdaExpression, visitor: Visitor): KvsPlaceholderLambdaExpression => {
         const _arrow = visitNode(node.arrow, visitor, isArrowFunction);

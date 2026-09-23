@@ -515,7 +515,7 @@ resulting code is difficult to read. Effects should be sequenced explicitly.
 
 A relational comparison performs no KVS-specific narrowing. Member and indexed
 access, bitwise and shift operators, unary operators, compound assignments, and
-the explicit nulling sieve are outside this slice.
+the explicit sieve are outside this slice.
 
 No new syntax node is needed: the checker owns the nullable result and reports
 to the KVS emitter whether an ordinary binary expression requires lifting.
@@ -587,7 +587,7 @@ the protected initializer as `KvsCatchSplitExpression`. Assignment uses
 destructuring. Declaration emit expands a paired binding into two ordinary
 declarations so KVS syntax does not leak into `.d.ts` output.
 
-## Explicit nulling sieve
+## Explicit sieve
 
 Status: accepted.
 
@@ -597,14 +597,14 @@ records therefore remain truthy in those contexts. The abandoned global
 truthiness experiment is not part of the language or compiler architecture.
 
 Contiguous prefix `~~expression` explicitly filters a value. It returns null
-for absence, primitive falsy values, empty arrays and typed arrays, empty maps
+for absence, `NaN`, empty strings, empty arrays and typed arrays, empty maps
 and sets, and empty record-like objects. Arrays and typed arrays use `length`,
 maps and sets use `size`, and records use `Object.keys(value).length`.
 Ordinary class instances pass through. Accepted objects retain their identity,
 the operand is evaluated once, and exceptions propagate.
 
 The parser represents the operation as a dedicated
-`KvsNullingSieveExpression`. The two tilde tokens must be adjacent; spaced
+`KvsSieveExpression`. The two tilde tokens must be adjacent; spaced
 `~ ~expression` remains ordinary JavaScript double bitwise NOT. KVS deliberately
 takes over the contiguous numeric spelling without issuing a normal compiler
 warning.
@@ -612,7 +612,8 @@ warning.
 Declaration initializer `~=` is the same operation expressed at the binding.
 It is represented by `KvsSieveBindingInitializer`, is restricted to `const`
 and `let`, and likewise requires its punctuation to be adjacent. Conditional
-binding reuses its existing scope and ordinary successful-condition narrowing.
+binding reuses its existing scope and tests the sieved result for presence, not
+JavaScript truthiness, so zero and false enter the successful branch.
 
 General `target ~= expression` assignment is represented by
 `KvsSieveAssignmentExpression` and means `target = ~~expression`. It evaluates
@@ -622,9 +623,11 @@ the existing RHS-driven `?=` assignment: `?=` can skip the write, while `~=`
 cannot.
 
 The checker adds null to the operand's present value type but does not invent
-non-empty collection types. It also selects an emit strategy: primitive
-truthiness, `length`, `size`, `Object.keys`, or identity for statically known
-families. Mixed or otherwise dynamic types use a runtime-dispatch helper.
+non-empty collection types. It also selects an emit strategy: number, string,
+`length`, `size`, `Object.keys`, or identity for statically known families.
+Mixed or otherwise dynamic types use a runtime-dispatch helper. Boolean and
+bigint values pass unchanged; numbers reject only `NaN`; strings reject only
+the empty string.
 All three spellings share these strategies. The helper follows TypeScript's normal
 unscoped-helper path, including `--importHelpers` and `--noEmitHelpers`.
 

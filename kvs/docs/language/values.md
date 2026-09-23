@@ -134,10 +134,9 @@ particular, `arr || []` preserves an existing empty array and its identity.
 The condition of the KVS nulling operator `?:` uses the same ordinary
 truthiness.
 
-## Nulling sieve
+## Sieve
 
-**Nulling sieve `~~`** preserves a truthy/non-empty value and turns a falsy or
-empty value into `null`.
+**Sieve `~~`** preserves a usable value and turns an unusable value into `null`.
 
 ```kvs
 const items = ~~readItems();
@@ -158,7 +157,8 @@ The operand is evaluated exactly once. A retained array, collection, record,
 or object is returned unchanged, preserving its identity. Thrown exceptions
 are not handled and propagate normally.
 
-The filter rejects primitive falsy values and absence. Arrays and typed arrays
+The sieve rejects absence, `NaN`, empty strings, and empty collections. Zero
+and false pass unchanged. Arrays and typed arrays
 are empty when their `length` is zero; maps and sets are empty when their
 `size` is zero; record-like objects are empty when `Object.keys(value).length`
 is zero. Symbols and property values are not inspected, so `{ x: null }` is
@@ -167,8 +167,9 @@ properties.
 
 ```kvs
 ~~null       // null
-~~false      // null
-~~0          // null
+~~false      // false
+~~0          // 0
+~~NaN        // null
 ~~""         // null
 ~~[]         // null
 ~~{}         // null

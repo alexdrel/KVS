@@ -511,21 +511,22 @@ Run it with:
 go -C ./tsc test -run='TestLocal/kvsCompactArray' ./internal/testrunner
 ```
 
-## Truthy/non-empty-filter slice
+## Sieve slice
 
-`kvsNullingSieve.ts` checks ordinary JavaScript truthiness for empty arrays and
+`kvsSieve.ts` checks ordinary JavaScript truthiness for empty arrays and
 objects, identity-preserving `||`, prefix `~~` across primitive values, arrays,
 typed arrays, maps, sets, records, nullable operands, and class instances, the
 `const`/`let` filtered-binding form `~=`, and general filtered assignment. Its type baseline verifies that
 the result adds null without introducing a non-empty collection type. Its
-JavaScript baseline verifies type-directed primitive, `length`, `size`,
+JavaScript baseline verifies type-directed number, string, `length`, `size`,
 `Object.keys`, and identity lowering; dynamic-helper fallback; once-only
 operand evaluation; identity preservation; exception propagation; reuse of the
-same lowering for `~=`; and ordinary target-before-RHS assignment order. It
+same lowering for `~=`; presence-based conditional sieve bindings; and ordinary
+target-before-RHS assignment order. It
 also verifies that `if (~~value)` narrows the
 original operand through TypeScript's existing truthiness analysis.
-`kvsNullingSieveImportHelpers.ts` and
-`kvsNullingSieveNoEmitHelpers.ts` fence the helper's standard TypeScript flag
+`kvsSieveImportHelpers.ts` and
+`kvsSieveNoEmitHelpers.ts` fence the helper's standard TypeScript flag
 behavior.
 
 The test also fences syntax compatibility: contiguous `~~` has KVS filtering
@@ -538,7 +539,7 @@ contiguous KVS semantics are owned by the KVS conformance case.
 Run it with:
 
 ```sh
-go -C ./tsc test -run='TestLocal/kvsNullingSieve' ./internal/testrunner
+go -C ./tsc test -run='TestLocal/kvsSieve' ./internal/testrunner
 ```
 
 ## Failure-promotion slice

@@ -1,13 +1,13 @@
-kvsNullingSieve.ts(5,5): error TS2872: This kind of expression is always truthy.
-kvsNullingSieve.ts(9,5): error TS2872: This kind of expression is always truthy.
-kvsNullingSieve.ts(92,1): error TS2322: Type 'number[] | null' is not assignable to type 'string | null | undefined'.
+kvsSieve.ts(5,5): error TS2872: This kind of expression is always truthy.
+kvsSieve.ts(9,5): error TS2872: This kind of expression is always truthy.
+kvsSieve.ts(93,1): error TS2322: Type 'number[] | null' is not assignable to type 'string | null | undefined'.
   Type 'number[]' is not assignable to type 'string'.
-kvsNullingSieve.ts(105,7): error TS7005: Variable 'rejectedSpaced' implicitly has an 'any' type.
-kvsNullingSieve.ts(105,22): error TS1005: ',' expected.
-kvsNullingSieve.ts(105,24): error TS1109: Expression expected.
+kvsSieve.ts(118,7): error TS7005: Variable 'rejectedSpaced' implicitly has an 'any' type.
+kvsSieve.ts(118,22): error TS1005: ',' expected.
+kvsSieve.ts(118,24): error TS1109: Expression expected.
 
 
-==== kvsNullingSieve.ts (6 errors) ====
+==== kvsSieve.ts (6 errors) ====
     declare const nullableItems: number[]?;
     declare const items: number[];
     declare const dynamic: unknown;
@@ -30,6 +30,7 @@ kvsNullingSieve.ts(105,24): error TS1109: Expression expected.
     const undefinedValue = ~~undefined;
     const falseValue = ~~false;
     const zero = ~~0;
+    const zeroBigInt = ~~0n;
     const notANumber = ~~NaN;
     const emptyString = ~~"";
     const emptyArray = ~~[];
@@ -115,6 +116,18 @@ kvsNullingSieve.ts(105,24): error TS1109: Expression expected.
     if (const accepted ~= array) {
         accepted;
         accepted === array;
+    }
+    
+    if (const acceptedZero ~= 0) {
+        const stillZero: 0 = acceptedZero;
+    }
+    
+    if (const acceptedFalse ~= false) {
+        const stillFalse: false = acceptedFalse;
+    }
+    
+    if (const rejectedNaN ~= NaN) {
+        rejectedNaN;
     }
     
     const javascriptDoubleNot = ~ ~3.7;

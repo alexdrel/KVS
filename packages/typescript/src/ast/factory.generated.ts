@@ -174,12 +174,12 @@ import type {
     KvsNullableAssertionExpression,
     KvsNullableType,
     KvsNullingExpression,
-    KvsNullingSieveExpression,
     KvsPlaceholderLambdaExpression,
     KvsRangeExpression,
     KvsSelectExpression,
     KvsSieveAssignmentExpression,
     KvsSieveBindingInitializer,
+    KvsSieveExpression,
     KvsTypedObjectExpression,
     KvsTypedSpreadAssignmentExpression,
     KvsYieldStatement,
@@ -928,7 +928,7 @@ function cloneNodeData(node: Node): any {
             return { expression: n.expression, questionToken: n.questionToken };
         case SyntaxKind.KvsDefaultExpression:
             return { expression: n.expression };
-        case SyntaxKind.KvsNullingSieveExpression:
+        case SyntaxKind.KvsSieveExpression:
             return { firstTildeToken: n.firstTildeToken, secondTildeToken: n.secondTildeToken, expression: n.expression };
         case SyntaxKind.KvsPlaceholderLambdaExpression:
             return { arrow: n.arrow };
@@ -1381,7 +1381,7 @@ const forEachChildTable: Record<number, ForEachChildFunction> = {
         visitNode(cbNode, data.expression) ||
         visitNode(cbNode, data.questionToken),
     [SyntaxKind.KvsDefaultExpression]: (data, cbNode, cbNodes) => visitNode(cbNode, data.expression),
-    [SyntaxKind.KvsNullingSieveExpression]: (data, cbNode, cbNodes) =>
+    [SyntaxKind.KvsSieveExpression]: (data, cbNode, cbNodes) =>
         visitNode(cbNode, data.firstTildeToken) ||
         visitNode(cbNode, data.secondTildeToken) ||
         visitNode(cbNode, data.expression),
@@ -2192,12 +2192,12 @@ export function createKvsDefaultExpression(expression: Expression): KvsDefaultEx
     }) as unknown as KvsDefaultExpression;
 }
 
-export function createKvsNullingSieveExpression(firstTildeToken: TildeToken, secondTildeToken: TildeToken, expression: Expression): KvsNullingSieveExpression {
-    return new NodeObject(SyntaxKind.KvsNullingSieveExpression, {
+export function createKvsSieveExpression(firstTildeToken: TildeToken, secondTildeToken: TildeToken, expression: Expression): KvsSieveExpression {
+    return new NodeObject(SyntaxKind.KvsSieveExpression, {
         firstTildeToken,
         secondTildeToken,
         expression,
-    }) as unknown as KvsNullingSieveExpression;
+    }) as unknown as KvsSieveExpression;
 }
 
 export function createKvsPlaceholderLambdaExpression(arrow: ArrowFunction): KvsPlaceholderLambdaExpression {
@@ -3803,8 +3803,8 @@ export function updateKvsDefaultExpression(node: KvsDefaultExpression, expressio
     return node.expression !== expression ? createKvsDefaultExpression(expression) : node;
 }
 
-export function updateKvsNullingSieveExpression(node: KvsNullingSieveExpression, firstTildeToken: TildeToken, secondTildeToken: TildeToken, expression: Expression): KvsNullingSieveExpression {
-    return node.firstTildeToken !== firstTildeToken || node.secondTildeToken !== secondTildeToken || node.expression !== expression ? createKvsNullingSieveExpression(firstTildeToken, secondTildeToken, expression) : node;
+export function updateKvsSieveExpression(node: KvsSieveExpression, firstTildeToken: TildeToken, secondTildeToken: TildeToken, expression: Expression): KvsSieveExpression {
+    return node.firstTildeToken !== firstTildeToken || node.secondTildeToken !== secondTildeToken || node.expression !== expression ? createKvsSieveExpression(firstTildeToken, secondTildeToken, expression) : node;
 }
 
 export function updateKvsPlaceholderLambdaExpression(node: KvsPlaceholderLambdaExpression, arrow: ArrowFunction): KvsPlaceholderLambdaExpression {

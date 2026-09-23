@@ -5570,16 +5570,16 @@ func (p *Parser) parseSimpleUnaryExpression() *ast.Expression {
 func (p *Parser) parsePrefixUnaryExpression() *ast.Node {
 	pos := p.nodePos()
 	operator := p.token
-	if operator == ast.KindTildeToken && p.isKvsNullingSieve() {
+	if operator == ast.KindTildeToken && p.isKvsSieve() {
 		firstTildeToken := p.parseTokenNode()
 		secondTildeToken := p.parseTokenNode()
-		return p.finishNode(p.factory.NewKvsNullingSieveExpression(firstTildeToken, secondTildeToken, p.parseSimpleUnaryExpression()), pos)
+		return p.finishNode(p.factory.NewKvsSieveExpression(firstTildeToken, secondTildeToken, p.parseSimpleUnaryExpression()), pos)
 	}
 	p.nextToken()
 	return p.finishNode(p.factory.NewPrefixUnaryExpression(operator, p.parseSimpleUnaryExpression()), pos)
 }
 
-func (p *Parser) isKvsNullingSieve() bool {
+func (p *Parser) isKvsSieve() bool {
 	firstTildeEnd := p.scanner.TokenEnd()
 	return p.lookAhead(func(p *Parser) bool {
 		return p.nextToken() == ast.KindTildeToken && p.scanner.TokenStart() == firstTildeEnd
