@@ -467,7 +467,9 @@ func isExpressionKind(kind Kind) bool {
 		KindKvsNullingExpression,
 		KindKvsConditionalElement,
 		KindKvsCompactObjectExpression, KindKvsTypedObjectExpression,
+		KindKvsRangeExpression,
 		KindKvsCollectExpression,
+		KindKvsLazyCollectExpression,
 		KindKvsSelectExpression,
 		KindKvsForExpression,
 		KindYieldExpression,
@@ -502,6 +504,7 @@ func IsIterationStatement(node *Node, lookInLabeledStatements bool) bool {
 		KindForInStatement,
 		KindForOfStatement,
 		KindKvsCollectExpression,
+		KindKvsLazyCollectExpression,
 		KindKvsSelectExpression,
 		KindKvsForExpression,
 		KindDoStatement,
@@ -2042,9 +2045,9 @@ func IsExpressionNode(node *Node) bool {
 		KindCallExpression, KindNewExpression, KindTaggedTemplateExpression, KindAsExpression, KindTypeAssertionExpression,
 		KindSatisfiesExpression, KindNonNullExpression, KindParenthesizedExpression, KindFunctionExpression,
 		KindClassExpression, KindArrowFunction, KindVoidExpression, KindDeleteExpression, KindTypeOfExpression,
-		KindPrefixUnaryExpression, KindPostfixUnaryExpression, KindBinaryExpression, KindConditionalExpression, KindKvsExtantTestExpression, KindKvsDefaultExpression, KindKvsNullingSieveExpression, KindKvsSieveBindingInitializer, KindKvsSieveAssignmentExpression, KindKvsFailureDemotionExpression, KindKvsFailurePromotionExpression, KindKvsCatchSplitExpression, KindKvsCatchSplitAssignmentExpression, KindKvsNullingExpression, KindKvsConditionalElement,
+		KindPrefixUnaryExpression, KindPostfixUnaryExpression, KindBinaryExpression, KindConditionalExpression, KindKvsExtantTestExpression, KindKvsDefaultExpression, KindKvsNullingSieveExpression, KindKvsSieveBindingInitializer, KindKvsSieveAssignmentExpression, KindKvsFailureDemotionExpression, KindKvsFailurePromotionExpression, KindKvsCatchSplitExpression, KindKvsCatchSplitAssignmentExpression, KindKvsNullingExpression, KindKvsConditionalElement, KindKvsRangeExpression,
 		KindSpreadElement, KindTemplateExpression, KindOmittedExpression, KindJsxElement, KindJsxSelfClosingElement,
-		KindJsxFragment, KindYieldExpression, KindKvsNullableAssertionExpression, KindKvsExtantAssertionExpression, KindKvsExtantAssignmentExpression, KindKvsCollectExpression, KindKvsSelectExpression, KindKvsForExpression, KindAwaitExpression:
+		KindJsxFragment, KindYieldExpression, KindKvsNullableAssertionExpression, KindKvsExtantAssertionExpression, KindKvsExtantAssignmentExpression, KindKvsCollectExpression, KindKvsLazyCollectExpression, KindKvsSelectExpression, KindKvsForExpression, KindAwaitExpression:
 		return true
 	case KindMetaProperty:
 		// `import.defer` in `import.defer(...)` is not an expression
@@ -2147,9 +2150,13 @@ func IsInExpressionContext(node *Node) bool {
 	case KindForStatement:
 		s := parent.AsForStatement()
 		return s.Initializer == node && s.Initializer.Kind != KindVariableDeclarationList || s.Condition == node || s.Incrementor == node
-	case KindForInStatement, KindForOfStatement, KindKvsCollectExpression, KindKvsSelectExpression, KindKvsForExpression:
+	case KindForInStatement, KindForOfStatement, KindKvsCollectExpression, KindKvsLazyCollectExpression, KindKvsSelectExpression, KindKvsForExpression:
 		if parent.Kind == KindKvsCollectExpression {
 			s := parent.AsKvsCollectExpression()
+			return s.Initializer == node && s.Initializer.Kind != KindVariableDeclarationList || s.Expression == node
+		}
+		if parent.Kind == KindKvsLazyCollectExpression {
+			s := parent.AsKvsLazyCollectExpression()
 			return s.Initializer == node && s.Initializer.Kind != KindVariableDeclarationList || s.Expression == node
 		}
 		if parent.Kind == KindKvsSelectExpression {

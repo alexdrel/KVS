@@ -244,6 +244,7 @@ Run it with:
 
 ```sh
 go -C ./tsc test -run='TestLocal/kvsCollect' ./internal/testrunner
+go -C ./tsc test -run='TestLocal/kvsLazyCollect' ./internal/testrunner
 ```
 
 ## Eager select slice
@@ -570,6 +571,22 @@ equality diagnostics, monotonic relational and equality comparison chains,
 rejection of mixed and inequality chains, short-circuit lowering, generic
 syntax compatibility, and flow narrowing from finite alternatives and
 successful chains.
+
+## Numeric range slice
+
+`kvsRange.ts` checks exclusive and inclusive bounds, arithmetic endpoint
+precedence, comparison precedence, fractional and negative values, `number`
+typing, rejection of string and `bigint` bounds, and consumption through
+ordinary `for`, eager `collect`, and `select`. Its JavaScript baseline verifies
+left-to-right once-only bound capture, compact calls to one per-file helper,
+`+1` iteration, exclusive versus inclusive comparisons, and a reusable
+iterable object backed by a fresh iterator.
+
+Run it with:
+
+```sh
+go -C ./tsc test -run='TestLocal/kvsRange' ./internal/testrunner
+```
 
 ## Conditional-placement and compact-object slice
 

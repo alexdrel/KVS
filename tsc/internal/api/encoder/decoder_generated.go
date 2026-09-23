@@ -87,6 +87,8 @@ func (d *astDecoder) createChildrenNode(kind ast.Kind, data uint32, childIndices
 		ast.KindOpenBracketToken,
 		ast.KindCloseBracketToken,
 		ast.KindDotToken,
+		ast.KindDotDotToken,
+		ast.KindDotDotEqualsToken,
 		ast.KindDotDotDotToken,
 		ast.KindSemicolonToken,
 		ast.KindCommaToken,
@@ -425,12 +427,24 @@ func (d *astDecoder) createChildrenNode(kind ast.Kind, data uint32, childIndices
 		typeNode := d.nodeAt(it.nextIf(mask, 0))
 		properties := d.nodeListAt(it.nextIf(mask, 1))
 		return d.factory.NewKvsTypedObjectExpression(typeNode, properties, multiLine), nil
+	case ast.KindKvsRangeExpression:
+		it := newChildIter(childIndices)
+		lower := d.nodeAt(it.nextIf(mask, 0))
+		operatorToken := d.nodeAt(it.nextIf(mask, 1))
+		upper := d.nodeAt(it.nextIf(mask, 2))
+		return d.factory.NewKvsRangeExpression(lower, operatorToken, upper), nil
 	case ast.KindKvsCollectExpression:
 		it := newChildIter(childIndices)
 		initializer := d.nodeAt(it.nextIf(mask, 0))
 		expression := d.nodeAt(it.nextIf(mask, 1))
 		statement := d.nodeAt(it.nextIf(mask, 2))
 		return d.factory.NewKvsCollectExpression(initializer, expression, statement), nil
+	case ast.KindKvsLazyCollectExpression:
+		it := newChildIter(childIndices)
+		initializer := d.nodeAt(it.nextIf(mask, 0))
+		expression := d.nodeAt(it.nextIf(mask, 1))
+		statement := d.nodeAt(it.nextIf(mask, 2))
+		return d.factory.NewKvsLazyCollectExpression(initializer, expression, statement), nil
 	case ast.KindKvsSelectExpression:
 		it := newChildIter(childIndices)
 		initializer := d.nodeAt(it.nextIf(mask, 0))

@@ -1,10 +1,11 @@
 //// [tests/cases/compiler/numericLiteralsWithTrailingDecimalPoints02.ts] ////
 
 === numericLiteralsWithTrailingDecimalPoints02.ts ===
-1..toString();
->1..toString() : string
->1..toString : (radix?: number) => string
->1. : 1
+(1).toString();
+>(1).toString() : string
+>(1).toString : (radix?: number) => string
+>(1) : 1
+>1 : 1
 >toString : (radix?: number) => string
 
 1.0.toString();

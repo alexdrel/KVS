@@ -7,3 +7,4 @@ compiler. A goalpost moves here when all syntax it uses is implemented.
 - [Quadratic roots, v1](quadratic-v1.ts)
 - [Quadratic roots, final](quadratic.ts)
 - [Prime numbers, v0](primes-v0.ts)
+- [Prime numbers, final](primes.ts)

@@ -33,6 +33,8 @@
             "OpenBracketToken",
             "CloseBracketToken",
             "DotToken",
+            "DotDotToken",
+            "DotDotEqualsToken",
             "DotDotDotToken",
             "SemicolonToken",
             "CommaToken",
@@ -308,7 +310,9 @@
             "KvsCompactArrayExpression",
             "KvsCompactObjectExpression",
             "KvsTypedObjectExpression",
+            "KvsRangeExpression",
             "KvsCollectExpression",
+            "KvsLazyCollectExpression",
             "KvsSelectExpression",
             "KvsForExpression",
             "SpreadElement",
@@ -1219,6 +1223,8 @@
                 "instantiationAliases": {
                     "EndOfFile": "EndOfFile",
                     "DotToken": "DotToken",
+                    "DotDotToken": "DotDotToken",
+                    "DotDotEqualsToken": "DotDotEqualsToken",
                     "DotDotDotToken": "DotDotDotToken",
                     "QuestionToken": "QuestionToken",
                     "ExclamationToken": "ExclamationToken",
@@ -2156,7 +2162,52 @@
                     }
                 ]
             },
+            "KvsRangeExpression": {
+                "generateSubtreeFacts": true,
+                "extends": [
+                    "ExpressionBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "Lower",
+                        "type": "Expression"
+                    },
+                    {
+                        "name": "OperatorToken",
+                        "type": "Node"
+                    },
+                    {
+                        "name": "Upper",
+                        "type": "Expression"
+                    }
+                ],
+                "arena": true
+            },
             "KvsCollectExpression": {
+                "extends": [
+                    "ExpressionBase",
+                    "LocalsContainerBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "Initializer",
+                        "type": "ForInitializer"
+                    },
+                    {
+                        "name": "Expression",
+                        "type": "Expression"
+                    },
+                    {
+                        "name": "Statement",
+                        "type": "Statement",
+                        "visit": "iterationBody"
+                    }
+                ],
+                "arena": true
+            },
+            "KvsLazyCollectExpression": {
                 "extends": [
                     "ExpressionBase",
                     "LocalsContainerBase",

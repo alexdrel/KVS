@@ -1,0 +1,154 @@
+//// [tests/cases/conformance/kvs/kvsLazyCollect.ts] ////
+
+=== kvsLazyCollect.ts ===
+interface Item {
+    value: string;
+>value : string
+
+    optionalValue?: string;
+>optionalValue : string | undefined
+}
+
+declare function getItems(): Item[] | null;
+>getItems : () => Item[] | null
+
+const values = collect* (const item of getItems()) {
+>values : Generator<string, void, unknown>
+>collect* (const item of getItems()) {    yield item.value;    yield? item.optionalValue;} : Generator<string, void, unknown>
+>item : Item
+>getItems() : Item[] | null
+>getItems : () => Item[] | null
+
+    yield item.value;
+>item.value : string
+>item : Item
+>value : string
+
+    yield? item.optionalValue;
+>item.optionalValue : string | undefined
+>item : Item
+>optionalValue : string | undefined
+
+};
+
+const implicit = collect* (2..5) {
+>implicit : Generator<number, void, unknown>
+>collect* (2..5) {    yield _ * 2;} : Generator<number, void, unknown>
+>2..5 : Iterable<number, void, undefined>
+>2 : 2
+>5 : 5
+
+    yield _ * 2;
+>_ * 2 : number
+>_ : number
+>2 : 2
+
+};
+
+const expected: Generator<string, void, unknown> = values;
+>expected : Generator<string, void, unknown>
+>values : Generator<string, void, unknown>
+
+const implicitExpected: Generator<number, void, unknown> = implicit;
+>implicitExpected : Generator<number, void, unknown>
+>implicit : Generator<number, void, unknown>
+
+const nested = collect* (const item of [{ value: "nested" }]) {
+>nested : Generator<string[], void, unknown>
+>collect* (const item of [{ value: "nested" }]) {    yield collect (const value of [item.value]) {        yield value;    };} : Generator<string[], void, unknown>
+>item : { value: string; }
+>[{ value: "nested" }] : { value: string; }[]
+>{ value: "nested" } : { value: string; }
+>value : string
+>"nested" : "nested"
+
+    yield collect (const value of [item.value]) {
+>collect (const value of [item.value]) {        yield value;    } : string[]
+>value : string
+>[item.value] : string[]
+>item.value : string
+>item : { value: string; }
+>value : string
+
+        yield value;
+>value : string
+
+    };
+};
+
+const localLabel = collect* (["keep", "stop"]) {
+>localLabel : Generator<string, void, unknown>
+>collect* (["keep", "stop"]) {local:    {        if (_ === "stop") break local;        yield _;    }} : Generator<string, void, unknown>
+>["keep", "stop"] : string[]
+>"keep" : "keep"
+>"stop" : "stop"
+
+local:
+>local : any
+    {
+        if (_ === "stop") break local;
+>_ === "stop" : boolean
+>_ : string
+>"stop" : "stop"
+>local : any
+
+        yield _;
+>_ : string
+    }
+};
+
+function rejectReturn(items: Item[]): Generator<string, void, unknown> {
+>rejectReturn : (items: Item[]) => Generator<string, void, unknown>
+>items : Item[]
+
+    return collect* (items) {
+>collect* (items) {        if (_.value === "stop") return;        yield _.value;    } : Generator<string, void, unknown>
+>items : Item[]
+
+        if (_.value === "stop") return;
+>_.value === "stop" : boolean
+>_.value : string
+>_ : Item
+>value : string
+>"stop" : "stop"
+
+        yield _.value;
+>_.value : string
+>_ : Item
+>value : string
+
+    };
+}
+
+function rejectOuterJump(items: Item[]) {
+>rejectOuterJump : (items: Item[]) => Generator<string, void, unknown> | undefined
+>items : Item[]
+
+outer:
+>outer : any
+
+    for (;;) {
+        const iterator = collect* (items) {
+>iterator : Generator<string, void, unknown>
+>collect* (items) {            if (_.value === "stop") break outer;            yield _.value;        } : Generator<string, void, unknown>
+>items : Item[]
+
+            if (_.value === "stop") break outer;
+>_.value === "stop" : boolean
+>_.value : string
+>_ : Item
+>value : string
+>"stop" : "stop"
+>outer : any
+
+            yield _.value;
+>_.value : string
+>_ : Item
+>value : string
+
+        };
+        return iterator;
+>iterator : Generator<string, void, unknown>
+    }
+}
+

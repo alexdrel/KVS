@@ -72,6 +72,8 @@ import type {
     DestructuringAssignment,
     DoStatement,
     DotDotDotToken,
+    DotDotEqualsToken,
+    DotDotToken,
     DotToken,
     ElementAccessExpression,
     EmptyStatement,
@@ -205,11 +207,13 @@ import type {
     KvsForExpression,
     KvsIfBindingClause,
     KvsIfBindingStatement,
+    KvsLazyCollectExpression,
     KvsNullableAssertionExpression,
     KvsNullableType,
     KvsNullingExpression,
     KvsNullingSieveExpression,
     KvsPlaceholderLambdaExpression,
+    KvsRangeExpression,
     KvsSelectExpression,
     KvsSieveAssignmentExpression,
     KvsSieveBindingInitializer,
@@ -787,6 +791,15 @@ export declare namespace isKvsTypedObjectExpression {
 }
 isKvsTypedObjectExpression.Handle = isKvsTypedObjectExpression as any;
 
+export function isKvsRangeExpression(node: Node): node is KvsRangeExpression {
+    return node.kind === SyntaxKind.KvsRangeExpression;
+}
+
+export declare namespace isKvsRangeExpression {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsRangeExpression>;
+}
+isKvsRangeExpression.Handle = isKvsRangeExpression as any;
+
 export function isKvsCollectExpression(node: Node): node is KvsCollectExpression {
     return node.kind === SyntaxKind.KvsCollectExpression;
 }
@@ -795,6 +808,15 @@ export declare namespace isKvsCollectExpression {
     function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsCollectExpression>;
 }
 isKvsCollectExpression.Handle = isKvsCollectExpression as any;
+
+export function isKvsLazyCollectExpression(node: Node): node is KvsLazyCollectExpression {
+    return node.kind === SyntaxKind.KvsLazyCollectExpression;
+}
+
+export declare namespace isKvsLazyCollectExpression {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsLazyCollectExpression>;
+}
+isKvsLazyCollectExpression.Handle = isKvsLazyCollectExpression as any;
 
 export function isKvsSelectExpression(node: Node): node is KvsSelectExpression {
     return node.kind === SyntaxKind.KvsSelectExpression;
@@ -3275,6 +3297,26 @@ export declare namespace isDotToken {
 }
 
 isDotToken.Handle = isDotToken as any;
+
+export function isDotDotToken(node: Node): node is DotDotToken {
+    return node.kind === SyntaxKind.DotDotToken;
+}
+
+export declare namespace isDotDotToken {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, DotDotToken>;
+}
+
+isDotDotToken.Handle = isDotDotToken as any;
+
+export function isDotDotEqualsToken(node: Node): node is DotDotEqualsToken {
+    return node.kind === SyntaxKind.DotDotEqualsToken;
+}
+
+export declare namespace isDotDotEqualsToken {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, DotDotEqualsToken>;
+}
+
+isDotDotEqualsToken.Handle = isDotDotEqualsToken as any;
 
 export function isDotDotDotToken(node: Node): node is DotDotDotToken {
     return node.kind === SyntaxKind.DotDotDotToken;

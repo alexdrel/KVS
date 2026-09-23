@@ -13,7 +13,7 @@ aBool.toString();
 >aBool : Symbol(aBool, Decl(toStringOnPrimitives.ts, 1, 3))
 >toString : Symbol(Object.toString, Decl(lib.es5.d.ts, --, --))
 
-1..toString();
->1..toString : Symbol(Number.toString, Decl(lib.es5.d.ts, --, --))
+(1).toString();
+>(1).toString : Symbol(Number.toString, Decl(lib.es5.d.ts, --, --))
 >toString : Symbol(Number.toString, Decl(lib.es5.d.ts, --, --))
 

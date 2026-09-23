@@ -126,11 +126,13 @@ import type {
     KvsForExpression,
     KvsIfBindingClause,
     KvsIfBindingStatement,
+    KvsLazyCollectExpression,
     KvsNullableAssertionExpression,
     KvsNullableType,
     KvsNullingExpression,
     KvsNullingSieveExpression,
     KvsPlaceholderLambdaExpression,
+    KvsRangeExpression,
     KvsSelectExpression,
     KvsSieveAssignmentExpression,
     KvsSieveBindingInitializer,
@@ -332,11 +334,13 @@ import {
     updateKvsForExpression,
     updateKvsIfBindingClause,
     updateKvsIfBindingStatement,
+    updateKvsLazyCollectExpression,
     updateKvsNullableAssertionExpression,
     updateKvsNullableType,
     updateKvsNullingExpression,
     updateKvsNullingSieveExpression,
     updateKvsPlaceholderLambdaExpression,
+    updateKvsRangeExpression,
     updateKvsSelectExpression,
     updateKvsSieveAssignmentExpression,
     updateKvsSieveBindingInitializer,
@@ -801,11 +805,23 @@ const visitEachChildTable: Record<number, VisitEachChildFunction> = {
         const _properties = visitNodes(node.properties, visitor);
         return updateKvsTypedObjectExpression(node, _type, _properties);
     },
+    [SyntaxKind.KvsRangeExpression]: (node: KvsRangeExpression, visitor: Visitor): KvsRangeExpression => {
+        const _lower = visitNode(node.lower, visitor, isExpression);
+        const _operatorToken = visitNode(node.operatorToken, visitor);
+        const _upper = visitNode(node.upper, visitor, isExpression);
+        return updateKvsRangeExpression(node, _lower, _operatorToken, _upper);
+    },
     [SyntaxKind.KvsCollectExpression]: (node: KvsCollectExpression, visitor: Visitor): KvsCollectExpression => {
         const _initializer = visitNode(node.initializer, visitor, isForInitializer);
         const _expression = visitNode(node.expression, visitor, isExpression);
         const _statement = visitNode(node.statement, visitor, isStatement);
         return updateKvsCollectExpression(node, _initializer, _expression, _statement);
+    },
+    [SyntaxKind.KvsLazyCollectExpression]: (node: KvsLazyCollectExpression, visitor: Visitor): KvsLazyCollectExpression => {
+        const _initializer = visitNode(node.initializer, visitor, isForInitializer);
+        const _expression = visitNode(node.expression, visitor, isExpression);
+        const _statement = visitNode(node.statement, visitor, isStatement);
+        return updateKvsLazyCollectExpression(node, _initializer, _expression, _statement);
     },
     [SyntaxKind.KvsSelectExpression]: (node: KvsSelectExpression, visitor: Visitor): KvsSelectExpression => {
         const _initializer = visitNode(node.initializer, visitor, isForInitializer);

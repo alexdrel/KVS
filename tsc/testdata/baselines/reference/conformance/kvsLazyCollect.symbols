@@ -1,0 +1,131 @@
+//// [tests/cases/conformance/kvs/kvsLazyCollect.ts] ////
+
+=== kvsLazyCollect.ts ===
+interface Item {
+>Item : Symbol(Item, Decl(kvsLazyCollect.ts, 0, 0))
+
+    value: string;
+>value : Symbol(Item.value, Decl(kvsLazyCollect.ts, 0, 16))
+
+    optionalValue?: string;
+>optionalValue : Symbol(Item.optionalValue, Decl(kvsLazyCollect.ts, 1, 18))
+}
+
+declare function getItems(): Item[] | null;
+>getItems : Symbol(getItems, Decl(kvsLazyCollect.ts, 3, 1))
+>Item : Symbol(Item, Decl(kvsLazyCollect.ts, 0, 0))
+
+const values = collect* (const item of getItems()) {
+>values : Symbol(values, Decl(kvsLazyCollect.ts, 7, 5))
+>item : Symbol(item, Decl(kvsLazyCollect.ts, 7, 30))
+>getItems : Symbol(getItems, Decl(kvsLazyCollect.ts, 3, 1))
+
+    yield item.value;
+>item.value : Symbol(Item.value, Decl(kvsLazyCollect.ts, 0, 16))
+>item : Symbol(item, Decl(kvsLazyCollect.ts, 7, 30))
+>value : Symbol(Item.value, Decl(kvsLazyCollect.ts, 0, 16))
+
+    yield? item.optionalValue;
+>item.optionalValue : Symbol(Item.optionalValue, Decl(kvsLazyCollect.ts, 1, 18))
+>item : Symbol(item, Decl(kvsLazyCollect.ts, 7, 30))
+>optionalValue : Symbol(Item.optionalValue, Decl(kvsLazyCollect.ts, 1, 18))
+
+};
+
+const implicit = collect* (2..5) {
+>implicit : Symbol(implicit, Decl(kvsLazyCollect.ts, 12, 5))
+
+    yield _ * 2;
+>_ : Symbol(_, Decl(kvsLazyCollect.ts, 13, 9))
+
+};
+
+const expected: Generator<string, void, unknown> = values;
+>expected : Symbol(expected, Decl(kvsLazyCollect.ts, 16, 5))
+>Generator : Symbol(Generator, Decl(lib.es2015.generator.d.ts, --, --))
+>values : Symbol(values, Decl(kvsLazyCollect.ts, 7, 5))
+
+const implicitExpected: Generator<number, void, unknown> = implicit;
+>implicitExpected : Symbol(implicitExpected, Decl(kvsLazyCollect.ts, 17, 5))
+>Generator : Symbol(Generator, Decl(lib.es2015.generator.d.ts, --, --))
+>implicit : Symbol(implicit, Decl(kvsLazyCollect.ts, 12, 5))
+
+const nested = collect* (const item of [{ value: "nested" }]) {
+>nested : Symbol(nested, Decl(kvsLazyCollect.ts, 19, 5))
+>item : Symbol(item, Decl(kvsLazyCollect.ts, 19, 30))
+>value : Symbol(value, Decl(kvsLazyCollect.ts, 19, 41))
+
+    yield collect (const value of [item.value]) {
+>value : Symbol(value, Decl(kvsLazyCollect.ts, 20, 24))
+>item.value : Symbol(value, Decl(kvsLazyCollect.ts, 19, 41))
+>item : Symbol(item, Decl(kvsLazyCollect.ts, 19, 30))
+>value : Symbol(value, Decl(kvsLazyCollect.ts, 19, 41))
+
+        yield value;
+>value : Symbol(value, Decl(kvsLazyCollect.ts, 20, 24))
+
+    };
+};
+
+const localLabel = collect* (["keep", "stop"]) {
+>localLabel : Symbol(localLabel, Decl(kvsLazyCollect.ts, 25, 5))
+
+local:
+    {
+        if (_ === "stop") break local;
+>_ : Symbol(_, Decl(kvsLazyCollect.ts, 28, 12))
+
+        yield _;
+>_ : Symbol(_, Decl(kvsLazyCollect.ts, 28, 12))
+    }
+};
+
+function rejectReturn(items: Item[]): Generator<string, void, unknown> {
+>rejectReturn : Symbol(rejectReturn, Decl(kvsLazyCollect.ts, 31, 2))
+>items : Symbol(items, Decl(kvsLazyCollect.ts, 33, 22))
+>Item : Symbol(Item, Decl(kvsLazyCollect.ts, 0, 0))
+>Generator : Symbol(Generator, Decl(lib.es2015.generator.d.ts, --, --))
+
+    return collect* (items) {
+>items : Symbol(items, Decl(kvsLazyCollect.ts, 33, 22))
+
+        if (_.value === "stop") return;
+>_.value : Symbol(Item.value, Decl(kvsLazyCollect.ts, 0, 16))
+>_ : Symbol(_, Decl(kvsLazyCollect.ts, 35, 12))
+>value : Symbol(Item.value, Decl(kvsLazyCollect.ts, 0, 16))
+
+        yield _.value;
+>_.value : Symbol(Item.value, Decl(kvsLazyCollect.ts, 0, 16))
+>_ : Symbol(_, Decl(kvsLazyCollect.ts, 35, 12))
+>value : Symbol(Item.value, Decl(kvsLazyCollect.ts, 0, 16))
+
+    };
+}
+
+function rejectOuterJump(items: Item[]) {
+>rejectOuterJump : Symbol(rejectOuterJump, Decl(kvsLazyCollect.ts, 38, 1))
+>items : Symbol(items, Decl(kvsLazyCollect.ts, 40, 25))
+>Item : Symbol(Item, Decl(kvsLazyCollect.ts, 0, 0))
+
+outer:
+    for (;;) {
+        const iterator = collect* (items) {
+>iterator : Symbol(iterator, Decl(kvsLazyCollect.ts, 43, 13))
+>items : Symbol(items, Decl(kvsLazyCollect.ts, 40, 25))
+
+            if (_.value === "stop") break outer;
+>_.value : Symbol(Item.value, Decl(kvsLazyCollect.ts, 0, 16))
+>_ : Symbol(_, Decl(kvsLazyCollect.ts, 44, 16))
+>value : Symbol(Item.value, Decl(kvsLazyCollect.ts, 0, 16))
+
+            yield _.value;
+>_.value : Symbol(Item.value, Decl(kvsLazyCollect.ts, 0, 16))
+>_ : Symbol(_, Decl(kvsLazyCollect.ts, 44, 16))
+>value : Symbol(Item.value, Decl(kvsLazyCollect.ts, 0, 16))
+
+        };
+        return iterator;
+>iterator : Symbol(iterator, Decl(kvsLazyCollect.ts, 43, 13))
+    }
+}
+

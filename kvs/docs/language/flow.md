@@ -226,6 +226,9 @@ for (const region of regions) {
 
 An empty lazy result is an empty iterator, not null. Eager `collect` remains useful for immediate execution, indexing, repeated traversal, and small collections where iterator bookkeeping is unnecessary.
 
+The source expression is evaluated exactly once when the iterator is created.
+Iteration and the collector body remain deferred until the iterator is consumed.
+
 The iterator follows the [JavaScript resumption rules](implementation.md#lazy-iterator-resumption).
 
 ## `select`

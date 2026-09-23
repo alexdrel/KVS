@@ -29,7 +29,7 @@ class C2 {
 }
 
 const nodes2 = document.getElementsByTagName("li");
-type ItemType2 = 4..typeof(nodes.item(0));
+type ItemType2 = (4).typeof(nodes.item(0));
 
 //// [boolean.ts]
 interface Boolean {

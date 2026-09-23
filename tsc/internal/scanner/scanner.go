@@ -138,6 +138,8 @@ var textToToken = func() map[string]ast.Kind {
 		"[":    ast.KindOpenBracketToken,
 		"]":    ast.KindCloseBracketToken,
 		".":    ast.KindDotToken,
+		"..":   ast.KindDotDotToken,
+		"..=":  ast.KindDotDotEqualsToken,
 		"...":  ast.KindDotDotDotToken,
 		";":    ast.KindSemicolonToken,
 		",":    ast.KindCommaToken,
@@ -611,11 +613,20 @@ func (s *Scanner) Scan() ast.Kind {
 			}
 		case '.':
 			next := s.charAt(1)
-			if stringutil.IsDigit(next) {
+			if next == '.' {
+				switch s.charAt(2) {
+				case '.':
+					s.pos += 3
+					s.token = ast.KindDotDotDotToken
+				case '=':
+					s.pos += 3
+					s.token = ast.KindDotDotEqualsToken
+				default:
+					s.pos += 2
+					s.token = ast.KindDotDotToken
+				}
+			} else if stringutil.IsDigit(next) {
 				s.token = s.scanNumber()
-			} else if next == '.' && s.charAt(2) == '.' {
-				s.pos += 3
-				s.token = ast.KindDotDotDotToken
 			} else {
 				s.pos++
 				s.token = ast.KindDotToken
@@ -1977,7 +1988,7 @@ func (s *Scanner) scanNumber() ast.Kind {
 	fractionalPart := ""
 	exponentPreamble := ""
 	exponentPart := ""
-	if s.char() == '.' {
+	if s.char() == '.' && s.charAt(1) != '.' {
 		s.pos++
 		fractionalPart = s.scanNumberFragment()
 	}

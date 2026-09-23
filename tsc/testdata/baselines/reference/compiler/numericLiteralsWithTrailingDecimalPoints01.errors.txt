@@ -5,7 +5,7 @@ numericLiteralsWithTrailingDecimalPoints01.ts(9,24): error TS1109: Expression ex
 
 
 ==== numericLiteralsWithTrailingDecimalPoints01.ts (4 errors) ====
-    1..toString();
+    (1).toString();
     1.0.toString();
     1.toString();
       ~~~~~~~~

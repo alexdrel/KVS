@@ -2112,7 +2112,7 @@ func (c *Checker) isUsedInFunctionOrInstanceProperty(usage *ast.Node, declaratio
 
 func isImmediatelyUsedInInitializerOfBlockScopedVariable(declaration *ast.Node, usage *ast.Node, declContainer *ast.Node) bool {
 	switch declaration.Parent.Parent.Kind {
-	case ast.KindVariableStatement, ast.KindForStatement, ast.KindForOfStatement, ast.KindKvsCollectExpression, ast.KindKvsSelectExpression, ast.KindKvsForExpression:
+	case ast.KindVariableStatement, ast.KindForStatement, ast.KindForOfStatement, ast.KindKvsCollectExpression, ast.KindKvsLazyCollectExpression, ast.KindKvsSelectExpression, ast.KindKvsForExpression:
 		// variable statement/for/for-of statement case,
 		// use site should not be inside variable declaration (initializer of declaration or binding element)
 		if isSameScopeDescendentOf(usage, declaration, declContainer) {
@@ -2121,7 +2121,7 @@ func isImmediatelyUsedInInitializerOfBlockScopedVariable(declaration *ast.Node, 
 	}
 	// ForIn/ForOf case - use site should not be used in expression part
 	grandparent := declaration.Parent.Parent
-	return (ast.IsForInOrOfStatement(grandparent) || grandparent.Kind == ast.KindKvsCollectExpression || grandparent.Kind == ast.KindKvsSelectExpression || grandparent.Kind == ast.KindKvsForExpression) && isSameScopeDescendentOf(usage, grandparent.Expression(), declContainer)
+	return (ast.IsForInOrOfStatement(grandparent) || grandparent.Kind == ast.KindKvsCollectExpression || grandparent.Kind == ast.KindKvsLazyCollectExpression || grandparent.Kind == ast.KindKvsSelectExpression || grandparent.Kind == ast.KindKvsForExpression) && isSameScopeDescendentOf(usage, grandparent.Expression(), declContainer)
 }
 
 // Starting from 'initial' node walk up the parent chain until 'stopAt' node is reached.
@@ -4140,6 +4140,9 @@ func (c *Checker) checkReturnStatement(node *ast.Node) {
 	if exprNode != nil {
 		exprType = c.checkExpressionCached(exprNode)
 	}
+	if isInsideKvsLazyCollect(node) {
+		return
+	}
 	if c.checkGrammarStatementInAmbientContext(node) {
 		return
 	}
@@ -4177,6 +4180,9 @@ func (c *Checker) checkReturnStatement(node *ast.Node) {
 func (c *Checker) checkKvsExtantReturnStatement(node *ast.Node) {
 	expr := node.Expression()
 	exprType := c.GetNonNullableType(c.checkExpressionCached(expr))
+	if isInsideKvsLazyCollect(node) {
+		return
+	}
 	if c.checkGrammarStatementInAmbientContext(node) {
 		return
 	}
@@ -4206,6 +4212,18 @@ func (c *Checker) checkKvsExtantReturnStatement(node *ast.Node) {
 		unwrappedReturnType := core.OrElse(c.unwrapReturnType(returnType, functionFlags), returnType)
 		c.checkReturnExpression(container, unwrappedReturnType, node, expr, exprType, false)
 	}
+}
+
+func isInsideKvsLazyCollect(node *ast.Node) bool {
+	for current := node.Parent; current != nil; current = current.Parent {
+		if current.Kind == ast.KindKvsLazyCollectExpression {
+			return true
+		}
+		if ast.IsFunctionLike(current) {
+			return false
+		}
+	}
+	return false
 }
 
 // When checking an arrow expression such as `(x) => exp`, then `node` is the expression `exp`.
@@ -7279,7 +7297,7 @@ func (c *Checker) checkUnusedIdentifiers(potentiallyUnusedIdentifiers []*ast.Nod
 			c.checkUnusedClassMembers(node)
 			c.checkUnusedTypeParameters(node)
 		case ast.KindSourceFile, ast.KindModuleDeclaration, ast.KindBlock, ast.KindCaseBlock, ast.KindKvsIfBindingClause, ast.KindForStatement, ast.KindForInStatement,
-			ast.KindForOfStatement, ast.KindKvsCollectExpression, ast.KindKvsSelectExpression, ast.KindKvsForExpression:
+			ast.KindForOfStatement, ast.KindKvsCollectExpression, ast.KindKvsLazyCollectExpression, ast.KindKvsSelectExpression, ast.KindKvsForExpression:
 			c.checkUnusedLocalsAndParameters(node)
 		case ast.KindConstructor, ast.KindFunctionExpression, ast.KindFunctionDeclaration, ast.KindArrowFunction, ast.KindMethodDeclaration,
 			ast.KindGetAccessor, ast.KindSetAccessor:
@@ -7466,7 +7484,7 @@ func (c *Checker) isUnreferencedVariableDeclaration(node *ast.Node) bool {
 		}
 	}
 	if (ast.IsParameterDeclaration(node) ||
-		ast.IsVariableDeclaration(node) && (ast.IsForInOrOfStatement(node.Parent.Parent) || node.Parent.Parent.Kind == ast.KindKvsCollectExpression || node.Parent.Parent.Kind == ast.KindKvsSelectExpression || node.Parent.Parent.Kind == ast.KindKvsForExpression || c.getCombinedNodeFlagsCached(node)&ast.NodeFlagsUsing != 0) ||
+		ast.IsVariableDeclaration(node) && (ast.IsForInOrOfStatement(node.Parent.Parent) || node.Parent.Parent.Kind == ast.KindKvsCollectExpression || node.Parent.Parent.Kind == ast.KindKvsLazyCollectExpression || node.Parent.Parent.Kind == ast.KindKvsSelectExpression || node.Parent.Parent.Kind == ast.KindKvsForExpression || c.getCombinedNodeFlagsCached(node)&ast.NodeFlagsUsing != 0) ||
 		ast.IsBindingElement(node) && !(ast.IsObjectBindingPattern(node.Parent) && node.PropertyName() == nil)) &&
 		isIdentifierThatStartsWithUnderscore(name) {
 		return false
@@ -8087,8 +8105,12 @@ func (c *Checker) checkExpressionWorker(node *ast.Node, checkMode CheckMode) *Ty
 		return c.checkKvsComparisonAlternativesExpression(node.AsKvsComparisonAlternativesExpression(), checkMode)
 	case ast.KindKvsComparisonChainExpression:
 		return c.checkKvsComparisonChainExpression(node.AsKvsComparisonChainExpression(), checkMode)
+	case ast.KindKvsRangeExpression:
+		return c.checkKvsRangeExpression(node.AsKvsRangeExpression(), checkMode)
 	case ast.KindKvsCollectExpression:
 		return c.checkKvsCollectExpression(node)
+	case ast.KindKvsLazyCollectExpression:
+		return c.checkKvsLazyCollectExpression(node)
 	case ast.KindKvsSelectExpression:
 		return c.checkKvsSelectExpression(node)
 	case ast.KindKvsForExpression:
@@ -11922,7 +11944,7 @@ func (c *Checker) checkIdentifier(node *ast.Node, checkMode CheckMode) *Type {
 	// We only look for uninitialized variables in strict null checking mode, and only when we can analyze
 	// the entire control flow graph from the variable's declaration (i.e. when the flow container and
 	// declaration container are the same).
-	isNeverInitialized := immediateDeclaration != nil && ast.IsVariableDeclaration(immediateDeclaration) && !ast.IsForInOrOfStatement(immediateDeclaration.Parent.Parent) && immediateDeclaration.Parent.Parent.Kind != ast.KindKvsCollectExpression && immediateDeclaration.Parent.Parent.Kind != ast.KindKvsSelectExpression && immediateDeclaration.Parent.Parent.Kind != ast.KindKvsForExpression &&
+	isNeverInitialized := immediateDeclaration != nil && ast.IsVariableDeclaration(immediateDeclaration) && !ast.IsForInOrOfStatement(immediateDeclaration.Parent.Parent) && immediateDeclaration.Parent.Parent.Kind != ast.KindKvsCollectExpression && immediateDeclaration.Parent.Parent.Kind != ast.KindKvsLazyCollectExpression && immediateDeclaration.Parent.Parent.Kind != ast.KindKvsSelectExpression && immediateDeclaration.Parent.Parent.Kind != ast.KindKvsForExpression &&
 		immediateDeclaration.Initializer() == nil && immediateDeclaration.AsVariableDeclaration().ExclamationToken == nil &&
 		c.isMutableLocalVariableDeclaration(immediateDeclaration) && !c.isSymbolAssignedDefinitely(symbol)
 	assumeInitialized := isParameter ||
@@ -13890,6 +13912,7 @@ func (c *Checker) getSyntacticNullishnessSemantics(node *ast.Node) PredicateSema
 		ast.KindPropertyAccessExpression,
 		ast.KindYieldExpression,
 		ast.KindKvsCollectExpression,
+		ast.KindKvsLazyCollectExpression,
 		ast.KindKvsSelectExpression,
 		ast.KindKvsForExpression,
 		ast.KindThisKeyword:
@@ -17765,7 +17788,7 @@ func (c *Checker) getTypeForVariableLikeDeclaration(declaration *ast.Node, inclu
 				return c.getExtractStringType(indexType)
 			}
 			return c.stringType
-		case ast.KindForOfStatement, ast.KindKvsCollectExpression, ast.KindKvsSelectExpression:
+		case ast.KindForOfStatement, ast.KindKvsCollectExpression, ast.KindKvsLazyCollectExpression, ast.KindKvsSelectExpression:
 			// checkRightHandSideOfForOf will return undefined if the for-of expression type was
 			// missing properties/signatures required to get its iteratedType (like
 			// [Symbol.iterator] or next). This may be because we accessed properties from anyType,
@@ -18848,6 +18871,89 @@ func (c *Checker) checkKvsCollectExpression(node *ast.Node) *Type {
 	return c.checkKvsProducerExpression(node, data.Initializer, data.Expression, data.Statement, false)
 }
 
+func (c *Checker) checkKvsLazyCollectExpression(node *ast.Node) *Type {
+	data := node.AsKvsLazyCollectExpression()
+	if !ast.IsKvsProducerHeadPosition(node) {
+		c.error(node, diagnostics.KVS_collect_must_be_at_the_head_of_a_supported_value_expression)
+	}
+	elementType := c.checkKvsProducerElementType(node, data.Initializer, data.Statement)
+	c.checkExpressionCached(data.Expression)
+	c.checkKvsLazyCollectControlFlow(node, data.Statement)
+	return c.createGeneratorType(elementType, c.voidType, c.unknownType, false)
+}
+
+func (c *Checker) checkKvsLazyCollectControlFlow(producer *ast.Node, statement *ast.Statement) {
+	labels := make(map[string]bool)
+	var collectLabels func(*ast.Node) bool
+	collectLabels = func(current *ast.Node) bool {
+		if current != producer && (ast.IsFunctionLike(current) || current.Kind == ast.KindKvsCollectExpression || current.Kind == ast.KindKvsLazyCollectExpression || current.Kind == ast.KindKvsSelectExpression) {
+			return false
+		}
+		if current.Kind == ast.KindLabeledStatement {
+			labels[current.AsLabeledStatement().Label.Text()] = true
+		}
+		current.ForEachChild(collectLabels)
+		return false
+	}
+	statement.ForEachChild(collectLabels)
+	var visit func(*ast.Node) bool
+	visit = func(current *ast.Node) bool {
+		if current != producer && (ast.IsFunctionLike(current) || current.Kind == ast.KindKvsCollectExpression || current.Kind == ast.KindKvsLazyCollectExpression || current.Kind == ast.KindKvsSelectExpression) {
+			return false
+		}
+		switch current.Kind {
+		case ast.KindReturnStatement, ast.KindKvsExtantReturnStatement:
+			c.error(current, diagnostics.A_return_statement_cannot_cross_a_lazy_KVS_collector_boundary)
+		case ast.KindBreakStatement, ast.KindContinueStatement:
+			label := current.Label()
+			if label != nil && !labels[label.Text()] {
+				c.error(current, diagnostics.A_labeled_jump_cannot_cross_a_lazy_KVS_collector_boundary)
+			}
+		}
+		current.ForEachChild(visit)
+		return false
+	}
+	statement.ForEachChild(visit)
+}
+
+func (c *Checker) checkKvsProducerElementType(node *ast.Node, initializer *ast.ForInitializer, statement *ast.Statement) *Type {
+	c.checkVariableDeclarationList(initializer)
+	c.checkSourceElement(statement)
+	var yieldTypes []*Type
+	var visit func(*ast.Node) bool
+	visit = func(current *ast.Node) bool {
+		if current != node && (ast.IsFunctionLike(current) || current.Kind == ast.KindKvsCollectExpression || current.Kind == ast.KindKvsLazyCollectExpression || current.Kind == ast.KindKvsSelectExpression) {
+			return false
+		}
+		if current.Kind == ast.KindKvsYieldStatement || current.Kind == ast.KindKvsExtantYieldStatement {
+			t := c.checkExpressionCached(current.Expression())
+			if current.Kind == ast.KindKvsExtantYieldStatement {
+				t = c.GetNonNullableType(t)
+			}
+			yieldTypes = append(yieldTypes, c.getWidenedType(t))
+			return false
+		}
+		current.ForEachChild(visit)
+		return false
+	}
+	statement.ForEachChild(visit)
+	if node.Locals() != nil {
+		c.registerForUnusedIdentifiersCheck(node)
+	}
+	if len(yieldTypes) == 0 {
+		return c.neverType
+	}
+	return c.getUnionType(yieldTypes)
+}
+
+func (c *Checker) checkKvsRangeExpression(node *ast.KvsRangeExpression, checkMode CheckMode) *Type {
+	lowerType := c.checkExpressionEx(node.Lower, checkMode)
+	upperType := c.checkExpressionEx(node.Upper, checkMode)
+	c.checkTypeAssignableTo(lowerType, c.numberType, node.Lower, nil)
+	c.checkTypeAssignableTo(upperType, c.numberType, node.Upper, nil)
+	return c.createIterableType(c.numberType)
+}
+
 func (c *Checker) checkKvsSelectExpression(node *ast.Node) *Type {
 	data := node.AsKvsSelectExpression()
 	return c.checkKvsProducerExpression(node, data.Initializer, data.Expression, data.Statement, true)
@@ -18943,7 +19049,7 @@ func (c *Checker) checkKvsProducerExpression(node *ast.Node, initializer *ast.Fo
 	var yieldTypes []*Type
 	var visit func(*ast.Node) bool
 	visit = func(current *ast.Node) bool {
-		if current != node && (ast.IsFunctionLike(current) || current.Kind == ast.KindKvsCollectExpression || current.Kind == ast.KindKvsSelectExpression) {
+		if current != node && (ast.IsFunctionLike(current) || current.Kind == ast.KindKvsCollectExpression || current.Kind == ast.KindKvsLazyCollectExpression || current.Kind == ast.KindKvsSelectExpression) {
 			return false
 		}
 		if current.Kind == ast.KindKvsYieldStatement || current.Kind == ast.KindKvsExtantYieldStatement {

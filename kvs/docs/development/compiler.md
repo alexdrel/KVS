@@ -99,7 +99,8 @@ including it.
 
 ### Producing-loop assumptions
 
-Eager `KvsCollectExpression` and `KvsSelectExpression` nodes own loop bindings
+Eager `KvsCollectExpression`, lazy `KvsLazyCollectExpression`, and
+`KvsSelectExpression` nodes own loop bindings
 and ordinary iteration control flow even though they are expression-shaped.
 Existing compiler checks that special-case `ForOfStatement` for loop-variable
 initialization, block-scoped locals, and `break`/`continue` recognition must

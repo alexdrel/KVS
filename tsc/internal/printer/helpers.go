@@ -58,6 +58,23 @@ var KvsProjectHelper = &EmitHelper{
 };`,
 }
 
+var KvsRangeHelper = &EmitHelper{
+	Name:       "kvs:range",
+	ImportName: "__kvsRange",
+	Scoped:     false,
+	Text: `var __kvsRange = (this && this.__kvsRange) || function (lower, upper, inclusive) {
+    var range = {};
+    range[Symbol.iterator] = function () {
+        var value = lower;
+        return { next: function () {
+            if (inclusive ? value <= upper : value < upper) return { value: value++, done: false };
+            return { value: void 0, done: true };
+        } };
+    };
+    return range;
+};`,
+}
+
 // TypeScript Helpers
 
 var decorateHelper = &EmitHelper{

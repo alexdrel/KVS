@@ -766,6 +766,9 @@ export class RemoteNode extends RemoteNodeBase implements Node {
     get literal(): RemoteNode | undefined {
         return this.getNamedChild("literal") as RemoteNode;
     }
+    get lower(): RemoteNode | undefined {
+        return this.getNamedChild("lower") as RemoteNode;
+    }
     get members(): RemoteNodeList | undefined {
         return this.getNamedChild("members") as RemoteNodeList;
     }
@@ -924,6 +927,9 @@ export class RemoteNode extends RemoteNodeBase implements Node {
     }
     get types(): RemoteNodeList | undefined {
         return this.getNamedChild("types") as RemoteNodeList;
+    }
+    get upper(): RemoteNode | undefined {
+        return this.getNamedChild("upper") as RemoteNode;
     }
     get value(): RemoteNode | undefined {
         return this.getNamedChild("value") as RemoteNode;

@@ -1684,6 +1684,9 @@ func (b *Binder) bindChildren(node *ast.Node) {
 		b.bindForInOrForOfStatement(node)
 	case ast.KindKvsCollectExpression:
 		b.bindKvsCollectExpression(node)
+	case ast.KindKvsLazyCollectExpression:
+		expr := node.AsKvsLazyCollectExpression()
+		b.bindKvsProducerExpression(node, expr.Initializer, expr.Expression, expr.Statement, false)
 	case ast.KindKvsSelectExpression:
 		b.bindKvsSelectExpression(node)
 	case ast.KindKvsForExpression:
@@ -2583,7 +2586,7 @@ func (b *Binder) bindKvsNullingExpressionFlow(node *ast.Node) {
 
 func (b *Binder) bindVariableDeclarationFlow(node *ast.Node) {
 	b.bindEachChild(node)
-	if node.Initializer() != nil || ast.IsForInOrOfStatement(node.Parent.Parent) || node.Parent.Parent.Kind == ast.KindKvsCollectExpression || node.Parent.Parent.Kind == ast.KindKvsSelectExpression || node.Parent.Parent.Kind == ast.KindKvsForExpression {
+	if node.Initializer() != nil || ast.IsForInOrOfStatement(node.Parent.Parent) || node.Parent.Parent.Kind == ast.KindKvsCollectExpression || node.Parent.Parent.Kind == ast.KindKvsLazyCollectExpression || node.Parent.Parent.Kind == ast.KindKvsSelectExpression || node.Parent.Parent.Kind == ast.KindKvsForExpression {
 		b.bindInitializedVariableFlow(node)
 	}
 }
@@ -2857,7 +2860,7 @@ func GetContainerFlags(node *ast.Node) ContainerFlags {
 		} else {
 			return ContainerFlagsNone
 		}
-	case ast.KindCatchClause, ast.KindKvsIfBindingClause, ast.KindForStatement, ast.KindForInStatement, ast.KindForOfStatement, ast.KindKvsCollectExpression, ast.KindKvsSelectExpression, ast.KindKvsForExpression, ast.KindCaseBlock:
+	case ast.KindCatchClause, ast.KindKvsIfBindingClause, ast.KindForStatement, ast.KindForInStatement, ast.KindForOfStatement, ast.KindKvsCollectExpression, ast.KindKvsLazyCollectExpression, ast.KindKvsSelectExpression, ast.KindKvsForExpression, ast.KindCaseBlock:
 		return ContainerFlagsIsBlockScopedContainer | ContainerFlagsHasLocals
 	case ast.KindBlock:
 		if ast.IsFunctionLike(node.Parent) || ast.IsClassStaticBlockDeclaration(node.Parent) {

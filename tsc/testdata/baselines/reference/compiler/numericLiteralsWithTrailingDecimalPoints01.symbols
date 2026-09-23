@@ -1,8 +1,8 @@
 //// [tests/cases/compiler/numericLiteralsWithTrailingDecimalPoints01.ts] ////
 
 === numericLiteralsWithTrailingDecimalPoints01.ts ===
-1..toString();
->1..toString : Symbol(Number.toString, Decl(lib.es5.d.ts, --, --))
+(1).toString();
+>(1).toString : Symbol(Number.toString, Decl(lib.es5.d.ts, --, --))
 >toString : Symbol(Number.toString, Decl(lib.es5.d.ts, --, --))
 
 1.0.toString();

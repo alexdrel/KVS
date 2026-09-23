@@ -50,7 +50,7 @@ mod.mts(6,65): error TS2858: Import attribute values must be string literal expr
 !!! error TS2322:     Type '{ a: number; }' is not assignable to type 'string'.
                                                       ~~~~~~~~
 !!! error TS2858: Import attribute values must be string literal expressions.
-    import * as thing6 from "./mod.mjs" with { type: "json", field: 0..toString() };
-                                                                    ~~~~~~~~~~~~~
+    import * as thing6 from "./mod.mjs" with { type: "json", field: (0).toString() };
+                                                                    ~~~~~~~~~~~~~~
 !!! error TS2858: Import attribute values must be string literal expressions.
     

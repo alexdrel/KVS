@@ -1,0 +1,59 @@
+//// [tests/cases/conformance/kvs/kvsRange.ts] ////
+
+=== kvsRange.ts ===
+declare function lower(): number;
+>lower : Symbol(lower, Decl(kvsRange.ts, 0, 0))
+
+declare function upper(): number;
+>upper : Symbol(upper, Decl(kvsRange.ts, 0, 33))
+
+const exclusive: Iterable<number> = 2..5;
+>exclusive : Symbol(exclusive, Decl(kvsRange.ts, 3, 5))
+>Iterable : Symbol(Iterable, Decl(lib.es2015.iterable.d.ts, --, --))
+
+const inclusive: Iterable<number> = lower()..=upper();
+>inclusive : Symbol(inclusive, Decl(kvsRange.ts, 4, 5))
+>Iterable : Symbol(Iterable, Decl(lib.es2015.iterable.d.ts, --, --))
+>lower : Symbol(lower, Decl(kvsRange.ts, 0, 0))
+>upper : Symbol(upper, Decl(kvsRange.ts, 0, 33))
+
+const calculatedEndpoints = 2 * 3..10 / 2 + 1;
+>calculatedEndpoints : Symbol(calculatedEndpoints, Decl(kvsRange.ts, 5, 5))
+
+const comparisonOutside = 2..5 < 10;
+>comparisonOutside : Symbol(comparisonOutside, Decl(kvsRange.ts, 6, 5))
+
+const fractional = -1.5..=1.5;
+>fractional : Symbol(fractional, Decl(kvsRange.ts, 7, 5))
+
+for (const value of exclusive) {
+>value : Symbol(value, Decl(kvsRange.ts, 9, 10))
+>exclusive : Symbol(exclusive, Decl(kvsRange.ts, 3, 5))
+
+    value;
+>value : Symbol(value, Decl(kvsRange.ts, 9, 10))
+}
+
+const collected = collect (exclusive) {
+>collected : Symbol(collected, Decl(kvsRange.ts, 13, 5))
+>exclusive : Symbol(exclusive, Decl(kvsRange.ts, 3, 5))
+
+    yield _;
+>_ : Symbol(_, Decl(kvsRange.ts, 14, 9))
+
+};
+const selected = select (inclusive) {
+>selected : Symbol(selected, Decl(kvsRange.ts, 16, 5))
+>inclusive : Symbol(inclusive, Decl(kvsRange.ts, 4, 5))
+
+    yield _;
+>_ : Symbol(_, Decl(kvsRange.ts, 17, 9))
+
+};
+
+const invalidString = "a".."z";
+>invalidString : Symbol(invalidString, Decl(kvsRange.ts, 20, 5))
+
+const invalidBigInt = 1n..2n;
+>invalidBigInt : Symbol(invalidBigInt, Decl(kvsRange.ts, 21, 5))
+

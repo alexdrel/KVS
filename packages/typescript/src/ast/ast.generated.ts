@@ -20,6 +20,8 @@ export type PunctuationSyntaxKind =
     | SyntaxKind.OpenBracketToken
     | SyntaxKind.CloseBracketToken
     | SyntaxKind.DotToken
+    | SyntaxKind.DotDotToken
+    | SyntaxKind.DotDotEqualsToken
     | SyntaxKind.DotDotDotToken
     | SyntaxKind.SemicolonToken
     | SyntaxKind.CommaToken
@@ -189,6 +191,8 @@ export type TokenSyntaxKind =
     | SyntaxKind.OpenBracketToken
     | SyntaxKind.CloseBracketToken
     | SyntaxKind.DotToken
+    | SyntaxKind.DotDotToken
+    | SyntaxKind.DotDotEqualsToken
     | SyntaxKind.DotDotDotToken
     | SyntaxKind.SemicolonToken
     | SyntaxKind.CommaToken
@@ -731,8 +735,20 @@ export interface KvsTypedObjectExpression extends PrimaryExpressionBase, Declara
     readonly properties: NodeArray<ObjectLiteralElementLike>;
     readonly multiLine: boolean;
 }
+export interface KvsRangeExpression extends ExpressionBase {
+    readonly kind: SyntaxKind.KvsRangeExpression;
+    readonly lower: Expression;
+    readonly operatorToken: Node;
+    readonly upper: Expression;
+}
 export interface KvsCollectExpression extends ExpressionBase {
     readonly kind: SyntaxKind.KvsCollectExpression;
+    readonly initializer: ForInitializer;
+    readonly expression: Expression;
+    readonly statement: Statement;
+}
+export interface KvsLazyCollectExpression extends ExpressionBase {
+    readonly kind: SyntaxKind.KvsLazyCollectExpression;
     readonly initializer: ForInitializer;
     readonly expression: Expression;
     readonly statement: Statement;
@@ -1646,6 +1662,8 @@ export type BindingPattern = ObjectBindingPattern | ArrayBindingPattern | KvsCat
 export type JSDocParameterOrPropertyTag = JSDocParameterTag | JSDocPropertyTag;
 export type EndOfFile = Token<SyntaxKind.EndOfFile>;
 export type DotToken = Token<SyntaxKind.DotToken>;
+export type DotDotToken = Token<SyntaxKind.DotDotToken>;
+export type DotDotEqualsToken = Token<SyntaxKind.DotDotEqualsToken>;
 export type DotDotDotToken = Token<SyntaxKind.DotDotDotToken>;
 export type QuestionToken = Token<SyntaxKind.QuestionToken>;
 export type ExclamationToken = Token<SyntaxKind.ExclamationToken>;

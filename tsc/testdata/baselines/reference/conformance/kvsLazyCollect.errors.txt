@@ -1,0 +1,60 @@
+kvsLazyCollect.ts(36,33): error TS100083: A return statement cannot cross a lazy KVS collector boundary.
+kvsLazyCollect.ts(45,37): error TS100084: A labeled jump cannot cross a lazy KVS collector boundary.
+
+
+==== kvsLazyCollect.ts (2 errors) ====
+    interface Item {
+        value: string;
+        optionalValue?: string;
+    }
+    
+    declare function getItems(): Item[] | null;
+    
+    const values = collect* (const item of getItems()) {
+        yield item.value;
+        yield? item.optionalValue;
+    };
+    
+    const implicit = collect* (2..5) {
+        yield _ * 2;
+    };
+    
+    const expected: Generator<string, void, unknown> = values;
+    const implicitExpected: Generator<number, void, unknown> = implicit;
+    
+    const nested = collect* (const item of [{ value: "nested" }]) {
+        yield collect (const value of [item.value]) {
+            yield value;
+        };
+    };
+    
+    const localLabel = collect* (["keep", "stop"]) {
+    local:
+        {
+            if (_ === "stop") break local;
+            yield _;
+        }
+    };
+    
+    function rejectReturn(items: Item[]): Generator<string, void, unknown> {
+        return collect* (items) {
+            if (_.value === "stop") return;
+                                    ~~~~~~
+!!! error TS100083: A return statement cannot cross a lazy KVS collector boundary.
+            yield _.value;
+        };
+    }
+    
+    function rejectOuterJump(items: Item[]) {
+    outer:
+        for (;;) {
+            const iterator = collect* (items) {
+                if (_.value === "stop") break outer;
+                                        ~~~~~~~~~~~~
+!!! error TS100084: A labeled jump cannot cross a lazy KVS collector boundary.
+                yield _.value;
+            };
+            return iterator;
+        }
+    }
+    

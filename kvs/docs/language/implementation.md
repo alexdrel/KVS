@@ -239,6 +239,19 @@ if ($nickname != null) $profile.nickname = $nickname;
 
 A complete lowering preserves ordinary target-path evaluation and delays any staged `!` write-backs until the right-hand value passes the presence test. This is separate from JavaScript `??=`, which tests the current left-hand value. There is no conditional compound-assignment family.
 
+## Numeric ranges
+
+`lower..upper` and `lower..=upper` evaluate both numeric bounds once and return
+a reusable lazy iterable. Each iteration starts at the captured lower bound,
+advances by `+1`, and stops before or at the upper bound respectively. A lower
+bound above the upper bound therefore produces no values.
+
+The lowering calls a generated `__kvsRange(lower, upper, inclusive?)` helper.
+The helper captures the two bounds and returns an object whose
+`Symbol.iterator` property creates a fresh iterator. It is emitted once per
+file, so each range remains a compact call while creation stays lazy and
+repeatable.
+
 ## Producing and result loops
 
 `collect` lowers to an eager loop that appends each `yield`; `select` lowers to a zero-or-one producer boundary that exits on the first `yield` and produces null when none is reached. A `yield?` adds a presence guard and otherwise continues execution. Ordinary loops nested inside `select` do not intercept production.

@@ -167,8 +167,14 @@ func getChildrenPropertyMask(node *ast.Node) uint8 {
 	case ast.KindKvsTypedObjectExpression:
 		n := node.AsKvsTypedObjectExpression()
 		return (boolToByte(n.Type != nil) << 0) | (boolToByte(n.Properties != nil) << 1)
+	case ast.KindKvsRangeExpression:
+		n := node.AsKvsRangeExpression()
+		return (boolToByte(n.Lower != nil) << 0) | (boolToByte(n.OperatorToken != nil) << 1) | (boolToByte(n.Upper != nil) << 2)
 	case ast.KindKvsCollectExpression:
 		n := node.AsKvsCollectExpression()
+		return (boolToByte(n.Initializer != nil) << 0) | (boolToByte(n.Expression != nil) << 1) | (boolToByte(n.Statement != nil) << 2)
+	case ast.KindKvsLazyCollectExpression:
+		n := node.AsKvsLazyCollectExpression()
 		return (boolToByte(n.Initializer != nil) << 0) | (boolToByte(n.Expression != nil) << 1) | (boolToByte(n.Statement != nil) << 2)
 	case ast.KindKvsSelectExpression:
 		n := node.AsKvsSelectExpression()

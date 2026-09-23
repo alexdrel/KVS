@@ -363,6 +363,8 @@ func (n *Node) Expression() *Node {
 		return n.AsYieldExpression().Expression
 	case KindKvsCollectExpression:
 		return n.AsKvsCollectExpression().Expression
+	case KindKvsLazyCollectExpression:
+		return n.AsKvsLazyCollectExpression().Expression
 	case KindKvsNullableAssertionExpression:
 		return n.AsKvsNullableAssertionExpression().Expression
 	case KindKvsExtantAssertionExpression:
@@ -490,6 +492,8 @@ func (m *MutableNode) SetExpression(expr *Node) {
 		n.AsKvsSieveBindingInitializer().Expression = expr
 	case KindKvsCollectExpression:
 		n.AsKvsCollectExpression().Expression = expr
+	case KindKvsLazyCollectExpression:
+		n.AsKvsLazyCollectExpression().Expression = expr
 	case KindKvsSelectExpression:
 		n.AsKvsSelectExpression().Expression = expr
 	case KindKvsForExpression:
@@ -841,6 +845,8 @@ func (n *Node) Initializer() *Node {
 		return n.AsForInOrOfStatement().Initializer
 	case KindKvsCollectExpression:
 		return n.AsKvsCollectExpression().Initializer
+	case KindKvsLazyCollectExpression:
+		return n.AsKvsLazyCollectExpression().Initializer
 	case KindKvsSelectExpression:
 		return n.AsKvsSelectExpression().Initializer
 	case KindKvsForExpression:
@@ -874,6 +880,8 @@ func (m *MutableNode) SetInitializer(initializer *Node) {
 		n.AsForInOrOfStatement().Initializer = initializer
 	case KindKvsCollectExpression:
 		n.AsKvsCollectExpression().Initializer = initializer
+	case KindKvsLazyCollectExpression:
+		n.AsKvsLazyCollectExpression().Initializer = initializer
 	case KindKvsSelectExpression:
 		n.AsKvsSelectExpression().Initializer = initializer
 	case KindKvsForExpression:
@@ -1102,6 +1110,8 @@ func (n *Node) Statement() *Statement {
 		return n.AsForInOrOfStatement().Statement
 	case KindKvsCollectExpression:
 		return n.AsKvsCollectExpression().Statement
+	case KindKvsLazyCollectExpression:
+		return n.AsKvsLazyCollectExpression().Statement
 	case KindKvsSelectExpression:
 		return n.AsKvsSelectExpression().Statement
 	case KindKvsForExpression:

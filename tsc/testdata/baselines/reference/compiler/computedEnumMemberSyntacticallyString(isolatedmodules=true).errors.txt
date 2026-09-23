@@ -7,7 +7,7 @@ computedEnumMemberSyntacticallyString.ts(12,9): error TS18033: Type 'string' is 
 
 
 ==== computedEnumMemberSyntacticallyString.ts (6 errors) ====
-    const BAR = 2..toFixed(0);
+    const BAR = (2).toFixed(0);
     
     enum Foo {
         A = `${BAR}`,

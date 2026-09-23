@@ -60,11 +60,13 @@ type NodeFactory struct {
 	kvsForExpressionArena                    core.Arena[KvsForExpression]
 	kvsIfBindingClauseArena                  core.Arena[KvsIfBindingClause]
 	kvsIfBindingStatementArena               core.Arena[KvsIfBindingStatement]
+	kvsLazyCollectExpressionArena            core.Arena[KvsLazyCollectExpression]
 	kvsNullableAssertionExpressionArena      core.Arena[KvsNullableAssertionExpression]
 	kvsNullableTypeArena                     core.Arena[KvsNullableType]
 	kvsNullingExpressionArena                core.Arena[KvsNullingExpression]
 	kvsNullingSieveExpressionArena           core.Arena[KvsNullingSieveExpression]
 	kvsPlaceholderLambdaExpressionArena      core.Arena[KvsPlaceholderLambdaExpression]
+	kvsRangeExpressionArena                  core.Arena[KvsRangeExpression]
 	kvsSelectExpressionArena                 core.Arena[KvsSelectExpression]
 	kvsSieveAssignmentExpressionArena        core.Arena[KvsSieveAssignmentExpression]
 	kvsSieveBindingInitializerArena          core.Arena[KvsSieveBindingInitializer]
@@ -325,7 +327,9 @@ type (
 	KvsConditionalElementNode               = Node
 	KvsCompactObjectExpressionNode          = Node
 	KvsTypedObjectExpressionNode            = Node
+	KvsRangeExpressionNode                  = Node
 	KvsCollectExpressionNode                = Node
+	KvsLazyCollectExpressionNode            = Node
 	KvsSelectExpressionNode                 = Node
 	KvsForExpressionNode                    = Node
 	LabeledStatementNode                    = Node
@@ -501,6 +505,8 @@ type (
 	JSDocParameterOrPropertyTagNode         = Node
 	EndOfFile                               = Node
 	DotToken                                = Node
+	DotDotToken                             = Node
+	DotDotEqualsToken                       = Node
 	DotDotDotToken                          = Node
 	QuestionToken                           = Node
 	ExclamationToken                        = Node
@@ -667,7 +673,7 @@ func (node *Token) Clone(f NodeFactoryCoercible) *Node {
 
 func IsToken(node *Node) bool {
 	switch node.Kind {
-	case KindUnknown, KindEndOfFile, KindSingleLineCommentTrivia, KindMultiLineCommentTrivia, KindNewLineTrivia, KindWhitespaceTrivia, KindConflictMarkerTrivia, KindNonTextFileMarkerTrivia, KindNumericLiteral, KindBigIntLiteral, KindStringLiteral, KindJsxText, KindJsxTextAllWhiteSpaces, KindRegularExpressionLiteral, KindNoSubstitutionTemplateLiteral, KindTemplateHead, KindTemplateMiddle, KindTemplateTail, KindOpenBraceToken, KindCloseBraceToken, KindOpenParenToken, KindCloseParenToken, KindOpenBracketToken, KindCloseBracketToken, KindDotToken, KindDotDotDotToken, KindSemicolonToken, KindCommaToken, KindQuestionDotToken, KindLessThanToken, KindLessThanSlashToken, KindGreaterThanToken, KindLessThanEqualsToken, KindGreaterThanEqualsToken, KindEqualsEqualsToken, KindExclamationEqualsToken, KindEqualsEqualsEqualsToken, KindExclamationEqualsEqualsToken, KindEqualsGreaterThanToken, KindPlusToken, KindMinusToken, KindAsteriskToken, KindAsteriskAsteriskToken, KindSlashToken, KindPercentToken, KindPlusPlusToken, KindMinusMinusToken, KindLessThanLessThanToken, KindGreaterThanGreaterThanToken, KindGreaterThanGreaterThanGreaterThanToken, KindAmpersandToken, KindBarToken, KindCaretToken, KindExclamationToken, KindTildeToken, KindAmpersandAmpersandToken, KindBarBarToken, KindQuestionToken, KindColonToken, KindAtToken, KindQuestionQuestionToken, KindBacktickToken, KindHashToken, KindEqualsToken, KindPlusEqualsToken, KindMinusEqualsToken, KindAsteriskEqualsToken, KindAsteriskAsteriskEqualsToken, KindSlashEqualsToken, KindPercentEqualsToken, KindLessThanLessThanEqualsToken, KindGreaterThanGreaterThanEqualsToken, KindGreaterThanGreaterThanGreaterThanEqualsToken, KindAmpersandEqualsToken, KindBarEqualsToken, KindBarBarEqualsToken, KindAmpersandAmpersandEqualsToken, KindQuestionQuestionEqualsToken, KindCaretEqualsToken, KindIdentifier, KindPrivateIdentifier, KindJSDocCommentTextToken, KindBreakKeyword, KindCaseKeyword, KindCatchKeyword, KindClassKeyword, KindConstKeyword, KindContinueKeyword, KindDebuggerKeyword, KindDefaultKeyword, KindDeleteKeyword, KindDoKeyword, KindElseKeyword, KindEnumKeyword, KindExportKeyword, KindExtendsKeyword, KindFalseKeyword, KindFinallyKeyword, KindForKeyword, KindFunctionKeyword, KindIfKeyword, KindImportKeyword, KindInKeyword, KindInstanceOfKeyword, KindNewKeyword, KindNullKeyword, KindReturnKeyword, KindSuperKeyword, KindSwitchKeyword, KindThisKeyword, KindThrowKeyword, KindTrueKeyword, KindTryKeyword, KindTypeOfKeyword, KindVarKeyword, KindVoidKeyword, KindWhileKeyword, KindWithKeyword, KindImplementsKeyword, KindInterfaceKeyword, KindLetKeyword, KindPackageKeyword, KindPrivateKeyword, KindProtectedKeyword, KindPublicKeyword, KindStaticKeyword, KindYieldKeyword, KindAbstractKeyword, KindAccessorKeyword, KindAsKeyword, KindAssertsKeyword, KindAssertKeyword, KindAnyKeyword, KindAsyncKeyword, KindAwaitKeyword, KindBooleanKeyword, KindConstructorKeyword, KindDeclareKeyword, KindGetKeyword, KindImmediateKeyword, KindInferKeyword, KindIntrinsicKeyword, KindIsKeyword, KindKeyOfKeyword, KindModuleKeyword, KindNamespaceKeyword, KindNeverKeyword, KindOutKeyword, KindReadonlyKeyword, KindRequireKeyword, KindNumberKeyword, KindObjectKeyword, KindSatisfiesKeyword, KindSetKeyword, KindStringKeyword, KindSymbolKeyword, KindTypeKeyword, KindUndefinedKeyword, KindUniqueKeyword, KindUnknownKeyword, KindUsingKeyword, KindFromKeyword, KindGlobalKeyword, KindBigIntKeyword, KindOverrideKeyword, KindOfKeyword, KindDeferKeyword:
+	case KindUnknown, KindEndOfFile, KindSingleLineCommentTrivia, KindMultiLineCommentTrivia, KindNewLineTrivia, KindWhitespaceTrivia, KindConflictMarkerTrivia, KindNonTextFileMarkerTrivia, KindNumericLiteral, KindBigIntLiteral, KindStringLiteral, KindJsxText, KindJsxTextAllWhiteSpaces, KindRegularExpressionLiteral, KindNoSubstitutionTemplateLiteral, KindTemplateHead, KindTemplateMiddle, KindTemplateTail, KindOpenBraceToken, KindCloseBraceToken, KindOpenParenToken, KindCloseParenToken, KindOpenBracketToken, KindCloseBracketToken, KindDotToken, KindDotDotToken, KindDotDotEqualsToken, KindDotDotDotToken, KindSemicolonToken, KindCommaToken, KindQuestionDotToken, KindLessThanToken, KindLessThanSlashToken, KindGreaterThanToken, KindLessThanEqualsToken, KindGreaterThanEqualsToken, KindEqualsEqualsToken, KindExclamationEqualsToken, KindEqualsEqualsEqualsToken, KindExclamationEqualsEqualsToken, KindEqualsGreaterThanToken, KindPlusToken, KindMinusToken, KindAsteriskToken, KindAsteriskAsteriskToken, KindSlashToken, KindPercentToken, KindPlusPlusToken, KindMinusMinusToken, KindLessThanLessThanToken, KindGreaterThanGreaterThanToken, KindGreaterThanGreaterThanGreaterThanToken, KindAmpersandToken, KindBarToken, KindCaretToken, KindExclamationToken, KindTildeToken, KindAmpersandAmpersandToken, KindBarBarToken, KindQuestionToken, KindColonToken, KindAtToken, KindQuestionQuestionToken, KindBacktickToken, KindHashToken, KindEqualsToken, KindPlusEqualsToken, KindMinusEqualsToken, KindAsteriskEqualsToken, KindAsteriskAsteriskEqualsToken, KindSlashEqualsToken, KindPercentEqualsToken, KindLessThanLessThanEqualsToken, KindGreaterThanGreaterThanEqualsToken, KindGreaterThanGreaterThanGreaterThanEqualsToken, KindAmpersandEqualsToken, KindBarEqualsToken, KindBarBarEqualsToken, KindAmpersandAmpersandEqualsToken, KindQuestionQuestionEqualsToken, KindCaretEqualsToken, KindIdentifier, KindPrivateIdentifier, KindJSDocCommentTextToken, KindBreakKeyword, KindCaseKeyword, KindCatchKeyword, KindClassKeyword, KindConstKeyword, KindContinueKeyword, KindDebuggerKeyword, KindDefaultKeyword, KindDeleteKeyword, KindDoKeyword, KindElseKeyword, KindEnumKeyword, KindExportKeyword, KindExtendsKeyword, KindFalseKeyword, KindFinallyKeyword, KindForKeyword, KindFunctionKeyword, KindIfKeyword, KindImportKeyword, KindInKeyword, KindInstanceOfKeyword, KindNewKeyword, KindNullKeyword, KindReturnKeyword, KindSuperKeyword, KindSwitchKeyword, KindThisKeyword, KindThrowKeyword, KindTrueKeyword, KindTryKeyword, KindTypeOfKeyword, KindVarKeyword, KindVoidKeyword, KindWhileKeyword, KindWithKeyword, KindImplementsKeyword, KindInterfaceKeyword, KindLetKeyword, KindPackageKeyword, KindPrivateKeyword, KindProtectedKeyword, KindPublicKeyword, KindStaticKeyword, KindYieldKeyword, KindAbstractKeyword, KindAccessorKeyword, KindAsKeyword, KindAssertsKeyword, KindAssertKeyword, KindAnyKeyword, KindAsyncKeyword, KindAwaitKeyword, KindBooleanKeyword, KindConstructorKeyword, KindDeclareKeyword, KindGetKeyword, KindImmediateKeyword, KindInferKeyword, KindIntrinsicKeyword, KindIsKeyword, KindKeyOfKeyword, KindModuleKeyword, KindNamespaceKeyword, KindNeverKeyword, KindOutKeyword, KindReadonlyKeyword, KindRequireKeyword, KindNumberKeyword, KindObjectKeyword, KindSatisfiesKeyword, KindSetKeyword, KindStringKeyword, KindSymbolKeyword, KindTypeKeyword, KindUndefinedKeyword, KindUniqueKeyword, KindUnknownKeyword, KindUsingKeyword, KindFromKeyword, KindGlobalKeyword, KindBigIntKeyword, KindOverrideKeyword, KindOfKeyword, KindDeferKeyword:
 		return true
 	}
 	return false
@@ -2734,6 +2740,55 @@ func IsKvsTypedObjectExpression(node *Node) bool {
 }
 
 // ──────────────────────────────────────────────────────────────────────
+// KvsRangeExpression
+// ──────────────────────────────────────────────────────────────────────
+
+type KvsRangeExpression struct {
+	ExpressionBase
+	CompositeBase
+	Lower         *Expression
+	OperatorToken *Node
+	Upper         *Expression
+}
+
+func (f *NodeFactory) NewKvsRangeExpression(lower *Expression, operatorToken *Node, upper *Expression) *Node {
+	data := f.kvsRangeExpressionArena.New()
+	data.Lower = lower
+	data.OperatorToken = operatorToken
+	data.Upper = upper
+	return f.newNode(KindKvsRangeExpression, data)
+}
+
+func (f *NodeFactory) UpdateKvsRangeExpression(node *KvsRangeExpression, lower *Expression, operatorToken *Node, upper *Expression) *Node {
+	if lower != node.Lower || operatorToken != node.OperatorToken || upper != node.Upper {
+		return updateNode(f.NewKvsRangeExpression(lower, operatorToken, upper), node.AsNode(), f.hooks)
+	}
+	return node.AsNode()
+}
+
+func (node *KvsRangeExpression) ForEachChild(v Visitor) bool {
+	return visit(v, node.Lower) || visit(v, node.OperatorToken) || visit(v, node.Upper)
+}
+
+func (node *KvsRangeExpression) VisitEachChild(v *NodeVisitor) *Node {
+	return v.Factory.UpdateKvsRangeExpression(node, v.visitNode(node.Lower), v.visitNode(node.OperatorToken), v.visitNode(node.Upper))
+}
+
+func (node *KvsRangeExpression) Clone(f NodeFactoryCoercible) *Node {
+	return cloneNode(f.AsNodeFactory().NewKvsRangeExpression(node.Lower, node.OperatorToken, node.Upper), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func (node *KvsRangeExpression) computeSubtreeFacts() SubtreeFacts {
+	return propagateSubtreeFacts(node.Lower) |
+		propagateSubtreeFacts(node.OperatorToken) |
+		propagateSubtreeFacts(node.Upper)
+}
+
+func IsKvsRangeExpression(node *Node) bool {
+	return node.Kind == KindKvsRangeExpression
+}
+
+// ──────────────────────────────────────────────────────────────────────
 // KvsCollectExpression
 // ──────────────────────────────────────────────────────────────────────
 
@@ -2775,6 +2830,50 @@ func (node *KvsCollectExpression) Clone(f NodeFactoryCoercible) *Node {
 
 func IsKvsCollectExpression(node *Node) bool {
 	return node.Kind == KindKvsCollectExpression
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// KvsLazyCollectExpression
+// ──────────────────────────────────────────────────────────────────────
+
+type KvsLazyCollectExpression struct {
+	ExpressionBase
+	LocalsContainerBase
+	CompositeBase
+	Initializer *ForInitializer
+	Expression  *Expression
+	Statement   *Statement
+}
+
+func (f *NodeFactory) NewKvsLazyCollectExpression(initializer *ForInitializer, expression *Expression, statement *Statement) *Node {
+	data := f.kvsLazyCollectExpressionArena.New()
+	data.Initializer = initializer
+	data.Expression = expression
+	data.Statement = statement
+	return f.newNode(KindKvsLazyCollectExpression, data)
+}
+
+func (f *NodeFactory) UpdateKvsLazyCollectExpression(node *KvsLazyCollectExpression, initializer *ForInitializer, expression *Expression, statement *Statement) *Node {
+	if initializer != node.Initializer || expression != node.Expression || statement != node.Statement {
+		return updateNode(f.NewKvsLazyCollectExpression(initializer, expression, statement), node.AsNode(), f.hooks)
+	}
+	return node.AsNode()
+}
+
+func (node *KvsLazyCollectExpression) ForEachChild(v Visitor) bool {
+	return visit(v, node.Initializer) || visit(v, node.Expression) || visit(v, node.Statement)
+}
+
+func (node *KvsLazyCollectExpression) VisitEachChild(v *NodeVisitor) *Node {
+	return v.Factory.UpdateKvsLazyCollectExpression(node, v.visitNode(node.Initializer), v.visitNode(node.Expression), v.visitIterationBody(node.Statement))
+}
+
+func (node *KvsLazyCollectExpression) Clone(f NodeFactoryCoercible) *Node {
+	return cloneNode(f.AsNodeFactory().NewKvsLazyCollectExpression(node.Initializer, node.Expression, node.Statement), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func IsKvsLazyCollectExpression(node *Node) bool {
+	return node.Kind == KindKvsLazyCollectExpression
 }
 
 // ──────────────────────────────────────────────────────────────────────
@@ -10229,8 +10328,12 @@ func (n *Node) ForEachChild(v Visitor) bool {
 		return n.data.(*KvsCompactObjectExpression).ForEachChild(v)
 	case KindKvsTypedObjectExpression:
 		return n.data.(*KvsTypedObjectExpression).ForEachChild(v)
+	case KindKvsRangeExpression:
+		return n.data.(*KvsRangeExpression).ForEachChild(v)
 	case KindKvsCollectExpression:
 		return n.data.(*KvsCollectExpression).ForEachChild(v)
+	case KindKvsLazyCollectExpression:
+		return n.data.(*KvsLazyCollectExpression).ForEachChild(v)
 	case KindKvsSelectExpression:
 		return n.data.(*KvsSelectExpression).ForEachChild(v)
 	case KindKvsForExpression:
@@ -10742,8 +10845,16 @@ func (n *Node) AsKvsTypedObjectExpression() *KvsTypedObjectExpression {
 	return n.data.(*KvsTypedObjectExpression)
 }
 
+func (n *Node) AsKvsRangeExpression() *KvsRangeExpression {
+	return n.data.(*KvsRangeExpression)
+}
+
 func (n *Node) AsKvsCollectExpression() *KvsCollectExpression {
 	return n.data.(*KvsCollectExpression)
+}
+
+func (n *Node) AsKvsLazyCollectExpression() *KvsLazyCollectExpression {
+	return n.data.(*KvsLazyCollectExpression)
 }
 
 func (n *Node) AsKvsSelectExpression() *KvsSelectExpression {

@@ -620,6 +620,21 @@ func (f *NodeFactory) NewKvsProjectHelper(target *ast.Expression, source *ast.Ex
 	)
 }
 
+func (f *NodeFactory) NewKvsRangeHelper(lower *ast.Expression, upper *ast.Expression, inclusive bool) *ast.Expression {
+	f.emitContext.RequestEmitHelper(KvsRangeHelper)
+	args := []*ast.Node{lower, upper}
+	if inclusive {
+		args = append(args, f.NewTrueExpression())
+	}
+	return f.NewCallExpression(
+		f.NewUnscopedHelperName("__kvsRange"),
+		nil,
+		nil,
+		f.NewNodeList(args),
+		ast.NodeFlagsNone,
+	)
+}
+
 func (f *NodeFactory) NewDecorateHelper(decoratorExpressions []*ast.Node, target *ast.Node, memberName *ast.Node, descriptor *ast.Node) *ast.Expression {
 	f.emitContext.RequestEmitHelper(decorateHelper)
 

@@ -751,3 +751,27 @@ and retains that narrowed type. Otherwise the fallback and result type come from
 the operand's unnarrowed declared/static type. Thus an explicitly annotated
 `const value: Profile? = null` defaults to `Profile{}`, while an inferred
 `const value = null` is rejected because it names no present default type.
+
+## Numeric range slice
+
+Status: implemented for `number` bounds.
+
+`lower..upper` excludes the upper bound and `lower..=upper` includes it. Both
+bounds are evaluated once when the range value is created. The result is a
+reusable lazy `Iterable<number>` whose iterations advance by `+1`; it does not
+infer a descending direction, so an upper bound below the lower bound yields no
+values. `bigint` and non-numeric bounds are rejected.
+
+Range precedence is below shift and arithmetic operations and above relational
+comparisons. This makes arithmetic part of either endpoint while a following
+comparison applies to the completed range. The syntax deliberately reclaims
+JavaScript's `1..member` numeric-property spelling; `(1).member` remains
+available.
+
+Lowering calls `__kvsRange(lower, upper)` for an exclusive range and
+`__kvsRange(lower, upper, true)` for an inclusive range. Its arguments provide
+left-to-right, once-only bound evaluation. The helper is emitted once per file
+and returns an object that creates a fresh iterator from the captured bounds
+for every `Symbol.iterator` request. The helper uses the iterator protocol
+directly because raw emit-helper text is inserted after target downleveling;
+generator syntax in that text would otherwise leak into older targets.

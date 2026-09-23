@@ -59,7 +59,7 @@ Known semantic debts:
   earlier property values, computed names, and spreads may therefore run late.
 - Extant assignment is currently RHS-first and skips target evaluation when
   the RHS is absent.
-- Lazy `collect*` and asynchronous iteration are not implemented.
+- Asynchronous iteration is not implemented.
 - Implicit-subject `for...in` is postponed until KVS decides whether it should
   preserve JavaScript's inherited-enumerable-property behavior or iterate only
   own enumerable properties.
@@ -68,6 +68,7 @@ Focused conformance inputs:
 
 - `tsc/testdata/tests/cases/conformance/kvs/kvsExtantReturn.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsCollect.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsLazyCollect.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsSelect.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsForExpression.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsExtantAssignment.ts`
@@ -223,14 +224,14 @@ them; generated example `.js` files are intentionally ignored.
 
 ### Range expressions
 
-- [ ] Exclusive upper bound: `lower..upper`
-- [ ] Inclusive upper bound: `lower..=upper`
-- [ ] Precedence below arithmetic and above comparison
-- [ ] Lazy iterable
-- [ ] Bounds evaluated once when the range is created
-- [ ] Unit positive step
-- [ ] Upper bound below lower bound produces an empty range
-- [ ] Accepted anywhere an ordinary iterable is accepted
+- [x] Exclusive upper bound: `lower..upper`
+- [x] Inclusive upper bound: `lower..=upper`
+- [x] Precedence below arithmetic and above comparison
+- [x] Lazy iterable
+- [x] Bounds evaluated once when the range is created
+- [x] Unit positive step
+- [x] Upper bound below lower bound produces an empty range
+- [x] Accepted anywhere an ordinary iterable is accepted
 
 ### Implicit subject
 
@@ -283,15 +284,15 @@ them; generated example `.js` files are intentionally ignored.
 
 ### `collect*`
 
-- [ ] Lazy iterator
-- [ ] `yield`
-- [ ] `yield?`
-- [ ] Captured lexical state
+- [x] Lazy iterator
+- [x] `yield`
+- [x] `yield?`
+- [x] Captured lexical state
 - [ ] Captured context state
-- [ ] Iterator closing
-- [ ] JavaScript `.next(value)` resumption semantics
-- [ ] Prohibit outer `return`
-- [ ] Prohibit cross-boundary labeled jumps
+- [x] Iterator closing
+- [x] JavaScript `.next(value)` resumption semantics
+- [x] Prohibit outer `return`
+- [x] Prohibit cross-boundary labeled jumps
 
 ### `select`
 
@@ -546,6 +547,7 @@ them; generated example `.js` files are intentionally ignored.
 - [ ] Distinct domain usable as primitive base
 - [ ] Cross-domain operation rejected
 - [ ] Domain-preserving primitive operations
+- [ ] Numeric ranges accept a shared distinct domain and yield that domain
 - [ ] Neutral operands do not erase domain
 - [ ] Base-typed function signatures preserve participating domain
 - [ ] Domain-aware return may erase domain

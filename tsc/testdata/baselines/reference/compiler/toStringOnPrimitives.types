@@ -17,9 +17,10 @@ aBool.toString();
 >aBool : false
 >toString : () => string
 
-1..toString();
->1..toString() : string
->1..toString : (radix?: number) => string
->1. : 1
+(1).toString();
+>(1).toString() : string
+>(1).toString : (radix?: number) => string
+>(1) : 1
+>1 : 1
 >toString : (radix?: number) => string
 

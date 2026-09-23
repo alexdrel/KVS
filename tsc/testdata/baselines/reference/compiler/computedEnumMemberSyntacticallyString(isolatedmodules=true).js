@@ -1,7 +1,7 @@
 //// [tests/cases/compiler/computedEnumMemberSyntacticallyString.ts] ////
 
 //// [computedEnumMemberSyntacticallyString.ts]
-const BAR = 2..toFixed(0);
+const BAR = (2).toFixed(0);
 
 enum Foo {
     A = `${BAR}`,
@@ -19,7 +19,7 @@ enum Foo {
 
 //// [computedEnumMemberSyntacticallyString.js]
 "use strict";
-const BAR = 2..toFixed(0);
+const BAR = (2).toFixed(0);
 var Foo;
 (function (Foo) {
     Foo["A"] = `${BAR}`;

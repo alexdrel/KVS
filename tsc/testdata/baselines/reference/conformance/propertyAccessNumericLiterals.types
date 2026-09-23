@@ -19,10 +19,11 @@
 >0b01101101 : 109
 >toString : (radix?: number) => string
 
-1234..toString();
->1234..toString() : string
->1234..toString : (radix?: number) => string
->1234. : 1234
+(1234).toString();
+>(1234).toString() : string
+>(1234).toString : (radix?: number) => string
+>(1234) : 1234
+>1234 : 1234
 >toString : (radix?: number) => string
 
 1e0.toString();

@@ -55,6 +55,7 @@ mod.mts(11,64): error TS2858: Import attribute values must be string literal exp
                                                      ~~~~~~~~
 !!! error TS2858: Import attribute values must be string literal expressions.
     
-    import * as thing6 from "./mod.mjs" with {type: "json", field: 0..toString()}
-                                                                   ~~~~~~~~~~~~~
+    import * as thing6 from "./mod.mjs" with {type: "json", field: (0).toString()}
+                                                                   ~~~~~~~~~~~~~~
 !!! error TS2858: Import attribute values must be string literal expressions.
+    

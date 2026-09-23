@@ -8635,5 +8635,13 @@
     "KVS typed in-place spread requires a concrete interface or object type alias target.": {
         "category": "Error",
         "code": 100082
+    },
+    "A return statement cannot cross a lazy KVS collector boundary.": {
+        "category": "Error",
+        "code": 100083
+    },
+    "A labeled jump cannot cross a lazy KVS collector boundary.": {
+        "category": "Error",
+        "code": 100084
     }
 }

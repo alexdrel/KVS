@@ -4,11 +4,12 @@
 true.toString()
 var aBool = false;
 aBool.toString();
-1..toString();
+(1).toString();
+
 
 //// [toStringOnPrimitives.js]
 "use strict";
 true.toString();
 var aBool = false;
 aBool.toString();
-1..toString();
+(1).toString();

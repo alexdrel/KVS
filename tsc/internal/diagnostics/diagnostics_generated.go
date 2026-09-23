@@ -4454,6 +4454,10 @@ var KVS_typed_construction_requires_a_concrete_defaultable_interface_or_object_t
 
 var KVS_typed_in_place_spread_requires_a_concrete_interface_or_object_type_alias_target = &Message{code: 100082, category: CategoryError, key: "KVS_typed_in_place_spread_requires_a_concrete_interface_or_object_type_alias_target_100082", text: "KVS typed in-place spread requires a concrete interface or object type alias target."}
 
+var A_return_statement_cannot_cross_a_lazy_KVS_collector_boundary = &Message{code: 100083, category: CategoryError, key: "A_return_statement_cannot_cross_a_lazy_KVS_collector_boundary_100083", text: "A return statement cannot cross a lazy KVS collector boundary."}
+
+var A_labeled_jump_cannot_cross_a_lazy_KVS_collector_boundary = &Message{code: 100084, category: CategoryError, key: "A_labeled_jump_cannot_cross_a_lazy_KVS_collector_boundary_100084", text: "A labeled jump cannot cross a lazy KVS collector boundary."}
+
 func keyToMessage(key Key) *Message {
 	switch key {
 	case "Unterminated_string_literal_1002":
@@ -8908,6 +8912,10 @@ func keyToMessage(key Key) *Message {
 		return KVS_typed_construction_requires_a_concrete_defaultable_interface_or_object_type_alias
 	case "KVS_typed_in_place_spread_requires_a_concrete_interface_or_object_type_alias_target_100082":
 		return KVS_typed_in_place_spread_requires_a_concrete_interface_or_object_type_alias_target
+	case "A_return_statement_cannot_cross_a_lazy_KVS_collector_boundary_100083":
+		return A_return_statement_cannot_cross_a_lazy_KVS_collector_boundary
+	case "A_labeled_jump_cannot_cross_a_lazy_KVS_collector_boundary_100084":
+		return A_labeled_jump_cannot_cross_a_lazy_KVS_collector_boundary
 	default:
 		return nil
 	}

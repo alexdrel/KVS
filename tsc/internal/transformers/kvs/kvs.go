@@ -18,6 +18,8 @@ type transformer struct {
 	producerResult      *ast.IdentifierNode
 	producerTemporaries []*ast.IdentifierNode
 	selectProducer      bool
+	lazyProducer        bool
+	lazyLabels          map[string]bool
 	selectLabel         *ast.IdentifierNode
 	// Head effects are lowered into statements before their containing value. The
 	// original effect node is then replaced by its generated result temporary
@@ -61,6 +63,13 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 			return tx.Factory().NewReturnStatement(expression)
 		}); result != nil {
 			return result
+		}
+	case ast.KindBreakStatement, ast.KindContinueStatement:
+		if tx.lazyProducer && node.Label() != nil && !tx.lazyLabels[node.Label().Text()] {
+			if node.Kind == ast.KindBreakStatement {
+				return tx.Factory().NewBreakStatement(nil)
+			}
+			return tx.Factory().NewContinueStatement(nil)
 		}
 	case ast.KindVariableStatement:
 		if result := tx.transformHeadVariableStatement(node.AsVariableStatement()); result != nil {
@@ -165,6 +174,10 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 		return tx.transformObjectExpression(node, node.Properties(), node.AsKvsCompactObjectExpression().MultiLine, true)
 	case ast.KindKvsTypedObjectExpression:
 		return tx.transformTypedObjectExpression(node.AsKvsTypedObjectExpression())
+	case ast.KindKvsRangeExpression:
+		return tx.transformRangeExpression(node.AsKvsRangeExpression())
+	case ast.KindKvsLazyCollectExpression:
+		return tx.transformLazyCollectExpression(node.AsKvsLazyCollectExpression())
 	case ast.KindKvsNullableAssertionExpression, ast.KindKvsExtantAssertionExpression:
 		return tx.Visitor().VisitNode(node.Expression())
 	case ast.KindBinaryExpression:
@@ -183,6 +196,63 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 		return tx.Factory().NewArrayLiteralExpression(nil, false)
 	}
 	return tx.Visitor().VisitEachChild(node)
+}
+
+func (tx *transformer) transformRangeExpression(node *ast.KvsRangeExpression) *ast.Node {
+	return tx.Factory().NewKvsRangeHelper(
+		tx.Visitor().VisitNode(node.Lower),
+		tx.Visitor().VisitNode(node.Upper),
+		node.OperatorToken.Kind == ast.KindDotDotEqualsToken,
+	)
+}
+
+func (tx *transformer) transformLazyCollectExpression(node *ast.KvsLazyCollectExpression) *ast.Node {
+	factory := tx.Factory()
+	sourceName := factory.NewUniqueName("source")
+	parameter := factory.NewParameterDeclaration(nil, nil, sourceName, nil, nil, nil)
+
+	savedLazy := tx.lazyProducer
+	savedLabels := tx.lazyLabels
+	savedTemporaries := tx.producerTemporaries
+	tx.lazyProducer = true
+	tx.lazyLabels = collectLazyLabels(node.Statement)
+	tx.producerTemporaries = nil
+	body := tx.Visitor().VisitNode(node.Statement)
+	temporaries := tx.producerTemporaries
+	tx.lazyProducer = savedLazy
+	tx.lazyLabels = savedLabels
+	tx.producerTemporaries = savedTemporaries
+
+	statements := make([]*ast.Node, 0, 2)
+	if len(temporaries) != 0 {
+		declarations := make([]*ast.Node, 0, len(temporaries))
+		for _, temp := range temporaries {
+			declarations = append(declarations, factory.NewVariableDeclaration(temp, nil, nil, nil))
+		}
+		statements = append(statements, factory.NewVariableStatement(nil, factory.NewVariableDeclarationList(factory.NewNodeList(declarations), ast.NodeFlagsNone)))
+	}
+	source := factory.NewBinaryExpression(nil, sourceName, nil, factory.NewToken(ast.KindQuestionQuestionToken), factory.NewArrayLiteralExpression(nil, false))
+	loop := factory.NewForInOrOfStatement(ast.KindForOfStatement, nil, tx.transformIterationInitializer(node.Initializer, node.Flags&ast.NodeFlagsKvsImplicitSubject != 0), source, body)
+	statements = append(statements, loop)
+	function := factory.NewFunctionExpression(nil, factory.NewToken(ast.KindAsteriskToken), nil, nil, factory.NewNodeList([]*ast.Node{parameter}), nil, nil, factory.NewBlock(factory.NewNodeList(statements), true))
+	return factory.NewCallExpression(function, nil, nil, factory.NewNodeList([]*ast.Node{tx.Visitor().VisitNode(node.Expression)}), ast.NodeFlagsNone)
+}
+
+func collectLazyLabels(statement *ast.Node) map[string]bool {
+	labels := make(map[string]bool)
+	var visit func(*ast.Node) bool
+	visit = func(node *ast.Node) bool {
+		if node != statement && (ast.IsFunctionLike(node) || node.Kind == ast.KindKvsCollectExpression || node.Kind == ast.KindKvsLazyCollectExpression || node.Kind == ast.KindKvsSelectExpression) {
+			return false
+		}
+		if node.Kind == ast.KindLabeledStatement {
+			labels[node.AsLabeledStatement().Label.Text()] = true
+		}
+		node.ForEachChild(visit)
+		return false
+	}
+	statement.ForEachChild(visit)
+	return labels
 }
 
 func (tx *transformer) transformPlaceholderLambda(node *ast.KvsPlaceholderLambdaExpression) *ast.Node {
@@ -895,6 +965,12 @@ func (tx *transformer) lowerHeadEffects(root *ast.Expression, continuation func(
 		if node != root && ast.IsFunctionLike(node) {
 			return false
 		}
+		// A lazy collector becomes a generator function. Effects in its body must
+		// be lowered while that body is transformed, never hoisted to the scope
+		// where the iterator is created.
+		if node.Kind == ast.KindKvsLazyCollectExpression {
+			return false
+		}
 		if isKvsProducer(node) || node.Kind == ast.KindKvsFailurePromotionExpression {
 			if ast.IsKvsStatementHeadPosition(node) {
 				effects = append(effects, node)
@@ -1019,10 +1095,12 @@ func (tx *transformer) lowerProducer(producer *ast.Node, continuation func(*ast.
 	savedResult := tx.producerResult
 	savedTemporaries := tx.producerTemporaries
 	savedSelectProducer := tx.selectProducer
+	savedLazyProducer := tx.lazyProducer
 	savedLabel := tx.selectLabel
 	tx.producerResult = result
 	tx.producerTemporaries = nil
 	tx.selectProducer = selectProducer
+	tx.lazyProducer = false
 	if selectProducer && selectNeedsLabel(statement) {
 		tx.selectLabel = factory.NewUniqueName("select")
 	} else {
@@ -1034,6 +1112,7 @@ func (tx *transformer) lowerProducer(producer *ast.Node, continuation func(*ast.
 	tx.producerResult = savedResult
 	tx.producerTemporaries = savedTemporaries
 	tx.selectProducer = savedSelectProducer
+	tx.lazyProducer = savedLazyProducer
 	tx.selectLabel = savedLabel
 	var visitedSource *ast.Node
 	var sourceTemp *ast.IdentifierNode
@@ -1170,7 +1249,7 @@ func selectNeedsLabel(statement *ast.Node) bool {
 	// their yields belong to a different control-flow scope.
 	var visit func(*ast.Node, bool) bool
 	visit = func(node *ast.Node, beneathBreakTarget bool) bool {
-		if node == nil || ast.IsFunctionLike(node) || node.Kind == ast.KindKvsCollectExpression || node.Kind == ast.KindKvsSelectExpression {
+		if node == nil || ast.IsFunctionLike(node) || node.Kind == ast.KindKvsCollectExpression || node.Kind == ast.KindKvsLazyCollectExpression || node.Kind == ast.KindKvsSelectExpression {
 			return false
 		}
 		if node.Kind == ast.KindKvsYieldStatement || node.Kind == ast.KindKvsExtantYieldStatement {
@@ -1205,6 +1284,18 @@ func (tx *transformer) transformYieldValue(value *ast.Expression, extant bool) *
 	// value and performs the shared KVS presence test (`value != null`), so the
 	// expression is evaluated exactly once and absent values are skipped.
 	factory := tx.Factory()
+	if tx.lazyProducer {
+		yieldValue := func(value *ast.Expression) *ast.Node {
+			return factory.NewExpressionStatement(factory.NewYieldExpression(nil, value))
+		}
+		if !extant {
+			return yieldValue(value)
+		}
+		temp := factory.NewTempVariable()
+		tx.producerTemporaries = append(tx.producerTemporaries, temp)
+		condition := factory.NewBinaryExpression(nil, factory.NewAssignmentExpression(temp, value), nil, factory.NewToken(ast.KindExclamationEqualsToken), factory.NewKeywordExpression(ast.KindNullKeyword))
+		return factory.NewIfStatement(condition, yieldValue(temp), nil)
+	}
 	if tx.selectProducer {
 		selectValue := func(value *ast.Expression) *ast.Node {
 			assignment := factory.NewExpressionStatement(factory.NewAssignmentExpression(tx.producerResult, value))

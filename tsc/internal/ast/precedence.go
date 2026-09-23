@@ -80,6 +80,10 @@ const (
 	//     RelationalExpression `in` ShiftExpression
 	//     [+TypeScript] RelationalExpression `as` Type
 	OperatorPrecedenceRelational
+	// RangeExpression:
+	//     ShiftExpression `..` ShiftExpression
+	//     ShiftExpression `..=` ShiftExpression
+	OperatorPrecedenceRange
 	// ShiftExpression:
 	//     AdditiveExpression
 	//     ShiftExpression `<<` AdditiveExpression
@@ -245,6 +249,8 @@ func GetOperatorPrecedence(nodeKind Kind, operatorKind Kind, flags OperatorPrece
 		return OperatorPrecedenceEquality
 	case KindKvsComparisonChainExpression:
 		return OperatorPrecedenceRelational
+	case KindKvsRangeExpression:
+		return OperatorPrecedenceRange
 	case KindConditionalExpression, KindKvsNullingExpression:
 		return OperatorPrecedenceConditional
 	case KindBinaryExpression:
@@ -332,6 +338,7 @@ func GetOperatorPrecedence(nodeKind Kind, operatorKind Kind, flags OperatorPrece
 		KindKvsCompactObjectExpression,
 		KindKvsTypedObjectExpression,
 		KindKvsCollectExpression,
+		KindKvsLazyCollectExpression,
 		KindKvsSelectExpression,
 		KindKvsForExpression,
 		KindObjectLiteralExpression,
@@ -376,6 +383,8 @@ func GetBinaryOperatorPrecedence(operatorKind Kind) OperatorPrecedence {
 	case KindLessThanToken, KindGreaterThanToken, KindLessThanEqualsToken, KindGreaterThanEqualsToken,
 		KindInstanceOfKeyword, KindInKeyword, KindAsKeyword, KindSatisfiesKeyword:
 		return OperatorPrecedenceRelational
+	case KindDotDotToken, KindDotDotEqualsToken:
+		return OperatorPrecedenceRange
 	case KindLessThanLessThanToken, KindGreaterThanGreaterThanToken, KindGreaterThanGreaterThanGreaterThanToken:
 		return OperatorPrecedenceShift
 	case KindPlusToken, KindMinusToken:

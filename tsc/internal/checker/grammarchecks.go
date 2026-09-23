@@ -1550,7 +1550,7 @@ func (c *Checker) checkGrammarVariableDeclaration(node *ast.VariableDeclaration)
 		}
 	}
 
-	if node.Parent.Parent.Kind != ast.KindForInStatement && node.Parent.Parent.Kind != ast.KindForOfStatement && node.Parent.Parent.Kind != ast.KindKvsCollectExpression && node.Parent.Parent.Kind != ast.KindKvsSelectExpression && node.Parent.Parent.Kind != ast.KindKvsForExpression {
+	if node.Parent.Parent.Kind != ast.KindForInStatement && node.Parent.Parent.Kind != ast.KindForOfStatement && node.Parent.Parent.Kind != ast.KindKvsCollectExpression && node.Parent.Parent.Kind != ast.KindKvsLazyCollectExpression && node.Parent.Parent.Kind != ast.KindKvsSelectExpression && node.Parent.Parent.Kind != ast.KindKvsForExpression {
 		if nodeFlags&ast.NodeFlagsAmbient != 0 {
 			c.checkAmbientInitializer(node.AsNode())
 		} else if node.Initializer == nil {

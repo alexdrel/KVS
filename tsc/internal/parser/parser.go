@@ -5018,7 +5018,10 @@ func (p *Parser) parseBinaryExpressionRest(precedence ast.OperatorPrecedence, le
 			}
 		} else {
 			operatorToken := p.parseTokenNode()
-			if (operator == ast.KindEqualsEqualsToken || operator == ast.KindExclamationEqualsToken) && p.token == ast.KindDotDotDotToken {
+			if operator == ast.KindDotDotToken || operator == ast.KindDotDotEqualsToken {
+				rightOperand := p.parseBinaryExpressionOrHigher(newPrecedence)
+				leftOperand = p.finishNode(p.factory.NewKvsRangeExpression(leftOperand, operatorToken, rightOperand), pos)
+			} else if (operator == ast.KindEqualsEqualsToken || operator == ast.KindExclamationEqualsToken) && p.token == ast.KindDotDotDotToken {
 				spreadToken := p.parseTokenNode()
 				alternative := p.parseBinaryExpressionOrHigher(newPrecedence)
 				leftOperand = p.finishNode(p.factory.NewKvsComparisonAlternativesExpression(leftOperand, operatorToken, spreadToken, p.factory.NewNodeList([]*ast.Node{alternative})), pos)
@@ -6112,6 +6115,9 @@ func (p *Parser) parseTemplateSpan(isTaggedTemplate bool) *ast.Node {
 }
 
 func (p *Parser) parsePrimaryExpression() *ast.Expression {
+	if p.token == ast.KindIdentifier && p.scanner.TokenValue() == "collect" && p.lookAhead((*Parser).nextTokenIsContiguousAsteriskAndOpenParen) {
+		return p.parseKvsProducerExpression()
+	}
 	if p.token == ast.KindIdentifier && (p.scanner.TokenValue() == "collect" || p.scanner.TokenValue() == "select") && p.lookAhead((*Parser).nextTokenIsOpenParen) {
 		return p.parseKvsProducerExpression()
 	}
@@ -6171,6 +6177,14 @@ func (p *Parser) parsePrimaryExpression() *ast.Expression {
 		return p.parsePrivateIdentifier()
 	}
 	return p.parseIdentifierWithDiagnostic(diagnostics.Expression_expected, nil)
+}
+
+func (p *Parser) nextTokenIsContiguousAsteriskAndOpenParen() bool {
+	identifierEnd := p.scanner.TokenEnd()
+	if p.nextToken() != ast.KindAsteriskToken || p.scanner.TokenStart() != identifierEnd {
+		return false
+	}
+	return p.nextToken() == ast.KindOpenParenToken
 }
 
 func (p *Parser) parseKvsForExpression() *ast.Expression {
@@ -6343,6 +6357,10 @@ func (p *Parser) parseKvsProducerExpression() *ast.Expression {
 	pos := p.nodePos()
 	kind := p.scanner.TokenValue()
 	p.nextToken()
+	lazy := kind == "collect" && p.token == ast.KindAsteriskToken
+	if lazy {
+		p.nextToken()
+	}
 	p.parseExpected(ast.KindOpenParenToken)
 	implicitSubject := p.token != ast.KindConstKeyword
 	var initializer *ast.ForInitializer
@@ -6368,6 +6386,8 @@ func (p *Parser) parseKvsProducerExpression() *ast.Expression {
 	var result *ast.Node
 	if kind == "select" {
 		result = p.factory.NewKvsSelectExpression(initializer, expression, statement)
+	} else if lazy {
+		result = p.factory.NewKvsLazyCollectExpression(initializer, expression, statement)
 	} else {
 		result = p.factory.NewKvsCollectExpression(initializer, expression, statement)
 	}

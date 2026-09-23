@@ -1,0 +1,89 @@
+//// [tests/cases/conformance/kvs/kvsRange.ts] ////
+
+=== kvsRange.ts ===
+declare function lower(): number;
+>lower : () => number
+
+declare function upper(): number;
+>upper : () => number
+
+const exclusive: Iterable<number> = 2..5;
+>exclusive : Iterable<number>
+>2..5 : Iterable<number, void, undefined>
+>2 : 2
+>5 : 5
+
+const inclusive: Iterable<number> = lower()..=upper();
+>inclusive : Iterable<number>
+>lower()..=upper() : Iterable<number, void, undefined>
+>lower() : number
+>lower : () => number
+>upper() : number
+>upper : () => number
+
+const calculatedEndpoints = 2 * 3..10 / 2 + 1;
+>calculatedEndpoints : Iterable<number, void, undefined>
+>2 * 3..10 / 2 + 1 : Iterable<number, void, undefined>
+>2 * 3 : number
+>2 : 2
+>3 : 3
+>10 / 2 + 1 : number
+>10 / 2 : number
+>10 : 10
+>2 : 2
+>1 : 1
+
+const comparisonOutside = 2..5 < 10;
+>comparisonOutside : boolean
+>2..5 < 10 : boolean
+>2..5 : Iterable<number, void, undefined>
+>2 : 2
+>5 : 5
+>10 : 10
+
+const fractional = -1.5..=1.5;
+>fractional : Iterable<number, void, undefined>
+>-1.5..=1.5 : Iterable<number, void, undefined>
+>-1.5 : -1.5
+>1.5 : 1.5
+>1.5 : 1.5
+
+for (const value of exclusive) {
+>value : number
+>exclusive : Iterable<number>
+
+    value;
+>value : number
+}
+
+const collected = collect (exclusive) {
+>collected : number[]
+>collect (exclusive) {    yield _;} : number[]
+>exclusive : Iterable<number>
+
+    yield _;
+>_ : number
+
+};
+const selected = select (inclusive) {
+>selected : number | null
+>select (inclusive) {    yield _;} : number | null
+>inclusive : Iterable<number>
+
+    yield _;
+>_ : number
+
+};
+
+const invalidString = "a".."z";
+>invalidString : Iterable<number, void, undefined>
+>"a".."z" : Iterable<number, void, undefined>
+>"a" : "a"
+>"z" : "z"
+
+const invalidBigInt = 1n..2n;
+>invalidBigInt : Iterable<number, void, undefined>
+>1n..2n : Iterable<number, void, undefined>
+>1n : 1n
+>2n : 2n
+

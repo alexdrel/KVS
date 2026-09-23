@@ -3439,8 +3439,12 @@ func (p *Printer) emitExpression(node *ast.Expression, precedence ast.OperatorPr
 		p.emitKvsCompactObjectExpression(node.AsKvsCompactObjectExpression())
 	case ast.KindKvsTypedObjectExpression:
 		p.emitKvsTypedObjectExpression(node.AsKvsTypedObjectExpression())
+	case ast.KindKvsRangeExpression:
+		p.emitKvsRangeExpression(node.AsKvsRangeExpression())
 	case ast.KindKvsCollectExpression:
 		p.emitKvsCollectExpression(node.AsKvsCollectExpression())
+	case ast.KindKvsLazyCollectExpression:
+		p.emitKvsLazyCollectExpression(node.AsKvsLazyCollectExpression())
 	case ast.KindKvsSelectExpression:
 		p.emitKvsSelectExpression(node.AsKvsSelectExpression())
 	case ast.KindKvsForExpression:
@@ -3828,6 +3832,32 @@ func (p *Printer) emitKvsCollectExpression(node *ast.KvsCollectExpression) {
 	p.emitExpression(node.Expression, ast.OperatorPrecedenceLowest)
 	p.writePunctuation(")")
 	p.emitEmbeddedStatement(node.AsNode(), node.Statement)
+	p.exitNode(node.AsNode(), state)
+}
+
+func (p *Printer) emitKvsLazyCollectExpression(node *ast.KvsLazyCollectExpression) {
+	state := p.enterNode(node.AsNode())
+	p.writeKeyword("collect")
+	p.writePunctuation("*")
+	p.writeSpace()
+	p.writePunctuation("(")
+	if node.Flags&ast.NodeFlagsKvsImplicitSubject == 0 {
+		p.emitForInitializer(node.Initializer)
+		p.writeSpace()
+		p.writeKeyword("of")
+		p.writeSpace()
+	}
+	p.emitExpression(node.Expression, ast.OperatorPrecedenceLowest)
+	p.writePunctuation(")")
+	p.emitEmbeddedStatement(node.AsNode(), node.Statement)
+	p.exitNode(node.AsNode(), state)
+}
+
+func (p *Printer) emitKvsRangeExpression(node *ast.KvsRangeExpression) {
+	state := p.enterNode(node.AsNode())
+	p.emitExpression(node.Lower, ast.OperatorPrecedenceRange)
+	p.emitTokenNode(node.OperatorToken)
+	p.emitExpression(node.Upper, ast.OperatorPrecedenceRange)
 	p.exitNode(node.AsNode(), state)
 }
 

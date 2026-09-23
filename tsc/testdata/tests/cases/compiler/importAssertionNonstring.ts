@@ -11,4 +11,4 @@ import * as thing4 from "./mod.mjs" with {field: ["a"]};
 
 import * as thing5 from "./mod.mjs" with {field: { a: 0 }};
 
-import * as thing6 from "./mod.mjs" with {type: "json", field: 0..toString()}
+import * as thing6 from "./mod.mjs" with {type: "json", field: (0).toString()}

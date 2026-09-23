@@ -5,7 +5,7 @@ boolean.ts(7,24): error TS1389: 'typeof' is not allowed as a variable declaratio
 boolean.ts(12,22): error TS1005: ';' expected.
 number.ts(7,26): error TS1005: ',' expected.
 number.ts(7,27): error TS1389: 'typeof' is not allowed as a variable declaration name.
-number.ts(12,20): error TS1005: ';' expected.
+number.ts(12,21): error TS1005: ';' expected.
 string.ts(7,20): error TS1005: ',' expected.
 string.ts(7,21): error TS1389: 'typeof' is not allowed as a variable declaration name.
 string.ts(12,19): error TS1005: ';' expected.
@@ -54,8 +54,8 @@ string.ts(12,19): error TS1005: ';' expected.
     }
     
     const nodes2 = document.getElementsByTagName("li");
-    type ItemType2 = 4..typeof(nodes.item(0));
-                       ~
+    type ItemType2 = (4).typeof(nodes.item(0));
+                        ~
 !!! error TS1005: ';' expected.
     
 ==== boolean.ts (3 errors) ====

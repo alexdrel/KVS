@@ -1,7 +1,7 @@
 //// [tests/cases/compiler/numericLiteralsWithTrailingDecimalPoints02.ts] ////
 
 //// [numericLiteralsWithTrailingDecimalPoints02.ts]
-1..toString();
+(1).toString();
 1.0.toString();
 1.toString();
 1.+2.0 + 3. ;
@@ -39,7 +39,7 @@ var test17 = 3. // comment time again
 
 //// [numericLiteralsWithTrailingDecimalPoints02.js]
 "use strict";
-1..toString();
+(1).toString();
 1.0.toString();
 1.;
 toString();

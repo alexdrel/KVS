@@ -79,7 +79,7 @@ const nodes2 = document.getElementsByTagName("li");
 >getElementsByTagName : { <K extends keyof HTMLElementTagNameMap>(qualifiedName: K): HTMLCollectionOf<HTMLElementTagNameMap[K]>; <K extends keyof SVGElementTagNameMap>(qualifiedName: K): HTMLCollectionOf<SVGElementTagNameMap[K]>; <K extends keyof MathMLElementTagNameMap>(qualifiedName: K): HTMLCollectionOf<MathMLElementTagNameMap[K]>; <K extends keyof HTMLElementDeprecatedTagNameMap>(qualifiedName: K): HTMLCollectionOf<HTMLElementDeprecatedTagNameMap[K]>; (qualifiedName: string): HTMLCollectionOf<Element>; }
 >"li" : "li"
 
-type ItemType2 = 4..typeof(nodes.item(0));
+type ItemType2 = (4).typeof(nodes.item(0));
 >ItemType2 : 4
 >typeof(nodes.item(0)) : "bigint" | "boolean" | "function" | "number" | "object" | "string" | "symbol" | "undefined"
 >(nodes.item(0)) : HTMLLIElement

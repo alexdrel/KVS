@@ -1,0 +1,41 @@
+kvsRange.ts(7,27): error TS2365: Operator '<' cannot be applied to types 'Iterable<number, void, undefined>' and 'number'.
+kvsRange.ts(21,23): error TS2322: Type 'string' is not assignable to type 'number'.
+kvsRange.ts(21,28): error TS2322: Type 'string' is not assignable to type 'number'.
+kvsRange.ts(22,23): error TS2322: Type 'bigint' is not assignable to type 'number'.
+kvsRange.ts(22,27): error TS2322: Type 'bigint' is not assignable to type 'number'.
+
+
+==== kvsRange.ts (5 errors) ====
+    declare function lower(): number;
+    declare function upper(): number;
+    
+    const exclusive: Iterable<number> = 2..5;
+    const inclusive: Iterable<number> = lower()..=upper();
+    const calculatedEndpoints = 2 * 3..10 / 2 + 1;
+    const comparisonOutside = 2..5 < 10;
+                              ~~~~~~~~~
+!!! error TS2365: Operator '<' cannot be applied to types 'Iterable<number, void, undefined>' and 'number'.
+    const fractional = -1.5..=1.5;
+    
+    for (const value of exclusive) {
+        value;
+    }
+    
+    const collected = collect (exclusive) {
+        yield _;
+    };
+    const selected = select (inclusive) {
+        yield _;
+    };
+    
+    const invalidString = "a".."z";
+                          ~~~
+!!! error TS2322: Type 'string' is not assignable to type 'number'.
+                               ~~~
+!!! error TS2322: Type 'string' is not assignable to type 'number'.
+    const invalidBigInt = 1n..2n;
+                          ~~
+!!! error TS2322: Type 'bigint' is not assignable to type 'number'.
+                              ~~
+!!! error TS2322: Type 'bigint' is not assignable to type 'number'.
+    

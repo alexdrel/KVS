@@ -20,7 +20,14 @@ const [] = [Math.min(./*marker*/)]
 	f.GoToMarker(t, "marker")
 	f.VerifyCompletions(t, nil, nil)
 	f.Insert(t, ".")
-	f.VerifyCompletions(t, nil, nil)
+	f.VerifyCompletions(t, nil, &fourslash.CompletionsExpectedList{
+		IsIncomplete: false,
+		ItemDefaults: &fourslash.CompletionsExpectedItemDefaults{
+			CommitCharacters: &DefaultCommitCharacters,
+			EditRange:        Ignored,
+		},
+		Items: &fourslash.CompletionsExpectedItems{Exact: CompletionGlobals},
+	})
 	f.Insert(t, ".")
 	f.VerifyCompletions(t, nil, &fourslash.CompletionsExpectedList{
 		IsIncomplete: false,
