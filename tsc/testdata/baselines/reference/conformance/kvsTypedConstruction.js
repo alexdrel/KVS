@@ -157,6 +157,10 @@ readonlyPoint ...= rectangle;
 
 let maybePoint: Point?;
 maybePoint ...= rectangle;
+maybePoint! ...= rectangle;
+const materializedPoint = maybePoint;
+declare const fixedMaybePoint: Point?;
+fixedMaybePoint! ...= rectangle;
 
 Point{ ...incompatible };
 Point{ ...maybeIncompatible };
@@ -286,6 +290,9 @@ let readonlyPoint = { x: 0, y: 0 };
 __kvsProject(readonlyPoint, rectangle, ["x", "y"]);
 let maybePoint;
 __kvsProject(maybePoint, rectangle, []);
+__kvsProject(maybePoint ?? (maybePoint = { y: 0, x: 0 }), rectangle, ["y", "x"]);
+const materializedPoint = maybePoint;
+__kvsProject(fixedMaybePoint ?? { y: 0, x: 0 }, rectangle, ["y", "x"]);
 ({ y: 0, x: 0, ...__kvsProject({}, incompatible, ["x"]) });
 ({ y: 0, x: 0, ...__kvsProject({}, maybeIncompatible, ["x"]) });
 ({ y: 0, x: 0, ...__kvsProject({}, nullablePoint, ["y", "x"]) });

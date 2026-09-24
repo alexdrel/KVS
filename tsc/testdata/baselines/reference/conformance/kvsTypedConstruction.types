@@ -422,6 +422,23 @@ maybePoint ...= rectangle;
 >maybePoint : any
 >rectangle : any
 
+maybePoint! ...= rectangle;
+>maybePoint! : Point
+>maybePoint : Point | null | undefined
+>rectangle : any
+
+const materializedPoint = maybePoint;
+>materializedPoint : Point
+>maybePoint : Point
+
+declare const fixedMaybePoint: Point?;
+>fixedMaybePoint : Point | null | undefined
+
+fixedMaybePoint! ...= rectangle;
+>fixedMaybePoint! : Point
+>fixedMaybePoint : Point | null | undefined
+>rectangle : any
+
 Point{ ...incompatible };
 >Point{ ...incompatible } : Point
 >incompatible : { x: string; }

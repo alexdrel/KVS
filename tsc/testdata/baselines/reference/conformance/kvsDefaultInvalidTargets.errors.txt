@@ -1,0 +1,38 @@
+kvsDefaultInvalidTargets.ts(11,1): error TS100087: KVS '!' cannot be the target of an assignment or update.
+kvsDefaultInvalidTargets.ts(12,1): error TS100087: KVS '!' cannot be the target of an assignment or update.
+kvsDefaultInvalidTargets.ts(13,1): error TS100087: KVS '!' cannot be the target of an assignment or update.
+kvsDefaultInvalidTargets.ts(14,1): error TS100087: KVS '!' cannot be the target of an assignment or update.
+kvsDefaultInvalidTargets.ts(15,1): error TS100088: KVS '!' on an assignment or update target requires a writable proper base.
+kvsDefaultInvalidTargets.ts(16,1): error TS100088: KVS '!' on an assignment or update target requires a writable proper base.
+
+
+==== kvsDefaultInvalidTargets.ts (6 errors) ====
+    interface User {
+        id: number?;
+    }
+    
+    declare let user: User;
+    declare let count: number?;
+    declare let users: User[];
+    declare let readonlyUsers: readonly User[];
+    declare const fixedUser: User?;
+    
+    user.id! = 1;
+    ~~~~~~~~
+!!! error TS100087: KVS '!' cannot be the target of an assignment or update.
+    user.id! += 2;
+    ~~~~~~~~
+!!! error TS100087: KVS '!' cannot be the target of an assignment or update.
+    count!++;
+    ~~~~~~
+!!! error TS100087: KVS '!' cannot be the target of an assignment or update.
+    users[0]! = user;
+    ~~~~~~~~~
+!!! error TS100087: KVS '!' cannot be the target of an assignment or update.
+    readonlyUsers[0]!.id = 1;
+    ~~~~~~~~~~~~~~~~
+!!! error TS100088: KVS '!' on an assignment or update target requires a writable proper base.
+    fixedUser!.id = 1;
+    ~~~~~~~~~
+!!! error TS100088: KVS '!' on an assignment or update target requires a writable proper base.
+    

@@ -170,7 +170,8 @@ const tax = order.taxRate!;
 const items = response.items!;
 ```
 
-lowers according to statically known defaults:
+Terminal `!` lowers according to its statically known default without writing
+back to its operand:
 
 ```ts
 const tax = order?.taxRate ?? 0;
@@ -398,13 +399,27 @@ arr ??= [];
 arr.push(value);
 ```
 
-Here `makeDefaultProfile` and `makeDefaultUser` stand for functions that construct default POD values.
+Here `makeDefaultProfile` and `makeDefaultUser` stand for functions that
+construct default POD values. On assignment and update targets, each `!` must
+precede another property or element access and its operand must be writable.
+Those proper bases materialize from left to right. Computed indices are
+evaluated once.
 
-The compiler rejects intermediate materialization when the preceding expression
-is not writable. Terminal defaulting merely produces a value and accepts
-non-writable operands, including call results.
+Method callees also materialize writable bases. A non-writable base instead
+uses a transient default:
 
-Optional writes lower to guarded assignments whose right-hand side runs only when the path exists.
+```kvs
+arr!.push(value)           // arr ??= []
+makeItems()!.join(",")     // (makeItems() ?? []).join(",")
+```
+
+Other value expressions accept only terminal `!`; an intermediate `!` is a
+checker error and therefore has no lowering contract.
+
+Optional writes lower to nested presence guards. Receivers and computed indices
+are evaluated once. An assignment's right-hand side runs only when every
+optional segment exists; increment and decrement likewise run only on a
+complete path. An abandoned write produces null.
 
 ### Outcome conversion
 

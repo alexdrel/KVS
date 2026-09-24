@@ -2215,8 +2215,8 @@
     "KVS_collect_must_be_at_the_head_of_a_supported_value_expression_100069": "KVS 'collect' must be at the head of a supported value expression.",
     "KVS_select_must_be_at_the_head_of_a_supported_value_expression_100070": "KVS 'select' must be at the head of a supported value expression.",
     "A_KVS_nullable_binding_requires_an_inferred_let_declaration_with_an_initializer_100071": "A KVS nullable binding requires an inferred 'let' declaration with an initializer.",
-    "KVS_terminal_requires_a_defaultable_type_100072": "KVS terminal '!' requires a defaultable type.",
-    "KVS_terminal_cannot_determine_a_default_value_from_an_absence_only_type_100073": "KVS terminal '!' cannot determine a default value from an absence-only type.",
+    "KVS_requires_a_defaultable_type_100072": "KVS '!' requires a defaultable type.",
+    "KVS_cannot_determine_a_default_value_from_an_absence_only_type_100073": "KVS '!' cannot determine a default value from an absence-only type.",
     "KVS_expression_valued_for_must_be_at_the_head_of_a_supported_value_expression_100074": "KVS expression-valued 'for' must be at the head of a supported value expression.",
     "KVS_template_interpolation_does_not_accept_nullable_values_resolve_absence_explicitly_100075": "KVS template interpolation does not accept nullable values; resolve absence explicitly.",
     "A_KVS_sieve_binding_requires_a_const_or_let_declaration_100076": "A KVS sieve binding requires a 'const' or 'let' declaration.",
@@ -2228,5 +2228,9 @@
     "KVS_typed_in_place_spread_requires_a_concrete_interface_or_object_type_alias_target_100082": "KVS typed in-place spread requires a concrete interface or object type alias target.",
     "A_return_statement_cannot_cross_a_lazy_KVS_collector_boundary_100083": "A return statement cannot cross a lazy KVS collector boundary.",
     "A_labeled_jump_cannot_cross_a_lazy_KVS_collector_boundary_100084": "A labeled jump cannot cross a lazy KVS collector boundary.",
-    "KVS_optional_invocation_supports_only_fixed_tuple_spreads_100085": "KVS optional invocation supports only fixed tuple spreads."
+    "KVS_optional_invocation_supports_only_fixed_tuple_spreads_100085": "KVS optional invocation supports only fixed tuple spreads.",
+    "KVS_in_a_value_expression_must_be_terminal_100086": "KVS '!' in a value expression must be terminal.",
+    "KVS_cannot_be_the_target_of_an_assignment_or_update_100087": "KVS '!' cannot be the target of an assignment or update.",
+    "KVS_on_an_assignment_or_update_target_requires_a_writable_proper_base_100088": "KVS '!' on an assignment or update target requires a writable proper base.",
+    "KVS_on_a_typed_in_place_spread_target_requires_a_writable_target_100089": "KVS '!' on a typed in-place spread target requires a writable target."
 }

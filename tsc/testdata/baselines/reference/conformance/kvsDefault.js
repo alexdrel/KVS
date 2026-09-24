@@ -63,7 +63,7 @@ const readonlyMap = maybeReadonlyMap!;
 const set = maybeSet!;
 const readonlySet = maybeReadonlySet!;
 const stringSet = maybeStringSet!;
-const stringLength = maybeString!.length;
+const stringLength = maybeString.length!;
 const incremented = maybeNumber! + 1;
 const profile = maybeProfile!;
 const box = maybeBox!;
@@ -110,6 +110,105 @@ const implicitSession = maybeImplicitSession!;
 const sessionAlias = maybeSessionAlias!;
 const date = maybeDate!;
 
+interface Account {
+    profile: Profile?;
+}
+
+let account: Account? = null;
+account!.profile!.enabled = true;
+account.profile.enabled;
+const materializedAccount = account;
+
+declare let storedAccount: Account?;
+const storedEnabled = storedAccount.profile.enabled!;
+const invalidStoredEnabled = storedAccount!.profile!.enabled;
+
+let accountHolder = { account: null as Account? };
+declare function getAccountHolder(): typeof accountHolder;
+getAccountHolder().account!.profile!.enabled = true;
+
+let users: Account[]? = null;
+declare function nextIndex(): number;
+users![nextIndex()]!.profile!.enabled = true;
+const indexedAccount = users?.[nextIndex()]!;
+
+class IndexedEditor {
+    save() {}
+}
+
+let indexedEditors: IndexedEditor[]? = null;
+indexedEditors![nextIndex()]!.save();
+
+declare function maybeIndex(): number?;
+users![maybeIndex()!].profile = null;
+
+interface CounterHolder {
+    count: number;
+}
+
+let counterHolder: CounterHolder? = null;
+counterHolder!.count++;
+counterHolder!.count += 2;
+
+declare let plainAccount: Account?;
+plainAccount.profile = null;
+
+declare const fixedAccount: Account?;
+fixedAccount!.profile;
+fixedAccount.profile!;
+
+interface ReadonlyAccount {
+    readonly profile: Profile?;
+}
+
+declare let readonlyAccount: ReadonlyAccount;
+readonlyAccount.profile!.enabled = true;
+
+class AccountView {
+    get profile(): Profile? {
+        return null;
+    }
+}
+
+declare let accountView: AccountView;
+accountView.profile!.enabled = true;
+
+declare function loadAccount(): Account?;
+loadAccount()!.profile;
+loadAccount()!.profile = null;
+
+let values: string[]? = null;
+values!.push("stored");
+values.push("again");
+
+declare function loadValues(): string[]?;
+const joinedValues = loadValues()!.join(",");
+
+class Editor {
+    save() {}
+}
+
+interface Settings {
+    editor: Editor?;
+}
+
+let settings: Settings? = null;
+settings!.editor!.save();
+settings.editor.save();
+
+class SettingsView {
+    get editor(): Editor? {
+        return null;
+    }
+}
+
+declare const settingsView: SettingsView;
+settingsView.editor!.save();
+
+declare let readValue: string?;
+const defaultedValue = readValue!;
+readValue.length;
+
 namespace Models {
     export class Token {
         constructor(public value?: string) {}
@@ -154,6 +253,7 @@ namespace Shadowed {
 
 //// [kvsDefault.js]
 "use strict";
+var _a, _b, _c, _d, _e, _f, _g, _h, _j;
 const absentConst = null;
 let absentLet = null;
 const inferredNull = null;
@@ -169,7 +269,7 @@ const readonlyMap = maybeReadonlyMap ?? new Map();
 const set = maybeSet ?? new Set();
 const readonlySet = maybeReadonlySet ?? new Set();
 const stringSet = maybeStringSet ?? new Set();
-const stringLength = (maybeString ?? "").length;
+const stringLength = maybeString?.length ?? 0;
 const incremented = (maybeNumber ?? 0) + 1;
 const profile = maybeProfile ?? { enabled: false, tags: [], settings: { retries: 0, aliases: new Map(), visited: new Set() }, id: "" };
 const box = maybeBox ?? { value: "", values: [] };
@@ -203,6 +303,56 @@ const session = maybeSession ?? new Session();
 const implicitSession = maybeImplicitSession ?? new ImplicitSession();
 const sessionAlias = maybeSessionAlias ?? new Session();
 const date = maybeDate ?? new Date();
+let account = null;
+((_a = account ?? (account = {})).profile ?? (_a.profile = { enabled: false, tags: [], settings: { retries: 0, aliases: new Map(), visited: new Set() }, id: "" })).enabled = true;
+account.profile.enabled;
+const materializedAccount = account;
+const storedEnabled = storedAccount?.profile?.enabled ?? false;
+const invalidStoredEnabled = ((storedAccount ?? {}).profile ?? { enabled: false, tags: [], settings: { retries: 0, aliases: new Map(), visited: new Set() }, id: "" }).enabled;
+let accountHolder = { account: null };
+((_c = (_b = getAccountHolder()).account ?? (_b.account = {})).profile ?? (_c.profile = { enabled: false, tags: [], settings: { retries: 0, aliases: new Map(), visited: new Set() }, id: "" })).enabled = true;
+let users = null;
+((_f = (_d = users ?? (users = []))[_e = nextIndex()] ?? (_d[_e] = {})).profile ?? (_f.profile = { enabled: false, tags: [], settings: { retries: 0, aliases: new Map(), visited: new Set() }, id: "" })).enabled = true;
+const indexedAccount = users?.[nextIndex()] ?? {};
+class IndexedEditor {
+    save() { }
+}
+let indexedEditors = null;
+((_g = indexedEditors ?? (indexedEditors = []))[_h = nextIndex()] ?? (_g[_h] = new IndexedEditor())).save();
+users[maybeIndex() ?? 0].profile = null;
+let counterHolder = null;
+(counterHolder ?? (counterHolder = { count: 0 })).count++;
+counterHolder.count += 2;
+plainAccount.profile = null;
+(fixedAccount ?? {}).profile;
+fixedAccount?.profile ?? { enabled: false, tags: [], settings: { retries: 0, aliases: new Map(), visited: new Set() }, id: "" };
+(readonlyAccount.profile ?? { enabled: false, tags: [], settings: { retries: 0, aliases: new Map(), visited: new Set() }, id: "" }).enabled = true;
+class AccountView {
+    get profile() {
+        return null;
+    }
+}
+(accountView.profile ?? { enabled: false, tags: [], settings: { retries: 0, aliases: new Map(), visited: new Set() }, id: "" }).enabled = true;
+(loadAccount() ?? {}).profile;
+(loadAccount() ?? {}).profile = null;
+let values = null;
+(values ?? (values = [])).push("stored");
+values.push("again");
+const joinedValues = (loadValues() ?? []).join(",");
+class Editor {
+    save() { }
+}
+let settings = null;
+((_j = settings ?? (settings = {})).editor ?? (_j.editor = new Editor())).save();
+settings.editor.save();
+class SettingsView {
+    get editor() {
+        return null;
+    }
+}
+(settingsView.editor ?? new Editor()).save();
+const defaultedValue = readValue ?? "";
+readValue?.length;
 var Models;
 (function (Models) {
     class Token {

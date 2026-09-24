@@ -204,67 +204,39 @@ interface Node {
 
 but a required `next: Node` fails the same recursive eligibility rule and prevents construction of a finite default value.
 
-## Writable nullable paths
+## Writes through nullable paths
 
-Reads propagate absence automatically. Writes must state what happens when an intermediate receiver is absent.
-
-### `?`: abandon the path
-
-```kvs
-user.profile?.theme = dark;
-```
-
-If `profile` is absent, the assignment is skipped and its right-hand side is not evaluated.
-
-### `!`: complete the path
+Reads propagate absence automatically. A write through a nullable path must say
+whether a missing part should be created or should stop the write:
 
 ```kvs
-user.profile!.theme = dark;
+user.profile!.theme = dark; // absent profile: create it, then write
+user.profile?.theme = dark; // absent profile: skip the write
 ```
 
-If `profile` is absent, KVS creates its default value, stores it in `user.profile`, and continues.
-
-Intermediate `!` materializes a path; terminal `!` defaults a result:
-
-```kvs
-const theme = user.profile.theme!; // default result; no write-back
-user.profile!.theme = dark;        // materialize profile; write-back
-const storedTheme = user.profile!.theme; // materialize profile, then read theme
-```
-
-Arrays use the same path operators:
-
-```kvs
-arr![i] = value;
-const value = arr[i]!;
-users![i]!.theme = dark;
-arr!.push(value);
-```
-
-Sparse arrays are allowed; holes read as `undefined` and therefore participate as absence.
-
-### Assignability
-
-The expression immediately before an intermediate `!` must be a writable assignment target under normal JavaScript rules and KVS's static readonly information. This restriction does not apply to terminal `!`, because terminal defaulting performs no write-back.
-
-```kvs
-getProfile()!.theme           // error: call result is not assignable
-readonlyUser.profile!.theme   // error: profile is readonly
-users[index()]!.theme = dark  // valid
-getUser().profile!.theme      // valid if profile is writable
-const profile = getProfile()! // valid terminal defaulting
-```
-
-Known getter-only properties are rejected.
-
-A plain write through a nullable path is an error:
+These are applications of the general [`!` and `?` absence-resolution
+rules](values.md#postfix--and--resolve-or-skip-absence). A plain write through
+an unresolved nullable path is an error:
 
 ```kvs
 user.profile.theme = dark
 // error: choose profile?.theme or profile!.theme
 ```
 
-[Extant assignment](flow.md#extant-assignment) controls the write from the other side: `target ?= value` leaves the target unchanged when the right-hand value is absent. It composes with the same writable-path rules, including staged `!` materialization.
+Arrays and indexed writes use the same rules:
+
+```kvs
+arr![i] = value;
+users![i]!.theme = dark;
+```
+
+Sparse arrays are allowed; holes read as `undefined` and therefore participate
+as absence.
+
+[Extant assignment](flow.md#extant-assignment) controls the write from the
+other side: `target ?= value` leaves the target unchanged when the right-hand
+value is absent. Any `!` materialization needed to reach that target is
+committed only if the assignment proceeds.
 
 ## Constructor-backed defaults
 
@@ -284,9 +256,8 @@ An implicit or explicit zero-argument constructor qualifies, as does a
 constructor whose parameters are optional or have defaults. Abstract classes,
 inaccessible constructors, and constructors requiring arguments are not
 defaultable. Constructor effects and exceptions occur only when `!` encounters
-absence. Intermediate materialization additionally requires a writable path
-because the new instance must be stored back; terminal defaulting has no such
-requirement.
+absence. When such a default is materialized into a nullable write path, it is
+stored according to the general [`!` and `?` rules](values.md#postfix--and--resolve-or-skip-absence).
 
 ## Typed spread
 
@@ -399,9 +370,9 @@ profile ...= patch;
 // alias observes the same mutations
 ```
 
-The left side must be a writable variable or property. The operation mutates
-the object directly rather than assigning it back. A property target's setter
-is not invoked.
+The left side must be a variable or property reference. The operation mutates
+the object directly rather than assigning it back, so a `const` binding is a
+valid target. A property target's setter is not invoked.
 
 Readonly fields are rejected. A nullable target can be materialized explicitly before mutation:
 
@@ -411,6 +382,9 @@ profile! ...= patch;
 ```
 
 This first stores the default `Profile{}` value in `profile` if absent, then applies the typed in-place spread. If `patch` is absent, it contributes nothing, but the explicit `!` still materializes `profile`.
+
+Because materialization assigns the default back, this nullable form requires a
+writable target.
 
 ## Copying and updating
 

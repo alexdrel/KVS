@@ -63,7 +63,7 @@ const readonlyMap = maybeReadonlyMap!;
 const set = maybeSet!;
 const readonlySet = maybeReadonlySet!;
 const stringSet = maybeStringSet!;
-const stringLength = maybeString!.length;
+const stringLength = maybeString.length!;
 const incremented = maybeNumber! + 1;
 const profile = maybeProfile!;
 const box = maybeBox!;
@@ -109,6 +109,105 @@ const session = maybeSession!;
 const implicitSession = maybeImplicitSession!;
 const sessionAlias = maybeSessionAlias!;
 const date = maybeDate!;
+
+interface Account {
+    profile: Profile?;
+}
+
+let account: Account? = null;
+account!.profile!.enabled = true;
+account.profile.enabled;
+const materializedAccount = account;
+
+declare let storedAccount: Account?;
+const storedEnabled = storedAccount.profile.enabled!;
+const invalidStoredEnabled = storedAccount!.profile!.enabled;
+
+let accountHolder = { account: null as Account? };
+declare function getAccountHolder(): typeof accountHolder;
+getAccountHolder().account!.profile!.enabled = true;
+
+let users: Account[]? = null;
+declare function nextIndex(): number;
+users![nextIndex()]!.profile!.enabled = true;
+const indexedAccount = users?.[nextIndex()]!;
+
+class IndexedEditor {
+    save() {}
+}
+
+let indexedEditors: IndexedEditor[]? = null;
+indexedEditors![nextIndex()]!.save();
+
+declare function maybeIndex(): number?;
+users![maybeIndex()!].profile = null;
+
+interface CounterHolder {
+    count: number;
+}
+
+let counterHolder: CounterHolder? = null;
+counterHolder!.count++;
+counterHolder!.count += 2;
+
+declare let plainAccount: Account?;
+plainAccount.profile = null;
+
+declare const fixedAccount: Account?;
+fixedAccount!.profile;
+fixedAccount.profile!;
+
+interface ReadonlyAccount {
+    readonly profile: Profile?;
+}
+
+declare let readonlyAccount: ReadonlyAccount;
+readonlyAccount.profile!.enabled = true;
+
+class AccountView {
+    get profile(): Profile? {
+        return null;
+    }
+}
+
+declare let accountView: AccountView;
+accountView.profile!.enabled = true;
+
+declare function loadAccount(): Account?;
+loadAccount()!.profile;
+loadAccount()!.profile = null;
+
+let values: string[]? = null;
+values!.push("stored");
+values.push("again");
+
+declare function loadValues(): string[]?;
+const joinedValues = loadValues()!.join(",");
+
+class Editor {
+    save() {}
+}
+
+interface Settings {
+    editor: Editor?;
+}
+
+let settings: Settings? = null;
+settings!.editor!.save();
+settings.editor.save();
+
+class SettingsView {
+    get editor(): Editor? {
+        return null;
+    }
+}
+
+declare const settingsView: SettingsView;
+settingsView.editor!.save();
+
+declare let readValue: string?;
+const defaultedValue = readValue!;
+readValue.length;
 
 namespace Models {
     export class Token {

@@ -8,27 +8,28 @@ kvsTypedConstruction.ts(145,1): error TS2588: Cannot assign to 'constantPoint' b
 kvsTypedConstruction.ts(146,1): error TS2364: The left-hand side of an assignment expression must be a variable or a property access.
 kvsTypedConstruction.ts(153,20): error TS2540: Cannot assign to 'x' because it is a read-only property.
 kvsTypedConstruction.ts(156,1): error TS100082: KVS typed in-place spread requires a concrete interface or object type alias target.
-kvsTypedConstruction.ts(158,11): error TS2322: Type 'string' is not assignable to type 'number'.
-kvsTypedConstruction.ts(159,11): error TS2322: Type 'string' is not assignable to type 'number'.
-kvsTypedConstruction.ts(160,11): error TS2322: Type 'number | null' is not assignable to type 'number'.
+kvsTypedConstruction.ts(160,1): error TS100089: KVS '!' on a typed in-place spread target requires a writable target.
+kvsTypedConstruction.ts(162,11): error TS2322: Type 'string' is not assignable to type 'number'.
+kvsTypedConstruction.ts(163,11): error TS2322: Type 'string' is not assignable to type 'number'.
+kvsTypedConstruction.ts(164,11): error TS2322: Type 'number | null' is not assignable to type 'number'.
   Type 'null' is not assignable to type 'number'.
-kvsTypedConstruction.ts(161,8): error TS2559: Type '{ width: number; }' has no properties in common with type 'Point'.
-kvsTypedConstruction.ts(162,8): error TS2698: Spread types may only be created from object types.
-kvsTypedConstruction.ts(164,10): error TS2322: Type 'string | null | undefined' is not assignable to type 'string'.
+kvsTypedConstruction.ts(165,8): error TS2559: Type '{ width: number; }' has no properties in common with type 'Point'.
+kvsTypedConstruction.ts(166,8): error TS2698: Spread types may only be created from object types.
+kvsTypedConstruction.ts(168,10): error TS2322: Type 'string | null | undefined' is not assignable to type 'string'.
   Type 'undefined' is not assignable to type 'string'.
-kvsTypedConstruction.ts(165,10): error TS2353: Object literal may only specify known properties, and 'unknown' does not exist in type 'Profile'.
-kvsTypedConstruction.ts(170,1): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
-kvsTypedConstruction.ts(173,1): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
-kvsTypedConstruction.ts(178,1): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
-kvsTypedConstruction.ts(183,1): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
-kvsTypedConstruction.ts(193,1): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
-kvsTypedConstruction.ts(195,1): error TS100072: KVS terminal '!' requires a defaultable type.
-kvsTypedConstruction.ts(200,1): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
-kvsTypedConstruction.ts(203,12): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
-kvsTypedConstruction.ts(206,1): error TS2693: 'Profile' only refers to a type, but is being used as a value here.
+kvsTypedConstruction.ts(169,10): error TS2353: Object literal may only specify known properties, and 'unknown' does not exist in type 'Profile'.
+kvsTypedConstruction.ts(174,1): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+kvsTypedConstruction.ts(177,1): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+kvsTypedConstruction.ts(182,1): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+kvsTypedConstruction.ts(187,1): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+kvsTypedConstruction.ts(197,1): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+kvsTypedConstruction.ts(199,1): error TS100072: KVS '!' requires a defaultable type.
+kvsTypedConstruction.ts(204,1): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+kvsTypedConstruction.ts(207,12): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+kvsTypedConstruction.ts(210,1): error TS2693: 'Profile' only refers to a type, but is being used as a value here.
 
 
-==== kvsTypedConstruction.ts (25 errors) ====
+==== kvsTypedConstruction.ts (26 errors) ====
     interface Entity {
         id: string;
     }
@@ -204,6 +205,12 @@ kvsTypedConstruction.ts(206,1): error TS2693: 'Profile' only refers to a type, b
     maybePoint ...= rectangle;
     ~~~~~~~~~~
 !!! error TS100082: KVS typed in-place spread requires a concrete interface or object type alias target.
+    maybePoint! ...= rectangle;
+    const materializedPoint = maybePoint;
+    declare const fixedMaybePoint: Point?;
+    fixedMaybePoint! ...= rectangle;
+    ~~~~~~~~~~~~~~~
+!!! error TS100089: KVS '!' on a typed in-place spread target requires a writable target.
     
     Point{ ...incompatible };
               ~~~~~~~~~~~~
@@ -270,7 +277,7 @@ kvsTypedConstruction.ts(206,1): error TS2693: 'Profile' only refers to a type, b
     declare const maybeService: Service?;
     maybeService!;
     ~~~~~~~~~~~~~
-!!! error TS100072: KVS terminal '!' requires a defaultable type.
+!!! error TS100072: KVS '!' requires a defaultable type.
     
     interface RequiredRecursive {
         next: RequiredRecursive;

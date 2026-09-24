@@ -76,6 +76,7 @@ const (
 type EmitResolver interface {
 	binder.ReferenceResolver
 	GetKvsDefaultKind(node *ast.Node) ast.KvsDefaultKind
+	KvsDefaultWritesBack(node *ast.Node) bool
 	GetKvsTypedObjectDefaults(node *ast.Node) []KvsTypedObjectDefault
 	GetKvsTypedSpreadProperties(node *ast.Node) []string
 	CreateKvsDefaultConstructor(emitContext *EmitContext, node *ast.Node, symbol *ast.Symbol) *ast.Node

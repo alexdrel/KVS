@@ -219,6 +219,9 @@ func getBranchLabelAntecedents(flow *ast.FlowNode, reduceLabels []*ast.FlowReduc
 
 func (c *Checker) getTypeAtFlowAssignment(f *FlowState, flow *ast.FlowNode) FlowType {
 	node := flow.Node
+	if node.Parent != nil && node.Parent.Kind == ast.KindKvsDefaultExpression && !c.isKvsWritableDefaultOperand(node) {
+		return FlowType{}
+	}
 	// Assignments only narrow the computed type if the declared type is a union type. Thus, we
 	// only need to evaluate the assigned type if the declared type is a union type.
 	if c.isMatchingReference(f.reference, node) {
@@ -1627,7 +1630,7 @@ func (c *Checker) reportFlowControlError(node *ast.Node) {
 
 func (c *Checker) isMatchingReference(source *ast.Node, target *ast.Node) bool {
 	switch target.Kind {
-	case ast.KindParenthesizedExpression, ast.KindNonNullExpression, ast.KindKvsExtantAssertionExpression:
+	case ast.KindParenthesizedExpression, ast.KindNonNullExpression, ast.KindKvsExtantAssertionExpression, ast.KindKvsDefaultExpression:
 		return c.isMatchingReference(source, target.Expression())
 	case ast.KindBinaryExpression:
 		return ast.IsAssignmentExpression(target, false) && c.isMatchingReference(source, target.AsBinaryExpression().Left) ||
@@ -1647,7 +1650,7 @@ func (c *Checker) isMatchingReference(source *ast.Node, target *ast.Node) bool {
 		return target.Kind == ast.KindThisKeyword
 	case ast.KindSuperKeyword:
 		return target.Kind == ast.KindSuperKeyword
-	case ast.KindNonNullExpression, ast.KindKvsExtantAssertionExpression, ast.KindParenthesizedExpression, ast.KindSatisfiesExpression:
+	case ast.KindNonNullExpression, ast.KindKvsExtantAssertionExpression, ast.KindKvsDefaultExpression, ast.KindParenthesizedExpression, ast.KindSatisfiesExpression:
 		return c.isMatchingReference(source.Expression(), target)
 	case ast.KindPropertyAccessExpression, ast.KindElementAccessExpression:
 		if sourcePropertyName, ok := c.getAccessedPropertyName(source); ok {
@@ -2328,6 +2331,8 @@ func (c *Checker) getAssignedType(node *ast.Node) *Type {
 		}
 	case ast.KindBinaryExpression:
 		return c.getAssignedTypeOfBinaryExpression(parent)
+	case ast.KindKvsDefaultExpression:
+		return c.checkExpression(parent)
 	case ast.KindDeleteExpression:
 		return c.undefinedType
 	case ast.KindArrayLiteralExpression:

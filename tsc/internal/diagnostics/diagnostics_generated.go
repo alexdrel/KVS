@@ -4434,9 +4434,9 @@ var KVS_select_must_be_at_the_head_of_a_supported_value_expression = &Message{co
 
 var A_KVS_nullable_binding_requires_an_inferred_let_declaration_with_an_initializer = &Message{code: 100071, category: CategoryError, key: "A_KVS_nullable_binding_requires_an_inferred_let_declaration_with_an_initializer_100071", text: "A KVS nullable binding requires an inferred 'let' declaration with an initializer."}
 
-var KVS_terminal_requires_a_defaultable_type = &Message{code: 100072, category: CategoryError, key: "KVS_terminal_requires_a_defaultable_type_100072", text: "KVS terminal '!' requires a defaultable type."}
+var KVS_requires_a_defaultable_type = &Message{code: 100072, category: CategoryError, key: "KVS_requires_a_defaultable_type_100072", text: "KVS '!' requires a defaultable type."}
 
-var KVS_terminal_cannot_determine_a_default_value_from_an_absence_only_type = &Message{code: 100073, category: CategoryError, key: "KVS_terminal_cannot_determine_a_default_value_from_an_absence_only_type_100073", text: "KVS terminal '!' cannot determine a default value from an absence-only type."}
+var KVS_cannot_determine_a_default_value_from_an_absence_only_type = &Message{code: 100073, category: CategoryError, key: "KVS_cannot_determine_a_default_value_from_an_absence_only_type_100073", text: "KVS '!' cannot determine a default value from an absence-only type."}
 
 var KVS_expression_valued_for_must_be_at_the_head_of_a_supported_value_expression = &Message{code: 100074, category: CategoryError, key: "KVS_expression_valued_for_must_be_at_the_head_of_a_supported_value_expression_100074", text: "KVS expression-valued 'for' must be at the head of a supported value expression."}
 
@@ -4461,6 +4461,14 @@ var A_return_statement_cannot_cross_a_lazy_KVS_collector_boundary = &Message{cod
 var A_labeled_jump_cannot_cross_a_lazy_KVS_collector_boundary = &Message{code: 100084, category: CategoryError, key: "A_labeled_jump_cannot_cross_a_lazy_KVS_collector_boundary_100084", text: "A labeled jump cannot cross a lazy KVS collector boundary."}
 
 var KVS_optional_invocation_supports_only_fixed_tuple_spreads = &Message{code: 100085, category: CategoryError, key: "KVS_optional_invocation_supports_only_fixed_tuple_spreads_100085", text: "KVS optional invocation supports only fixed tuple spreads."}
+
+var KVS_in_a_value_expression_must_be_terminal = &Message{code: 100086, category: CategoryError, key: "KVS_in_a_value_expression_must_be_terminal_100086", text: "KVS '!' in a value expression must be terminal."}
+
+var KVS_cannot_be_the_target_of_an_assignment_or_update = &Message{code: 100087, category: CategoryError, key: "KVS_cannot_be_the_target_of_an_assignment_or_update_100087", text: "KVS '!' cannot be the target of an assignment or update."}
+
+var KVS_on_an_assignment_or_update_target_requires_a_writable_proper_base = &Message{code: 100088, category: CategoryError, key: "KVS_on_an_assignment_or_update_target_requires_a_writable_proper_base_100088", text: "KVS '!' on an assignment or update target requires a writable proper base."}
+
+var KVS_on_a_typed_in_place_spread_target_requires_a_writable_target = &Message{code: 100089, category: CategoryError, key: "KVS_on_a_typed_in_place_spread_target_requires_a_writable_target_100089", text: "KVS '!' on a typed in-place spread target requires a writable target."}
 
 var allMessages = [...]**Message{
 	&Unterminated_string_literal,
@@ -6679,8 +6687,8 @@ var allMessages = [...]**Message{
 	&KVS_collect_must_be_at_the_head_of_a_supported_value_expression,
 	&KVS_select_must_be_at_the_head_of_a_supported_value_expression,
 	&A_KVS_nullable_binding_requires_an_inferred_let_declaration_with_an_initializer,
-	&KVS_terminal_requires_a_defaultable_type,
-	&KVS_terminal_cannot_determine_a_default_value_from_an_absence_only_type,
+	&KVS_requires_a_defaultable_type,
+	&KVS_cannot_determine_a_default_value_from_an_absence_only_type,
 	&KVS_expression_valued_for_must_be_at_the_head_of_a_supported_value_expression,
 	&KVS_template_interpolation_does_not_accept_nullable_values_resolve_absence_explicitly,
 	&A_KVS_sieve_binding_requires_a_const_or_let_declaration,
@@ -6693,4 +6701,8 @@ var allMessages = [...]**Message{
 	&A_return_statement_cannot_cross_a_lazy_KVS_collector_boundary,
 	&A_labeled_jump_cannot_cross_a_lazy_KVS_collector_boundary,
 	&KVS_optional_invocation_supports_only_fixed_tuple_spreads,
+	&KVS_in_a_value_expression_must_be_terminal,
+	&KVS_cannot_be_the_target_of_an_assignment_or_update,
+	&KVS_on_an_assignment_or_update_target_requires_a_writable_proper_base,
+	&KVS_on_a_typed_in_place_spread_target_requires_a_writable_target,
 }

@@ -12,7 +12,7 @@ const name = normalize?(user.profile.displayName);
 
 The surrounding computation can use `name` without a separate guard or temporary variable for the input. `?(` marks the whole call as optional; no whitespace separates `?` from `(`.
 
-The call runs only when the callable and all arguments corresponding to non-nullable parameters are present. Otherwise it produces null. A parameter that accepts absence receives it normally and does not make the call optional:
+The call runs only when the callable and all arguments corresponding to non-nullable parameters are present. Otherwise it produces null. A nullable parameter receives absence normally and does not make the call optional:
 
 ```kvs
 function display(value: string?): Widget { ... }
@@ -20,13 +20,9 @@ function display(value: string?): Widget { ... }
 const widget = display(name);
 ```
 
-Optional invocation treats `null` and `undefined` as one KVS absence category,
-but adapts an absent argument to a representation accepted by the destination
-parameter. It passes `null` when only `null` is accepted and `undefined` when
-only `undefined` is accepted. A defaulted parameter is treated as accepting
-`undefined`. When both representations are accepted, the original
-representation is preserved. If the parameter accepts neither, the call is
-skipped.
+An absent argument is passed as `null` or `undefined` according to what the
+parameter accepts; a parameter with a default accepts `undefined`. When either
+representation is accepted, the original value is preserved.
 
 A plain call requires its callable and every required argument to be statically non-nullable:
 
@@ -45,31 +41,13 @@ callable?(arguments) // skip the call
 
 ### Optional calls and materialization
 
-An optional call evaluates arguments in source order until a required input is
-absent. Later arguments and the call itself are skipped, while effects from
-earlier arguments remain observable:
-
-```kvs
-debug?(mode, expensiveReport())
-```
-
-When `mode` is absent, `expensiveReport()` does not run. An argument accepted by
-an absent-capable parameter never blocks the call. A potentially absent callable is
-checked before arguments so that it can suppress all of them.
-
-KVS does not otherwise preserve ordinary call evaluation order for an operation
-that may be skipped. In particular, when a receiver and method are statically
-extant, their evaluation and lookup may occur only after required arguments have
-passed.
+An optional call guards the whole operation. A potentially absent callable is resolved before its arguments. Arguments are then evaluated left-to-right until a required input is absent; later arguments are skipped, while earlier effects remain observable. A receiver and method known to be present may be resolved after the required arguments have passed.
 
 ```kvs
 arr!.push?(nullableItem)
 ```
 
-Here an absent item also prevents the new array from being stored in `arr`.
-Receiver-path defaults are committed only when the call can proceed. The
-[evaluation reference](implementation.md#optional-call-evaluation) gives the
-complete rules.
+Here an absent item also prevents the new array from being stored in `arr`. Receiver-path defaults are committed only when the call can proceed. The [evaluation reference](implementation.md#optional-call-evaluation) gives the complete staging sequence.
 
 ## Fluent calls
 

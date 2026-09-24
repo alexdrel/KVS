@@ -8254,12 +8254,35 @@ func (c *Checker) checkKvsCatchSplitAssignmentExpression(node *ast.KvsCatchSplit
 
 func (c *Checker) checkKvsDefaultExpression(node *ast.Node, checkMode CheckMode) *Type {
 	flowType := c.checkExpressionEx(node.Expression(), checkMode)
+	usage, properBase := getKvsDefaultUsage(node)
+	writable := c.isKvsWritableDefaultOperand(node.Expression())
+	switch usage {
+	case kvsDefaultUsageAssignment:
+		if !properBase {
+			c.error(node, diagnostics.KVS_cannot_be_the_target_of_an_assignment_or_update)
+		} else if !writable {
+			c.error(node.Expression(), diagnostics.KVS_on_an_assignment_or_update_target_requires_a_writable_proper_base)
+		}
+	case kvsDefaultUsageTypedSpread:
+		if !writable {
+			c.error(node.Expression(), diagnostics.KVS_on_a_typed_in_place_spread_target_requires_a_writable_target)
+		}
+	case kvsDefaultUsageCallee:
+		// A method call may materialize a writable base or use a transient default.
+	case kvsDefaultUsageValue:
+		if properBase {
+			c.error(node, diagnostics.KVS_in_a_value_expression_must_be_terminal)
+		}
+	}
+	if writable && (properBase && (usage == kvsDefaultUsageAssignment || usage == kvsDefaultUsageCallee) || usage == kvsDefaultUsageTypedSpread) {
+		c.nodeLinks.Get(node).flags |= NodeCheckFlagsKvsDefaultWritesBack
+	}
 	presentType, needsDefault := c.getKvsDefaultType(node.Expression(), flowType)
 	if !needsDefault {
 		return presentType
 	}
 	if presentType.flags&TypeFlagsNever != 0 {
-		c.error(node, diagnostics.KVS_terminal_cannot_determine_a_default_value_from_an_absence_only_type)
+		c.error(node, diagnostics.KVS_cannot_determine_a_default_value_from_an_absence_only_type)
 	} else if c.getKvsDefaultKindForType(presentType) == ast.KvsDefaultKindUnsupported {
 		if constructor := c.getKvsDefaultConstructorSymbol(presentType, node); constructor != nil {
 			c.nodeLinks.Get(node).kvsDefaultConstructorSymbol = constructor
@@ -8268,7 +8291,7 @@ func (c *Checker) checkKvsDefaultExpression(node *ast.Node, checkMode CheckMode)
 		defaults, ok := c.getKvsTypedObjectDefaults(presentType, make(map[*Type]bool))
 		ok = ok && c.isKvsNamedStructuralObjectType(presentType)
 		if !ok {
-			c.error(node, diagnostics.KVS_terminal_requires_a_defaultable_type)
+			c.error(node, diagnostics.KVS_requires_a_defaultable_type)
 		} else {
 			c.nodeLinks.Get(node).kvsTypedObjectDefaults = defaults
 		}
@@ -8276,13 +8299,80 @@ func (c *Checker) checkKvsDefaultExpression(node *ast.Node, checkMode CheckMode)
 	return presentType
 }
 
+type kvsDefaultUsage uint8
+
+const (
+	kvsDefaultUsageValue kvsDefaultUsage = iota
+	kvsDefaultUsageAssignment
+	kvsDefaultUsageTypedSpread
+	kvsDefaultUsageCallee
+)
+
+func getKvsDefaultUsage(node *ast.Node) (usage kvsDefaultUsage, properBase bool) {
+	current := node
+	for {
+		parent := current.Parent
+		switch {
+		case parent == nil:
+			return kvsDefaultUsageValue, properBase
+		case ast.IsOuterExpression(parent, ast.OEKAssertions|ast.OEKParentheses) && parent.Expression() == current:
+			current = parent
+		case parent.Kind == ast.KindKvsDefaultExpression && parent.Expression() == current:
+			current = parent
+		case parent.Kind == ast.KindKvsTypedSpreadAssignmentExpression && parent.AsKvsTypedSpreadAssignmentExpression().Left == current:
+			return kvsDefaultUsageTypedSpread, properBase
+		case ast.IsAccessExpression(parent) && parent.Expression() == current:
+			properBase = true
+			current = parent
+		case ast.IsCallExpression(parent) && parent.Expression() == current && properBase:
+			return kvsDefaultUsageCallee, properBase
+		default:
+			if ast.GetAssignmentTarget(current) != nil {
+				return kvsDefaultUsageAssignment, properBase
+			}
+			return kvsDefaultUsageValue, properBase
+		}
+	}
+}
+
+func (c *Checker) isKvsWritableDefaultOperand(expression *ast.Node) bool {
+	target := ast.SkipOuterExpressions(expression, ast.OEKAssertions|ast.OEKParentheses)
+	if target.Kind != ast.KindIdentifier && !ast.IsAccessExpression(target) {
+		return false
+	}
+	symbol := c.getResolvedSymbolOrNil(target)
+	if symbol == nil || symbol == c.unknownSymbol {
+		if ast.IsElementAccessExpression(target) {
+			element := target.AsElementAccessExpression()
+			objectType := c.GetNonNullableType(c.getTypeOfExpression(element.Expression))
+			indexType := c.getTypeOfExpression(element.ArgumentExpression)
+			info := c.getApplicableIndexInfo(c.getApparentType(objectType), indexType)
+			return info != nil && !info.isReadonly
+		}
+		return false
+	}
+	if symbol.Flags&ast.SymbolFlagsAlias != 0 {
+		return false
+	}
+	if ast.IsIdentifier(target) {
+		return symbol.Flags&ast.SymbolFlagsVariable != 0 && !c.isReadonlySymbol(symbol)
+	}
+	return !c.isAssignmentToReadonlyEntity(target, symbol, AssignmentKindDefinite)
+}
+
 func (c *Checker) getKvsDefaultType(expression *ast.Node, flowType *Type) (*Type, bool) {
-	if !isKvsNullableType(flowType) {
+	expression = ast.SkipParentheses(expression)
+	// An indexed lookup can miss at runtime even when its declared element type is
+	// not nullable (most notably for a sparse or out-of-bounds array access).
+	indexedLookup := ast.IsElementAccessExpression(expression)
+	if !isKvsNullableType(flowType) && !indexedLookup {
 		return flowType, false
+	}
+	if !isKvsNullableType(flowType) {
+		return flowType, true
 	}
 
 	staticType := flowType
-	expression = ast.SkipParentheses(expression)
 	var symbol *ast.Symbol
 	if ast.IsIdentifier(expression) {
 		symbol = c.getResolvedSymbol(expression)
@@ -11779,12 +11869,18 @@ func (c *Checker) checkPrefixUnaryExpression(node *ast.Node) *Type {
 			return c.booleanType
 		}
 	case ast.KindPlusPlusToken, ast.KindMinusMinusToken:
-		ok := c.checkArithmeticOperandType(expr.Operand, c.checkNonNullType(operandType, expr.Operand), diagnostics.An_arithmetic_operand_must_be_of_type_any_number_bigint_or_an_enum_type, false)
+		optional := ast.IsKvsOptionalWritePath(expr.Operand)
+		checkedType := c.GetNonNullableType(operandType)
+		if !optional {
+			checkedType = c.checkNonNullType(operandType, expr.Operand)
+		}
+		ok := c.checkArithmeticOperandType(expr.Operand, checkedType, diagnostics.An_arithmetic_operand_must_be_of_type_any_number_bigint_or_an_enum_type, false)
 		if ok {
 			// run check only if former checks succeeded to avoid reporting cascading errors
 			c.checkReferenceExpression(expr.Operand, diagnostics.The_operand_of_an_increment_or_decrement_operator_must_be_a_variable_or_a_property_access, diagnostics.The_operand_of_an_increment_or_decrement_operator_may_not_be_an_optional_property_access)
 		}
-		return c.getUnaryResultType(operandType)
+		result := c.getUnaryResultType(checkedType)
+		return core.IfElse(optional, c.getNullableType(result, TypeFlagsNull), result)
 	}
 	return c.errorType
 }
@@ -11795,12 +11891,18 @@ func (c *Checker) checkPostfixUnaryExpression(node *ast.Node) *Type {
 	if operandType == c.silentNeverType {
 		return c.silentNeverType
 	}
-	ok := c.checkArithmeticOperandType(expr.Operand, c.checkNonNullType(operandType, expr.Operand), diagnostics.An_arithmetic_operand_must_be_of_type_any_number_bigint_or_an_enum_type, false)
+	optional := ast.IsKvsOptionalWritePath(expr.Operand)
+	checkedType := c.GetNonNullableType(operandType)
+	if !optional {
+		checkedType = c.checkNonNullType(operandType, expr.Operand)
+	}
+	ok := c.checkArithmeticOperandType(expr.Operand, checkedType, diagnostics.An_arithmetic_operand_must_be_of_type_any_number_bigint_or_an_enum_type, false)
 	if ok {
 		// run check only if former checks succeeded to avoid reporting cascading errors
 		c.checkReferenceExpression(expr.Operand, diagnostics.The_operand_of_an_increment_or_decrement_operator_must_be_a_variable_or_a_property_access, diagnostics.The_operand_of_an_increment_or_decrement_operator_may_not_be_an_optional_property_access)
 	}
-	return c.getUnaryResultType(operandType)
+	result := c.getUnaryResultType(checkedType)
+	return core.IfElse(optional, c.getNullableType(result, TypeFlagsNull), result)
 }
 
 func (c *Checker) getUnaryResultType(operandType *Type) *Type {
@@ -14236,11 +14338,25 @@ func (c *Checker) isExactOptionalPropertyMismatch(source *Type, target *Type) bo
 func (c *Checker) checkReferenceExpression(expr *ast.Node, invalidReferenceMessage *diagnostics.Message, invalidOptionalChainMessage *diagnostics.Message) bool {
 	// References are combinations of identifiers, parentheses, and property accesses.
 	node := ast.SkipOuterExpressions(expr, ast.OEKAssertions|ast.OEKParentheses)
+	if node.Kind == ast.KindKvsDefaultExpression && ast.GetAssignmentTarget(node) != nil {
+		// The KVS default checker reports the more specific direct-target diagnostic.
+		return false
+	}
 	if node.Kind != ast.KindIdentifier && !ast.IsAccessExpression(node) {
 		c.error(expr, invalidReferenceMessage)
 		return false
 	}
 	if node.Flags&ast.NodeFlagsOptionalChain != 0 {
+		if target := ast.GetAssignmentTarget(node); target != nil {
+			switch target.Kind {
+			case ast.KindBinaryExpression:
+				if target.AsBinaryExpression().OperatorToken.Kind == ast.KindEqualsToken && target.AsBinaryExpression().Left == expr {
+					return true
+				}
+			case ast.KindPrefixUnaryExpression, ast.KindPostfixUnaryExpression:
+				return true
+			}
+		}
 		c.error(expr, invalidOptionalChainMessage)
 		return false
 	}

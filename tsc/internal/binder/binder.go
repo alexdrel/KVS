@@ -1740,6 +1740,12 @@ func (b *Binder) bindChildren(node *ast.Node) {
 		b.bindEachChild(node)
 	case ast.KindKvsFailureDemotionExpression, ast.KindKvsFailurePromotionExpression:
 		b.bindEachChild(node)
+	case ast.KindKvsDefaultExpression:
+		b.bind(node.Expression())
+		if ast.IsKvsPotentiallyMaterializingDefaultExpression(node) && !ast.IsKvsOptionalWritePath(node.Expression()) {
+			b.bindAssignmentTargetFlow(node.Expression())
+			b.hasFlowEffects = true
+		}
 	case ast.KindKvsCatchSplitAssignmentExpression:
 		b.bindKvsCatchSplitAssignmentExpression(node)
 	case ast.KindDeleteExpression:
@@ -2439,7 +2445,9 @@ func (b *Binder) bindPrefixUnaryExpressionFlow(node *ast.Node) {
 	} else {
 		b.bindEachChild(node)
 		if expr.Operator == ast.KindPlusPlusToken || expr.Operator == ast.KindMinusMinusToken {
-			b.bindAssignmentTargetFlow(expr.Operand)
+			if !ast.IsKvsOptionalWritePath(expr.Operand) {
+				b.bindAssignmentTargetFlow(expr.Operand)
+			}
 		}
 	}
 }
@@ -2448,7 +2456,9 @@ func (b *Binder) bindPostfixUnaryExpressionFlow(node *ast.Node) {
 	expr := node.AsPostfixUnaryExpression()
 	b.bindEachChild(node)
 	if expr.Operator == ast.KindPlusPlusToken || expr.Operator == ast.KindMinusMinusToken {
-		b.bindAssignmentTargetFlow(expr.Operand)
+		if !ast.IsKvsOptionalWritePath(expr.Operand) {
+			b.bindAssignmentTargetFlow(expr.Operand)
+		}
 	}
 }
 
@@ -2503,7 +2513,9 @@ func (b *Binder) bindBinaryExpressionFlow(node *ast.Node) {
 			b.maybeBindExpressionFlowIfCall(expr.Right)
 		}
 		if ast.IsAssignmentOperator(operator) && !ast.IsAssignmentTarget(node) {
-			b.bindAssignmentTargetFlow(expr.Left)
+			if operator != ast.KindEqualsToken || !ast.IsKvsOptionalWritePath(expr.Left) {
+				b.bindAssignmentTargetFlow(expr.Left)
+			}
 			if operator == ast.KindEqualsToken && expr.Left.Kind == ast.KindElementAccessExpression {
 				elementAccess := expr.Left.AsElementAccessExpression()
 				if isNarrowableOperand(elementAccess.Expression) {
@@ -2918,7 +2930,7 @@ func isNarrowableReference(node *ast.Node) bool {
 	switch node.Kind {
 	case ast.KindIdentifier, ast.KindThisKeyword, ast.KindSuperKeyword, ast.KindMetaProperty:
 		return true
-	case ast.KindPropertyAccessExpression, ast.KindParenthesizedExpression, ast.KindNonNullExpression, ast.KindKvsExtantAssertionExpression:
+	case ast.KindPropertyAccessExpression, ast.KindParenthesizedExpression, ast.KindNonNullExpression, ast.KindKvsExtantAssertionExpression, ast.KindKvsDefaultExpression:
 		return isNarrowableReference(node.Expression())
 	case ast.KindElementAccessExpression:
 		expr := node.AsElementAccessExpression()

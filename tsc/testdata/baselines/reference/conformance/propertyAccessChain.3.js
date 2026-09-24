@@ -44,16 +44,17 @@ var __rest = (this && this.__rest) || function (s, e) {
         }
     return t;
 };
-(obj === null || obj === void 0 ? void 0 : obj.a)++;
-(obj === null || obj === void 0 ? void 0 : obj.a.b)++;
-(obj === null || obj === void 0 ? void 0 : obj.a)--;
-(obj === null || obj === void 0 ? void 0 : obj.a.b)--;
-++(obj === null || obj === void 0 ? void 0 : obj.a);
-++(obj === null || obj === void 0 ? void 0 : obj.a.b);
---(obj === null || obj === void 0 ? void 0 : obj.a);
---(obj === null || obj === void 0 ? void 0 : obj.a.b);
-obj === null || obj === void 0 ? void 0 : obj.a = 1;
-obj === null || obj === void 0 ? void 0 : obj.a.b = 1;
+var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
+(_a = obj) != null ? _a.a++ : null;
+(_b = obj) != null ? _b.a.b++ : null;
+(_c = obj) != null ? _c.a-- : null;
+(_d = obj) != null ? _d.a.b-- : null;
+(_e = obj) != null ? ++_e.a : null;
+(_f = obj) != null ? ++_f.a.b : null;
+(_g = obj) != null ? --_g.a : null;
+(_h = obj) != null ? --_h.a.b : null;
+(_j = obj) != null ? _j.a = 1 : null;
+(_k = obj) != null ? _k.a.b = 1 : null;
 obj === null || obj === void 0 ? void 0 : obj.a += 1;
 obj === null || obj === void 0 ? void 0 : obj.a.b += 1;
 for (obj === null || obj === void 0 ? void 0 : obj.a in {})

@@ -1,0 +1,188 @@
+//// [tests/cases/conformance/kvs/kvsOptionalWrite.ts] ////
+
+=== kvsOptionalWrite.ts ===
+interface Profile {
+    theme: string;
+>theme : string
+}
+
+interface User {
+    profile: Profile?;
+>profile : Profile | null | undefined
+}
+
+interface Preferences {
+    contrast: number;
+>contrast : number
+}
+
+interface Member {
+    preferences: Preferences?;
+>preferences : Preferences | null | undefined
+}
+
+interface Counter {
+    count: number;
+>count : number
+}
+
+declare let user: User?;
+>user : User | null | undefined
+
+declare let users: User[]?;
+>users : User[] | null | undefined
+
+declare let members: Member[]?;
+>members : Member[] | null | undefined
+
+declare let optionalThenMaterialized: User?;
+>optionalThenMaterialized : User | null | undefined
+
+declare let materializedThenOptional: User?;
+>materializedThenOptional : User | null | undefined
+
+declare let counter: Counter?;
+>counter : Counter | null | undefined
+
+declare let counters: Counter[]?;
+>counters : Counter[] | null | undefined
+
+declare let valueEffects: number;
+>valueEffects : number
+
+declare let indexEffects: number;
+>indexEffects : number
+
+user?.profile = { theme: "dark" };
+>user?.profile = { theme: "dark" } : { theme: string; }
+>user?.profile : Profile | null | undefined
+>user : User | null | undefined
+>profile : Profile | null | undefined
+>{ theme: "dark" } : { theme: string; }
+>theme : string
+>"dark" : "dark"
+
+user?.profile?.theme = "light";
+>user?.profile?.theme = "light" : "light"
+>user?.profile?.theme : string | undefined
+>user?.profile : Profile | null | undefined
+>user : User | null | undefined
+>profile : Profile | null | undefined
+>theme : string | undefined
+>"light" : "light"
+
+users?.[indexEffects++]?.profile?.theme = "blue";
+>users?.[indexEffects++]?.profile?.theme = "blue" : "blue"
+>users?.[indexEffects++]?.profile?.theme : string | undefined
+>users?.[indexEffects++]?.profile : Profile | null | undefined
+>users?.[indexEffects++] : User | undefined
+>users : User[] | null | undefined
+>indexEffects++ : number
+>indexEffects : number
+>profile : Profile | null | undefined
+>theme : string | undefined
+>"blue" : "blue"
+
+user?.profile = (valueEffects++, { theme: "contrast" });
+>user?.profile = (valueEffects++, { theme: "contrast" }) : { theme: string; }
+>user?.profile : Profile | null | undefined
+>user : User | null | undefined
+>profile : Profile | null | undefined
+>(valueEffects++, { theme: "contrast" }) : { theme: string; }
+>valueEffects++, { theme: "contrast" } : { theme: string; }
+>valueEffects++ : number
+>valueEffects : number
+>{ theme: "contrast" } : { theme: string; }
+>theme : string
+>"contrast" : "contrast"
+
+optionalThenMaterialized?.profile!.theme = "optional then materialize";
+>optionalThenMaterialized?.profile!.theme = "optional then materialize" : "optional then materialize"
+>optionalThenMaterialized?.profile!.theme : string
+>optionalThenMaterialized?.profile! : Profile
+>optionalThenMaterialized?.profile : Profile | null | undefined
+>optionalThenMaterialized : User | null | undefined
+>profile : Profile | null | undefined
+>theme : string
+>"optional then materialize" : "optional then materialize"
+
+const stillOptionalUser = optionalThenMaterialized;
+>stillOptionalUser : User | null | undefined
+>optionalThenMaterialized : User | null | undefined
+
+const stillOptionalProfile = optionalThenMaterialized.profile;
+>stillOptionalProfile : Profile | null | undefined
+>optionalThenMaterialized.profile : Profile | null | undefined
+>optionalThenMaterialized : User | null | undefined
+>profile : Profile | null | undefined
+
+materializedThenOptional!.profile?.theme = "materialize then optional";
+>materializedThenOptional!.profile?.theme = "materialize then optional" : "materialize then optional"
+>materializedThenOptional!.profile?.theme : string | undefined
+>materializedThenOptional!.profile : Profile | null | undefined
+>materializedThenOptional! : User
+>materializedThenOptional : User | null | undefined
+>profile : Profile | null | undefined
+>theme : string | undefined
+>"materialize then optional" : "materialize then optional"
+
+const materializedUser = materializedThenOptional;
+>materializedUser : User
+>materializedThenOptional : User
+
+const stillNullableProfile = materializedThenOptional.profile;
+>stillNullableProfile : Profile | null | undefined
+>materializedThenOptional.profile : Profile | null | undefined
+>materializedThenOptional : User
+>profile : Profile | null | undefined
+
+members?.[indexEffects++]!.preferences!.contrast = 2;
+>members?.[indexEffects++]!.preferences!.contrast = 2 : 2
+>members?.[indexEffects++]!.preferences!.contrast : number
+>members?.[indexEffects++]!.preferences! : Preferences
+>members?.[indexEffects++]!.preferences : Preferences | null | undefined
+>members?.[indexEffects++]! : Member
+>members?.[indexEffects++] : Member | undefined
+>members : Member[] | null | undefined
+>indexEffects++ : number
+>indexEffects : number
+>preferences : Preferences | null | undefined
+>contrast : number
+>2 : 2
+
+const previousCount = counter?.count++;
+>previousCount : number | null
+>counter?.count++ : number | null
+>counter?.count : number | undefined
+>counter : Counter | null | undefined
+>count : number | undefined
+
+const nextCount = ++counter?.count;
+>nextCount : number | null
+>++counter?.count : number | null
+>counter?.count : number | undefined
+>counter : Counter | null | undefined
+>count : number | undefined
+
+counters?.[indexEffects++]?.count--;
+>counters?.[indexEffects++]?.count-- : number | null
+>counters?.[indexEffects++]?.count : number | undefined
+>counters?.[indexEffects++] : Counter | undefined
+>counters : Counter[] | null | undefined
+>indexEffects++ : number
+>indexEffects : number
+>count : number | undefined
+
+const stillOptionalCounter = counter;
+>stillOptionalCounter : Counter | null | undefined
+>counter : Counter | null | undefined
+
+user.profile = { theme: "plain" };
+>user.profile = { theme: "plain" } : { theme: string; }
+>user.profile : Profile | null | undefined
+>user : User | null | undefined
+>profile : Profile | null | undefined
+>{ theme: "plain" } : { theme: string; }
+>theme : string
+>"plain" : "plain"
+

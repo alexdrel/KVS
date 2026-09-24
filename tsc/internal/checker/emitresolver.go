@@ -72,6 +72,13 @@ func (r *EmitResolver) GetKvsDefaultKind(node *ast.Node) ast.KvsDefaultKind {
 	return kind
 }
 
+func (r *EmitResolver) KvsDefaultWritesBack(node *ast.Node) bool {
+	r.checkerMu.Lock()
+	defer r.checkerMu.Unlock()
+	r.checker.checkExpression(node)
+	return r.checker.nodeLinks.Get(node).flags&NodeCheckFlagsKvsDefaultWritesBack != 0
+}
+
 func (r *EmitResolver) GetKvsTypedObjectDefaults(node *ast.Node) []printer.KvsTypedObjectDefault {
 	r.checkerMu.Lock()
 	defer r.checkerMu.Unlock()

@@ -1,0 +1,70 @@
+//// [tests/cases/conformance/kvs/kvsDefaultInvalidTargets.ts] ////
+
+=== kvsDefaultInvalidTargets.ts ===
+interface User {
+    id: number?;
+>id : number | null | undefined
+}
+
+declare let user: User;
+>user : User
+
+declare let count: number?;
+>count : number | null | undefined
+
+declare let users: User[];
+>users : User[]
+
+declare let readonlyUsers: readonly User[];
+>readonlyUsers : readonly User[]
+
+declare const fixedUser: User?;
+>fixedUser : User | null | undefined
+
+user.id! = 1;
+>user.id! = 1 : 1
+>user.id! : number
+>user.id : number | null | undefined
+>user : User
+>id : number | null | undefined
+>1 : 1
+
+user.id! += 2;
+>user.id! += 2 : number
+>user.id! : number
+>user.id : number
+>user : User
+>id : number
+>2 : 2
+
+count!++;
+>count!++ : number
+>count! : number
+>count : number | null | undefined
+
+users[0]! = user;
+>users[0]! = user : User
+>users[0]! : User
+>users[0] : User
+>users : User[]
+>0 : 0
+>user : User
+
+readonlyUsers[0]!.id = 1;
+>readonlyUsers[0]!.id = 1 : 1
+>readonlyUsers[0]!.id : number | null | undefined
+>readonlyUsers[0]! : User
+>readonlyUsers[0] : User
+>readonlyUsers : readonly User[]
+>0 : 0
+>id : number | null | undefined
+>1 : 1
+
+fixedUser!.id = 1;
+>fixedUser!.id = 1 : 1
+>fixedUser!.id : number | null | undefined
+>fixedUser! : User
+>fixedUser : User | null | undefined
+>id : number | null | undefined
+>1 : 1
+

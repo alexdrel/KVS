@@ -8900,13 +8900,29 @@
         "category": "Error",
         "code": 100071
     },
-    "KVS terminal '!' requires a defaultable type.": {
+    "KVS '!' requires a defaultable type.": {
         "category": "Error",
         "code": 100072
     },
-    "KVS terminal '!' cannot determine a default value from an absence-only type.": {
+    "KVS '!' cannot determine a default value from an absence-only type.": {
         "category": "Error",
         "code": 100073
+    },
+    "KVS '!' in a value expression must be terminal.": {
+        "category": "Error",
+        "code": 100086
+    },
+    "KVS '!' cannot be the target of an assignment or update.": {
+        "category": "Error",
+        "code": 100087
+    },
+    "KVS '!' on an assignment or update target requires a writable proper base.": {
+        "category": "Error",
+        "code": 100088
+    },
+    "KVS '!' on a typed in-place spread target requires a writable target.": {
+        "category": "Error",
+        "code": 100089
     },
     "KVS expression-valued 'for' must be at the head of a supported value expression.": {
         "category": "Error",

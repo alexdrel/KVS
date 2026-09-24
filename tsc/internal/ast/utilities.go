@@ -246,6 +246,54 @@ func GetAssignmentTarget(node *Node) *Node {
 	}
 }
 
+func IsKvsPotentiallyMaterializingDefaultExpression(node *Node) bool {
+	if node == nil || node.Kind != KindKvsDefaultExpression {
+		return false
+	}
+	expression := SkipOuterExpressions(node.Expression(), OEKAssertions|OEKParentheses)
+	if !(expression.Kind == KindIdentifier && expression.Text() != "undefined" || IsAccessExpression(expression)) {
+		return false
+	}
+	current := node
+	properBase := false
+	for {
+		parent := current.Parent
+		switch {
+		case parent == nil:
+			return false
+		case IsOuterExpression(parent, OEKAssertions|OEKParentheses) && parent.Expression() == current:
+			current = parent
+		case parent.Kind == KindKvsDefaultExpression && parent.Expression() == current:
+			current = parent
+		case parent.Kind == KindKvsTypedSpreadAssignmentExpression && parent.AsKvsTypedSpreadAssignmentExpression().Left == current:
+			return true
+		case IsAccessExpression(parent) && parent.Expression() == current:
+			properBase = true
+			current = parent
+		case IsCallExpression(parent) && parent.Expression() == current:
+			return properBase
+		default:
+			return properBase && GetAssignmentTarget(current) != nil
+		}
+	}
+}
+
+func IsKvsOptionalWritePath(node *Node) bool {
+	for {
+		switch {
+		case IsAccessExpression(node):
+			if node.QuestionDotToken() != nil {
+				return true
+			}
+			node = node.Expression()
+		case node.Kind == KindKvsDefaultExpression:
+			node = node.Expression()
+		default:
+			return false
+		}
+	}
+}
+
 func IsLogicalBinaryOperator(token Kind) bool {
 	return token == KindBarBarToken || token == KindAmpersandAmpersandToken
 }
@@ -426,7 +474,7 @@ func isLeftHandSideExpressionKind(kind Kind) bool {
 		KindPrivateIdentifier, KindRegularExpressionLiteral, KindNumericLiteral, KindBigIntLiteral, KindStringLiteral,
 		KindNoSubstitutionTemplateLiteral, KindTemplateExpression, KindFalseKeyword, KindNullKeyword, KindThisKeyword,
 		KindTrueKeyword, KindSuperKeyword, KindNonNullExpression, KindExpressionWithTypeArguments, KindMetaProperty,
-		KindImportKeyword, KindMissingDeclaration:
+		KindImportKeyword, KindMissingDeclaration, KindKvsDefaultExpression:
 		return true
 	}
 	return false

@@ -171,12 +171,12 @@ const stringSet = maybeStringSet!;
 >maybeStringSet! : StringSet
 >maybeStringSet : StringSet | null | undefined
 
-const stringLength = maybeString!.length;
+const stringLength = maybeString.length!;
 >stringLength : number
->maybeString!.length : number
->maybeString! : string
+>maybeString.length! : number
+>maybeString.length : number | null | undefined
 >maybeString : string | null | undefined
->length : number
+>length : number | null | undefined
 
 const incremented = maybeNumber! + 1;
 >incremented : number
@@ -331,6 +331,351 @@ const date = maybeDate!;
 >date : Date
 >maybeDate! : Date
 >maybeDate : Date | null | undefined
+
+interface Account {
+    profile: Profile?;
+>profile : Profile | null | undefined
+}
+
+let account: Account? = null;
+>account : Account | null | undefined
+
+account!.profile!.enabled = true;
+>account!.profile!.enabled = true : true
+>account!.profile!.enabled : boolean
+>account!.profile! : Profile
+>account!.profile : Profile | null | undefined
+>account! : Account
+>account : null
+>profile : Profile | null | undefined
+>enabled : boolean
+>true : true
+
+account.profile.enabled;
+>account.profile.enabled : true
+>account.profile : Profile
+>account : Account
+>profile : Profile
+>enabled : true
+
+const materializedAccount = account;
+>materializedAccount : Account
+>account : Account
+
+declare let storedAccount: Account?;
+>storedAccount : Account | null | undefined
+
+const storedEnabled = storedAccount.profile.enabled!;
+>storedEnabled : boolean
+>storedAccount.profile.enabled! : boolean
+>storedAccount.profile.enabled : boolean | null | undefined
+>storedAccount.profile : Profile | null | undefined
+>storedAccount : Account | null | undefined
+>profile : Profile | null | undefined
+>enabled : boolean | null | undefined
+
+const invalidStoredEnabled = storedAccount!.profile!.enabled;
+>invalidStoredEnabled : boolean
+>storedAccount!.profile!.enabled : boolean
+>storedAccount!.profile! : Profile
+>storedAccount!.profile : Profile | null | undefined
+>storedAccount! : Account
+>storedAccount : Account | null | undefined
+>profile : Profile | null | undefined
+>enabled : boolean
+
+let accountHolder = { account: null as Account? };
+>accountHolder : { account: Account?; }
+>{ account: null as Account? } : { account: Account?; }
+>account : Account | null | undefined
+>null as Account? : Account | null | undefined
+
+declare function getAccountHolder(): typeof accountHolder;
+>getAccountHolder : () => typeof accountHolder
+>accountHolder : { account: Account?; }
+
+getAccountHolder().account!.profile!.enabled = true;
+>getAccountHolder().account!.profile!.enabled = true : true
+>getAccountHolder().account!.profile!.enabled : boolean
+>getAccountHolder().account!.profile! : Profile
+>getAccountHolder().account!.profile : Profile | null | undefined
+>getAccountHolder().account! : Account
+>getAccountHolder().account : Account | null | undefined
+>getAccountHolder() : { account: Account?; }
+>getAccountHolder : () => typeof accountHolder
+>account : Account | null | undefined
+>profile : Profile | null | undefined
+>enabled : boolean
+>true : true
+
+let users: Account[]? = null;
+>users : Account[] | null | undefined
+
+declare function nextIndex(): number;
+>nextIndex : () => number
+
+users![nextIndex()]!.profile!.enabled = true;
+>users![nextIndex()]!.profile!.enabled = true : true
+>users![nextIndex()]!.profile!.enabled : boolean
+>users![nextIndex()]!.profile! : Profile
+>users![nextIndex()]!.profile : Profile | null | undefined
+>users![nextIndex()]! : Account
+>users![nextIndex()] : Account
+>users! : Account[]
+>users : null
+>nextIndex() : number
+>nextIndex : () => number
+>profile : Profile | null | undefined
+>enabled : boolean
+>true : true
+
+const indexedAccount = users?.[nextIndex()]!;
+>indexedAccount : Account
+>users?.[nextIndex()]! : Account
+>users?.[nextIndex()] : Account
+>users : Account[]
+>nextIndex() : number
+>nextIndex : () => number
+
+class IndexedEditor {
+>IndexedEditor : IndexedEditor
+
+    save() {}
+>save : () => void
+}
+
+let indexedEditors: IndexedEditor[]? = null;
+>indexedEditors : IndexedEditor[] | null | undefined
+
+indexedEditors![nextIndex()]!.save();
+>indexedEditors![nextIndex()]!.save() : void
+>indexedEditors![nextIndex()]!.save : () => void
+>indexedEditors![nextIndex()]! : IndexedEditor
+>indexedEditors![nextIndex()] : IndexedEditor
+>indexedEditors! : IndexedEditor[]
+>indexedEditors : null
+>nextIndex() : number
+>nextIndex : () => number
+>save : () => void
+
+declare function maybeIndex(): number?;
+>maybeIndex : () => number?
+
+users![maybeIndex()!].profile = null;
+>users![maybeIndex()!].profile = null : null
+>users![maybeIndex()!].profile : Profile | null | undefined
+>users![maybeIndex()!] : Account
+>users! : Account[]
+>users : Account[]
+>maybeIndex()! : number
+>maybeIndex() : number | null | undefined
+>maybeIndex : () => number?
+>profile : Profile | null | undefined
+
+interface CounterHolder {
+    count: number;
+>count : number
+}
+
+let counterHolder: CounterHolder? = null;
+>counterHolder : CounterHolder | null | undefined
+
+counterHolder!.count++;
+>counterHolder!.count++ : number
+>counterHolder!.count : number
+>counterHolder! : CounterHolder
+>counterHolder : null
+>count : number
+
+counterHolder!.count += 2;
+>counterHolder!.count += 2 : number
+>counterHolder!.count : number
+>counterHolder! : CounterHolder
+>counterHolder : CounterHolder
+>count : number
+>2 : 2
+
+declare let plainAccount: Account?;
+>plainAccount : Account | null | undefined
+
+plainAccount.profile = null;
+>plainAccount.profile = null : null
+>plainAccount.profile : Profile | null | undefined
+>plainAccount : Account | null | undefined
+>profile : Profile | null | undefined
+
+declare const fixedAccount: Account?;
+>fixedAccount : Account | null | undefined
+
+fixedAccount!.profile;
+>fixedAccount!.profile : Profile | null | undefined
+>fixedAccount! : Account
+>fixedAccount : Account | null | undefined
+>profile : Profile | null | undefined
+
+fixedAccount.profile!;
+>fixedAccount.profile! : Profile
+>fixedAccount.profile : Profile | null | undefined
+>fixedAccount : Account | null | undefined
+>profile : Profile | null | undefined
+
+interface ReadonlyAccount {
+    readonly profile: Profile?;
+>profile : Profile | null | undefined
+}
+
+declare let readonlyAccount: ReadonlyAccount;
+>readonlyAccount : ReadonlyAccount
+
+readonlyAccount.profile!.enabled = true;
+>readonlyAccount.profile!.enabled = true : true
+>readonlyAccount.profile!.enabled : boolean
+>readonlyAccount.profile! : Profile
+>readonlyAccount.profile : Profile | null | undefined
+>readonlyAccount : ReadonlyAccount
+>profile : Profile | null | undefined
+>enabled : boolean
+>true : true
+
+class AccountView {
+>AccountView : AccountView
+
+    get profile(): Profile? {
+>profile : Profile | null | undefined
+
+        return null;
+    }
+}
+
+declare let accountView: AccountView;
+>accountView : AccountView
+
+accountView.profile!.enabled = true;
+>accountView.profile!.enabled = true : true
+>accountView.profile!.enabled : boolean
+>accountView.profile! : Profile
+>accountView.profile : Profile | null | undefined
+>accountView : AccountView
+>profile : Profile | null | undefined
+>enabled : boolean
+>true : true
+
+declare function loadAccount(): Account?;
+>loadAccount : () => Account?
+
+loadAccount()!.profile;
+>loadAccount()!.profile : Profile | null | undefined
+>loadAccount()! : Account
+>loadAccount() : Account | null | undefined
+>loadAccount : () => Account?
+>profile : Profile | null | undefined
+
+loadAccount()!.profile = null;
+>loadAccount()!.profile = null : null
+>loadAccount()!.profile : Profile | null | undefined
+>loadAccount()! : Account
+>loadAccount() : Account | null | undefined
+>loadAccount : () => Account?
+>profile : Profile | null | undefined
+
+let values: string[]? = null;
+>values : string[] | null | undefined
+
+values!.push("stored");
+>values!.push("stored") : number
+>values!.push : (...items: string[]) => number
+>values! : string[]
+>values : null
+>push : (...items: string[]) => number
+>"stored" : "stored"
+
+values.push("again");
+>values.push("again") : number
+>values.push : (...items: string[]) => number
+>values : string[]
+>push : (...items: string[]) => number
+>"again" : "again"
+
+declare function loadValues(): string[]?;
+>loadValues : () => string[]?
+
+const joinedValues = loadValues()!.join(",");
+>joinedValues : string
+>loadValues()!.join(",") : string
+>loadValues()!.join : (separator?: string) => string
+>loadValues()! : string[]
+>loadValues() : string[] | null | undefined
+>loadValues : () => string[]?
+>join : (separator?: string) => string
+>"," : ","
+
+class Editor {
+>Editor : Editor
+
+    save() {}
+>save : () => void
+}
+
+interface Settings {
+    editor: Editor?;
+>editor : Editor | null | undefined
+}
+
+let settings: Settings? = null;
+>settings : Settings | null | undefined
+
+settings!.editor!.save();
+>settings!.editor!.save() : void
+>settings!.editor!.save : () => void
+>settings!.editor! : Editor
+>settings!.editor : Editor | null | undefined
+>settings! : Settings
+>settings : null
+>editor : Editor | null | undefined
+>save : () => void
+
+settings.editor.save();
+>settings.editor.save() : void
+>settings.editor.save : () => void
+>settings.editor : Editor
+>settings : Settings
+>editor : Editor
+>save : () => void
+
+class SettingsView {
+>SettingsView : SettingsView
+
+    get editor(): Editor? {
+>editor : Editor | null | undefined
+
+        return null;
+    }
+}
+
+declare const settingsView: SettingsView;
+>settingsView : SettingsView
+
+settingsView.editor!.save();
+>settingsView.editor!.save() : void
+>settingsView.editor!.save : () => void
+>settingsView.editor! : Editor
+>settingsView.editor : Editor | null | undefined
+>settingsView : SettingsView
+>editor : Editor | null | undefined
+>save : () => void
+
+declare let readValue: string?;
+>readValue : string | null | undefined
+
+const defaultedValue = readValue!;
+>defaultedValue : string
+>readValue! : string
+>readValue : string | null | undefined
+
+readValue.length;
+>readValue.length : number | null | undefined
+>readValue : string | null | undefined
+>length : number | null | undefined
 
 namespace Models {
 >Models : typeof Models

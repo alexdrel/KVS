@@ -3,7 +3,7 @@
 This is a working implementation aid, not a language specification or feature
 order. The language documents remain authoritative for accepted semantics.
 
-Progress: **258 of 374 items complete (69.0%)**; **116 remain open**.
+Progress: **271 of 377 items complete (71.9%)**; **106 remain open**.
 
 - `[x]` means implemented with focused compiler evidence.
 - `[ ]` means unimplemented, incomplete, or not yet deliberately validated.
@@ -30,8 +30,8 @@ Implemented vertical slices:
 - Nulling operator: `condition ?: expression`.
 - Nullability type operators: `T?` and `T!`.
 - Successful-branch binding: `if (const value = expression)`.
-- Terminal defaults for strings, numbers, booleans, bigints, and ordinary
-  arrays: postfix `value!`.
+- Type-directed defaults and materialization for strings, numbers, booleans,
+  bigints, and ordinary arrays: postfix `value!`.
 - Nullable sources for synchronous `for...of`, eager `collect`, and `select`.
 - Implicit subjects for synchronous `for`, eager `collect`, and `select`.
 - Arithmetic operators lifted over absence.
@@ -455,19 +455,22 @@ them; generated example `.js` files are intentionally ignored.
 - [x] Preserve target identity
 - [x] Preserve alias visibility
 - [x] Reject readonly fields
-- [ ] Nullable/materialized target
+- [x] Nullable/materialized target
 
 ### Writable nullable paths
 
-- [ ] Reject plain write through nullable path
-- [ ] `?.` path abandons write
-- [ ] `!.` path materializes
-- [ ] Nested materialization
-- [ ] Array/index materialization
-- [ ] Computed index evaluated once
-- [ ] Writable-reference requirement
-- [ ] Getter-only rejection
-- [ ] Terminal `!` vs intermediate `!`
+- [x] Reject plain write through nullable path
+- [x] `?.` path abandons write
+- [x] `!.` named property path materializes
+- [x] Nested named-property materialization
+- [x] Element/index materialization
+- [x] Computed index evaluated once
+- [x] Assignment/update `!` only on writable proper bases
+- [x] Reject `!` on the assignment/update target itself
+- [x] Reject intermediate `!` in ordinary value expressions
+- [x] Writable method-callee bases materialize
+- [x] Non-writable method-callee bases default transiently
+- [x] Terminal value defaults do not write back
 
 ## 5. Calls, composition, and callbacks
 

@@ -373,6 +373,7 @@ const (
 	NodeCheckFlagsKvsLiftedBinaryRightNullable             NodeCheckFlags = 1 << 27
 	NodeCheckFlagsKvsPlaceholderBoundary                   NodeCheckFlags = 1 << 28
 	NodeCheckFlagsKvsNullableAccess                        NodeCheckFlags = 1 << 29
+	NodeCheckFlagsKvsDefaultWritesBack                     NodeCheckFlags = 1 << 30
 )
 
 // Common links

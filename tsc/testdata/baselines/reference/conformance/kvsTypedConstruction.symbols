@@ -431,6 +431,19 @@ let maybePoint: Point?;
 >Point : Symbol(Point, Decl(kvsTypedConstruction.ts, 58, 1))
 
 maybePoint ...= rectangle;
+maybePoint! ...= rectangle;
+>maybePoint : Symbol(maybePoint, Decl(kvsTypedConstruction.ts, 154, 3))
+
+const materializedPoint = maybePoint;
+>materializedPoint : Symbol(materializedPoint, Decl(kvsTypedConstruction.ts, 157, 5))
+>maybePoint : Symbol(maybePoint, Decl(kvsTypedConstruction.ts, 154, 3))
+
+declare const fixedMaybePoint: Point?;
+>fixedMaybePoint : Symbol(fixedMaybePoint, Decl(kvsTypedConstruction.ts, 158, 13))
+>Point : Symbol(Point, Decl(kvsTypedConstruction.ts, 58, 1))
+
+fixedMaybePoint! ...= rectangle;
+>fixedMaybePoint : Symbol(fixedMaybePoint, Decl(kvsTypedConstruction.ts, 158, 13))
 
 Point{ ...incompatible };
 >Point : Symbol(Point, Decl(kvsTypedConstruction.ts, 58, 1))
@@ -454,88 +467,88 @@ Point{ ...unknownSource };
 
 Profile{ id: maybeName };
 >Profile : Symbol(Profile, Decl(kvsTypedConstruction.ts, 15, 1))
->id : Symbol(id, Decl(kvsTypedConstruction.ts, 163, 8))
+>id : Symbol(id, Decl(kvsTypedConstruction.ts, 167, 8))
 >maybeName : Symbol(maybeName, Decl(kvsTypedConstruction.ts, 52, 13))
 
 Profile{ unknown: 1 };
 >Profile : Symbol(Profile, Decl(kvsTypedConstruction.ts, 15, 1))
->unknown : Symbol(unknown, Decl(kvsTypedConstruction.ts, 164, 8))
+>unknown : Symbol(unknown, Decl(kvsTypedConstruction.ts, 168, 8))
 
 class Model {
->Model : Symbol(Model, Decl(kvsTypedConstruction.ts, 164, 22))
+>Model : Symbol(Model, Decl(kvsTypedConstruction.ts, 168, 22))
 
     value = 1;
->value : Symbol(Model.value, Decl(kvsTypedConstruction.ts, 166, 13))
+>value : Symbol(Model.value, Decl(kvsTypedConstruction.ts, 170, 13))
 }
 Model{};
->Model : Symbol(Model, Decl(kvsTypedConstruction.ts, 164, 22))
+>Model : Symbol(Model, Decl(kvsTypedConstruction.ts, 168, 22))
 
 type Primitive = string;
->Primitive : Symbol(Primitive, Decl(kvsTypedConstruction.ts, 169, 8))
+>Primitive : Symbol(Primitive, Decl(kvsTypedConstruction.ts, 173, 8))
 
 Primitive{};
->Primitive : Symbol(Primitive, Decl(kvsTypedConstruction.ts, 169, 8))
+>Primitive : Symbol(Primitive, Decl(kvsTypedConstruction.ts, 173, 8))
 
 interface Invalid {
->Invalid : Symbol(Invalid, Decl(kvsTypedConstruction.ts, 172, 12))
+>Invalid : Symbol(Invalid, Decl(kvsTypedConstruction.ts, 176, 12))
 
     callback: () => void;
->callback : Symbol(Invalid.callback, Decl(kvsTypedConstruction.ts, 174, 19))
+>callback : Symbol(Invalid.callback, Decl(kvsTypedConstruction.ts, 178, 19))
 }
 Invalid{};
->Invalid : Symbol(Invalid, Decl(kvsTypedConstruction.ts, 172, 12))
+>Invalid : Symbol(Invalid, Decl(kvsTypedConstruction.ts, 176, 12))
 
 interface InvalidState {
->InvalidState : Symbol(InvalidState, Decl(kvsTypedConstruction.ts, 177, 10))
+>InvalidState : Symbol(InvalidState, Decl(kvsTypedConstruction.ts, 181, 10))
 
     state: "waiting" | "finished";
->state : Symbol(InvalidState.state, Decl(kvsTypedConstruction.ts, 179, 24))
+>state : Symbol(InvalidState.state, Decl(kvsTypedConstruction.ts, 183, 24))
 }
 InvalidState{};
->InvalidState : Symbol(InvalidState, Decl(kvsTypedConstruction.ts, 177, 10))
+>InvalidState : Symbol(InvalidState, Decl(kvsTypedConstruction.ts, 181, 10))
 
 class Connection {
->Connection : Symbol(Connection, Decl(kvsTypedConstruction.ts, 182, 15))
+>Connection : Symbol(Connection, Decl(kvsTypedConstruction.ts, 186, 15))
 
     constructor(url: string) {}
->url : Symbol(url, Decl(kvsTypedConstruction.ts, 185, 16))
+>url : Symbol(url, Decl(kvsTypedConstruction.ts, 189, 16))
 }
 
 interface Service {
->Service : Symbol(Service, Decl(kvsTypedConstruction.ts, 186, 1))
+>Service : Symbol(Service, Decl(kvsTypedConstruction.ts, 190, 1))
 
     connection: Connection;
->connection : Symbol(Service.connection, Decl(kvsTypedConstruction.ts, 188, 19))
->Connection : Symbol(Connection, Decl(kvsTypedConstruction.ts, 182, 15))
+>connection : Symbol(Service.connection, Decl(kvsTypedConstruction.ts, 192, 19))
+>Connection : Symbol(Connection, Decl(kvsTypedConstruction.ts, 186, 15))
 }
 
 Service{};
->Service : Symbol(Service, Decl(kvsTypedConstruction.ts, 186, 1))
+>Service : Symbol(Service, Decl(kvsTypedConstruction.ts, 190, 1))
 
 declare const maybeService: Service?;
->maybeService : Symbol(maybeService, Decl(kvsTypedConstruction.ts, 193, 13))
->Service : Symbol(Service, Decl(kvsTypedConstruction.ts, 186, 1))
+>maybeService : Symbol(maybeService, Decl(kvsTypedConstruction.ts, 197, 13))
+>Service : Symbol(Service, Decl(kvsTypedConstruction.ts, 190, 1))
 
 maybeService!;
->maybeService : Symbol(maybeService, Decl(kvsTypedConstruction.ts, 193, 13))
+>maybeService : Symbol(maybeService, Decl(kvsTypedConstruction.ts, 197, 13))
 
 interface RequiredRecursive {
->RequiredRecursive : Symbol(RequiredRecursive, Decl(kvsTypedConstruction.ts, 194, 14))
+>RequiredRecursive : Symbol(RequiredRecursive, Decl(kvsTypedConstruction.ts, 198, 14))
 
     next: RequiredRecursive;
->next : Symbol(RequiredRecursive.next, Decl(kvsTypedConstruction.ts, 196, 29))
->RequiredRecursive : Symbol(RequiredRecursive, Decl(kvsTypedConstruction.ts, 194, 14))
+>next : Symbol(RequiredRecursive.next, Decl(kvsTypedConstruction.ts, 200, 29))
+>RequiredRecursive : Symbol(RequiredRecursive, Decl(kvsTypedConstruction.ts, 198, 14))
 }
 RequiredRecursive{};
->RequiredRecursive : Symbol(RequiredRecursive, Decl(kvsTypedConstruction.ts, 194, 14))
+>RequiredRecursive : Symbol(RequiredRecursive, Decl(kvsTypedConstruction.ts, 198, 14))
 
 function open<T>() {
->open : Symbol(open, Decl(lib.dom.d.ts, --, --), Decl(kvsTypedConstruction.ts, 199, 20))
->T : Symbol(T, Decl(kvsTypedConstruction.ts, 201, 14))
+>open : Symbol(open, Decl(lib.dom.d.ts, --, --), Decl(kvsTypedConstruction.ts, 203, 20))
+>T : Symbol(T, Decl(kvsTypedConstruction.ts, 205, 14))
 
     return Box<T>{};
 >Box : Symbol(Box, Decl(kvsTypedConstruction.ts, 34, 2))
->T : Symbol(T, Decl(kvsTypedConstruction.ts, 201, 14))
+>T : Symbol(T, Decl(kvsTypedConstruction.ts, 205, 14))
 }
 
 Profile

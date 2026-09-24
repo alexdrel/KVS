@@ -157,6 +157,10 @@ readonlyPoint ...= rectangle;
 
 let maybePoint: Point?;
 maybePoint ...= rectangle;
+maybePoint! ...= rectangle;
+const materializedPoint = maybePoint;
+declare const fixedMaybePoint: Point?;
+fixedMaybePoint! ...= rectangle;
 
 Point{ ...incompatible };
 Point{ ...maybeIncompatible };

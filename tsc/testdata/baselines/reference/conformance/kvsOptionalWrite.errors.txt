@@ -1,0 +1,58 @@
+kvsOptionalWrite.ts(51,1): error TS18049: 'user' is possibly 'null' or 'undefined'.
+
+
+==== kvsOptionalWrite.ts (1 errors) ====
+    interface Profile {
+        theme: string;
+    }
+    
+    interface User {
+        profile: Profile?;
+    }
+    
+    interface Preferences {
+        contrast: number;
+    }
+    
+    interface Member {
+        preferences: Preferences?;
+    }
+    
+    interface Counter {
+        count: number;
+    }
+    
+    declare let user: User?;
+    declare let users: User[]?;
+    declare let members: Member[]?;
+    declare let optionalThenMaterialized: User?;
+    declare let materializedThenOptional: User?;
+    declare let counter: Counter?;
+    declare let counters: Counter[]?;
+    declare let valueEffects: number;
+    declare let indexEffects: number;
+    
+    user?.profile = { theme: "dark" };
+    user?.profile?.theme = "light";
+    users?.[indexEffects++]?.profile?.theme = "blue";
+    user?.profile = (valueEffects++, { theme: "contrast" });
+    
+    optionalThenMaterialized?.profile!.theme = "optional then materialize";
+    const stillOptionalUser = optionalThenMaterialized;
+    const stillOptionalProfile = optionalThenMaterialized.profile;
+    
+    materializedThenOptional!.profile?.theme = "materialize then optional";
+    const materializedUser = materializedThenOptional;
+    const stillNullableProfile = materializedThenOptional.profile;
+    
+    members?.[indexEffects++]!.preferences!.contrast = 2;
+    
+    const previousCount = counter?.count++;
+    const nextCount = ++counter?.count;
+    counters?.[indexEffects++]?.count--;
+    const stillOptionalCounter = counter;
+    
+    user.profile = { theme: "plain" };
+    ~~~~
+!!! error TS18049: 'user' is possibly 'null' or 'undefined'.
+    

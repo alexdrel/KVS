@@ -185,9 +185,9 @@ const stringSet = maybeStringSet!;
 >stringSet : Symbol(stringSet, Decl(kvsDefault.ts, 61, 5))
 >maybeStringSet : Symbol(maybeStringSet, Decl(kvsDefault.ts, 12, 13))
 
-const stringLength = maybeString!.length;
+const stringLength = maybeString.length!;
 >stringLength : Symbol(stringLength, Decl(kvsDefault.ts, 62, 5))
->maybeString!.length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+>maybeString.length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
 >maybeString : Symbol(maybeString, Decl(kvsDefault.ts, 0, 13))
 >length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
 
@@ -323,69 +323,371 @@ const date = maybeDate!;
 >date : Symbol(date, Decl(kvsDefault.ts, 107, 5))
 >maybeDate : Symbol(maybeDate, Decl(kvsDefault.ts, 103, 13))
 
+interface Account {
+>Account : Symbol(Account, Decl(kvsDefault.ts, 107, 24))
+
+    profile: Profile?;
+>profile : Symbol(Account.profile, Decl(kvsDefault.ts, 109, 19))
+>Profile : Symbol(Profile, Decl(kvsDefault.ts, 16, 1))
+}
+
+let account: Account? = null;
+>account : Symbol(account, Decl(kvsDefault.ts, 113, 3))
+>Account : Symbol(Account, Decl(kvsDefault.ts, 107, 24))
+
+account!.profile!.enabled = true;
+>account!.profile!.enabled : Symbol(Profile.enabled, Decl(kvsDefault.ts, 18, 38))
+>account!.profile : Symbol(Account.profile, Decl(kvsDefault.ts, 109, 19))
+>account : Symbol(account, Decl(kvsDefault.ts, 113, 3))
+>profile : Symbol(Account.profile, Decl(kvsDefault.ts, 109, 19))
+>enabled : Symbol(Profile.enabled, Decl(kvsDefault.ts, 18, 38))
+
+account.profile.enabled;
+>account.profile.enabled : Symbol(Profile.enabled, Decl(kvsDefault.ts, 18, 38))
+>account.profile : Symbol(Account.profile, Decl(kvsDefault.ts, 109, 19))
+>account : Symbol(account, Decl(kvsDefault.ts, 113, 3))
+>profile : Symbol(Account.profile, Decl(kvsDefault.ts, 109, 19))
+>enabled : Symbol(Profile.enabled, Decl(kvsDefault.ts, 18, 38))
+
+const materializedAccount = account;
+>materializedAccount : Symbol(materializedAccount, Decl(kvsDefault.ts, 116, 5))
+>account : Symbol(account, Decl(kvsDefault.ts, 113, 3))
+
+declare let storedAccount: Account?;
+>storedAccount : Symbol(storedAccount, Decl(kvsDefault.ts, 118, 11))
+>Account : Symbol(Account, Decl(kvsDefault.ts, 107, 24))
+
+const storedEnabled = storedAccount.profile.enabled!;
+>storedEnabled : Symbol(storedEnabled, Decl(kvsDefault.ts, 119, 5))
+>storedAccount.profile.enabled : Symbol(Profile.enabled, Decl(kvsDefault.ts, 18, 38))
+>storedAccount.profile : Symbol(Account.profile, Decl(kvsDefault.ts, 109, 19))
+>storedAccount : Symbol(storedAccount, Decl(kvsDefault.ts, 118, 11))
+>profile : Symbol(Account.profile, Decl(kvsDefault.ts, 109, 19))
+>enabled : Symbol(Profile.enabled, Decl(kvsDefault.ts, 18, 38))
+
+const invalidStoredEnabled = storedAccount!.profile!.enabled;
+>invalidStoredEnabled : Symbol(invalidStoredEnabled, Decl(kvsDefault.ts, 120, 5))
+>storedAccount!.profile!.enabled : Symbol(Profile.enabled, Decl(kvsDefault.ts, 18, 38))
+>storedAccount!.profile : Symbol(Account.profile, Decl(kvsDefault.ts, 109, 19))
+>storedAccount : Symbol(storedAccount, Decl(kvsDefault.ts, 118, 11))
+>profile : Symbol(Account.profile, Decl(kvsDefault.ts, 109, 19))
+>enabled : Symbol(Profile.enabled, Decl(kvsDefault.ts, 18, 38))
+
+let accountHolder = { account: null as Account? };
+>accountHolder : Symbol(accountHolder, Decl(kvsDefault.ts, 122, 3))
+>account : Symbol(account, Decl(kvsDefault.ts, 122, 21))
+>Account : Symbol(Account, Decl(kvsDefault.ts, 107, 24))
+
+declare function getAccountHolder(): typeof accountHolder;
+>getAccountHolder : Symbol(getAccountHolder, Decl(kvsDefault.ts, 122, 50))
+>accountHolder : Symbol(accountHolder, Decl(kvsDefault.ts, 122, 3))
+
+getAccountHolder().account!.profile!.enabled = true;
+>getAccountHolder().account!.profile!.enabled : Symbol(Profile.enabled, Decl(kvsDefault.ts, 18, 38))
+>getAccountHolder().account!.profile : Symbol(Account.profile, Decl(kvsDefault.ts, 109, 19))
+>getAccountHolder().account : Symbol(account, Decl(kvsDefault.ts, 122, 21))
+>getAccountHolder : Symbol(getAccountHolder, Decl(kvsDefault.ts, 122, 50))
+>account : Symbol(account, Decl(kvsDefault.ts, 122, 21))
+>profile : Symbol(Account.profile, Decl(kvsDefault.ts, 109, 19))
+>enabled : Symbol(Profile.enabled, Decl(kvsDefault.ts, 18, 38))
+
+let users: Account[]? = null;
+>users : Symbol(users, Decl(kvsDefault.ts, 126, 3))
+>Account : Symbol(Account, Decl(kvsDefault.ts, 107, 24))
+
+declare function nextIndex(): number;
+>nextIndex : Symbol(nextIndex, Decl(kvsDefault.ts, 126, 29))
+
+users![nextIndex()]!.profile!.enabled = true;
+>users![nextIndex()]!.profile!.enabled : Symbol(Profile.enabled, Decl(kvsDefault.ts, 18, 38))
+>users![nextIndex()]!.profile : Symbol(Account.profile, Decl(kvsDefault.ts, 109, 19))
+>users : Symbol(users, Decl(kvsDefault.ts, 126, 3))
+>nextIndex : Symbol(nextIndex, Decl(kvsDefault.ts, 126, 29))
+>profile : Symbol(Account.profile, Decl(kvsDefault.ts, 109, 19))
+>enabled : Symbol(Profile.enabled, Decl(kvsDefault.ts, 18, 38))
+
+const indexedAccount = users?.[nextIndex()]!;
+>indexedAccount : Symbol(indexedAccount, Decl(kvsDefault.ts, 129, 5))
+>users : Symbol(users, Decl(kvsDefault.ts, 126, 3))
+>nextIndex : Symbol(nextIndex, Decl(kvsDefault.ts, 126, 29))
+
+class IndexedEditor {
+>IndexedEditor : Symbol(IndexedEditor, Decl(kvsDefault.ts, 129, 45))
+
+    save() {}
+>save : Symbol(IndexedEditor.save, Decl(kvsDefault.ts, 131, 21))
+}
+
+let indexedEditors: IndexedEditor[]? = null;
+>indexedEditors : Symbol(indexedEditors, Decl(kvsDefault.ts, 135, 3))
+>IndexedEditor : Symbol(IndexedEditor, Decl(kvsDefault.ts, 129, 45))
+
+indexedEditors![nextIndex()]!.save();
+>indexedEditors![nextIndex()]!.save : Symbol(IndexedEditor.save, Decl(kvsDefault.ts, 131, 21))
+>indexedEditors : Symbol(indexedEditors, Decl(kvsDefault.ts, 135, 3))
+>nextIndex : Symbol(nextIndex, Decl(kvsDefault.ts, 126, 29))
+>save : Symbol(IndexedEditor.save, Decl(kvsDefault.ts, 131, 21))
+
+declare function maybeIndex(): number?;
+>maybeIndex : Symbol(maybeIndex, Decl(kvsDefault.ts, 136, 37))
+
+users![maybeIndex()!].profile = null;
+>users![maybeIndex()!].profile : Symbol(Account.profile, Decl(kvsDefault.ts, 109, 19))
+>users : Symbol(users, Decl(kvsDefault.ts, 126, 3))
+>maybeIndex : Symbol(maybeIndex, Decl(kvsDefault.ts, 136, 37))
+>profile : Symbol(Account.profile, Decl(kvsDefault.ts, 109, 19))
+
+interface CounterHolder {
+>CounterHolder : Symbol(CounterHolder, Decl(kvsDefault.ts, 139, 37))
+
+    count: number;
+>count : Symbol(CounterHolder.count, Decl(kvsDefault.ts, 141, 25))
+}
+
+let counterHolder: CounterHolder? = null;
+>counterHolder : Symbol(counterHolder, Decl(kvsDefault.ts, 145, 3))
+>CounterHolder : Symbol(CounterHolder, Decl(kvsDefault.ts, 139, 37))
+
+counterHolder!.count++;
+>counterHolder!.count : Symbol(CounterHolder.count, Decl(kvsDefault.ts, 141, 25))
+>counterHolder : Symbol(counterHolder, Decl(kvsDefault.ts, 145, 3))
+>count : Symbol(CounterHolder.count, Decl(kvsDefault.ts, 141, 25))
+
+counterHolder!.count += 2;
+>counterHolder!.count : Symbol(CounterHolder.count, Decl(kvsDefault.ts, 141, 25))
+>counterHolder : Symbol(counterHolder, Decl(kvsDefault.ts, 145, 3))
+>count : Symbol(CounterHolder.count, Decl(kvsDefault.ts, 141, 25))
+
+declare let plainAccount: Account?;
+>plainAccount : Symbol(plainAccount, Decl(kvsDefault.ts, 149, 11))
+>Account : Symbol(Account, Decl(kvsDefault.ts, 107, 24))
+
+plainAccount.profile = null;
+>plainAccount.profile : Symbol(Account.profile, Decl(kvsDefault.ts, 109, 19))
+>plainAccount : Symbol(plainAccount, Decl(kvsDefault.ts, 149, 11))
+>profile : Symbol(Account.profile, Decl(kvsDefault.ts, 109, 19))
+
+declare const fixedAccount: Account?;
+>fixedAccount : Symbol(fixedAccount, Decl(kvsDefault.ts, 152, 13))
+>Account : Symbol(Account, Decl(kvsDefault.ts, 107, 24))
+
+fixedAccount!.profile;
+>fixedAccount!.profile : Symbol(Account.profile, Decl(kvsDefault.ts, 109, 19))
+>fixedAccount : Symbol(fixedAccount, Decl(kvsDefault.ts, 152, 13))
+>profile : Symbol(Account.profile, Decl(kvsDefault.ts, 109, 19))
+
+fixedAccount.profile!;
+>fixedAccount.profile : Symbol(Account.profile, Decl(kvsDefault.ts, 109, 19))
+>fixedAccount : Symbol(fixedAccount, Decl(kvsDefault.ts, 152, 13))
+>profile : Symbol(Account.profile, Decl(kvsDefault.ts, 109, 19))
+
+interface ReadonlyAccount {
+>ReadonlyAccount : Symbol(ReadonlyAccount, Decl(kvsDefault.ts, 154, 22))
+
+    readonly profile: Profile?;
+>profile : Symbol(ReadonlyAccount.profile, Decl(kvsDefault.ts, 156, 27))
+>Profile : Symbol(Profile, Decl(kvsDefault.ts, 16, 1))
+}
+
+declare let readonlyAccount: ReadonlyAccount;
+>readonlyAccount : Symbol(readonlyAccount, Decl(kvsDefault.ts, 160, 11))
+>ReadonlyAccount : Symbol(ReadonlyAccount, Decl(kvsDefault.ts, 154, 22))
+
+readonlyAccount.profile!.enabled = true;
+>readonlyAccount.profile!.enabled : Symbol(Profile.enabled, Decl(kvsDefault.ts, 18, 38))
+>readonlyAccount.profile : Symbol(ReadonlyAccount.profile, Decl(kvsDefault.ts, 156, 27))
+>readonlyAccount : Symbol(readonlyAccount, Decl(kvsDefault.ts, 160, 11))
+>profile : Symbol(ReadonlyAccount.profile, Decl(kvsDefault.ts, 156, 27))
+>enabled : Symbol(Profile.enabled, Decl(kvsDefault.ts, 18, 38))
+
+class AccountView {
+>AccountView : Symbol(AccountView, Decl(kvsDefault.ts, 161, 40))
+
+    get profile(): Profile? {
+>profile : Symbol(AccountView.profile, Decl(kvsDefault.ts, 163, 19))
+>Profile : Symbol(Profile, Decl(kvsDefault.ts, 16, 1))
+
+        return null;
+    }
+}
+
+declare let accountView: AccountView;
+>accountView : Symbol(accountView, Decl(kvsDefault.ts, 169, 11))
+>AccountView : Symbol(AccountView, Decl(kvsDefault.ts, 161, 40))
+
+accountView.profile!.enabled = true;
+>accountView.profile!.enabled : Symbol(Profile.enabled, Decl(kvsDefault.ts, 18, 38))
+>accountView.profile : Symbol(AccountView.profile, Decl(kvsDefault.ts, 163, 19))
+>accountView : Symbol(accountView, Decl(kvsDefault.ts, 169, 11))
+>profile : Symbol(AccountView.profile, Decl(kvsDefault.ts, 163, 19))
+>enabled : Symbol(Profile.enabled, Decl(kvsDefault.ts, 18, 38))
+
+declare function loadAccount(): Account?;
+>loadAccount : Symbol(loadAccount, Decl(kvsDefault.ts, 170, 36))
+>Account : Symbol(Account, Decl(kvsDefault.ts, 107, 24))
+
+loadAccount()!.profile;
+>loadAccount()!.profile : Symbol(Account.profile, Decl(kvsDefault.ts, 109, 19))
+>loadAccount : Symbol(loadAccount, Decl(kvsDefault.ts, 170, 36))
+>profile : Symbol(Account.profile, Decl(kvsDefault.ts, 109, 19))
+
+loadAccount()!.profile = null;
+>loadAccount()!.profile : Symbol(Account.profile, Decl(kvsDefault.ts, 109, 19))
+>loadAccount : Symbol(loadAccount, Decl(kvsDefault.ts, 170, 36))
+>profile : Symbol(Account.profile, Decl(kvsDefault.ts, 109, 19))
+
+let values: string[]? = null;
+>values : Symbol(values, Decl(kvsDefault.ts, 176, 3))
+
+values!.push("stored");
+>values!.push : Symbol(Array.push, Decl(lib.es5.d.ts, --, --))
+>values : Symbol(values, Decl(kvsDefault.ts, 176, 3))
+>push : Symbol(Array.push, Decl(lib.es5.d.ts, --, --))
+
+values.push("again");
+>values.push : Symbol(Array.push, Decl(lib.es5.d.ts, --, --))
+>values : Symbol(values, Decl(kvsDefault.ts, 176, 3))
+>push : Symbol(Array.push, Decl(lib.es5.d.ts, --, --))
+
+declare function loadValues(): string[]?;
+>loadValues : Symbol(loadValues, Decl(kvsDefault.ts, 178, 21))
+
+const joinedValues = loadValues()!.join(",");
+>joinedValues : Symbol(joinedValues, Decl(kvsDefault.ts, 181, 5))
+>loadValues()!.join : Symbol(Array.join, Decl(lib.es5.d.ts, --, --))
+>loadValues : Symbol(loadValues, Decl(kvsDefault.ts, 178, 21))
+>join : Symbol(Array.join, Decl(lib.es5.d.ts, --, --))
+
+class Editor {
+>Editor : Symbol(Editor, Decl(kvsDefault.ts, 181, 45))
+
+    save() {}
+>save : Symbol(Editor.save, Decl(kvsDefault.ts, 183, 14))
+}
+
+interface Settings {
+>Settings : Symbol(Settings, Decl(kvsDefault.ts, 185, 1))
+
+    editor: Editor?;
+>editor : Symbol(Settings.editor, Decl(kvsDefault.ts, 187, 20))
+>Editor : Symbol(Editor, Decl(kvsDefault.ts, 181, 45))
+}
+
+let settings: Settings? = null;
+>settings : Symbol(settings, Decl(kvsDefault.ts, 191, 3))
+>Settings : Symbol(Settings, Decl(kvsDefault.ts, 185, 1))
+
+settings!.editor!.save();
+>settings!.editor!.save : Symbol(Editor.save, Decl(kvsDefault.ts, 183, 14))
+>settings!.editor : Symbol(Settings.editor, Decl(kvsDefault.ts, 187, 20))
+>settings : Symbol(settings, Decl(kvsDefault.ts, 191, 3))
+>editor : Symbol(Settings.editor, Decl(kvsDefault.ts, 187, 20))
+>save : Symbol(Editor.save, Decl(kvsDefault.ts, 183, 14))
+
+settings.editor.save();
+>settings.editor.save : Symbol(Editor.save, Decl(kvsDefault.ts, 183, 14))
+>settings.editor : Symbol(Settings.editor, Decl(kvsDefault.ts, 187, 20))
+>settings : Symbol(settings, Decl(kvsDefault.ts, 191, 3))
+>editor : Symbol(Settings.editor, Decl(kvsDefault.ts, 187, 20))
+>save : Symbol(Editor.save, Decl(kvsDefault.ts, 183, 14))
+
+class SettingsView {
+>SettingsView : Symbol(SettingsView, Decl(kvsDefault.ts, 193, 23))
+
+    get editor(): Editor? {
+>editor : Symbol(SettingsView.editor, Decl(kvsDefault.ts, 195, 20))
+>Editor : Symbol(Editor, Decl(kvsDefault.ts, 181, 45))
+
+        return null;
+    }
+}
+
+declare const settingsView: SettingsView;
+>settingsView : Symbol(settingsView, Decl(kvsDefault.ts, 201, 13))
+>SettingsView : Symbol(SettingsView, Decl(kvsDefault.ts, 193, 23))
+
+settingsView.editor!.save();
+>settingsView.editor!.save : Symbol(Editor.save, Decl(kvsDefault.ts, 183, 14))
+>settingsView.editor : Symbol(SettingsView.editor, Decl(kvsDefault.ts, 195, 20))
+>settingsView : Symbol(settingsView, Decl(kvsDefault.ts, 201, 13))
+>editor : Symbol(SettingsView.editor, Decl(kvsDefault.ts, 195, 20))
+>save : Symbol(Editor.save, Decl(kvsDefault.ts, 183, 14))
+
+declare let readValue: string?;
+>readValue : Symbol(readValue, Decl(kvsDefault.ts, 204, 11))
+
+const defaultedValue = readValue!;
+>defaultedValue : Symbol(defaultedValue, Decl(kvsDefault.ts, 205, 5))
+>readValue : Symbol(readValue, Decl(kvsDefault.ts, 204, 11))
+
+readValue.length;
+>readValue.length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+>readValue : Symbol(readValue, Decl(kvsDefault.ts, 204, 11))
+>length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+
 namespace Models {
->Models : Symbol(Models, Decl(kvsDefault.ts, 107, 24))
+>Models : Symbol(Models, Decl(kvsDefault.ts, 206, 17))
 
     export class Token {
->Token : Symbol(Token, Decl(kvsDefault.ts, 109, 18))
+>Token : Symbol(Token, Decl(kvsDefault.ts, 208, 18))
 
         constructor(public value?: string) {}
->value : Symbol(Token.value, Decl(kvsDefault.ts, 111, 20))
+>value : Symbol(Token.value, Decl(kvsDefault.ts, 210, 20))
     }
 }
 declare const maybeToken: Models.Token?;
->maybeToken : Symbol(maybeToken, Decl(kvsDefault.ts, 114, 13))
->Models : Symbol(Models, Decl(kvsDefault.ts, 107, 24))
->Token : Symbol(Models.Token, Decl(kvsDefault.ts, 109, 18))
+>maybeToken : Symbol(maybeToken, Decl(kvsDefault.ts, 213, 13))
+>Models : Symbol(Models, Decl(kvsDefault.ts, 206, 17))
+>Token : Symbol(Models.Token, Decl(kvsDefault.ts, 208, 18))
 
 const token = maybeToken!;
->token : Symbol(token, Decl(kvsDefault.ts, 115, 5))
->maybeToken : Symbol(maybeToken, Decl(kvsDefault.ts, 114, 13))
+>token : Symbol(token, Decl(kvsDefault.ts, 214, 5))
+>maybeToken : Symbol(maybeToken, Decl(kvsDefault.ts, 213, 13))
 
 class RequiredConstructor {
->RequiredConstructor : Symbol(RequiredConstructor, Decl(kvsDefault.ts, 115, 26))
+>RequiredConstructor : Symbol(RequiredConstructor, Decl(kvsDefault.ts, 214, 26))
 
     constructor(value: string) {}
->value : Symbol(value, Decl(kvsDefault.ts, 118, 16))
+>value : Symbol(value, Decl(kvsDefault.ts, 217, 16))
 }
 declare const maybeRequiredConstructor: RequiredConstructor?;
->maybeRequiredConstructor : Symbol(maybeRequiredConstructor, Decl(kvsDefault.ts, 120, 13))
->RequiredConstructor : Symbol(RequiredConstructor, Decl(kvsDefault.ts, 115, 26))
+>maybeRequiredConstructor : Symbol(maybeRequiredConstructor, Decl(kvsDefault.ts, 219, 13))
+>RequiredConstructor : Symbol(RequiredConstructor, Decl(kvsDefault.ts, 214, 26))
 
 maybeRequiredConstructor!;
->maybeRequiredConstructor : Symbol(maybeRequiredConstructor, Decl(kvsDefault.ts, 120, 13))
+>maybeRequiredConstructor : Symbol(maybeRequiredConstructor, Decl(kvsDefault.ts, 219, 13))
 
 class PrivateConstructor {
->PrivateConstructor : Symbol(PrivateConstructor, Decl(kvsDefault.ts, 121, 26))
+>PrivateConstructor : Symbol(PrivateConstructor, Decl(kvsDefault.ts, 220, 26))
 
     private constructor() {}
 }
 declare const maybePrivateConstructor: PrivateConstructor?;
->maybePrivateConstructor : Symbol(maybePrivateConstructor, Decl(kvsDefault.ts, 126, 13))
->PrivateConstructor : Symbol(PrivateConstructor, Decl(kvsDefault.ts, 121, 26))
+>maybePrivateConstructor : Symbol(maybePrivateConstructor, Decl(kvsDefault.ts, 225, 13))
+>PrivateConstructor : Symbol(PrivateConstructor, Decl(kvsDefault.ts, 220, 26))
 
 maybePrivateConstructor!;
->maybePrivateConstructor : Symbol(maybePrivateConstructor, Decl(kvsDefault.ts, 126, 13))
+>maybePrivateConstructor : Symbol(maybePrivateConstructor, Decl(kvsDefault.ts, 225, 13))
 
 abstract class AbstractModel {}
->AbstractModel : Symbol(AbstractModel, Decl(kvsDefault.ts, 127, 25))
+>AbstractModel : Symbol(AbstractModel, Decl(kvsDefault.ts, 226, 25))
 
 declare const maybeAbstractModel: AbstractModel?;
->maybeAbstractModel : Symbol(maybeAbstractModel, Decl(kvsDefault.ts, 130, 13))
->AbstractModel : Symbol(AbstractModel, Decl(kvsDefault.ts, 127, 25))
+>maybeAbstractModel : Symbol(maybeAbstractModel, Decl(kvsDefault.ts, 229, 13))
+>AbstractModel : Symbol(AbstractModel, Decl(kvsDefault.ts, 226, 25))
 
 maybeAbstractModel!;
->maybeAbstractModel : Symbol(maybeAbstractModel, Decl(kvsDefault.ts, 130, 13))
+>maybeAbstractModel : Symbol(maybeAbstractModel, Decl(kvsDefault.ts, 229, 13))
 
 function open<T>(value: Box<T>?) {
->open : Symbol(open, Decl(lib.dom.d.ts, --, --), Decl(kvsDefault.ts, 131, 20))
->T : Symbol(T, Decl(kvsDefault.ts, 133, 14))
->value : Symbol(value, Decl(kvsDefault.ts, 133, 17))
+>open : Symbol(open, Decl(lib.dom.d.ts, --, --), Decl(kvsDefault.ts, 230, 20))
+>T : Symbol(T, Decl(kvsDefault.ts, 232, 14))
+>value : Symbol(value, Decl(kvsDefault.ts, 232, 17))
 >Box : Symbol(Box, Decl(kvsDefault.ts, 27, 1))
->T : Symbol(T, Decl(kvsDefault.ts, 133, 14))
+>T : Symbol(T, Decl(kvsDefault.ts, 232, 14))
 
     return value!;
->value : Symbol(value, Decl(kvsDefault.ts, 133, 17))
+>value : Symbol(value, Decl(kvsDefault.ts, 232, 17))
 }
 
 null!;
@@ -393,29 +695,29 @@ undefined!;
 >undefined : Symbol(undefined)
 
 namespace Shadowed {
->Shadowed : Symbol(Shadowed, Decl(kvsDefault.ts, 138, 11))
+>Shadowed : Symbol(Shadowed, Decl(kvsDefault.ts, 237, 11))
 
     export interface Map<K, V> {
->Map : Symbol(Map, Decl(kvsDefault.ts, 140, 20))
->K : Symbol(K, Decl(kvsDefault.ts, 141, 25))
->V : Symbol(V, Decl(kvsDefault.ts, 141, 27))
+>Map : Symbol(Map, Decl(kvsDefault.ts, 239, 20))
+>K : Symbol(K, Decl(kvsDefault.ts, 240, 25))
+>V : Symbol(V, Decl(kvsDefault.ts, 240, 27))
 
         key: K;
->key : Symbol(Map.key, Decl(kvsDefault.ts, 141, 32))
->K : Symbol(K, Decl(kvsDefault.ts, 141, 25))
+>key : Symbol(Map.key, Decl(kvsDefault.ts, 240, 32))
+>K : Symbol(K, Decl(kvsDefault.ts, 240, 25))
 
         value: V;
->value : Symbol(Map.value, Decl(kvsDefault.ts, 142, 15))
->V : Symbol(V, Decl(kvsDefault.ts, 141, 27))
+>value : Symbol(Map.value, Decl(kvsDefault.ts, 241, 15))
+>V : Symbol(V, Decl(kvsDefault.ts, 240, 27))
 
         callback: () => void;
->callback : Symbol(Map.callback, Decl(kvsDefault.ts, 143, 17))
+>callback : Symbol(Map.callback, Decl(kvsDefault.ts, 242, 17))
     }
     declare const maybeMap: Map<string, number>?;
->maybeMap : Symbol(maybeMap, Decl(kvsDefault.ts, 146, 17))
->Map : Symbol(Map, Decl(kvsDefault.ts, 140, 20))
+>maybeMap : Symbol(maybeMap, Decl(kvsDefault.ts, 245, 17))
+>Map : Symbol(Map, Decl(kvsDefault.ts, 239, 20))
 
     maybeMap!;
->maybeMap : Symbol(maybeMap, Decl(kvsDefault.ts, 146, 17))
+>maybeMap : Symbol(maybeMap, Decl(kvsDefault.ts, 245, 17))
 }
 

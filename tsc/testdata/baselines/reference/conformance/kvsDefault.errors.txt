@@ -1,18 +1,26 @@
-kvsDefault.ts(72,1): error TS100073: KVS terminal '!' cannot determine a default value from an absence-only type.
-kvsDefault.ts(78,1): error TS100072: KVS terminal '!' requires a defaultable type.
-kvsDefault.ts(81,1): error TS100072: KVS terminal '!' requires a defaultable type.
-kvsDefault.ts(84,1): error TS100072: KVS terminal '!' requires a defaultable type.
-kvsDefault.ts(91,1): error TS100072: KVS terminal '!' requires a defaultable type.
-kvsDefault.ts(122,1): error TS100072: KVS terminal '!' requires a defaultable type.
-kvsDefault.ts(128,1): error TS100072: KVS terminal '!' requires a defaultable type.
-kvsDefault.ts(132,1): error TS100072: KVS terminal '!' requires a defaultable type.
-kvsDefault.ts(135,12): error TS100072: KVS terminal '!' requires a defaultable type.
-kvsDefault.ts(138,1): error TS100073: KVS terminal '!' cannot determine a default value from an absence-only type.
-kvsDefault.ts(139,1): error TS100073: KVS terminal '!' cannot determine a default value from an absence-only type.
-kvsDefault.ts(148,5): error TS100072: KVS terminal '!' requires a defaultable type.
+kvsDefault.ts(72,1): error TS100073: KVS '!' cannot determine a default value from an absence-only type.
+kvsDefault.ts(78,1): error TS100072: KVS '!' requires a defaultable type.
+kvsDefault.ts(81,1): error TS100072: KVS '!' requires a defaultable type.
+kvsDefault.ts(84,1): error TS100072: KVS '!' requires a defaultable type.
+kvsDefault.ts(91,1): error TS100072: KVS '!' requires a defaultable type.
+kvsDefault.ts(121,30): error TS100086: KVS '!' in a value expression must be terminal.
+kvsDefault.ts(121,30): error TS100086: KVS '!' in a value expression must be terminal.
+kvsDefault.ts(151,1): error TS18049: 'plainAccount' is possibly 'null' or 'undefined'.
+kvsDefault.ts(154,1): error TS100086: KVS '!' in a value expression must be terminal.
+kvsDefault.ts(162,1): error TS100088: KVS '!' on an assignment or update target requires a writable proper base.
+kvsDefault.ts(171,1): error TS100088: KVS '!' on an assignment or update target requires a writable proper base.
+kvsDefault.ts(174,1): error TS100086: KVS '!' in a value expression must be terminal.
+kvsDefault.ts(175,1): error TS100088: KVS '!' on an assignment or update target requires a writable proper base.
+kvsDefault.ts(221,1): error TS100072: KVS '!' requires a defaultable type.
+kvsDefault.ts(227,1): error TS100072: KVS '!' requires a defaultable type.
+kvsDefault.ts(231,1): error TS100072: KVS '!' requires a defaultable type.
+kvsDefault.ts(234,12): error TS100072: KVS '!' requires a defaultable type.
+kvsDefault.ts(237,1): error TS100073: KVS '!' cannot determine a default value from an absence-only type.
+kvsDefault.ts(238,1): error TS100073: KVS '!' cannot determine a default value from an absence-only type.
+kvsDefault.ts(247,5): error TS100072: KVS '!' requires a defaultable type.
 
 
-==== kvsDefault.ts (12 errors) ====
+==== kvsDefault.ts (20 errors) ====
     declare const maybeString: string | null | undefined;
     declare const maybeNumber: number | null;
     declare const maybeBoolean: boolean | undefined;
@@ -75,7 +83,7 @@ kvsDefault.ts(148,5): error TS100072: KVS terminal '!' requires a defaultable ty
     const set = maybeSet!;
     const readonlySet = maybeReadonlySet!;
     const stringSet = maybeStringSet!;
-    const stringLength = maybeString!.length;
+    const stringLength = maybeString.length!;
     const incremented = maybeNumber! + 1;
     const profile = maybeProfile!;
     const box = maybeBox!;
@@ -86,7 +94,7 @@ kvsDefault.ts(148,5): error TS100072: KVS terminal '!' requires a defaultable ty
     const letProfile = absentLet!;
     inferredNull!;
     ~~~~~~~~~~~~~
-!!! error TS100073: KVS terminal '!' cannot determine a default value from an absence-only type.
+!!! error TS100073: KVS '!' cannot determine a default value from an absence-only type.
     
     declare const stringLiteral: "left" | "right" | null;
     const literalValue = stringLiteral!;
@@ -94,17 +102,17 @@ kvsDefault.ts(148,5): error TS100072: KVS terminal '!' requires a defaultable ty
     declare const mixed: string | number | null;
     mixed!;
     ~~~~~~
-!!! error TS100072: KVS terminal '!' requires a defaultable type.
+!!! error TS100072: KVS '!' requires a defaultable type.
     
     declare const tuple: [string, number] | null;
     tuple!;
     ~~~~~~
-!!! error TS100072: KVS terminal '!' requires a defaultable type.
+!!! error TS100072: KVS '!' requires a defaultable type.
     
     declare const object: { value: string } | null;
     object!;
     ~~~~~~~
-!!! error TS100072: KVS terminal '!' requires a defaultable type.
+!!! error TS100072: KVS '!' requires a defaultable type.
     
     class Model {
         value = 1;
@@ -113,7 +121,7 @@ kvsDefault.ts(148,5): error TS100072: KVS terminal '!' requires a defaultable ty
     declare const maybeModel: Model?;
     maybeModel!;
     ~~~~~~~~~~~
-!!! error TS100072: KVS terminal '!' requires a defaultable type.
+!!! error TS100072: KVS '!' requires a defaultable type.
     if (maybeModel !== null && maybeModel !== undefined) {
         maybeModel!;
     }
@@ -132,6 +140,121 @@ kvsDefault.ts(148,5): error TS100072: KVS terminal '!' requires a defaultable ty
     const sessionAlias = maybeSessionAlias!;
     const date = maybeDate!;
     
+    interface Account {
+        profile: Profile?;
+    }
+    
+    let account: Account? = null;
+    account!.profile!.enabled = true;
+    account.profile.enabled;
+    const materializedAccount = account;
+    
+    declare let storedAccount: Account?;
+    const storedEnabled = storedAccount.profile.enabled!;
+    const invalidStoredEnabled = storedAccount!.profile!.enabled;
+                                 ~~~~~~~~~~~~~~
+!!! error TS100086: KVS '!' in a value expression must be terminal.
+                                 ~~~~~~~~~~~~~~~~~~~~~~~
+!!! error TS100086: KVS '!' in a value expression must be terminal.
+    
+    let accountHolder = { account: null as Account? };
+    declare function getAccountHolder(): typeof accountHolder;
+    getAccountHolder().account!.profile!.enabled = true;
+    
+    let users: Account[]? = null;
+    declare function nextIndex(): number;
+    users![nextIndex()]!.profile!.enabled = true;
+    const indexedAccount = users?.[nextIndex()]!;
+    
+    class IndexedEditor {
+        save() {}
+    }
+    
+    let indexedEditors: IndexedEditor[]? = null;
+    indexedEditors![nextIndex()]!.save();
+    
+    declare function maybeIndex(): number?;
+    users![maybeIndex()!].profile = null;
+    
+    interface CounterHolder {
+        count: number;
+    }
+    
+    let counterHolder: CounterHolder? = null;
+    counterHolder!.count++;
+    counterHolder!.count += 2;
+    
+    declare let plainAccount: Account?;
+    plainAccount.profile = null;
+    ~~~~~~~~~~~~
+!!! error TS18049: 'plainAccount' is possibly 'null' or 'undefined'.
+    
+    declare const fixedAccount: Account?;
+    fixedAccount!.profile;
+    ~~~~~~~~~~~~~
+!!! error TS100086: KVS '!' in a value expression must be terminal.
+    fixedAccount.profile!;
+    
+    interface ReadonlyAccount {
+        readonly profile: Profile?;
+    }
+    
+    declare let readonlyAccount: ReadonlyAccount;
+    readonlyAccount.profile!.enabled = true;
+    ~~~~~~~~~~~~~~~~~~~~~~~
+!!! error TS100088: KVS '!' on an assignment or update target requires a writable proper base.
+    
+    class AccountView {
+        get profile(): Profile? {
+            return null;
+        }
+    }
+    
+    declare let accountView: AccountView;
+    accountView.profile!.enabled = true;
+    ~~~~~~~~~~~~~~~~~~~
+!!! error TS100088: KVS '!' on an assignment or update target requires a writable proper base.
+    
+    declare function loadAccount(): Account?;
+    loadAccount()!.profile;
+    ~~~~~~~~~~~~~~
+!!! error TS100086: KVS '!' in a value expression must be terminal.
+    loadAccount()!.profile = null;
+    ~~~~~~~~~~~~~
+!!! error TS100088: KVS '!' on an assignment or update target requires a writable proper base.
+    
+    let values: string[]? = null;
+    values!.push("stored");
+    values.push("again");
+    
+    declare function loadValues(): string[]?;
+    const joinedValues = loadValues()!.join(",");
+    
+    class Editor {
+        save() {}
+    }
+    
+    interface Settings {
+        editor: Editor?;
+    }
+    
+    let settings: Settings? = null;
+    settings!.editor!.save();
+    settings.editor.save();
+    
+    class SettingsView {
+        get editor(): Editor? {
+            return null;
+        }
+    }
+    
+    declare const settingsView: SettingsView;
+    settingsView.editor!.save();
+    
+    declare let readValue: string?;
+    const defaultedValue = readValue!;
+    readValue.length;
+    
     namespace Models {
         export class Token {
             constructor(public value?: string) {}
@@ -146,7 +269,7 @@ kvsDefault.ts(148,5): error TS100072: KVS terminal '!' requires a defaultable ty
     declare const maybeRequiredConstructor: RequiredConstructor?;
     maybeRequiredConstructor!;
     ~~~~~~~~~~~~~~~~~~~~~~~~~
-!!! error TS100072: KVS terminal '!' requires a defaultable type.
+!!! error TS100072: KVS '!' requires a defaultable type.
     
     class PrivateConstructor {
         private constructor() {}
@@ -154,26 +277,26 @@ kvsDefault.ts(148,5): error TS100072: KVS terminal '!' requires a defaultable ty
     declare const maybePrivateConstructor: PrivateConstructor?;
     maybePrivateConstructor!;
     ~~~~~~~~~~~~~~~~~~~~~~~~
-!!! error TS100072: KVS terminal '!' requires a defaultable type.
+!!! error TS100072: KVS '!' requires a defaultable type.
     
     abstract class AbstractModel {}
     declare const maybeAbstractModel: AbstractModel?;
     maybeAbstractModel!;
     ~~~~~~~~~~~~~~~~~~~
-!!! error TS100072: KVS terminal '!' requires a defaultable type.
+!!! error TS100072: KVS '!' requires a defaultable type.
     
     function open<T>(value: Box<T>?) {
         return value!;
                ~~~~~~
-!!! error TS100072: KVS terminal '!' requires a defaultable type.
+!!! error TS100072: KVS '!' requires a defaultable type.
     }
     
     null!;
     ~~~~~
-!!! error TS100073: KVS terminal '!' cannot determine a default value from an absence-only type.
+!!! error TS100073: KVS '!' cannot determine a default value from an absence-only type.
     undefined!;
     ~~~~~~~~~~
-!!! error TS100073: KVS terminal '!' cannot determine a default value from an absence-only type.
+!!! error TS100073: KVS '!' cannot determine a default value from an absence-only type.
     
     namespace Shadowed {
         export interface Map<K, V> {
@@ -184,6 +307,6 @@ kvsDefault.ts(148,5): error TS100072: KVS terminal '!' requires a defaultable ty
         declare const maybeMap: Map<string, number>?;
         maybeMap!;
         ~~~~~~~~~
-!!! error TS100072: KVS terminal '!' requires a defaultable type.
+!!! error TS100072: KVS '!' requires a defaultable type.
     }
     

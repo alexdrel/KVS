@@ -187,7 +187,9 @@ in the conformance case rather than the example.
 
 The in-place cases additionally verify ordinary compound-assignment target
 eligibility, property targets without writeback, readonly projected fields,
-nullable targets, and reuse of the same projection diagnostics and helper.
+rejection of an unmaterialized nullable target, explicit materialization and
+flow narrowing through `target! ...= source`, and reuse of the same projection
+diagnostics and helper.
 
 Run it with:
 
@@ -399,7 +401,7 @@ Run it with:
 go -C ./tsc test -run='TestLocal/kvsNullabilityTypes' ./internal/testrunner
 ```
 
-## Terminal-default slice
+## Default and materialization slice
 
 `kvsDefault.ts` checks string, number, boolean, bigint, mutable and readonly
 array defaults, constructor-backed defaults, built-in mutable and readonly
@@ -418,6 +420,16 @@ generic PODs are rejected when defaulting is required. It separately rejects
 bare `null!` and `undefined!` because an absence-only type names no present
 default type. Its JavaScript baseline verifies type-directed `??` fallbacks and
 fresh mutable literals.
+
+The same case checks writable proper-base materialization through named and
+indexed paths, once-only computed indices, assignment and update targets,
+writable and transient method callees, terminal indexed defaults, and flow
+narrowing after materialization. `kvsDefaultInvalidTargets.ts` rejects `!` on
+the target itself and materialization through readonly properties, indices,
+and bindings. `kvsOptionalWrite.ts` verifies that `?.` abandons a write before
+later indices, defaults, or right-hand-side effects, including paths that mix
+`?.` and `!` in either order. It also covers prefix and postfix optional
+increment/decrement, their nullable result, and skipped computed indices.
 
 `kvsTypedConstruction.ts` additionally checks that Map/Set, Date, and ordinary
 constructor defaults participate recursively in POD fields and emit fresh

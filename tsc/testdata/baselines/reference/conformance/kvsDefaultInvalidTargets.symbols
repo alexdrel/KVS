@@ -1,0 +1,56 @@
+//// [tests/cases/conformance/kvs/kvsDefaultInvalidTargets.ts] ////
+
+=== kvsDefaultInvalidTargets.ts ===
+interface User {
+>User : Symbol(User, Decl(kvsDefaultInvalidTargets.ts, 0, 0))
+
+    id: number?;
+>id : Symbol(User.id, Decl(kvsDefaultInvalidTargets.ts, 0, 16))
+}
+
+declare let user: User;
+>user : Symbol(user, Decl(kvsDefaultInvalidTargets.ts, 4, 11))
+>User : Symbol(User, Decl(kvsDefaultInvalidTargets.ts, 0, 0))
+
+declare let count: number?;
+>count : Symbol(count, Decl(kvsDefaultInvalidTargets.ts, 5, 11))
+
+declare let users: User[];
+>users : Symbol(users, Decl(kvsDefaultInvalidTargets.ts, 6, 11))
+>User : Symbol(User, Decl(kvsDefaultInvalidTargets.ts, 0, 0))
+
+declare let readonlyUsers: readonly User[];
+>readonlyUsers : Symbol(readonlyUsers, Decl(kvsDefaultInvalidTargets.ts, 7, 11))
+>User : Symbol(User, Decl(kvsDefaultInvalidTargets.ts, 0, 0))
+
+declare const fixedUser: User?;
+>fixedUser : Symbol(fixedUser, Decl(kvsDefaultInvalidTargets.ts, 8, 13))
+>User : Symbol(User, Decl(kvsDefaultInvalidTargets.ts, 0, 0))
+
+user.id! = 1;
+>user.id : Symbol(User.id, Decl(kvsDefaultInvalidTargets.ts, 0, 16))
+>user : Symbol(user, Decl(kvsDefaultInvalidTargets.ts, 4, 11))
+>id : Symbol(User.id, Decl(kvsDefaultInvalidTargets.ts, 0, 16))
+
+user.id! += 2;
+>user.id : Symbol(User.id, Decl(kvsDefaultInvalidTargets.ts, 0, 16))
+>user : Symbol(user, Decl(kvsDefaultInvalidTargets.ts, 4, 11))
+>id : Symbol(User.id, Decl(kvsDefaultInvalidTargets.ts, 0, 16))
+
+count!++;
+>count : Symbol(count, Decl(kvsDefaultInvalidTargets.ts, 5, 11))
+
+users[0]! = user;
+>users : Symbol(users, Decl(kvsDefaultInvalidTargets.ts, 6, 11))
+>user : Symbol(user, Decl(kvsDefaultInvalidTargets.ts, 4, 11))
+
+readonlyUsers[0]!.id = 1;
+>readonlyUsers[0]!.id : Symbol(User.id, Decl(kvsDefaultInvalidTargets.ts, 0, 16))
+>readonlyUsers : Symbol(readonlyUsers, Decl(kvsDefaultInvalidTargets.ts, 7, 11))
+>id : Symbol(User.id, Decl(kvsDefaultInvalidTargets.ts, 0, 16))
+
+fixedUser!.id = 1;
+>fixedUser!.id : Symbol(User.id, Decl(kvsDefaultInvalidTargets.ts, 0, 16))
+>fixedUser : Symbol(fixedUser, Decl(kvsDefaultInvalidTargets.ts, 8, 13))
+>id : Symbol(User.id, Decl(kvsDefaultInvalidTargets.ts, 0, 16))
+

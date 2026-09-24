@@ -56,14 +56,14 @@ and [default values](#default-values).
 
 ## Absence
 
-KVS treats both `null` and `undefined` as **absent** during nullable computation
-while preserving their runtime identity for JavaScript interoperation.
-Operations that explicitly produce `null` continue to do so; propagated access
-uses JavaScript optional-access behavior and may produce `undefined`.
+KVS treats both `null` and `undefined` as **absent** during nullable computation.
+Their runtime identity is normally preserved for JavaScript interoperation, but
+an operation may adapt absence when its destination accepts only one nullish
+representation. KVS-produced absence normally uses `null`.
 
 ## Nullable dataflow
 
-Member and indexed access propagate absence without optional-chain punctuation:
+Member access propagates absence without optional-chain punctuation:
 
 ```kvs
 type User {
@@ -75,11 +75,9 @@ type Profile {
 }
 
 const city = user.profile.address.city;
-const firstTag = user.profile.tags[0];
 ```
 
-Both results are nullable. Evaluation stops at the first absent receiver, so an
-index expression is skipped when its receiver is absent.
+`city` is nullable. Evaluation stops at the first absent receiver.
 
 Arithmetic operators lift in the same way:
 
@@ -303,30 +301,119 @@ Constructor effects and exceptions occur only when absence selects the default.
 
 These defaults provide a predictable initial state. They do not imply that the resulting value satisfies application-specific invariants.
 
-### Terminal `!`: absence to default
+### `!` and `?`: resolve or skip absence
 
-At the end of an expression chain, postfix `!` replaces absence with the result type's default value without writing back:
+Postfix `!` replaces an absent value with the default value of its type:
 
 ```kvs
 const count = response.count!;
 const name = user.profile.name!;
-const items = response.items!;
+const names = getNames()!;
 ```
 
-The operation is rejected when the type has no default value.
+If the value is present, it passes through unchanged. If it is absent, the
+type's default is produced. The operation is rejected when the type has no
+default value.
 
-An absence-only expression has no result type from which to obtain a default,
+The resolved value can be used immediately as the object of a method call:
+
+```kvs
+getNames()!.join(", ");
+```
+
+If `getNames()` is absent, `!` supplies the default array and `join` is called
+on that array.
+
+When `!` resolves a writable part of a chain used to reach something being
+mutated or a method being called, the generated default is stored back as part
+of that operation:
+
+```kvs
+settings!.editor!.theme = "solarized";
+user!.count++;
+items!.push(value);
+```
+
+If `settings` or `editor` is absent, its default value is created and stored
+before the next access. Likewise, an absent `items` is initialized to `[]`
+before `push`.
+
+Use `?` instead when an absent part should make the mutation stop rather than
+create a default:
+
+```kvs
+user!.count++; // absent user: create it, then increment
+user?.count++; // absent user: skip the update
+```
+
+Only the object or collection chain used by the write or method call is
+materialized. Other expressions still use ordinary value defaulting:
+
+```kvs
+users![index!] = user;
+```
+
+Here an absent `users` is initialized and stored before the assignment. An
+absent `index` is simply replaced with its numeric default, `0`; it is not
+materialized.
+
+Materialization is committed only when the surrounding mutation or call
+actually proceeds. If a later condition abandons the operation, any
+materialization needed to reach it is discarded:
+
+```kvs
+settings!.editor?.theme = "solarized";
+user!.nickname ?= suggestion;
+items!.push?(item);
+```
+
+If `editor` is absent, the first assignment is skipped without creating
+`settings`. If `suggestion` is absent, the second assignment leaves `user`
+unchanged. If the optional call does not run, an absent `items` remains absent.
+
+Materialization is available where the surrounding operation needs an object or
+collection to exist in order to mutate it or invoke one of its methods. An
+ordinary read has no such need, and allowing it to write defaults back would
+make a value expression unexpectedly mutate program state:
+
+```kvs
+const theme = settings.editor.theme!;   // valid: default the value being read
+const theme = settings!.editor!.theme;  // error: would mutate during a read
+```
+
+Likewise, with ordinary assignment and update operators, `!` does not
+materialize the final target:
+
+```kvs
+user.theme! = "dark"; // error
+user.id! += 2;        // error
+count!++;             // error
+```
+
+Typed in-place spread is the exception: `profile! ...= patch` materializes its
+nullable target before updating it.
+
+Use `!` on an earlier part of the chain when that part itself must exist:
+
+```kvs
+user!.theme = "dark";
+user!.id += 2;
+user!.count++;
+```
+
+An absence-only expression has no present type from which to obtain a default,
 so `null!` and `undefined!` are errors. Use `null as!` or `undefined as!` when
 an unchecked impossible-value placeholder is needed.
 
-This runtime policy is distinct from the static assertion:
+Runtime `!` is distinct from the static assertion `as!`:
 
 ```kvs
-x!    // resolve absence at runtime using the type's default
+x!    // resolve absence using the type's default
 x as! // emit nothing; trust that x is present
 ```
 
-When `x` is present they produce the same value. When it is absent, only `x!` applies the KVS defaulting policy.
+When `x` is present they produce the same value. When it is absent, only `x!`
+applies the KVS defaulting policy.
 
 ## Comparison conveniences
 
