@@ -1,6 +1,7 @@
 package checker
 
 import (
+	"context"
 	"maps"
 	"slices"
 	"sync"
@@ -160,6 +161,15 @@ func (r *EmitResolver) IsKvsPlaceholderBoundary(node *ast.Node) bool {
 	defer r.checkerMu.Unlock()
 	r.checker.checkExpression(node)
 	return r.checker.nodeLinks.Get(node).flags&NodeCheckFlagsKvsPlaceholderBoundary != 0
+}
+
+func (r *EmitResolver) IsKvsNullableAccess(node *ast.Node) bool {
+	r.checkerMu.Lock()
+	defer r.checkerMu.Unlock()
+	if sourceFile := ast.GetSourceFileOfNode(node); sourceFile != nil && !r.checker.sourceFileLinks.Get(sourceFile).typeChecked {
+		r.checker.checkSourceFile(context.Background(), sourceFile, false)
+	}
+	return r.checker.nodeLinks.Get(node).flags&NodeCheckFlagsKvsNullableAccess != 0
 }
 
 func isSyntacticallyKvsAbsent(node *ast.Node) bool {

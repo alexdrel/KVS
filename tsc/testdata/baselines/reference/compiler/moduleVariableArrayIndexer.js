@@ -11,6 +11,7 @@ namespace Bar {
 "use strict";
 var Bar;
 (function (Bar) {
+    var _a;
     Bar.a = 1;
-    var t = undefined[Bar.a][Bar.a]; // CG: var t = undefined[Bar.a][a];
+    var t = (_a = undefined === null || undefined === void 0 ? void 0 : undefined[Bar.a]) === null || _a === void 0 ? void 0 : _a[Bar.a]; // CG: var t = undefined[Bar.a][a];
 })(Bar || (Bar = {}));

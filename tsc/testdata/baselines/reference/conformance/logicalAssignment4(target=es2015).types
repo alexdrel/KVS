@@ -135,9 +135,9 @@ function doSomethingWithAlias(thing: ThingWithOriginal | undefined, defaultValue
 >name : string
 
             defaultValue.name;
->defaultValue.name : string
+>defaultValue.name : string | null | undefined
 >defaultValue : ThingWithOriginal | undefined
->name : string
+>name : string | null | undefined
         }
     }
     else {
@@ -152,9 +152,9 @@ function doSomethingWithAlias(thing: ThingWithOriginal | undefined, defaultValue
 >name : string
 
             defaultValue.name;
->defaultValue.name : string
+>defaultValue.name : string | null | undefined
 >defaultValue : ThingWithOriginal | undefined
->name : string
+>name : string | null | undefined
         }
     }
 }

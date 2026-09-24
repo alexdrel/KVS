@@ -33,6 +33,14 @@ func NewTransformer(opts *transformers.TransformOptions) *transformers.Transform
 	return tx.NewTransformer(tx.visit, opts.Context)
 }
 
+func (tx *transformer) declareTemp(temp *ast.IdentifierNode) {
+	if tx.lazyProducer {
+		tx.producerTemporaries = append(tx.producerTemporaries, temp)
+	} else {
+		tx.EmitContext().AddVariableDeclaration(temp)
+	}
+}
+
 func (tx *transformer) visit(node *ast.Node) *ast.Node {
 	if replacement := tx.headReplacements[node]; replacement != nil {
 		return replacement
@@ -178,6 +186,10 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 		return tx.transformLazyCollectExpression(node.AsKvsLazyCollectExpression())
 	case ast.KindKvsNullableAssertionExpression, ast.KindKvsExtantAssertionExpression:
 		return tx.Visitor().VisitNode(node.Expression())
+	case ast.KindPropertyAccessExpression, ast.KindElementAccessExpression:
+		if tx.resolver.IsKvsNullableAccess(node) {
+			return tx.transformNullableAccess(node)
+		}
 	case ast.KindBinaryExpression:
 		if tx.resolver.IsKvsLiftedBinaryExpression(node) {
 			return tx.transformLiftedBinaryExpression(node.AsBinaryExpression())
@@ -194,6 +206,34 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 		return tx.Factory().NewArrayLiteralExpression(nil, false)
 	}
 	return tx.Visitor().VisitEachChild(node)
+}
+
+func (tx *transformer) transformNullableAccess(node *ast.Node) *ast.Node {
+	factory := tx.Factory()
+	questionDot := factory.NewToken(ast.KindQuestionDotToken)
+	flags := node.Flags | ast.NodeFlagsOptionalChain
+	if node.Kind == ast.KindPropertyAccessExpression {
+		access := node.AsPropertyAccessExpression()
+		updated := factory.UpdatePropertyAccessExpression(
+			access,
+			tx.Visitor().VisitNode(access.Expression),
+			questionDot,
+			tx.Visitor().VisitNode(access.Name()),
+			flags,
+		)
+		updated.Flags |= ast.NodeFlagsOptionalChain
+		return updated
+	}
+	access := node.AsElementAccessExpression()
+	updated := factory.UpdateElementAccessExpression(
+		access,
+		tx.Visitor().VisitNode(access.Expression),
+		questionDot,
+		tx.Visitor().VisitNode(access.ArgumentExpression),
+		flags,
+	)
+	updated.Flags |= ast.NodeFlagsOptionalChain
+	return updated
 }
 
 func (tx *transformer) transformRangeExpression(node *ast.KvsRangeExpression) *ast.Node {
@@ -270,7 +310,7 @@ func (tx *transformer) transformPlaceholderLambda(node *ast.KvsPlaceholderLambda
 func (tx *transformer) transformComparisonAlternatives(node *ast.KvsComparisonAlternativesExpression) *ast.Node {
 	factory := tx.Factory()
 	temp := factory.NewTempVariable()
-	tx.EmitContext().AddVariableDeclaration(temp)
+	tx.declareTemp(temp)
 	assignSubject := factory.NewAssignmentExpression(temp, tx.Visitor().VisitNode(node.Subject))
 	var membership *ast.Node
 	if node.SpreadToken != nil || len(node.Alternatives.Nodes) >= 3 {
@@ -313,7 +353,7 @@ func (tx *transformer) transformComparisonChain(node *ast.KvsComparisonChainExpr
 		right := tx.Visitor().VisitNode(node.Operands.Nodes[i+1])
 		if i+1 < len(node.Operands.Nodes)-1 {
 			temp := factory.NewTempVariable()
-			tx.EmitContext().AddVariableDeclaration(temp)
+			tx.declareTemp(temp)
 			right = factory.NewAssignmentExpression(temp, right)
 			comparison := factory.NewBinaryExpression(nil, left, nil, factory.NewToken(operator.Kind), right)
 			left = temp
@@ -348,7 +388,7 @@ func (tx *transformer) transformSieve(expression *ast.Expression) *ast.Node {
 		return value
 	}
 	temp := factory.NewTempVariable()
-	tx.EmitContext().AddVariableDeclaration(temp)
+	tx.declareTemp(temp)
 	assigned := factory.NewAssignmentExpression(temp, value)
 	var test *ast.Node
 	switch kind {
@@ -412,7 +452,7 @@ func (tx *transformer) transformFailureDemotion(node *ast.KvsFailureDemotionExpr
 	factory := tx.Factory()
 	if !tx.resolver.IsKvsFailureDemotionErrorPattern(node.Pattern) {
 		value := factory.NewTempVariable()
-		tx.EmitContext().AddVariableDeclaration(value)
+		tx.declareTemp(value)
 		capture := factory.NewAssignmentExpression(value, tx.Visitor().VisitNode(node.Expression))
 		objectIs := factory.NewPropertyAccessExpression(factory.NewIdentifier("Object"), nil, factory.NewIdentifier("is"), ast.NodeFlagsNone)
 		matches := factory.NewCallExpression(objectIs, nil, nil, factory.NewNodeList([]*ast.Node{capture, tx.Visitor().VisitNode(node.Pattern)}), ast.NodeFlagsNone)
@@ -540,7 +580,7 @@ func (tx *transformer) transformArrayElements(sourceElements []*ast.Node, multiL
 		}
 		if temp == nil {
 			temp = factory.NewTempVariable()
-			tx.EmitContext().AddVariableDeclaration(temp)
+			tx.declareTemp(temp)
 		}
 		assigned := factory.NewAssignmentExpression(temp, visited)
 		present := factory.NewBinaryExpression(nil, assigned, nil, factory.NewToken(ast.KindExclamationEqualsToken), factory.NewKeywordExpression(ast.KindNullKeyword))
@@ -587,7 +627,7 @@ func (tx *transformer) transformObjectExpression(node *ast.Node, sourcePropertie
 		}
 		if valueTemp == nil {
 			valueTemp = factory.NewTempVariable()
-			tx.EmitContext().AddVariableDeclaration(valueTemp)
+			tx.declareTemp(valueTemp)
 		}
 
 		name := tx.Visitor().VisitNode(property.Name())
@@ -595,7 +635,7 @@ func (tx *transformer) transformObjectExpression(node *ast.Node, sourcePropertie
 		if ast.IsComputedPropertyName(property.Name()) {
 			if keyTemp == nil {
 				keyTemp = factory.NewTempVariable()
-				tx.EmitContext().AddVariableDeclaration(keyTemp)
+				tx.declareTemp(keyTemp)
 			}
 			keyAssignment = factory.NewAssignmentExpression(keyTemp, tx.Visitor().VisitNode(property.Name().Expression()))
 			name = factory.NewComputedPropertyName(keyTemp)
@@ -709,7 +749,7 @@ func (tx *transformer) transformLiftedBinaryExpression(node *ast.BinaryExpressio
 	// absent. Each operand is captured because either may have observable effects.
 	factory := tx.Factory()
 	leftTemp := factory.NewTempVariable()
-	tx.EmitContext().AddVariableDeclaration(leftTemp)
+	tx.declareTemp(leftTemp)
 
 	left := tx.Visitor().VisitNode(node.Left)
 	right := tx.Visitor().VisitNode(node.Right)
@@ -718,7 +758,7 @@ func (tx *transformer) transformLiftedBinaryExpression(node *ast.BinaryExpressio
 	rightResult := (*ast.Node)(nil)
 	if tx.resolver.IsKvsLiftedBinaryRightNullable(node.AsNode()) {
 		rightTemp := factory.NewTempVariable()
-		tx.EmitContext().AddVariableDeclaration(rightTemp)
+		tx.declareTemp(rightTemp)
 		rightValue := factory.NewAssignmentExpression(rightTemp, right)
 		rightPresent := factory.NewBinaryExpression(nil, rightValue, nil, factory.NewToken(ast.KindExclamationEqualsToken), factory.NewKeywordExpression(ast.KindNullKeyword))
 		operationRight = rightTemp
@@ -850,7 +890,15 @@ func (tx *transformer) transformIfBindingStatement(node *ast.KvsIfBindingStateme
 	clause := node.Clause.AsKvsIfBindingClause()
 	declaration := clause.DeclarationList.AsVariableDeclarationList().Declarations.Nodes[0].AsVariableDeclaration()
 	sieveBinding := declaration.Initializer != nil && declaration.Initializer.Kind == ast.KindKvsSieveBindingInitializer
-	temp := factory.NewTempVariable()
+	var temp *ast.IdentifierNode
+	if tx.lazyProducer {
+		// The iterator body owns its hoisted expression temporaries. Keep this
+		// block-scoped capture out of the temporary-name pool so it cannot shadow
+		// one of those declarations inside its own initializer.
+		temp = factory.NewUniqueName("binding")
+	} else {
+		temp = factory.NewTempVariable()
+	}
 	tempDeclaration := factory.NewVariableDeclaration(temp, nil, nil, tx.Visitor().VisitNode(declaration.Initializer))
 	tempStatement := factory.NewVariableStatement(nil, factory.NewVariableDeclarationList(factory.NewNodeList([]*ast.Node{tempDeclaration}), ast.NodeFlagsConst))
 
@@ -888,7 +936,7 @@ func (tx *transformer) transformExtantAssignment(node *ast.KvsExtantAssignmentEx
 	// target-spilling needed to preserve JavaScript evaluation order is pending.
 	factory := tx.Factory()
 	temp := factory.NewTempVariable()
-	tx.EmitContext().AddVariableDeclaration(temp)
+	tx.declareTemp(temp)
 	right := tx.Visitor().VisitNode(node.Right)
 	left := tx.Visitor().VisitNode(node.Left)
 	value := factory.NewAssignmentExpression(temp, right)
@@ -1345,7 +1393,7 @@ func (tx *transformer) transformExtantReturnValue(value *ast.Expression) *ast.No
 	// downstream transforms with an ordinary conditional return.
 	factory := tx.Factory()
 	temp := factory.NewTempVariable()
-	tx.EmitContext().AddVariableDeclaration(temp)
+	tx.declareTemp(temp)
 	assignment := factory.NewAssignmentExpression(temp, value)
 	condition := factory.NewBinaryExpression(
 		nil,

@@ -58,11 +58,12 @@ and [default values](#default-values).
 
 KVS treats both `null` and `undefined` as **absent** during nullable computation
 while preserving their runtime identity for JavaScript interoperation.
-KVS-produced absence normally uses `null`.
+Operations that explicitly produce `null` continue to do so; propagated access
+uses JavaScript optional-access behavior and may produce `undefined`.
 
 ## Nullable dataflow
 
-Member access propagates absence without optional-chain punctuation:
+Member and indexed access propagate absence without optional-chain punctuation:
 
 ```kvs
 type User {
@@ -74,9 +75,11 @@ type Profile {
 }
 
 const city = user.profile.address.city;
+const firstTag = user.profile.tags[0];
 ```
 
-`city` is nullable. Evaluation stops at the first absent receiver.
+Both results are nullable. Evaluation stops at the first absent receiver, so an
+index expression is skipped when its receiver is absent.
 
 Arithmetic operators lift in the same way:
 
@@ -280,7 +283,7 @@ A rest binding is absent when its source is absent.
 
 ## Default values
 
-Some types have a default value that can be supplied when absence is explicitly resolved. For primitive types this is their JavaScript falsy value; for collections it is their empty KVS-falsy value:
+Some types have a default value that can be supplied when absence is explicitly resolved. For primitive types this is their JavaScript falsy value; for collections it is their empty value:
 
 number                       0
 boolean                      false

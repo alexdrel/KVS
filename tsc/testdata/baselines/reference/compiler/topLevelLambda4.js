@@ -4,4 +4,4 @@
 export var x = () => this.window;
 
 //// [topLevelLambda4.js]
-export var x = () => this.window;
+export var x = () => this === null || this === void 0 ? void 0 : this.window;

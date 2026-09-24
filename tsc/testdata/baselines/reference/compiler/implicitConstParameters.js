@@ -96,7 +96,7 @@ function f4(x) {
 }
 function f5(x) {
     if (x) {
-        doSomething(() => x.length);
+        doSomething(() => x === null || x === void 0 ? void 0 : x.length);
     }
     x = "abc"; // causes x to be considered non-const
 }

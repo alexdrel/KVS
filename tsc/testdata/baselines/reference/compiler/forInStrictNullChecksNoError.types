@@ -20,7 +20,7 @@ function f(x: { [key: string]: number; } | null | undefined) {
 >key : string
     }
     x["no"]; // should still error
->x["no"] : number
+>x["no"] : number | null | undefined
 >x : { [key: string]: number; } | null | undefined
 >"no" : "no"
 }

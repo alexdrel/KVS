@@ -14,14 +14,22 @@ assignments, and a small set of emitted helpers.
 
 ```kvs
 const name = user.profile.displayName;
+const tag = user.profile.tags[index()];
 ```
 
-lowers approximately to:
+Nullable read receivers are marked by the checker and rewritten to synthetic
+optional-chain segments before TypeScript's ECMAScript transforms:
 
 ```ts
-const $profile = user.profile;
-const name = $profile == null ? null : $profile.displayName;
+const name = user?.profile?.displayName;
+const tag = user?.profile?.tags?.[index()];
 ```
+
+Property and element accesses whose receivers are statically present remain
+ordinary accesses. Assignment targets and accesses used as the callable of a
+plain call are not rewritten. Explicit authored optional chains remain intact.
+The existing optional-chain transform supplies temporaries and downlevel emit
+when the configured JavaScript target requires them.
 
 ### Explicit optional calls
 

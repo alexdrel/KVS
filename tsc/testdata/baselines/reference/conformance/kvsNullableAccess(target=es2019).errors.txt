@@ -1,0 +1,64 @@
+kvsNullableAccess.ts(28,22): error TS18049: 'maybeRoot' is possibly 'null' or 'undefined'.
+kvsNullableAccess.ts(29,28): error TS18049: 'maybeRoot' is possibly 'null' or 'undefined'.
+kvsNullableAccess.ts(29,28): error TS18049: 'maybeRoot.child' is possibly 'null' or 'undefined'.
+kvsNullableAccess.ts(30,1): error TS18049: 'maybeRoot' is possibly 'null' or 'undefined'.
+kvsNullableAccess.ts(31,1): error TS18049: 'maybeRoot' is possibly 'null' or 'undefined'.
+kvsNullableAccess.ts(31,1): error TS18047: 'maybeRoot.child' is possibly 'null'.
+kvsNullableAccess.ts(32,1): error TS18049: 'maybeRoot' is possibly 'null' or 'undefined'.
+kvsNullableAccess.ts(32,1): error TS18049: 'maybeRoot.items' is possibly 'null' or 'undefined'.
+kvsNullableAccess.ts(33,8): error TS18049: 'maybeRoot' is possibly 'null' or 'undefined'.
+
+
+==== kvsNullableAccess.ts (9 errors) ====
+    interface Leaf {
+        value: string;
+        format(): string;
+    }
+    
+    interface Root {
+        child: Leaf?;
+        items: Leaf[]?;
+        required: Leaf;
+        render(): string;
+    }
+    
+    declare const root: Root;
+    declare const maybeRoot: Root?;
+    declare const replacement: Leaf;
+    declare function index(): number;
+    
+    const required = root.required.value;
+    const direct = maybeRoot.required;
+    const nested = maybeRoot.child.value;
+    const indexed = maybeRoot.items[index()].value;
+    const extractedMethod = maybeRoot.render;
+    
+    // Authored optional chains remain authored optional chains.
+    const explicit = maybeRoot?.child?.value;
+    
+    // Calls and writes remain explicit policy boundaries.
+    const rejectedCall = maybeRoot.render();
+                         ~~~~~~~~~
+!!! error TS18049: 'maybeRoot' is possibly 'null' or 'undefined'.
+    const rejectedNestedCall = maybeRoot.child.format();
+                               ~~~~~~~~~
+!!! error TS18049: 'maybeRoot' is possibly 'null' or 'undefined'.
+                               ~~~~~~~~~~~~~~~
+!!! error TS18049: 'maybeRoot.child' is possibly 'null' or 'undefined'.
+    maybeRoot.child = null;
+    ~~~~~~~~~
+!!! error TS18049: 'maybeRoot' is possibly 'null' or 'undefined'.
+    maybeRoot.child.value = "updated";
+    ~~~~~~~~~
+!!! error TS18049: 'maybeRoot' is possibly 'null' or 'undefined'.
+    ~~~~~~~~~~~~~~~
+!!! error TS18047: 'maybeRoot.child' is possibly 'null'.
+    maybeRoot.items[index()] = replacement;
+    ~~~~~~~~~
+!!! error TS18049: 'maybeRoot' is possibly 'null' or 'undefined'.
+    ~~~~~~~~~~~~~~~
+!!! error TS18049: 'maybeRoot.items' is possibly 'null' or 'undefined'.
+    delete maybeRoot.child;
+           ~~~~~~~~~
+!!! error TS18049: 'maybeRoot' is possibly 'null' or 'undefined'.
+    

@@ -2746,7 +2746,7 @@ var Harness;
                 compileString(testCode, 'test.ts', function (compilerResult) {
                     errors = compilerResult.errors;
                 });
-                return errors.length === 0;
+                return (errors === null || errors === void 0 ? void 0 : errors.length) === 0;
             }
             isSubtypeOf(other) {
                 var testCode = 'class __test1__ {\n';
@@ -2869,7 +2869,7 @@ var Harness;
                 compileString(code, 'test.ts', function (compilerResult) {
                     errors = compilerResult.errors;
                 });
-                if (errors.length > 0)
+                if ((errors === null || errors === void 0 ? void 0 : errors.length) > 0)
                     throw new Error("Type definition contains errors: " + errors.join(","));
                 var matchingIdentifiers = [];
                 if (!Harness.usePull) {
@@ -3148,8 +3148,9 @@ var Harness;
         }
         Compiler.updateUnit = updateUnit;
         function compileFile(path, callback, settingsCallback, context, references) {
+            var _a;
             path = switchToForwardSlashes(path);
-            var filename = path.match(/[^\/]*$/)[0];
+            var filename = (_a = path.match(/[^\/]*$/)) === null || _a === void 0 ? void 0 : _a[0];
             var code = readFile(path);
             compileUnit(code, filename, callback, settingsCallback, context, references);
         }
@@ -3185,8 +3186,9 @@ var Harness;
         }
         Compiler.compileUnit = compileUnit;
         function compileUnits(units, callback, settingsCallback) {
+            var _a;
             var lastUnit = units[units.length - 1];
-            var unitName = switchToForwardSlashes(lastUnit.name).match(/[^\/]*$/)[0];
+            var unitName = (_a = switchToForwardSlashes(lastUnit.name).match(/[^\/]*$/)) === null || _a === void 0 ? void 0 : _a[0];
             var dependencies = units.slice(0, units.length - 1);
             var compilationContext = Harness.Compiler.defineCompilationContextForTest(unitName, dependencies);
             compileUnit(lastUnit.content, unitName, callback, settingsCallback, compilationContext, lastUnit.references);
@@ -3645,8 +3647,9 @@ var Harness;
     let Runner;
     (function (Runner) {
         function runCollateral(path, callback) {
+            var _a;
             path = switchToForwardSlashes(path);
-            runString(readFile(path), path.match(/[^\/]*$/)[0], callback);
+            runString(readFile(path), (_a = path.match(/[^\/]*$/)) === null || _a === void 0 ? void 0 : _a[0], callback);
         }
         Runner.runCollateral = runCollateral;
         function runJSString(code, callback) {
@@ -3794,7 +3797,7 @@ var Harness;
             if (runImmediately) {
                 var actual = generateActual(actualFilename, generateContent);
                 var comparison = compareToBaseline(actual, relativeFilename, opts);
-                writeComparison(comparison.expected, comparison.actual, relativeFilename, actualFilename, descriptionForDescribe);
+                writeComparison(comparison === null || comparison === void 0 ? void 0 : comparison.expected, comparison === null || comparison === void 0 ? void 0 : comparison.actual, relativeFilename, actualFilename, descriptionForDescribe);
             }
             else {
                 describe(descriptionForDescribe, () => {
@@ -3804,7 +3807,7 @@ var Harness;
                     });
                     it('Matches the baseline file', () => {
                         var comparison = compareToBaseline(actual, relativeFilename, opts);
-                        writeComparison(comparison.expected, comparison.actual, relativeFilename, actualFilename, descriptionForDescribe);
+                        writeComparison(comparison === null || comparison === void 0 ? void 0 : comparison.expected, comparison === null || comparison === void 0 ? void 0 : comparison.actual, relativeFilename, actualFilename, descriptionForDescribe);
                     });
                 });
             }

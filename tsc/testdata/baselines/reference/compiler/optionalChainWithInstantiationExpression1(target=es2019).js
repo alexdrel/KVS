@@ -19,5 +19,6 @@ a?.b.d
 
 //// [optionalChainWithInstantiationExpression1.js]
 "use strict";
-(a === null || a === void 0 ? void 0 : a.b).d;
+var _a;
+(_a = (a === null || a === void 0 ? void 0 : a.b)) === null || _a === void 0 ? void 0 : _a.d;
 a === null || a === void 0 ? void 0 : a.b.d;

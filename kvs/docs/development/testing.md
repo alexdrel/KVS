@@ -238,7 +238,9 @@ It also checks early `break`, production from nested ordinary loops, array
 values remaining single unflattened elements, ordinary `return` retaining its
 containing-function meaning, and `await` retaining its containing async-function
 meaning. A terminal-`!` case checks that an absent source becomes a fresh `[]`
-after producer lowering.
+after producer lowering. `kvsLazyCollect.ts` also combines lifted nullable
+arithmetic, sieve binding, conditional placement, and `yield?` inside a lazy
+collector to verify that all generated temporaries remain iterator-local.
 
 Run it with:
 
@@ -480,6 +482,21 @@ Run it with:
 
 ```sh
 go -C ./tsc test -run='TestLocal/kvsNullableOperators' ./internal/testrunner
+```
+
+## Nullable-access slice
+
+`kvsNullableAccess.ts` checks direct and nested property reads, indexed reads,
+method extraction, and unchanged access through a present receiver. Its ES2020
+baseline verifies optional-chain lowering, while its ES2019 baseline verifies
+TypeScript's temporary-based downlevel emit and skipped index evaluation.
+Authored optional chains remain unchanged; plain calls, writes, and deletes
+fence the non-propagating boundary.
+
+Run it with:
+
+```sh
+go -C ./tsc test -run='TestLocal/kvsNullableAccess' ./internal/testrunner
 ```
 
 ## Compact-array slice

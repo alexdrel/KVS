@@ -125,6 +125,26 @@ emit context, which produces a hoisted `var` and an assignment in the `if`
 condition. This follows existing compiler temporary handling and guarantees
 single evaluation.
 
+## Nullable read access uses optional-chain lowering
+
+Status: accepted for the first implementation.
+
+Ordinary property and element reads propagate absence when their receiver is
+nullable. The checker removes absence for member lookup, adds absence to the
+result, and records the access for KVS lowering. Writes, read/write operations,
+and a member access used as the callable of a plain call remain non-propagating
+policy boundaries.
+
+The KVS transformer rewrites recorded accesses to synthetic optional-chain
+segments before TypeScript's ECMAScript transforms. This reuses TypeScript's
+temporary handling, receiver preservation, skipped element-index evaluation,
+and target-specific downlevel emit. A short-circuited access may therefore
+produce `undefined`; KVS treats both `null` and `undefined` as absence and does
+not normalize propagation to `null`.
+
+Explicit JavaScript optional chains remain unchanged. This slice adds no
+implicit call suppression and no writable-path materialization.
+
 ## First eager-collect slice
 
 Status: accepted prototype boundary.

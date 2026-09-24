@@ -39,9 +39,9 @@ a.left.length;
 >length : number
 
 a.other.length;  // Error expected here
->a.other.length : number
+>a.other.length : number | null | undefined
 >a.other : string | undefined
 >a : Alignments
 >other : string | undefined
->length : number
+>length : number | null | undefined
 

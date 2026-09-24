@@ -1,0 +1,130 @@
+//// [tests/cases/conformance/kvs/kvsNullableAccess.ts] ////
+
+=== kvsNullableAccess.ts ===
+interface Leaf {
+>Leaf : Symbol(Leaf, Decl(kvsNullableAccess.ts, 0, 0))
+
+    value: string;
+>value : Symbol(Leaf.value, Decl(kvsNullableAccess.ts, 0, 16))
+
+    format(): string;
+>format : Symbol(Leaf.format, Decl(kvsNullableAccess.ts, 1, 18))
+}
+
+interface Root {
+>Root : Symbol(Root, Decl(kvsNullableAccess.ts, 3, 1))
+
+    child: Leaf?;
+>child : Symbol(Root.child, Decl(kvsNullableAccess.ts, 5, 16))
+>Leaf : Symbol(Leaf, Decl(kvsNullableAccess.ts, 0, 0))
+
+    items: Leaf[]?;
+>items : Symbol(Root.items, Decl(kvsNullableAccess.ts, 6, 17))
+>Leaf : Symbol(Leaf, Decl(kvsNullableAccess.ts, 0, 0))
+
+    required: Leaf;
+>required : Symbol(Root.required, Decl(kvsNullableAccess.ts, 7, 19))
+>Leaf : Symbol(Leaf, Decl(kvsNullableAccess.ts, 0, 0))
+
+    render(): string;
+>render : Symbol(Root.render, Decl(kvsNullableAccess.ts, 8, 19))
+}
+
+declare const root: Root;
+>root : Symbol(root, Decl(kvsNullableAccess.ts, 12, 13))
+>Root : Symbol(Root, Decl(kvsNullableAccess.ts, 3, 1))
+
+declare const maybeRoot: Root?;
+>maybeRoot : Symbol(maybeRoot, Decl(kvsNullableAccess.ts, 13, 13))
+>Root : Symbol(Root, Decl(kvsNullableAccess.ts, 3, 1))
+
+declare const replacement: Leaf;
+>replacement : Symbol(replacement, Decl(kvsNullableAccess.ts, 14, 13))
+>Leaf : Symbol(Leaf, Decl(kvsNullableAccess.ts, 0, 0))
+
+declare function index(): number;
+>index : Symbol(index, Decl(kvsNullableAccess.ts, 14, 32))
+
+const required = root.required.value;
+>required : Symbol(required, Decl(kvsNullableAccess.ts, 17, 5))
+>root.required.value : Symbol(Leaf.value, Decl(kvsNullableAccess.ts, 0, 16))
+>root.required : Symbol(Root.required, Decl(kvsNullableAccess.ts, 7, 19))
+>root : Symbol(root, Decl(kvsNullableAccess.ts, 12, 13))
+>required : Symbol(Root.required, Decl(kvsNullableAccess.ts, 7, 19))
+>value : Symbol(Leaf.value, Decl(kvsNullableAccess.ts, 0, 16))
+
+const direct = maybeRoot.required;
+>direct : Symbol(direct, Decl(kvsNullableAccess.ts, 18, 5))
+>maybeRoot.required : Symbol(Root.required, Decl(kvsNullableAccess.ts, 7, 19))
+>maybeRoot : Symbol(maybeRoot, Decl(kvsNullableAccess.ts, 13, 13))
+>required : Symbol(Root.required, Decl(kvsNullableAccess.ts, 7, 19))
+
+const nested = maybeRoot.child.value;
+>nested : Symbol(nested, Decl(kvsNullableAccess.ts, 19, 5))
+>maybeRoot.child.value : Symbol(Leaf.value, Decl(kvsNullableAccess.ts, 0, 16))
+>maybeRoot.child : Symbol(Root.child, Decl(kvsNullableAccess.ts, 5, 16))
+>maybeRoot : Symbol(maybeRoot, Decl(kvsNullableAccess.ts, 13, 13))
+>child : Symbol(Root.child, Decl(kvsNullableAccess.ts, 5, 16))
+>value : Symbol(Leaf.value, Decl(kvsNullableAccess.ts, 0, 16))
+
+const indexed = maybeRoot.items[index()].value;
+>indexed : Symbol(indexed, Decl(kvsNullableAccess.ts, 20, 5))
+>maybeRoot.items[index()].value : Symbol(Leaf.value, Decl(kvsNullableAccess.ts, 0, 16))
+>maybeRoot.items : Symbol(Root.items, Decl(kvsNullableAccess.ts, 6, 17))
+>maybeRoot : Symbol(maybeRoot, Decl(kvsNullableAccess.ts, 13, 13))
+>items : Symbol(Root.items, Decl(kvsNullableAccess.ts, 6, 17))
+>index : Symbol(index, Decl(kvsNullableAccess.ts, 14, 32))
+>value : Symbol(Leaf.value, Decl(kvsNullableAccess.ts, 0, 16))
+
+const extractedMethod = maybeRoot.render;
+>extractedMethod : Symbol(extractedMethod, Decl(kvsNullableAccess.ts, 21, 5))
+>maybeRoot.render : Symbol(Root.render, Decl(kvsNullableAccess.ts, 8, 19))
+>maybeRoot : Symbol(maybeRoot, Decl(kvsNullableAccess.ts, 13, 13))
+>render : Symbol(Root.render, Decl(kvsNullableAccess.ts, 8, 19))
+
+// Authored optional chains remain authored optional chains.
+const explicit = maybeRoot?.child?.value;
+>explicit : Symbol(explicit, Decl(kvsNullableAccess.ts, 24, 5))
+>maybeRoot?.child?.value : Symbol(Leaf.value, Decl(kvsNullableAccess.ts, 0, 16))
+>maybeRoot?.child : Symbol(Root.child, Decl(kvsNullableAccess.ts, 5, 16))
+>maybeRoot : Symbol(maybeRoot, Decl(kvsNullableAccess.ts, 13, 13))
+>child : Symbol(Root.child, Decl(kvsNullableAccess.ts, 5, 16))
+>value : Symbol(Leaf.value, Decl(kvsNullableAccess.ts, 0, 16))
+
+// Calls and writes remain explicit policy boundaries.
+const rejectedCall = maybeRoot.render();
+>rejectedCall : Symbol(rejectedCall, Decl(kvsNullableAccess.ts, 27, 5))
+>maybeRoot.render : Symbol(Root.render, Decl(kvsNullableAccess.ts, 8, 19))
+>maybeRoot : Symbol(maybeRoot, Decl(kvsNullableAccess.ts, 13, 13))
+>render : Symbol(Root.render, Decl(kvsNullableAccess.ts, 8, 19))
+
+const rejectedNestedCall = maybeRoot.child.format();
+>rejectedNestedCall : Symbol(rejectedNestedCall, Decl(kvsNullableAccess.ts, 28, 5))
+>maybeRoot.child.format : Symbol(Leaf.format, Decl(kvsNullableAccess.ts, 1, 18))
+>maybeRoot.child : Symbol(Root.child, Decl(kvsNullableAccess.ts, 5, 16))
+>maybeRoot : Symbol(maybeRoot, Decl(kvsNullableAccess.ts, 13, 13))
+>child : Symbol(Root.child, Decl(kvsNullableAccess.ts, 5, 16))
+>format : Symbol(Leaf.format, Decl(kvsNullableAccess.ts, 1, 18))
+
+maybeRoot.child = null;
+>maybeRoot.child : Symbol(Root.child, Decl(kvsNullableAccess.ts, 5, 16))
+>maybeRoot : Symbol(maybeRoot, Decl(kvsNullableAccess.ts, 13, 13))
+>child : Symbol(Root.child, Decl(kvsNullableAccess.ts, 5, 16))
+
+maybeRoot.child.value = "updated";
+>maybeRoot.child : Symbol(Root.child, Decl(kvsNullableAccess.ts, 5, 16))
+>maybeRoot : Symbol(maybeRoot, Decl(kvsNullableAccess.ts, 13, 13))
+>child : Symbol(Root.child, Decl(kvsNullableAccess.ts, 5, 16))
+
+maybeRoot.items[index()] = replacement;
+>maybeRoot.items : Symbol(Root.items, Decl(kvsNullableAccess.ts, 6, 17))
+>maybeRoot : Symbol(maybeRoot, Decl(kvsNullableAccess.ts, 13, 13))
+>items : Symbol(Root.items, Decl(kvsNullableAccess.ts, 6, 17))
+>index : Symbol(index, Decl(kvsNullableAccess.ts, 14, 32))
+>replacement : Symbol(replacement, Decl(kvsNullableAccess.ts, 14, 13))
+
+delete maybeRoot.child;
+>maybeRoot.child : Symbol(Root.child, Decl(kvsNullableAccess.ts, 5, 16))
+>maybeRoot : Symbol(maybeRoot, Decl(kvsNullableAccess.ts, 13, 13))
+>child : Symbol(Root.child, Decl(kvsNullableAccess.ts, 5, 16))
+

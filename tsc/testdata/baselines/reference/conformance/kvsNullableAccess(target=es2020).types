@@ -1,0 +1,133 @@
+//// [tests/cases/conformance/kvs/kvsNullableAccess.ts] ////
+
+=== kvsNullableAccess.ts ===
+interface Leaf {
+    value: string;
+>value : string
+
+    format(): string;
+>format : () => string
+}
+
+interface Root {
+    child: Leaf?;
+>child : Leaf | null | undefined
+
+    items: Leaf[]?;
+>items : Leaf[] | null | undefined
+
+    required: Leaf;
+>required : Leaf
+
+    render(): string;
+>render : () => string
+}
+
+declare const root: Root;
+>root : Root
+
+declare const maybeRoot: Root?;
+>maybeRoot : Root | null | undefined
+
+declare const replacement: Leaf;
+>replacement : Leaf
+
+declare function index(): number;
+>index : () => number
+
+const required = root.required.value;
+>required : string
+>root.required.value : string
+>root.required : Leaf
+>root : Root
+>required : Leaf
+>value : string
+
+const direct = maybeRoot.required;
+>direct : Leaf | null | undefined
+>maybeRoot.required : Leaf | null | undefined
+>maybeRoot : Root | null | undefined
+>required : Leaf | null | undefined
+
+const nested = maybeRoot.child.value;
+>nested : string | null | undefined
+>maybeRoot.child.value : string | null | undefined
+>maybeRoot.child : Leaf | null | undefined
+>maybeRoot : Root | null | undefined
+>child : Leaf | null | undefined
+>value : string | null | undefined
+
+const indexed = maybeRoot.items[index()].value;
+>indexed : string | null | undefined
+>maybeRoot.items[index()].value : string | null | undefined
+>maybeRoot.items[index()] : Leaf | null | undefined
+>maybeRoot.items : Leaf[] | null | undefined
+>maybeRoot : Root | null | undefined
+>items : Leaf[] | null | undefined
+>index() : number
+>index : () => number
+>value : string | null | undefined
+
+const extractedMethod = maybeRoot.render;
+>extractedMethod : (() => string) | null | undefined
+>maybeRoot.render : (() => string) | null | undefined
+>maybeRoot : Root | null | undefined
+>render : (() => string) | null | undefined
+
+// Authored optional chains remain authored optional chains.
+const explicit = maybeRoot?.child?.value;
+>explicit : string | undefined
+>maybeRoot?.child?.value : string | undefined
+>maybeRoot?.child : Leaf | null | undefined
+>maybeRoot : Root | null | undefined
+>child : Leaf | null | undefined
+>value : string | undefined
+
+// Calls and writes remain explicit policy boundaries.
+const rejectedCall = maybeRoot.render();
+>rejectedCall : string
+>maybeRoot.render() : string
+>maybeRoot.render : () => string
+>maybeRoot : Root | null | undefined
+>render : () => string
+
+const rejectedNestedCall = maybeRoot.child.format();
+>rejectedNestedCall : string
+>maybeRoot.child.format() : string
+>maybeRoot.child.format : () => string
+>maybeRoot.child : Leaf | null | undefined
+>maybeRoot : Root | null | undefined
+>child : Leaf | null | undefined
+>format : () => string
+
+maybeRoot.child = null;
+>maybeRoot.child = null : null
+>maybeRoot.child : Leaf | null | undefined
+>maybeRoot : Root | null | undefined
+>child : Leaf | null | undefined
+
+maybeRoot.child.value = "updated";
+>maybeRoot.child.value = "updated" : "updated"
+>maybeRoot.child.value : any
+>maybeRoot.child : null
+>maybeRoot : Root | null | undefined
+>child : null
+>value : any
+>"updated" : "updated"
+
+maybeRoot.items[index()] = replacement;
+>maybeRoot.items[index()] = replacement : Leaf
+>maybeRoot.items[index()] : Leaf
+>maybeRoot.items : Leaf[] | null | undefined
+>maybeRoot : Root | null | undefined
+>items : Leaf[] | null | undefined
+>index() : number
+>index : () => number
+>replacement : Leaf
+
+delete maybeRoot.child;
+>delete maybeRoot.child : boolean
+>maybeRoot.child : null
+>maybeRoot : Root | null | undefined
+>child : null
+

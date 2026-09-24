@@ -278,7 +278,6 @@ class C {
         // Not fine, since we can *only* consist of a single throw statement
         // if no return statements are present but we are a get accessor.
         throw null;
-        throw undefined.
-        ;
+        throw undefined === null || undefined === void 0 ? void 0 : undefined.;
     }
 }

@@ -9,9 +9,9 @@ namespace Bar {
 >1 : 1
 
     var t = undefined[a][a]; // CG: var t = undefined[Bar.a][a];
->t : any
->undefined[a][a] : any
->undefined[a] : any
+>t : null | undefined
+>undefined[a][a] : null | undefined
+>undefined[a] : null | undefined
 >undefined : undefined
 >a : number
 >a : number

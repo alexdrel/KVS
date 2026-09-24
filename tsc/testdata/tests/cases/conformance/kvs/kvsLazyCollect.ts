@@ -20,6 +20,17 @@ const implicit = collect* (2..5) {
 const expected: Generator<string, void, unknown> = values;
 const implicitExpected: Generator<number, void, unknown> = implicit;
 
+declare const histogram: number?[];
+declare const spikeFactor: number;
+
+const spikes = collect* (1..histogram.length) {
+    if (const growth ~= histogram[_] / histogram[_ - 1]) {
+        yield? growth > spikeFactor ?: _;
+    }
+};
+
+const spikesExpected: Generator<number, void, unknown> = spikes;
+
 const nested = collect* (const item of [{ value: "nested" }]) {
     yield collect (const value of [item.value]) {
         yield value;

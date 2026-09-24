@@ -1,5 +1,5 @@
-kvsLazyCollect.ts(36,33): error TS100083: A return statement cannot cross a lazy KVS collector boundary.
-kvsLazyCollect.ts(45,37): error TS100084: A labeled jump cannot cross a lazy KVS collector boundary.
+kvsLazyCollect.ts(47,33): error TS100083: A return statement cannot cross a lazy KVS collector boundary.
+kvsLazyCollect.ts(56,37): error TS100084: A labeled jump cannot cross a lazy KVS collector boundary.
 
 
 ==== kvsLazyCollect.ts (2 errors) ====
@@ -21,6 +21,17 @@ kvsLazyCollect.ts(45,37): error TS100084: A labeled jump cannot cross a lazy KVS
     
     const expected: Generator<string, void, unknown> = values;
     const implicitExpected: Generator<number, void, unknown> = implicit;
+    
+    declare const histogram: number?[];
+    declare const spikeFactor: number;
+    
+    const spikes = collect* (1..histogram.length) {
+        if (const growth ~= histogram[_] / histogram[_ - 1]) {
+            yield? growth > spikeFactor ?: _;
+        }
+    };
+    
+    const spikesExpected: Generator<number, void, unknown> = spikes;
     
     const nested = collect* (const item of [{ value: "nested" }]) {
         yield collect (const value of [item.value]) {

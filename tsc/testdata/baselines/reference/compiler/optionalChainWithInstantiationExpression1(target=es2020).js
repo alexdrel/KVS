@@ -19,5 +19,5 @@ a?.b.d
 
 //// [optionalChainWithInstantiationExpression1.js]
 "use strict";
-(a?.b).d;
+(a?.b)?.d;
 a?.b.d;

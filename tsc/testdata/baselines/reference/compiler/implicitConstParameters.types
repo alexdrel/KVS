@@ -131,10 +131,10 @@ function f5(x: string | undefined) {
         doSomething(() => x.length);
 >doSomething(() => x.length) : void
 >doSomething : (cb: () => void) => void
->() => x.length : () => number
->x.length : number
+>() => x.length : () => number | null | undefined
+>x.length : number | null | undefined
 >x : string | undefined
->length : number
+>length : number | null | undefined
     }
     x = "abc";  // causes x to be considered non-const
 >x = "abc" : "abc"

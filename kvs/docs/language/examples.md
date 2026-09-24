@@ -168,9 +168,9 @@ function buildCards(photos: ImportedPhoto[]?): Card[] {
         // Typed spread physically removes import-only fields.
         const photo = Photo{ ..._ };
         photo.caption ?= normalize?(photo.caption);
-        const area = photo.metadata.width * photo.metadata.height;
+        const area = (photo.metadata.width * photo.metadata.height)!;
 
-        // Null dimensions make this condition unsatisfied.
+        // Absent dimensions default the area to zero.
         if (area > 1_000_000) {
             const background = (
                 parseColor?(photo.metadata.background) ~ InvalidColor

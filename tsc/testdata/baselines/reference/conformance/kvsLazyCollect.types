@@ -53,6 +53,47 @@ const implicitExpected: Generator<number, void, unknown> = implicit;
 >implicitExpected : Generator<number, void, unknown>
 >implicit : Generator<number, void, unknown>
 
+declare const histogram: number?[];
+>histogram : (number | null | undefined)[]
+
+declare const spikeFactor: number;
+>spikeFactor : number
+
+const spikes = collect* (1..histogram.length) {
+>spikes : Generator<number, void, unknown>
+>collect* (1..histogram.length) {    if (const growth ~= histogram[_] / histogram[_ - 1]) {        yield? growth > spikeFactor ?: _;    }} : Generator<number, void, unknown>
+>1..histogram.length : Iterable<number, void, undefined>
+>1 : 1
+>histogram.length : number
+>histogram : (number | null | undefined)[]
+>length : number
+
+    if (const growth ~= histogram[_] / histogram[_ - 1]) {
+>growth : number | null
+>~= histogram[_] / histogram[_ - 1] : number | null
+>histogram[_] / histogram[_ - 1] : number | null
+>histogram[_] : number | null | undefined
+>histogram : (number | null | undefined)[]
+>_ : number
+>histogram[_ - 1] : number | null | undefined
+>histogram : (number | null | undefined)[]
+>_ - 1 : number
+>_ : number
+>1 : 1
+
+        yield? growth > spikeFactor ?: _;
+>growth > spikeFactor ?: _ : number | null
+>growth > spikeFactor : boolean
+>growth : number
+>spikeFactor : number
+>_ : number
+    }
+};
+
+const spikesExpected: Generator<number, void, unknown> = spikes;
+>spikesExpected : Generator<number, void, unknown>
+>spikes : Generator<number, void, unknown>
+
 const nested = collect* (const item of [{ value: "nested" }]) {
 >nested : Generator<string[], void, unknown>
 >collect* (const item of [{ value: "nested" }]) {    yield collect (const value of [item.value]) {        yield value;    };} : Generator<string[], void, unknown>

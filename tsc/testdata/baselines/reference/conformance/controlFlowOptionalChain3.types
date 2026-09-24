@@ -74,9 +74,9 @@ function Test3({ foo }: { foo: Foo | undefined }) {
 
       {foo.bar ? "true" : "false"}
 >foo.bar ? "true" : "false" : "false" | "true"
->foo.bar : boolean
+>foo.bar : boolean | null | undefined
 >foo : Foo | undefined
->bar : boolean
+>bar : boolean | null | undefined
 >"true" : "true"
 >"false" : "false"
 
@@ -93,15 +93,15 @@ function test4(options?: { a?: boolean; b?: boolean }) {
 >b : boolean | undefined
 
   if (options?.a === false || options.b) {
->options?.a === false || options.b : boolean | undefined
+>options?.a === false || options.b : boolean | null | undefined
 >options?.a === false : boolean
 >options?.a : boolean | undefined
 >options : { a?: boolean; b?: boolean; } | undefined
 >a : boolean | undefined
 >false : false
->options.b : boolean | undefined
+>options.b : boolean | null | undefined
 >options : { a?: boolean; b?: boolean; } | undefined
->b : boolean | undefined
+>b : boolean | null | undefined
 
     options;
 >options : { a?: boolean; b?: boolean; } | undefined

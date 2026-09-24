@@ -176,9 +176,9 @@ else {
 >f : ((x: any) => x is number) | undefined
 
     o2.f;
->o2.f : (x: any) => x is number
+>o2.f : ((x: any) => x is number) | null | undefined
 >o2 : { f(x: any): x is number; } | undefined
->f : (x: any) => x is number
+>f : ((x: any) => x is number) | null | undefined
 }
 x;
 >x : string | number
@@ -192,9 +192,9 @@ o2?.f;
 >f : ((x: any) => x is number) | undefined
 
 o2.f;
->o2.f : (x: any) => x is number
+>o2.f : ((x: any) => x is number) | null | undefined
 >o2 : { f(x: any): x is number; } | undefined
->f : (x: any) => x is number
+>f : ((x: any) => x is number) | null | undefined
 
 declare const o3: { x: 1, y: string } | { x: 2, y: number } | undefined;
 >o3 : { x: 1; y: string; } | { x: 2; y: number; } | undefined
@@ -233,9 +233,9 @@ else {
 >x : 2 | undefined
 
     o3.x;
->o3.x : 2
+>o3.x : 2 | null | undefined
 >o3 : { x: 2; y: number; } | undefined
->x : 2
+>x : 2 | null | undefined
 }
 o3;
 >o3 : { x: 1; y: string; } | { x: 2; y: number; } | undefined
@@ -246,9 +246,9 @@ o3?.x;
 >x : 1 | 2 | undefined
 
 o3.x;
->o3.x : 1 | 2
+>o3.x : 1 | 2 | null | undefined
 >o3 : { x: 1; y: string; } | { x: 2; y: number; } | undefined
->x : 1 | 2
+>x : 1 | 2 | null | undefined
 
 declare const o4: { x?: { y: boolean } };
 >o4 : { x?: { y: boolean; }; }
@@ -295,11 +295,11 @@ else {
 >y : boolean | undefined
 
     o4.x.y;
->o4.x.y : boolean
+>o4.x.y : boolean | null | undefined
 >o4.x : { y: boolean; } | undefined
 >o4 : { x?: { y: boolean; }; }
 >x : { y: boolean; } | undefined
->y : boolean
+>y : boolean | null | undefined
 }
 o4.x;
 >o4.x : { y: boolean; } | undefined
@@ -314,11 +314,11 @@ o4.x?.y;
 >y : boolean | undefined
 
 o4.x.y;
->o4.x.y : boolean
+>o4.x.y : boolean | null | undefined
 >o4.x : { y: boolean; } | undefined
 >o4 : { x?: { y: boolean; }; }
 >x : { y: boolean; } | undefined
->y : boolean
+>y : boolean | null | undefined
 
 declare const o5: { x?: { y: { z?: { w: boolean } } } };
 >o5 : { x?: { y: { z?: { w: boolean; }; }; }; }
@@ -437,22 +437,22 @@ else {
 >w : boolean | undefined
 
     o5.x.y;
->o5.x.y : { z?: { w: boolean; }; }
+>o5.x.y : { z?: { w: boolean; }; } | null | undefined
 >o5.x : { y: { z?: { w: boolean; }; }; } | undefined
 >o5 : { x?: { y: { z?: { w: boolean; }; }; }; }
 >x : { y: { z?: { w: boolean; }; }; } | undefined
->y : { z?: { w: boolean; }; }
+>y : { z?: { w: boolean; }; } | null | undefined
 
     o5.x.y.z.w;
->o5.x.y.z.w : boolean
->o5.x.y.z : { w: boolean; } | undefined
->o5.x.y : { z?: { w: boolean; }; }
+>o5.x.y.z.w : boolean | null | undefined
+>o5.x.y.z : { w: boolean; } | null | undefined
+>o5.x.y : { z?: { w: boolean; }; } | null | undefined
 >o5.x : { y: { z?: { w: boolean; }; }; } | undefined
 >o5 : { x?: { y: { z?: { w: boolean; }; }; }; }
 >x : { y: { z?: { w: boolean; }; }; } | undefined
->y : { z?: { w: boolean; }; }
->z : { w: boolean; } | undefined
->w : boolean
+>y : { z?: { w: boolean; }; } | null | undefined
+>z : { w: boolean; } | null | undefined
+>w : boolean | null | undefined
 }
 o5.x;
 >o5.x : { y: { z?: { w: boolean; }; }; } | undefined
@@ -487,22 +487,22 @@ o5.x?.y.z?.w;
 >w : boolean | undefined
 
 o5.x.y;
->o5.x.y : { z?: { w: boolean; }; }
+>o5.x.y : { z?: { w: boolean; }; } | null | undefined
 >o5.x : { y: { z?: { w: boolean; }; }; } | undefined
 >o5 : { x?: { y: { z?: { w: boolean; }; }; }; }
 >x : { y: { z?: { w: boolean; }; }; } | undefined
->y : { z?: { w: boolean; }; }
+>y : { z?: { w: boolean; }; } | null | undefined
 
 o5.x.y.z.w;
->o5.x.y.z.w : boolean
->o5.x.y.z : { w: boolean; } | undefined
->o5.x.y : { z?: { w: boolean; }; }
+>o5.x.y.z.w : boolean | null | undefined
+>o5.x.y.z : { w: boolean; } | null | undefined
+>o5.x.y : { z?: { w: boolean; }; } | null | undefined
 >o5.x : { y: { z?: { w: boolean; }; }; } | undefined
 >o5 : { x?: { y: { z?: { w: boolean; }; }; }; }
 >x : { y: { z?: { w: boolean; }; }; } | undefined
->y : { z?: { w: boolean; }; }
->z : { w: boolean; } | undefined
->w : boolean
+>y : { z?: { w: boolean; }; } | null | undefined
+>z : { w: boolean; } | null | undefined
+>w : boolean | null | undefined
 
 interface Base {
     f(): this is Derived;
@@ -541,9 +541,9 @@ else {
 >f : (() => this is Derived) | undefined
 
     o6.f;
->o6.f : () => this is Derived
+>o6.f : (() => this is Derived) | null | undefined
 >o6 : Base | undefined
->f : () => this is Derived
+>f : (() => this is Derived) | null | undefined
 }
 o6;
 >o6 : Base | undefined
@@ -554,9 +554,9 @@ o6?.f;
 >f : (() => this is Derived) | undefined
 
 o6.f;
->o6.f : () => this is Derived
+>o6.f : (() => this is Derived) | null | undefined
 >o6 : Base | undefined
->f : () => this is Derived
+>f : (() => this is Derived) | null | undefined
 
 // asserts
 declare const isDefined: <T>(value: T) => asserts value is NonNullable<T>;
@@ -817,9 +817,9 @@ function f12(o: Thing | undefined, value: number | undefined) {
 >value : number | undefined
 
         o.foo;  // Error
->o.foo : number
+>o.foo : number | null | undefined
 >o : Thing | undefined
->foo : number
+>foo : number | null | undefined
     }
     if (o?.["foo"] === value) {
 >o?.["foo"] === value : boolean
@@ -829,7 +829,7 @@ function f12(o: Thing | undefined, value: number | undefined) {
 >value : number | undefined
 
         o["foo"];  // Error
->o["foo"] : number
+>o["foo"] : number | null | undefined
 >o : Thing | undefined
 >"foo" : "foo"
     }
@@ -842,9 +842,9 @@ function f12(o: Thing | undefined, value: number | undefined) {
 >value : number | undefined
 
         o.bar;  // Error
->o.bar : () => number
+>o.bar : (() => number) | null | undefined
 >o : Thing | undefined
->bar : () => number
+>bar : (() => number) | null | undefined
     }
     if (o?.foo == value) {
 >o?.foo == value : boolean
@@ -854,9 +854,9 @@ function f12(o: Thing | undefined, value: number | undefined) {
 >value : number | undefined
 
         o.foo;  // Error
->o.foo : number
+>o.foo : number | null | undefined
 >o : Thing | undefined
->foo : number
+>foo : number | null | undefined
     }
     if (o?.["foo"] == value) {
 >o?.["foo"] == value : boolean
@@ -866,7 +866,7 @@ function f12(o: Thing | undefined, value: number | undefined) {
 >value : number | undefined
 
         o["foo"];  // Error
->o["foo"] : number
+>o["foo"] : number | null | undefined
 >o : Thing | undefined
 >"foo" : "foo"
     }
@@ -879,9 +879,9 @@ function f12(o: Thing | undefined, value: number | undefined) {
 >value : number | undefined
 
         o.bar;  // Error
->o.bar : () => number
+>o.bar : (() => number) | null | undefined
 >o : Thing | undefined
->bar : () => number
+>bar : (() => number) | null | undefined
     }
 }
 
@@ -935,9 +935,9 @@ function f12a(o: Thing | undefined, value: number | null) {
 >value : number | null
 
         o.foo;  // Error
->o.foo : number
+>o.foo : number | null | undefined
 >o : Thing | undefined
->foo : number
+>foo : number | null | undefined
     }
     if (o?.["foo"] == value) {
 >o?.["foo"] == value : boolean
@@ -947,7 +947,7 @@ function f12a(o: Thing | undefined, value: number | null) {
 >value : number | null
 
         o["foo"];  // Error
->o["foo"] : number
+>o["foo"] : number | null | undefined
 >o : Thing | undefined
 >"foo" : "foo"
     }
@@ -960,9 +960,9 @@ function f12a(o: Thing | undefined, value: number | null) {
 >value : number | null
 
         o.bar;  // Error
->o.bar : () => number
+>o.bar : (() => number) | null | undefined
 >o : Thing | undefined
->bar : () => number
+>bar : (() => number) | null | undefined
     }
 }
 
@@ -1057,9 +1057,9 @@ function f13a(o: Thing | undefined) {
 >foo : string | number | undefined
 
         o.foo;  // Error
->o.foo : string | number
+>o.foo : string | number | null | undefined
 >o : Thing | undefined
->foo : string | number
+>foo : string | number | null | undefined
     }
     if (o?.["foo"] !== null) {
 >o?.["foo"] !== null : boolean
@@ -1068,7 +1068,7 @@ function f13a(o: Thing | undefined) {
 >"foo" : "foo"
 
         o["foo"];  // Error
->o["foo"] : string | number
+>o["foo"] : string | number | null | undefined
 >o : Thing | undefined
 >"foo" : "foo"
     }
@@ -1080,9 +1080,9 @@ function f13a(o: Thing | undefined) {
 >bar : (() => number) | undefined
 
         o.bar;  // Error
->o.bar : () => number
+>o.bar : (() => number) | null | undefined
 >o : Thing | undefined
->bar : () => number
+>bar : (() => number) | null | undefined
     }
     if (o?.foo != null) {
 >o?.foo != null : boolean
@@ -1182,9 +1182,9 @@ function f15(o: Thing | undefined, value: number) {
     }
     else {
         o.foo;  // Error
->o.foo : string | number
+>o.foo : string | number | null | undefined
 >o : Thing | undefined
->foo : string | number
+>foo : string | number | null | undefined
     }
     if (o?.foo !== value) {
 >o?.foo !== value : boolean
@@ -1194,9 +1194,9 @@ function f15(o: Thing | undefined, value: number) {
 >value : number
 
         o.foo;  // Error
->o.foo : string | number
+>o.foo : string | number | null | undefined
 >o : Thing | undefined
->foo : string | number
+>foo : string | number | null | undefined
     }
     else {
         o.foo;
@@ -1218,9 +1218,9 @@ function f15(o: Thing | undefined, value: number) {
     }
     else {
         o.foo;  // Error
->o.foo : string | number
+>o.foo : string | number | null | undefined
 >o : Thing | undefined
->foo : string | number
+>foo : string | number | null | undefined
     }
     if (o?.foo != value) {
 >o?.foo != value : boolean
@@ -1230,9 +1230,9 @@ function f15(o: Thing | undefined, value: number) {
 >value : number
 
         o.foo;  // Error
->o.foo : string | number
+>o.foo : string | number | null | undefined
 >o : Thing | undefined
->foo : string | number
+>foo : string | number | null | undefined
     }
     else {
         o.foo;
@@ -1255,15 +1255,15 @@ function f15a(o: Thing | undefined, value: unknown) {
 >value : unknown
 
         o.foo;  // Error
->o.foo : string | number
+>o.foo : string | number | null | undefined
 >o : Thing | undefined
->foo : string | number
+>foo : string | number | null | undefined
     }
     else {
         o.foo;  // Error
->o.foo : string | number
+>o.foo : string | number | null | undefined
 >o : Thing | undefined
->foo : string | number
+>foo : string | number | null | undefined
     }
     if (o?.foo !== value) {
 >o?.foo !== value : boolean
@@ -1273,15 +1273,15 @@ function f15a(o: Thing | undefined, value: unknown) {
 >value : unknown
 
         o.foo;  // Error
->o.foo : string | number
+>o.foo : string | number | null | undefined
 >o : Thing | undefined
->foo : string | number
+>foo : string | number | null | undefined
     }
     else {
         o.foo;  // Error
->o.foo : string | number
+>o.foo : string | number | null | undefined
 >o : Thing | undefined
->foo : string | number
+>foo : string | number | null | undefined
     }
     if (o?.foo == value) {
 >o?.foo == value : boolean
@@ -1291,15 +1291,15 @@ function f15a(o: Thing | undefined, value: unknown) {
 >value : unknown
 
         o.foo;  // Error
->o.foo : string | number
+>o.foo : string | number | null | undefined
 >o : Thing | undefined
->foo : string | number
+>foo : string | number | null | undefined
     }
     else {
         o.foo;  // Error
->o.foo : string | number
+>o.foo : string | number | null | undefined
 >o : Thing | undefined
->foo : string | number
+>foo : string | number | null | undefined
     }
     if (o?.foo != value) {
 >o?.foo != value : boolean
@@ -1309,15 +1309,15 @@ function f15a(o: Thing | undefined, value: unknown) {
 >value : unknown
 
         o.foo;  // Error
->o.foo : string | number
+>o.foo : string | number | null | undefined
 >o : Thing | undefined
->foo : string | number
+>foo : string | number | null | undefined
     }
     else {
         o.foo;  // Error
->o.foo : string | number
+>o.foo : string | number | null | undefined
 >o : Thing | undefined
->foo : string | number
+>foo : string | number | null | undefined
     }
 }
 
@@ -1333,9 +1333,9 @@ function f16(o: Thing | undefined) {
 >undefined : undefined
 
         o.foo;  // Error
->o.foo : never
+>o.foo : null | undefined
 >o : Thing | undefined
->foo : never
+>foo : null | undefined
     }
     else {
         o.foo;
@@ -1357,9 +1357,9 @@ function f16(o: Thing | undefined) {
     }
     else {
         o.foo;  // Error
->o.foo : never
+>o.foo : null | undefined
 >o : Thing | undefined
->foo : never
+>foo : null | undefined
     }
     if (o?.foo == undefined) {
 >o?.foo == undefined : boolean
@@ -1369,9 +1369,9 @@ function f16(o: Thing | undefined) {
 >undefined : undefined
 
         o.foo;  // Error
->o.foo : never
+>o.foo : null | undefined
 >o : Thing | undefined
->foo : never
+>foo : null | undefined
     }
     else {
         o.foo;
@@ -1393,9 +1393,9 @@ function f16(o: Thing | undefined) {
     }
     else {
         o.foo;  // Error
->o.foo : never
+>o.foo : null | undefined
 >o : Thing | undefined
->foo : never
+>foo : null | undefined
     }
 }
 
@@ -1534,9 +1534,9 @@ function f22(o: Thing | undefined) {
     }
     else {
         o.foo;  // Error
->o.foo : string
+>o.foo : string | null | undefined
 >o : Thing | undefined
->foo : string
+>foo : string | null | undefined
     }
     if (typeof o?.foo !== "number") {
 >typeof o?.foo !== "number" : boolean
@@ -1547,9 +1547,9 @@ function f22(o: Thing | undefined) {
 >"number" : "number"
 
         o.foo;  // Error
->o.foo : string
+>o.foo : string | null | undefined
 >o : Thing | undefined
->foo : string
+>foo : string | null | undefined
     }
     else {
         o.foo;
@@ -1572,9 +1572,9 @@ function f22(o: Thing | undefined) {
     }
     else {
         o.foo;  // Error
->o.foo : string
+>o.foo : string | null | undefined
 >o : Thing | undefined
->foo : string
+>foo : string | null | undefined
     }
     if (typeof o?.foo != "number") {
 >typeof o?.foo != "number" : boolean
@@ -1585,9 +1585,9 @@ function f22(o: Thing | undefined) {
 >"number" : "number"
 
         o.foo;  // Error
->o.foo : string
+>o.foo : string | null | undefined
 >o : Thing | undefined
->foo : string
+>foo : string | null | undefined
     }
     else {
         o.foo;
@@ -1610,9 +1610,9 @@ function f23(o: Thing | undefined) {
 >"undefined" : "undefined"
 
         o.foo;  // Error
->o.foo : never
+>o.foo : null | undefined
 >o : Thing | undefined
->foo : never
+>foo : null | undefined
     }
     else {
         o.foo;
@@ -1635,9 +1635,9 @@ function f23(o: Thing | undefined) {
     }
     else {
         o.foo;  // Error
->o.foo : never
+>o.foo : null | undefined
 >o : Thing | undefined
->foo : never
+>foo : null | undefined
     }
     if (typeof o?.foo == "undefined") {
 >typeof o?.foo == "undefined" : boolean
@@ -1648,9 +1648,9 @@ function f23(o: Thing | undefined) {
 >"undefined" : "undefined"
 
         o.foo;  // Error
->o.foo : never
+>o.foo : null | undefined
 >o : Thing | undefined
->foo : never
+>foo : null | undefined
     }
     else {
         o.foo;
@@ -1673,9 +1673,9 @@ function f23(o: Thing | undefined) {
     }
     else {
         o.foo;  // Error
->o.foo : never
+>o.foo : null | undefined
 >o : Thing | undefined
->foo : never
+>foo : null | undefined
     }
 }
 
@@ -1797,16 +1797,16 @@ function f40(o: Thing | undefined) {
 >undefined : undefined
 
             o.foo;  // Error
->o.foo : never
+>o.foo : null | undefined
 >o : Thing | undefined
->foo : never
+>foo : null | undefined
 
             break;
         default:
             o.foo;  // Error
->o.foo : string | number
+>o.foo : string | number | null | undefined
 >o : Thing | undefined
->foo : string | number
+>foo : string | number | null | undefined
 
             break;
     }
@@ -1844,16 +1844,16 @@ function f41(o: Thing | undefined) {
 >"undefined" : "undefined"
 
             o.foo;  // Error
->o.foo : never
+>o.foo : null | undefined
 >o : Thing | undefined
->foo : never
+>foo : null | undefined
 
             break;
         default:
             o.foo;  // Error
->o.foo : never
+>o.foo : null | undefined
 >o : Thing | undefined
->foo : never
+>foo : null | undefined
 
             break;
     }

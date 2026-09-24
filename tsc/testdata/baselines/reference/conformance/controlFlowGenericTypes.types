@@ -437,8 +437,8 @@ function fx3<T extends Record<keyof T, string> | undefined, K extends keyof T>(o
 >key : K
 
     const x1 = obj[key];  // Error
->x1 : Record<keyof T, string>[K]
->obj[key] : Record<keyof T, string>[K]
+>x1 : Record<keyof T, string>[K] | null | undefined
+>obj[key] : Record<keyof T, string>[K] | null | undefined
 >obj : Record<keyof T, string> | undefined
 >key : K
 
@@ -467,13 +467,13 @@ class TableBaseEnum<
 >null as! : never
 
         iSpec[null as! as keyof InternalSpec];  // Error, object possibly undefined
->iSpec[null as! as keyof InternalSpec] : Record<keyof PublicSpec, any>[keyof InternalSpec]
+>iSpec[null as! as keyof InternalSpec] : Record<keyof PublicSpec, any>[keyof InternalSpec] | null | undefined
 >iSpec : Record<keyof PublicSpec, any> | undefined
 >null as! as keyof InternalSpec : keyof InternalSpec
 >null as! : never
 
         iSpec[null as! as keyof PublicSpec];    // Error, object possibly undefined
->iSpec[null as! as keyof PublicSpec] : Record<keyof PublicSpec, any>[keyof PublicSpec]
+>iSpec[null as! as keyof PublicSpec] : Record<keyof PublicSpec, any>[keyof PublicSpec] | null | undefined
 >iSpec : Record<keyof PublicSpec, any> | undefined
 >null as! as keyof PublicSpec : keyof PublicSpec
 >null as! : never

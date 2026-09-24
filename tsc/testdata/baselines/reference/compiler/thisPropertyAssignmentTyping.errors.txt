@@ -1,4 +1,5 @@
-main.js(47,21): error TS2532: Object is possibly 'undefined'.
+main.js(47,21): error TS2322: Type 'number | null' is not assignable to type 'number'.
+  Type 'null' is not assignable to type 'number'.
 main.js(55,9): error TS2322: Type 'string' is not assignable to type 'number'.
 main.js(64,9): error TS7008: Member 'bar' implicitly has an 'any[]' type.
 
@@ -51,8 +52,9 @@ main.js(64,9): error TS7008: Member 'bar' implicitly has an 'any[]' type.
         method2() {
             this.foo;  // number[] | undefined
             this.foo = [this.foo[0] * 2];  // Error: Object is possibly undefined
-                        ~~~~~~~~
-!!! error TS2532: Object is possibly 'undefined'.
+                        ~~~~~~~~~~~~~~~
+!!! error TS2322: Type 'number | null' is not assignable to type 'number'.
+!!! error TS2322:   Type 'null' is not assignable to type 'number'.
             this.foo;  // number[]
         }
     }

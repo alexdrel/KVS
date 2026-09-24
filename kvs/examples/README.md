@@ -20,6 +20,7 @@ runnable `.ts` file must have a matching `.stdout` file.
 - [Sieve and nulling](sieve-and-nulling.ts)
 - [Binding in an `if` condition](if-binding.ts)
 - [Implicit iteration subjects](implicit-subject.ts)
+- [Nullable access paths](nullable-paths.ts)
 - [Nullable operators](nullable-operators.ts)
 - [Comparison conveniences](comparisons.ts)
 - [Catch and split](catch-and-split.ts)

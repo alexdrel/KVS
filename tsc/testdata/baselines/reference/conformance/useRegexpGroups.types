@@ -14,56 +14,56 @@ let result = re.exec("2015-01-02");
 >"2015-01-02" : "2015-01-02"
 
 let date = result[0];
->date : string
->result[0] : string
+>date : string | null | undefined
+>result[0] : string | null | undefined
 >result : RegExpExecArray | null
 >0 : 0
 
 let year1 = result.groups.year;
->year1 : string
->result.groups.year : string
->result.groups : { [key: string]: string; } | undefined
+>year1 : string | null | undefined
+>result.groups.year : string | null | undefined
+>result.groups : { [key: string]: string; } | null | undefined
 >result : RegExpExecArray | null
->groups : { [key: string]: string; } | undefined
->year : string
+>groups : { [key: string]: string; } | null | undefined
+>year : string | null | undefined
 
 let year2 = result[1];
->year2 : string
->result[1] : string
+>year2 : string | null | undefined
+>result[1] : string | null | undefined
 >result : RegExpExecArray | null
 >1 : 1
 
 let month1 = result.groups.month;
->month1 : string
->result.groups.month : string
->result.groups : { [key: string]: string; } | undefined
+>month1 : string | null | undefined
+>result.groups.month : string | null | undefined
+>result.groups : { [key: string]: string; } | null | undefined
 >result : RegExpExecArray | null
->groups : { [key: string]: string; } | undefined
->month : string
+>groups : { [key: string]: string; } | null | undefined
+>month : string | null | undefined
 
 let month2 = result[2];
->month2 : string
->result[2] : string
+>month2 : string | null | undefined
+>result[2] : string | null | undefined
 >result : RegExpExecArray | null
 >2 : 2
 
 let day1 = result.groups.day;
->day1 : string
->result.groups.day : string
->result.groups : { [key: string]: string; } | undefined
+>day1 : string | null | undefined
+>result.groups.day : string | null | undefined
+>result.groups : { [key: string]: string; } | null | undefined
 >result : RegExpExecArray | null
->groups : { [key: string]: string; } | undefined
->day : string
+>groups : { [key: string]: string; } | null | undefined
+>day : string | null | undefined
 
 let day2 = result[3];
->day2 : string
->result[3] : string
+>day2 : string | null | undefined
+>result[3] : string | null | undefined
 >result : RegExpExecArray | null
 >3 : 3
 
 let foo = ("foo".match(/(?<bar>foo)/) as!).groups.foo;
->foo : string
->("foo".match(/(?<bar>foo)/) as!).groups.foo : string
+>foo : string | null | undefined
+>("foo".match(/(?<bar>foo)/) as!).groups.foo : string | null | undefined
 >("foo".match(/(?<bar>foo)/) as!).groups : { [key: string]: string; } | undefined
 >("foo".match(/(?<bar>foo)/) as!) : RegExpMatchArray
 >"foo".match(/(?<bar>foo)/) as! : RegExpMatchArray
@@ -73,5 +73,5 @@ let foo = ("foo".match(/(?<bar>foo)/) as!).groups.foo;
 >match : { (regexp: string | RegExp): RegExpMatchArray | null; (matcher: { [Symbol.match](string: string): RegExpMatchArray | null; }): RegExpMatchArray | null; }
 >/(?<bar>foo)/ : RegExp
 >groups : { [key: string]: string; } | undefined
->foo : string
+>foo : string | null | undefined
 

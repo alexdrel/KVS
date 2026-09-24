@@ -14,11 +14,11 @@ export function foo(matchResult: RegExpMatchArray, execResult: RegExpExecArray) 
 >length : number
 
     matchResult[999].length;
->matchResult[999].length : number
+>matchResult[999].length : number | null | undefined
 >matchResult[999] : string | undefined
 >matchResult : RegExpMatchArray
 >999 : 999
->length : number
+>length : number | null | undefined
 
     matchResult.index + 0;
 >matchResult.index + 0 : number | null
@@ -28,20 +28,20 @@ export function foo(matchResult: RegExpMatchArray, execResult: RegExpExecArray) 
 >0 : 0
 
     matchResult.input.length;
->matchResult.input.length : number
+>matchResult.input.length : number | null | undefined
 >matchResult.input : string | undefined
 >matchResult : RegExpMatchArray
 >input : string | undefined
->length : number
+>length : number | null | undefined
 
     matchResult.groups["someVariable"].length;
->matchResult.groups["someVariable"].length : number
->matchResult.groups["someVariable"] : string | undefined
+>matchResult.groups["someVariable"].length : number | null | undefined
+>matchResult.groups["someVariable"] : string | null | undefined
 >matchResult.groups : { [key: string]: string; } | undefined
 >matchResult : RegExpMatchArray
 >groups : { [key: string]: string; } | undefined
 >"someVariable" : "someVariable"
->length : number
+>length : number | null | undefined
 
     matchResult.groups = undefined;
 >matchResult.groups = undefined : undefined
@@ -58,11 +58,11 @@ export function foo(matchResult: RegExpMatchArray, execResult: RegExpExecArray) 
 >length : number
 
     execResult[999].length;
->execResult[999].length : number
+>execResult[999].length : number | null | undefined
 >execResult[999] : string | undefined
 >execResult : RegExpExecArray
 >999 : 999
->length : number
+>length : number | null | undefined
 
     execResult.index + 0;
 >execResult.index + 0 : number
@@ -79,13 +79,13 @@ export function foo(matchResult: RegExpMatchArray, execResult: RegExpExecArray) 
 >length : number
 
     execResult.groups["someVariable"].length;
->execResult.groups["someVariable"].length : number
->execResult.groups["someVariable"] : string | undefined
+>execResult.groups["someVariable"].length : number | null | undefined
+>execResult.groups["someVariable"] : string | null | undefined
 >execResult.groups : { [key: string]: string; } | undefined
 >execResult : RegExpExecArray
 >groups : { [key: string]: string; } | undefined
 >"someVariable" : "someVariable"
->length : number
+>length : number | null | undefined
 
     execResult.groups = undefined;
 >execResult.groups = undefined : undefined

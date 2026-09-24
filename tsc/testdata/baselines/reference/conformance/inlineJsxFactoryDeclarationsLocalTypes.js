@@ -99,7 +99,7 @@ const MySFC = (props) => (0, renderer2_1.predom)("p", null,
     props.y,
     " = ",
     props.x + props.y,
-    ...this.props.children);
+    ...(this === null || this === void 0 ? void 0 : this.props).children);
 exports.MySFC = MySFC;
 class MyClass {
     constructor(props) {

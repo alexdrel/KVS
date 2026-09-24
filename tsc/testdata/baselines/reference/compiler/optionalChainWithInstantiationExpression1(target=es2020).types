@@ -23,12 +23,12 @@ declare const a: typeof A | undefined;
 >A : typeof A
 
 a?.b<c>.d;
->a?.b<c>.d : number
+>a?.b<c>.d : number | null | undefined
 >a?.b<c> : { new (x: unknown): A.b<unknown>; d: number; prototype: A.b<any>; } | undefined
 >a?.b : typeof A.b | undefined
 >a : typeof A | undefined
 >b : typeof A.b | undefined
->d : number
+>d : number | null | undefined
 
 a?.b.d
 >a?.b.d : number | undefined

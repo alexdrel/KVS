@@ -82,13 +82,13 @@ function doSomethingWithAlias(thing, defaultValue) {
     else if (v === 3) {
         if (thing || (thing = defaultValue)) {
             thing.name;
-            defaultValue.name;
+            defaultValue === null || defaultValue === void 0 ? void 0 : defaultValue.name;
         }
     }
     else {
         if (thing !== null && thing !== void 0 ? thing : (thing = defaultValue)) {
             thing.name;
-            defaultValue.name;
+            defaultValue === null || defaultValue === void 0 ? void 0 : defaultValue.name;
         }
     }
 }

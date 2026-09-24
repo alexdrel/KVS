@@ -8860,7 +8860,11 @@ func (c *Checker) checkIndexedAccess(node *ast.Node, checkMode CheckMode) *Type 
 	if node.Flags&ast.NodeFlagsOptionalChain != 0 {
 		return c.checkElementAccessChain(node, checkMode)
 	}
-	return c.checkElementAccessExpression(node, c.checkNonNullExpression(node.Expression()), checkMode)
+	result := c.checkElementAccessExpression(node, c.checkKvsAccessReceiver(node), checkMode)
+	if c.nodeLinks.Get(node).flags&NodeCheckFlagsKvsNullableAccess != 0 && result != c.silentNeverType && result != c.errorType {
+		return c.getNullableType(result, TypeFlagsNullable)
+	}
+	return result
 }
 
 func (c *Checker) checkElementAccessChain(node *ast.Node, checkMode CheckMode) *Type {
@@ -12100,7 +12104,38 @@ func (c *Checker) checkPropertyAccessExpression(node *ast.Node, checkMode CheckM
 		return c.checkPropertyAccessChain(node, checkMode)
 	}
 	expr := node.Expression()
-	return c.checkPropertyAccessExpressionOrQualifiedName(node, expr, c.checkNonNullExpression(expr), node.AsPropertyAccessExpression().Name(), checkMode, writeOnly)
+	var leftType *Type
+	if writeOnly {
+		leftType = c.checkNonNullExpression(expr)
+	} else {
+		leftType = c.checkKvsAccessReceiver(node)
+	}
+	result := c.checkPropertyAccessExpressionOrQualifiedName(node, expr, leftType, node.AsPropertyAccessExpression().Name(), checkMode, writeOnly)
+	if c.nodeLinks.Get(node).flags&NodeCheckFlagsKvsNullableAccess != 0 && result != c.silentNeverType && result != c.errorType {
+		return c.getNullableType(result, TypeFlagsNullable)
+	}
+	return result
+}
+
+func (c *Checker) checkKvsAccessReceiver(node *ast.Node) *Type {
+	receiver := node.Expression()
+	receiverType := c.checkExpression(receiver)
+	if c.isKvsPropagatingAccess(node, receiverType) {
+		c.nodeLinks.Get(node).flags |= NodeCheckFlagsKvsNullableAccess
+		return c.GetNonNullableType(receiverType)
+	}
+	return c.checkNonNullType(receiverType, receiver)
+}
+
+func (c *Checker) isKvsPropagatingAccess(node *ast.Node, receiverType *Type) bool {
+	path := node
+	for ast.IsAccessExpression(path.Parent) && path.Parent.Expression() == path {
+		path = path.Parent
+	}
+	return isKvsNullableType(receiverType) &&
+		getAssignmentTargetKind(path) == AssignmentKindNone &&
+		(path.Parent == nil || path.Parent.Kind != ast.KindDeleteExpression) &&
+		!(ast.IsCallExpression(path.Parent) && path.Parent.Expression() == path)
 }
 
 func (c *Checker) checkPropertyAccessChain(node *ast.Node, checkMode CheckMode) *Type {

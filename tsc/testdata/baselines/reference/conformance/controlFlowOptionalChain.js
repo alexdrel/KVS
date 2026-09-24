@@ -611,7 +611,7 @@ function f50(obj: Test5) {
 
 //// [controlFlowOptionalChain.js]
 "use strict";
-var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v;
+var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2, _3, _4, _5;
 let a;
 o === null || o === void 0 ? void 0 : o[a = 1];
 a.toString();
@@ -647,12 +647,12 @@ else {
     x;
     o2;
     o2 === null || o2 === void 0 ? void 0 : o2.f;
-    o2.f;
+    o2 === null || o2 === void 0 ? void 0 : o2.f;
 }
 x;
 o2;
 o2 === null || o2 === void 0 ? void 0 : o2.f;
-o2.f;
+o2 === null || o2 === void 0 ? void 0 : o2.f;
 if ((o3 === null || o3 === void 0 ? void 0 : o3.x) === 1) {
     o3;
     o3.x;
@@ -661,11 +661,11 @@ if ((o3 === null || o3 === void 0 ? void 0 : o3.x) === 1) {
 else {
     o3;
     o3 === null || o3 === void 0 ? void 0 : o3.x;
-    o3.x;
+    o3 === null || o3 === void 0 ? void 0 : o3.x;
 }
 o3;
 o3 === null || o3 === void 0 ? void 0 : o3.x;
-o3.x;
+o3 === null || o3 === void 0 ? void 0 : o3.x;
 if ((_a = o4.x) === null || _a === void 0 ? void 0 : _a.y) {
     o4.x; // { y: boolean }
     o4.x.y; // true
@@ -674,34 +674,34 @@ if ((_a = o4.x) === null || _a === void 0 ? void 0 : _a.y) {
 else {
     o4.x;
     (_c = o4.x) === null || _c === void 0 ? void 0 : _c.y;
-    o4.x.y;
+    (_d = o4.x) === null || _d === void 0 ? void 0 : _d.y;
 }
 o4.x;
-(_d = o4.x) === null || _d === void 0 ? void 0 : _d.y;
-o4.x.y;
-if ((_f = (_e = o5.x) === null || _e === void 0 ? void 0 : _e.y.z) === null || _f === void 0 ? void 0 : _f.w) {
+(_e = o4.x) === null || _e === void 0 ? void 0 : _e.y;
+(_f = o4.x) === null || _f === void 0 ? void 0 : _f.y;
+if ((_h = (_g = o5.x) === null || _g === void 0 ? void 0 : _g.y.z) === null || _h === void 0 ? void 0 : _h.w) {
     o5.x;
     o5.x.y;
     o5.x.y.z;
     o5.x.y.z.w; // true
-    (_g = o5.x.y.z) === null || _g === void 0 ? void 0 : _g.w; // true
-    (_h = o5.x) === null || _h === void 0 ? void 0 : _h.y.z.w; // true
-    (_k = (_j = o5.x) === null || _j === void 0 ? void 0 : _j.y.z) === null || _k === void 0 ? void 0 : _k.w; // true
+    (_j = o5.x.y.z) === null || _j === void 0 ? void 0 : _j.w; // true
+    (_k = o5.x) === null || _k === void 0 ? void 0 : _k.y.z.w; // true
+    (_m = (_l = o5.x) === null || _l === void 0 ? void 0 : _l.y.z) === null || _m === void 0 ? void 0 : _m.w; // true
 }
 else {
     o5.x;
-    (_l = o5.x) === null || _l === void 0 ? void 0 : _l.y;
-    (_m = o5.x) === null || _m === void 0 ? void 0 : _m.y.z;
-    (_p = (_o = o5.x) === null || _o === void 0 ? void 0 : _o.y.z) === null || _p === void 0 ? void 0 : _p.w;
-    o5.x.y;
-    o5.x.y.z.w;
+    (_o = o5.x) === null || _o === void 0 ? void 0 : _o.y;
+    (_p = o5.x) === null || _p === void 0 ? void 0 : _p.y.z;
+    (_r = (_q = o5.x) === null || _q === void 0 ? void 0 : _q.y.z) === null || _r === void 0 ? void 0 : _r.w;
+    (_s = o5.x) === null || _s === void 0 ? void 0 : _s.y;
+    (_v = (_u = (_t = o5.x) === null || _t === void 0 ? void 0 : _t.y) === null || _u === void 0 ? void 0 : _u.z) === null || _v === void 0 ? void 0 : _v.w;
 }
 o5.x;
-(_q = o5.x) === null || _q === void 0 ? void 0 : _q.y;
-(_r = o5.x) === null || _r === void 0 ? void 0 : _r.y.z;
-(_t = (_s = o5.x) === null || _s === void 0 ? void 0 : _s.y.z) === null || _t === void 0 ? void 0 : _t.w;
-o5.x.y;
-o5.x.y.z.w;
+(_w = o5.x) === null || _w === void 0 ? void 0 : _w.y;
+(_x = o5.x) === null || _x === void 0 ? void 0 : _x.y.z;
+(_z = (_y = o5.x) === null || _y === void 0 ? void 0 : _y.y.z) === null || _z === void 0 ? void 0 : _z.w;
+(_0 = o5.x) === null || _0 === void 0 ? void 0 : _0.y;
+(_3 = (_2 = (_1 = o5.x) === null || _1 === void 0 ? void 0 : _1.y) === null || _2 === void 0 ? void 0 : _2.z) === null || _3 === void 0 ? void 0 : _3.w;
 if (o6 === null || o6 === void 0 ? void 0 : o6.f()) {
     o6; // Derived
     o6.f;
@@ -709,11 +709,11 @@ if (o6 === null || o6 === void 0 ? void 0 : o6.f()) {
 else {
     o6;
     o6 === null || o6 === void 0 ? void 0 : o6.f;
-    o6.f;
+    o6 === null || o6 === void 0 ? void 0 : o6.f;
 }
 o6;
 o6 === null || o6 === void 0 ? void 0 : o6.f;
-o6.f;
+o6 === null || o6 === void 0 ? void 0 : o6.f;
 function f01(x) {
     if (!!true) {
         isString === null || isString === void 0 ? void 0 : isString(x);
@@ -775,22 +775,22 @@ function f11(o, value) {
 }
 function f12(o, value) {
     if ((o === null || o === void 0 ? void 0 : o.foo) === value) {
-        o.foo; // Error
+        o === null || o === void 0 ? void 0 : o.foo; // Error
     }
     if ((o === null || o === void 0 ? void 0 : o["foo"]) === value) {
-        o["foo"]; // Error
+        o === null || o === void 0 ? void 0 : o["foo"]; // Error
     }
     if ((o === null || o === void 0 ? void 0 : o.bar()) === value) {
-        o.bar; // Error
+        o === null || o === void 0 ? void 0 : o.bar; // Error
     }
     if ((o === null || o === void 0 ? void 0 : o.foo) == value) {
-        o.foo; // Error
+        o === null || o === void 0 ? void 0 : o.foo; // Error
     }
     if ((o === null || o === void 0 ? void 0 : o["foo"]) == value) {
-        o["foo"]; // Error
+        o === null || o === void 0 ? void 0 : o["foo"]; // Error
     }
     if ((o === null || o === void 0 ? void 0 : o.bar()) == value) {
-        o.bar; // Error
+        o === null || o === void 0 ? void 0 : o.bar; // Error
     }
 }
 function f12a(o, value) {
@@ -804,13 +804,13 @@ function f12a(o, value) {
         o.bar;
     }
     if ((o === null || o === void 0 ? void 0 : o.foo) == value) {
-        o.foo; // Error
+        o === null || o === void 0 ? void 0 : o.foo; // Error
     }
     if ((o === null || o === void 0 ? void 0 : o["foo"]) == value) {
-        o["foo"]; // Error
+        o === null || o === void 0 ? void 0 : o["foo"]; // Error
     }
     if ((o === null || o === void 0 ? void 0 : o.bar()) == value) {
-        o.bar; // Error
+        o === null || o === void 0 ? void 0 : o.bar; // Error
     }
 }
 function f13(o) {
@@ -835,13 +835,13 @@ function f13(o) {
 }
 function f13a(o) {
     if ((o === null || o === void 0 ? void 0 : o.foo) !== null) {
-        o.foo; // Error
+        o === null || o === void 0 ? void 0 : o.foo; // Error
     }
     if ((o === null || o === void 0 ? void 0 : o["foo"]) !== null) {
-        o["foo"]; // Error
+        o === null || o === void 0 ? void 0 : o["foo"]; // Error
     }
     if ((o === null || o === void 0 ? void 0 : o.bar()) !== null) {
-        o.bar; // Error
+        o === null || o === void 0 ? void 0 : o.bar; // Error
     }
     if ((o === null || o === void 0 ? void 0 : o.foo) != null) {
         o.foo;
@@ -869,10 +869,10 @@ function f15(o, value) {
         o.foo;
     }
     else {
-        o.foo; // Error
+        o === null || o === void 0 ? void 0 : o.foo; // Error
     }
     if ((o === null || o === void 0 ? void 0 : o.foo) !== value) {
-        o.foo; // Error
+        o === null || o === void 0 ? void 0 : o.foo; // Error
     }
     else {
         o.foo;
@@ -881,10 +881,10 @@ function f15(o, value) {
         o.foo;
     }
     else {
-        o.foo; // Error
+        o === null || o === void 0 ? void 0 : o.foo; // Error
     }
     if ((o === null || o === void 0 ? void 0 : o.foo) != value) {
-        o.foo; // Error
+        o === null || o === void 0 ? void 0 : o.foo; // Error
     }
     else {
         o.foo;
@@ -892,33 +892,33 @@ function f15(o, value) {
 }
 function f15a(o, value) {
     if ((o === null || o === void 0 ? void 0 : o.foo) === value) {
-        o.foo; // Error
+        o === null || o === void 0 ? void 0 : o.foo; // Error
     }
     else {
-        o.foo; // Error
+        o === null || o === void 0 ? void 0 : o.foo; // Error
     }
     if ((o === null || o === void 0 ? void 0 : o.foo) !== value) {
-        o.foo; // Error
+        o === null || o === void 0 ? void 0 : o.foo; // Error
     }
     else {
-        o.foo; // Error
+        o === null || o === void 0 ? void 0 : o.foo; // Error
     }
     if ((o === null || o === void 0 ? void 0 : o.foo) == value) {
-        o.foo; // Error
+        o === null || o === void 0 ? void 0 : o.foo; // Error
     }
     else {
-        o.foo; // Error
+        o === null || o === void 0 ? void 0 : o.foo; // Error
     }
     if ((o === null || o === void 0 ? void 0 : o.foo) != value) {
-        o.foo; // Error
+        o === null || o === void 0 ? void 0 : o.foo; // Error
     }
     else {
-        o.foo; // Error
+        o === null || o === void 0 ? void 0 : o.foo; // Error
     }
 }
 function f16(o) {
     if ((o === null || o === void 0 ? void 0 : o.foo) === undefined) {
-        o.foo; // Error
+        o === null || o === void 0 ? void 0 : o.foo; // Error
     }
     else {
         o.foo;
@@ -927,10 +927,10 @@ function f16(o) {
         o.foo;
     }
     else {
-        o.foo; // Error
+        o === null || o === void 0 ? void 0 : o.foo; // Error
     }
     if ((o === null || o === void 0 ? void 0 : o.foo) == undefined) {
-        o.foo; // Error
+        o === null || o === void 0 ? void 0 : o.foo; // Error
     }
     else {
         o.foo;
@@ -939,7 +939,7 @@ function f16(o) {
         o.foo;
     }
     else {
-        o.foo; // Error
+        o === null || o === void 0 ? void 0 : o.foo; // Error
     }
 }
 function f20(o) {
@@ -975,10 +975,10 @@ function f22(o) {
         o.foo;
     }
     else {
-        o.foo; // Error
+        o === null || o === void 0 ? void 0 : o.foo; // Error
     }
     if (typeof (o === null || o === void 0 ? void 0 : o.foo) !== "number") {
-        o.foo; // Error
+        o === null || o === void 0 ? void 0 : o.foo; // Error
     }
     else {
         o.foo;
@@ -987,10 +987,10 @@ function f22(o) {
         o.foo;
     }
     else {
-        o.foo; // Error
+        o === null || o === void 0 ? void 0 : o.foo; // Error
     }
     if (typeof (o === null || o === void 0 ? void 0 : o.foo) != "number") {
-        o.foo; // Error
+        o === null || o === void 0 ? void 0 : o.foo; // Error
     }
     else {
         o.foo;
@@ -998,7 +998,7 @@ function f22(o) {
 }
 function f23(o) {
     if (typeof (o === null || o === void 0 ? void 0 : o.foo) === "undefined") {
-        o.foo; // Error
+        o === null || o === void 0 ? void 0 : o.foo; // Error
     }
     else {
         o.foo;
@@ -1007,10 +1007,10 @@ function f23(o) {
         o.foo;
     }
     else {
-        o.foo; // Error
+        o === null || o === void 0 ? void 0 : o.foo; // Error
     }
     if (typeof (o === null || o === void 0 ? void 0 : o.foo) == "undefined") {
-        o.foo; // Error
+        o === null || o === void 0 ? void 0 : o.foo; // Error
     }
     else {
         o.foo;
@@ -1019,7 +1019,7 @@ function f23(o) {
         o.foo;
     }
     else {
-        o.foo; // Error
+        o === null || o === void 0 ? void 0 : o.foo; // Error
     }
 }
 function f30(o) {
@@ -1049,10 +1049,10 @@ function f40(o) {
             o.foo;
             break;
         case undefined:
-            o.foo; // Error
+            o === null || o === void 0 ? void 0 : o.foo; // Error
             break;
         default:
-            o.foo; // Error
+            o === null || o === void 0 ? void 0 : o.foo; // Error
             break;
     }
 }
@@ -1065,10 +1065,10 @@ function f41(o) {
             o.foo;
             break;
         case "undefined":
-            o.foo; // Error
+            o === null || o === void 0 ? void 0 : o.foo; // Error
             break;
         default:
-            o.foo; // Error
+            o === null || o === void 0 ? void 0 : o.foo; // Error
             break;
     }
 }
@@ -1093,7 +1093,7 @@ let lastSomeProperty;
 function someFunction(someOptionalObject) {
     if ((someOptionalObject === null || someOptionalObject === void 0 ? void 0 : someOptionalObject.someProperty) !== lastSomeProperty) {
         console.log(someOptionalObject);
-        console.log(someOptionalObject.someProperty); // Error
+        console.log(someOptionalObject === null || someOptionalObject === void 0 ? void 0 : someOptionalObject.someProperty); // Error
         lastSomeProperty = someOptionalObject === null || someOptionalObject === void 0 ? void 0 : someOptionalObject.someProperty;
     }
 }
@@ -1104,9 +1104,9 @@ someFunction(someObject);
 someFunction(undefined);
 // Repro from #35970
 let i = 0;
-while (((_u = arr[i]) === null || _u === void 0 ? void 0 : _u.tag) === "left") {
+while (((_4 = arr[i]) === null || _4 === void 0 ? void 0 : _4.tag) === "left") {
     i += 1;
-    if (((_v = arr[i]) === null || _v === void 0 ? void 0 : _v.tag) === "right") {
+    if (((_5 = arr[i]) === null || _5 === void 0 ? void 0 : _5.tag) === "right") {
         console.log("I should ALSO be reachable");
     }
 }

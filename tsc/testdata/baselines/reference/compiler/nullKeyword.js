@@ -5,4 +5,4 @@ null.foo;
 
 //// [nullKeyword.js]
 "use strict";
-null.foo;
+null === null || null === void 0 ? void 0 : null.foo;

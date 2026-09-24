@@ -328,15 +328,15 @@ function fx2(obj, key) {
     const x2 = obj && obj[key];
 }
 function fx3(obj, key) {
-    const x1 = obj[key]; // Error
+    const x1 = obj === null || obj === void 0 ? void 0 : obj[key]; // Error
     const x2 = obj && obj[key];
 }
 // Repro from #44166
 class TableBaseEnum {
     m() {
         let iSpec = null;
-        iSpec[null]; // Error, object possibly undefined
-        iSpec[null]; // Error, object possibly undefined
+        iSpec === null || iSpec === void 0 ? void 0 : iSpec[null]; // Error, object possibly undefined
+        iSpec === null || iSpec === void 0 ? void 0 : iSpec[null]; // Error, object possibly undefined
         if (iSpec === undefined) {
             return;
         }

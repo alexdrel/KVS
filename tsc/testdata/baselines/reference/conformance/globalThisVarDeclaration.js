@@ -44,8 +44,8 @@ self.a;
 self.b;
 window.a;
 window.b;
-top.a;
-top.b;
+top?.a;
+top?.b;
 //// [actual.js]
 "use strict";
 var b = 10;
@@ -58,5 +58,5 @@ self.a;
 self.b;
 window.a;
 window.b;
-top.a;
-top.b;
+top?.a;
+top?.b;

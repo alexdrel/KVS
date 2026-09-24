@@ -3,7 +3,7 @@
 This is a working implementation aid, not a language specification or feature
 order. The language documents remain authoritative for accepted semantics.
 
-Progress: **249 of 357 items complete (69.7%)**; **108 remain open**.
+Progress: **250 of 373 items complete (67.0%)**; **123 remain open**.
 
 - `[x]` means implemented with focused compiler evidence.
 - `[ ]` means unimplemented, incomplete, or not yet deliberately validated.
@@ -23,6 +23,8 @@ Implemented vertical slices:
   values.
 - Static nullability assertions and inferred binding suffixes: `as?`, `as!`,
   `let value?`, and `const`/`let value!`.
+- Nullable property and indexed reads propagate absence through their access
+  path.
 - Nulling operator: `condition ?: expression`.
 - Nullability type operators: `T?` and `T!`.
 - Successful-branch binding: `if (const value = expression)`.
@@ -59,9 +61,6 @@ Known semantic debts:
 - Extant assignment is currently RHS-first and skips target evaluation when
   the RHS is absent.
 - Asynchronous iteration is not implemented.
-- Implicit-subject `for...in` is postponed until KVS decides whether it should
-  preserve JavaScript's inherited-enumerable-property behavior or iterate only
-  own enumerable properties.
 
 Focused conformance inputs:
 
@@ -143,8 +142,8 @@ them; generated example `.js` files are intentionally ignored.
 
 ### Nullable dataflow
 
-- [ ] Member access propagates absence
-- [ ] Indexed access propagates absence
+- [x] Member access propagates absence
+- [x] Indexed access propagates absence
 - [x] Arithmetic operators lift over absence
 - [x] Relational operators reject nullable operands
 - [x] Ordinary template interpolation rejects nullable substitutions
@@ -244,14 +243,30 @@ them; generated example `.js` files are intentionally ignored.
 - [x] Nullable source is evaluated once
 - [x] Nullable `for await...of`
 
+### Keyed iteration
+
+- [ ] `_%` companion coordinate for implicit `for`, `collect`, `collect*`, and
+  `select`
+- [ ] Arrays, tuples, and typed arrays expose numeric indexes
+- [ ] Maps expose keys while `_` remains the mapped value
+- [ ] Records expose own enumerable string keys in JavaScript property order
+- [ ] Other iterables expose a zero-based source ordinal
+- [ ] Filtering, `continue`, and skipped production do not renumber coordinates
+- [ ] Yielded pair values remain values rather than being guessed as entries
+- [ ] Static source type selects the keyed iteration category
+- [ ] Ambiguous source types require narrowing or explicit iteration
+- [ ] Nullable sources retain the existing absent-iteration behavior
+- [ ] Explicit `for (const [key, value] in source)` keyed form
+- [ ] Existing single-binding `for...in` remains unchanged
+- [ ] Explicit `for...of` retains native iterator semantics
+- [ ] Nested implicit iteration shadows both `_` and `_%`
+
 ### Expression-valued `for`
 
 - [x] Scalar accumulator
 - [x] Explicit `for...of` form
 - [x] Implicit-subject `for...of` form
 - [x] Nullable `for...of` source returns initialized result
-- [x] Explicit `for...in` form
-- [ ] Implicit-subject `for...in` ownership semantics
 - [x] C-style `for`
 - [x] Tuple result
 - [x] Object result
@@ -532,6 +547,13 @@ them; generated example `.js` files are intentionally ignored.
 - [x] Head-position lowering without an IIFE or happy-path closure
 
 ## 7. Lightweight type-system additions
+
+### Record type shorthand
+
+- [ ] `{ *: Value }` shorthand for a string index signature
+- [ ] Named fields follow existing index-signature assignability rules
+- [ ] Arbitrary key types remain the responsibility of `Map<K, V>`
+- [ ] Shorthand identifies the static record category for keyed iteration
 
 ### `distinct`
 

@@ -39,7 +39,7 @@ context function log(message: string) {
 
 ```kvs
 context function processOrder(order: Order) {
-    log(`Processing ${order.id} for ${CurrentUser.name}`);
+    log(`Processing ${order.id} for ${CurrentUser.name ?? "anonymous"}`);
 }
 
 context async function loadAndProcess(id: string) {

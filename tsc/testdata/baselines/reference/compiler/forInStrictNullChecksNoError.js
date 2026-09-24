@@ -14,5 +14,5 @@ function f(x) {
     for (const key in x) { // 1
         console.log(x[key]); // 2
     }
-    x["no"]; // should still error
+    x === null || x === void 0 ? void 0 : x["no"]; // should still error
 }

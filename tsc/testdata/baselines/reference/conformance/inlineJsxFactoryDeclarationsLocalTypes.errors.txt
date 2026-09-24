@@ -1,5 +1,5 @@
 component.tsx(4,136): error TS2609: JSX spread child must be an array type.
-component.tsx(4,140): error TS2532: Object is possibly 'undefined'.
+component.tsx(4,145): error TS2339: Property 'props' does not exist on type 'never'.
 component.tsx(12,13): error TS2609: JSX spread child must be an array type.
 index.tsx(5,1): error TS2741: Property '__predomBrand' is missing in type 'import("renderer").dom.JSX.Element' but required in type 'import("renderer2").predom.JSX.Element'.
 index.tsx(13,82): error TS2609: JSX spread child must be an array type.
@@ -65,8 +65,8 @@ index.tsx(24,48): error TS2741: Property '__domBrand' is missing in type 'import
     export const MySFC = (props: {x: number, y: number, children?: predom.JSX.Element[]}) => <p>{props.x} + {props.y} = {props.x + props.y}{...this.props.children}</p>;
                                                                                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~
 !!! error TS2609: JSX spread child must be an array type.
-                                                                                                                                               ~~~~
-!!! error TS2532: Object is possibly 'undefined'.
+                                                                                                                                                    ~~~~~
+!!! error TS2339: Property 'props' does not exist on type 'never'.
     
     export class MyClass implements predom.JSX.Element {
         __predomBrand!: void;

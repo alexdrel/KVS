@@ -169,13 +169,13 @@ class C6 {
 >foo : number[] | undefined
 
         this.foo = [this.foo[0] * 2];  // Error: Object is possibly undefined
->this.foo = [this.foo[0] * 2] : number[]
+>this.foo = [this.foo[0] * 2] : (number | null)[]
 >this.foo : number[] | undefined
 >this : this
 >foo : number[] | undefined
->[this.foo[0] * 2] : number[]
->this.foo[0] * 2 : number
->this.foo[0] : number
+>[this.foo[0] * 2] : (number | null)[]
+>this.foo[0] * 2 : number | null
+>this.foo[0] : number | null | undefined
 >this.foo : number[] | undefined
 >this : this
 >foo : number[] | undefined
@@ -183,9 +183,9 @@ class C6 {
 >2 : 2
 
         this.foo;  // number[]
->this.foo : number[]
+>this.foo : number[] | undefined
 >this : this
->foo : number[]
+>foo : number[] | undefined
     }
 }
 
