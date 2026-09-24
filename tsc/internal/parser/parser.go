@@ -1354,13 +1354,13 @@ func (p *Parser) parseForOrForInOrForOfStatement() *ast.Node {
 			p.token == ast.KindAwaitKeyword && p.lookAhead((*Parser).nextIsUsingKeywordThenBindingIdentifierOrStartOfObjectDestructuringOnSameLine) {
 			initializer = p.parseVariableDeclarationList(true /*inForStatementInitializer*/)
 		} else {
-			initializer = doInContext(p, ast.NodeFlagsDisallowInContext, true, (*Parser).parseExpression)
+			initializer = p.doInContext(ast.NodeFlagsDisallowInContext, true, (*Parser).parseExpression)
 		}
 	}
 	var result *ast.Statement
 	switch {
 	case awaitToken != nil && p.parseExpected(ast.KindOfKeyword) || awaitToken == nil && p.parseOptional(ast.KindOfKeyword):
-		expression := doInContext(p, ast.NodeFlagsDisallowInContext, false, (*Parser).parseAssignmentExpressionOrHigher)
+		expression := p.doInContext(ast.NodeFlagsDisallowInContext, false, (*Parser).parseAssignmentExpressionOrHigher)
 		p.parseExpected(ast.KindCloseParenToken)
 		result = p.factory.NewForInOrOfStatement(ast.KindForOfStatement, awaitToken, initializer, expression, p.parseStatement())
 	case awaitToken == nil && p.token == ast.KindCloseParenToken && initializer != nil && initializer.Pos() < initializer.End() && !ast.IsVariableDeclarationList(initializer):
@@ -1451,7 +1451,7 @@ func (p *Parser) parseWithStatement() *ast.Node {
 	openParenParsed := p.parseExpected(ast.KindOpenParenToken)
 	expression := p.parseExpressionAllowIn()
 	p.parseExpectedMatchingBrackets(ast.KindOpenParenToken, ast.KindCloseParenToken, openParenParsed, openParenPosition)
-	statement := doInContext(p, ast.NodeFlagsInWithStatement, true, (*Parser).parseStatement)
+	statement := p.doInContext(ast.NodeFlagsInWithStatement, true, (*Parser).parseStatement)
 	result := p.finishNode(p.factory.NewWithStatement(expression, statement), pos)
 	p.withJSDoc(result, jsdoc)
 	return result
@@ -2141,7 +2141,7 @@ func (p *Parser) parsePropertyDeclaration(pos int, jsdoc jsdocScannerInfo, modif
 		postfixToken = p.parseOptionalToken(ast.KindExclamationToken)
 	}
 	typeNode := p.parseTypeAnnotation()
-	initializer := doInContext(p, ast.NodeFlagsYieldContext|ast.NodeFlagsAwaitContext|ast.NodeFlagsDisallowInContext, false, (*Parser).parseInitializer)
+	initializer := p.doInContext(ast.NodeFlagsYieldContext|ast.NodeFlagsAwaitContext|ast.NodeFlagsDisallowInContext, false, (*Parser).parseInitializer)
 	p.parseSemicolonAfterPropertyName(name, typeNode, initializer)
 	result := p.finishNode(p.factory.NewPropertyDeclaration(modifiers, name, postfixToken, typeNode, initializer), pos)
 	p.withJSDoc(result, jsdoc)
@@ -2295,7 +2295,7 @@ func (p *Parser) parseEnumMember() *ast.Node {
 	pos := p.nodePos()
 	jsdoc := p.jsdocScannerInfo()
 	name := p.parsePropertyName()
-	initializer := doInContext(p, ast.NodeFlagsDisallowInContext, false, (*Parser).parseInitializer)
+	initializer := p.doInContext(ast.NodeFlagsDisallowInContext, false, (*Parser).parseInitializer)
 	result := p.finishNode(p.factory.NewEnumMember(name, initializer), pos)
 	p.withJSDoc(result, jsdoc)
 	return result
@@ -2792,9 +2792,9 @@ func (p *Parser) parseType() *ast.TypeNode {
 			// The type following 'extends' is not permitted to be another conditional type
 			extendsType := p.parseConditionalTypePart()
 			p.parseExpected(ast.KindQuestionToken)
-			trueType := doInContext(p, ast.NodeFlagsDisallowConditionalTypesContext, false, (*Parser).parseType)
+			trueType := p.doInContext(ast.NodeFlagsDisallowConditionalTypesContext, false, (*Parser).parseType)
 			p.parseExpected(ast.KindColonToken)
-			falseType := doInContext(p, ast.NodeFlagsDisallowConditionalTypesContext, false, (*Parser).parseType)
+			falseType := p.doInContext(ast.NodeFlagsDisallowConditionalTypesContext, false, (*Parser).parseType)
 			conditionalType := p.factory.NewConditionalTypeNode(typeNode, extendsType, trueType, falseType)
 			p.finishNode(conditionalType, pos)
 			typeNode = conditionalType
@@ -2853,7 +2853,7 @@ func (p *Parser) parseTypeOperatorOrHigher() *ast.TypeNode {
 	case ast.KindInferKeyword:
 		return p.parseInferType()
 	}
-	return doInContext(p, ast.NodeFlagsDisallowConditionalTypesContext, false, (*Parser).parsePostfixTypeOrHigher)
+	return p.doInContext(ast.NodeFlagsDisallowConditionalTypesContext, false, (*Parser).parsePostfixTypeOrHigher)
 }
 
 func (p *Parser) parseTypeOperator(operator ast.Kind) *ast.Node {
@@ -2943,7 +2943,7 @@ func (p *Parser) nextIsStartOfType() bool {
 func (p *Parser) parseConditionalTypePart() *ast.TypeNode {
 	saved := p.parsingConditionalTypePart
 	p.parsingConditionalTypePart = true
-	typeNode := doInContext(p, ast.NodeFlagsDisallowConditionalTypesContext, true, (*Parser).parseType)
+	typeNode := p.doInContext(ast.NodeFlagsDisallowConditionalTypesContext, true, (*Parser).parseType)
 	p.parsingConditionalTypePart = saved
 	return typeNode
 }
@@ -3580,7 +3580,7 @@ func (p *Parser) parseNameOfParameter(modifiers *ast.ModifierList) *ast.Node {
 
 func (p *Parser) parseReturnType(returnToken ast.Kind, isType bool) *ast.TypeNode {
 	if p.shouldParseReturnType(returnToken, isType) {
-		return doInContext(p, ast.NodeFlagsDisallowConditionalTypesContext, false, (*Parser).parseTypeOrTypePredicate)
+		return p.doInContext(ast.NodeFlagsDisallowConditionalTypesContext, false, (*Parser).parseTypeOrTypePredicate)
 	}
 	return nil
 }
@@ -4129,7 +4129,7 @@ func (p *Parser) parseModifiersEx(allowDecorators bool, permitConstAsModifier bo
 func (p *Parser) parseDecorator() *ast.Node {
 	pos := p.nodePos()
 	p.parseExpected(ast.KindAtToken)
-	expression := doInContext(p, ast.NodeFlagsDecoratorContext, true, (*Parser).parseDecoratorExpression)
+	expression := p.doInContext(ast.NodeFlagsDecoratorContext, true, (*Parser).parseDecoratorExpression)
 	return p.finishNode(p.factory.NewDecorator(expression), pos)
 }
 
@@ -4301,7 +4301,7 @@ func (p *Parser) parseExpression() *ast.Expression {
 }
 
 func (p *Parser) parseExpressionAllowIn() *ast.Expression {
-	return doInContext(p, ast.NodeFlagsDisallowInContext, false, (*Parser).parseExpression)
+	return p.doInContext(ast.NodeFlagsDisallowInContext, false, (*Parser).parseExpression)
 }
 
 func (p *Parser) parseAssignmentExpressionOrHigher() *ast.Expression {
@@ -6000,7 +6000,7 @@ func (p *Parser) parseArgumentList() *ast.NodeList {
 }
 
 func (p *Parser) parseArgumentExpression() *ast.Expression {
-	expression := doInContext(p, ast.NodeFlagsDisallowInContext|ast.NodeFlagsDecoratorContext, false, (*Parser).parseArgumentOrArrayLiteralElement)
+	expression := p.doInContext(ast.NodeFlagsDisallowInContext|ast.NodeFlagsDecoratorContext, false, (*Parser).parseArgumentOrArrayLiteralElement)
 	placeholder := findKvsPlaceholder(expression)
 	if placeholder == nil {
 		return expression
@@ -6180,7 +6180,7 @@ func (p *Parser) parseKvsForExpression() *ast.Expression {
 		if p.token == ast.KindVarKeyword || p.token == ast.KindLetKeyword || p.token == ast.KindConstKeyword {
 			initializer = p.parseVariableDeclarationList(true /*inForStatementInitializer*/)
 		} else {
-			initializer = doInContext(p, ast.NodeFlagsDisallowInContext, true, (*Parser).parseExpression)
+			initializer = p.doInContext(ast.NodeFlagsDisallowInContext, true, (*Parser).parseExpression)
 		}
 	}
 
@@ -6196,7 +6196,7 @@ func (p *Parser) parseKvsForExpression() *ast.Expression {
 	if p.token == ast.KindOfKeyword || p.token == ast.KindInKeyword {
 		forIn = p.token == ast.KindInKeyword
 		p.nextToken()
-		expression = doInContext(p, ast.NodeFlagsDisallowInContext, false, (*Parser).parseAssignmentExpressionOrHigher)
+		expression = p.doInContext(ast.NodeFlagsDisallowInContext, false, (*Parser).parseAssignmentExpressionOrHigher)
 		p.parseExpected(ast.KindSemicolonToken)
 		result, tupleResult, objectResult = p.parseKvsForResult()
 	} else {
@@ -6353,7 +6353,7 @@ func (p *Parser) parseKvsProducerExpression() *ast.Expression {
 	} else {
 		initializer = p.parseVariableDeclarationList(true)
 		p.parseExpected(ast.KindOfKeyword)
-		expression = doInContext(p, ast.NodeFlagsDisallowInContext, false, (*Parser).parseAssignmentExpressionOrHigher)
+		expression = p.doInContext(ast.NodeFlagsDisallowInContext, false, (*Parser).parseAssignmentExpressionOrHigher)
 	}
 	p.parseExpected(ast.KindCloseParenToken)
 	saveActive := p.kvsProducerActive
@@ -6522,12 +6522,12 @@ func (p *Parser) parseObjectLiteralElement() *ast.Node {
 		equalsToken := p.parseOptionalToken(ast.KindEqualsToken)
 		var initializer *ast.Expression
 		if equalsToken != nil {
-			initializer = doInContext(p, ast.NodeFlagsDisallowInContext, false, (*Parser).parseAssignmentExpressionOrHigher)
+			initializer = p.doInContext(ast.NodeFlagsDisallowInContext, false, (*Parser).parseAssignmentExpressionOrHigher)
 		}
 		node = p.factory.NewShorthandPropertyAssignment(modifiers, name, postfixToken, nil /*typeNode*/, equalsToken, initializer)
 	} else {
 		p.parseExpected(ast.KindColonToken)
-		initializer := doInContext(p, ast.NodeFlagsDisallowInContext, false, (*Parser).parseAssignmentExpressionOrHigher)
+		initializer := p.doInContext(ast.NodeFlagsDisallowInContext, false, (*Parser).parseAssignmentExpressionOrHigher)
 		node = p.factory.NewPropertyAssignment(modifiers, name, postfixToken, nil /*typeNode*/, initializer)
 	}
 	p.finishNode(node, pos)
@@ -6554,11 +6554,11 @@ func (p *Parser) parseFunctionExpression() *ast.Expression {
 	var name *ast.Node
 	switch {
 	case isGenerator && isAsync:
-		name = doInContext(p, ast.NodeFlagsYieldContext|ast.NodeFlagsAwaitContext, true, (*Parser).parseOptionalBindingIdentifier)
+		name = p.doInContext(ast.NodeFlagsYieldContext|ast.NodeFlagsAwaitContext, true, (*Parser).parseOptionalBindingIdentifier)
 	case isGenerator:
-		name = doInContext(p, ast.NodeFlagsYieldContext, true, (*Parser).parseOptionalBindingIdentifier)
+		name = p.doInContext(ast.NodeFlagsYieldContext, true, (*Parser).parseOptionalBindingIdentifier)
 	case isAsync:
-		name = doInContext(p, ast.NodeFlagsAwaitContext, true, (*Parser).parseOptionalBindingIdentifier)
+		name = p.doInContext(ast.NodeFlagsAwaitContext, true, (*Parser).parseOptionalBindingIdentifier)
 	default:
 		name = p.parseOptionalBindingIdentifier()
 	}
@@ -7216,7 +7216,7 @@ func (p *Parser) setContextFlags(flags ast.NodeFlags, value bool) {
 	}
 }
 
-func doInContext[T any](p *Parser, flags ast.NodeFlags, value bool, f func(p *Parser) T) T {
+func (p *Parser) doInContext[T any](flags ast.NodeFlags, value bool, f func(p *Parser) T) T {
 	saveContextFlags := p.contextFlags
 	p.setContextFlags(flags, value)
 	result := f(p)

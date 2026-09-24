@@ -31,6 +31,7 @@ import {
     createExpressionStatement,
     createIdentifier,
     createIfStatement,
+    createMissingDeclaration,
     createNodeArray,
     createNumericLiteral,
     createSourceFile,
@@ -44,13 +45,21 @@ import {
     visitNodes,
 } from "@typescript/typescript/unstable/ast/visitor";
 import { createVirtualFileSystem } from "@typescript/typescript/unstable/fs";
-import { API } from "@typescript/typescript/unstable/sync";
+import {
+    API,
+    Checker,
+    TypeFlags,
+} from "@typescript/typescript/unstable/sync";
 import assert from "node:assert";
 import {
     describe,
     test,
 } from "node:test";
 import { fileURLToPath } from "node:url";
+import { areTestsFiltered } from "../testUtils.ts";
+import { runBenchmarks } from "./ast.bench.ts";
+
+const concurrency = areTestsFiltered();
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -65,11 +74,22 @@ function collectKinds(node: Node): SyntaxKind[] {
     return kinds;
 }
 
+describe("NodeObject + childrenIter", { concurrency }, () => {
+    test("skips absent optional child lists", () => {
+        const node = createMissingDeclaration();
+        assert.deepStrictEqual([...node.childrenIter()], []);
+    });
+});
+
+test("Benchmarks", async () => {
+    await runBenchmarks({ singleIteration: true });
+});
+
 // ---------------------------------------------------------------------------
 // cloneNode
 // ---------------------------------------------------------------------------
 
-describe("cloneNode", () => {
+describe("cloneNode", { concurrency }, () => {
     test("clones an identifier", () => {
         const id = createIdentifier("hello");
         const clone = cloneNode(id);
@@ -139,7 +159,7 @@ describe("cloneNode", () => {
 // visitNode / visitNodes
 // ---------------------------------------------------------------------------
 
-describe("visitNode", () => {
+describe("visitNode", { concurrency }, () => {
     test("returns undefined for undefined input", () => {
         const nothing: Node | undefined = undefined;
         const result = visitNode(nothing, () => undefined);
@@ -160,7 +180,7 @@ describe("visitNode", () => {
     });
 });
 
-describe("visitNodes", () => {
+describe("visitNodes", { concurrency }, () => {
     test("returns undefined for undefined input", () => {
         const nothing: NodeArray<Node> | undefined = undefined;
         const result = visitNodes(nothing, () => undefined);
@@ -205,7 +225,7 @@ describe("visitNodes", () => {
 // visitEachChild
 // ---------------------------------------------------------------------------
 
-describe("visitEachChild", () => {
+describe("visitEachChild", { concurrency }, () => {
     test("returns same node if nothing changed (identity visitor)", () => {
         const left = createIdentifier("a");
         const right = createIdentifier("b");
@@ -290,7 +310,7 @@ describe("visitEachChild", () => {
 // getSynthesizedDeepClone
 // ---------------------------------------------------------------------------
 
-describe("getSynthesizedDeepClone", () => {
+describe("getSynthesizedDeepClone", { concurrency }, () => {
     test("deeply clones identifier", () => {
         const id = createIdentifier("hello");
         const clone = getSynthesizedDeepClone(id);
@@ -423,7 +443,7 @@ describe("getSynthesizedDeepClone", () => {
 // getSynthesizedDeepClones (NodeArray)
 // ---------------------------------------------------------------------------
 
-describe("getSynthesizedDeepClones", () => {
+describe("getSynthesizedDeepClones", { concurrency }, () => {
     test("deeply clones a NodeArray", () => {
         const a = createIdentifier("a");
         const b = createIdentifier("b");
@@ -458,7 +478,7 @@ describe("getSynthesizedDeepClones", () => {
 // Type-only import use sites
 // ---------------------------------------------------------------------------
 
-describe("isValidTypeOnlyAliasUseSite", () => {
+describe("isValidTypeOnlyAliasUseSite", { concurrency }, () => {
     test("classifies syntactic type-only import use sites", () => {
         const source = `
 type TypeUse = TypeOnlyName;
@@ -510,7 +530,7 @@ class JSDocAugmentsUse {}
 // Integration: visitor transformation
 // ---------------------------------------------------------------------------
 
-describe("visitor transformation", () => {
+describe("visitor transformation", { concurrency }, () => {
     test("rename all identifiers via recursive visitor", () => {
         const a = createIdentifier("oldName");
         const b = createIdentifier("oldName");
@@ -575,13 +595,17 @@ function spawnAPI(files: Record<string, string> = {
     });
 }
 
-function getRemoteSourceFile(api: API, configPath: string, filePath: string) {
-    const snapshot = api.updateSnapshot({ openProject: configPath });
-    const project = snapshot.getProject(configPath)!;
-    return project.program.getSourceFile(filePath)!;
+function getRemoteSourceFileAndChecker(api: API, configPath: string, filePath: string) {
+    const snapshot = api.createSnapshot({ openProject: configPath });
+    const project = snapshot.getConfiguredProject(configPath)!;
+    return [project.program.getSourceFile(filePath)!, project.checker] as const;
 }
 
-describe("RemoteNode + cloneNode", () => {
+function getRemoteSourceFile(api: API, configPath: string, filePath: string) {
+    return getRemoteSourceFileAndChecker(api, configPath, filePath)[0];
+}
+
+describe("RemoteNode + cloneNode", { concurrency }, () => {
     test("does not read a sibling as an invalid JSDoc link name", () => {
         const api = spawnAPI({
             "/tsconfig.json": "{}",
@@ -697,7 +721,7 @@ interface I extends Parent<boolean> {}
     });
 });
 
-describe("RemoteNode + visitEachChild", () => {
+describe("RemoteNode + visitEachChild", { concurrency }, () => {
     test("identity visitor returns same remote node", () => {
         const api = spawnAPI();
         try {
@@ -739,7 +763,7 @@ describe("RemoteNode + visitEachChild", () => {
     });
 });
 
-describe("RemoteNodeList inherited array methods", () => {
+describe("RemoteNodeList inherited array methods", { concurrency }, () => {
     test("filter/map/slice return plain arrays without throwing", () => {
         const api = spawnAPI();
         try {
@@ -772,7 +796,7 @@ describe("RemoteNodeList inherited array methods", () => {
     });
 });
 
-describe("RemoteNode + getSynthesizedDeepClone", () => {
+describe("RemoteNode + getSynthesizedDeepClone", { concurrency }, () => {
     test("deep clones a remote import declaration", () => {
         const api = spawnAPI();
         try {
@@ -886,7 +910,7 @@ function assertGetterInvariants(node: Node, sf: SourceFile) {
     });
 }
 
-describe("RemoteNode + position/text getters", () => {
+describe("RemoteNode + position/text getters", { concurrency }, () => {
     const source = "/* lead */ const value = 123;";
     const files = {
         "/tsconfig.json": "{}",
@@ -1039,12 +1063,23 @@ describe("RemoteNode + position/text getters", () => {
 // RemoteNode: child/token getters
 // ---------------------------------------------------------------------------
 
-describe("RemoteNode + child/token getters", () => {
+describe("RemoteNode + child/token getters", { concurrency }, () => {
     function withFirstStatement(source: string, fn: (stmt: Node, sf: SourceFile) => void) {
         const api = spawnAPI({ "/tsconfig.json": "{}", "/src/children.ts": source });
         try {
             const sf = getRemoteSourceFile(api, "/tsconfig.json", "/src/children.ts");
             fn(sf.statements[0], sf);
+        }
+        finally {
+            api.close();
+        }
+    }
+
+    async function withFirstStatementAsync(source: string, fn: (stmt: Node, sf: SourceFile, api: API<false>, checker: Checker) => Promise<void>) {
+        const api = spawnAPI({ "/tsconfig.json": "{}", "/src/children.ts": source });
+        try {
+            const [sf, checker] = getRemoteSourceFileAndChecker(api, "/tsconfig.json", "/src/children.ts");
+            await fn(sf.statements[0], sf, api, checker);
         }
         finally {
             api.close();
@@ -1064,6 +1099,54 @@ describe("RemoteNode + child/token getters", () => {
         walk(node);
         return found;
     }
+
+    test("childrenIter generates all node children and supports early return value passthru", () => {
+        withFirstStatement("if (x) {}", stmt => {
+            const texts: string[] = [];
+            for (const c of stmt.childrenIter()) {
+                texts.push(c.getText());
+            }
+            assert.deepStrictEqual(texts, ["x", "{}"]);
+            const cGen = stmt.childrenIter<Node | undefined>();
+            let state = cGen.next();
+            while (!state.done) {
+                const n = state.value;
+                let foundX: Node | undefined;
+                if (n.getText() === "x") {
+                    foundX = n;
+                }
+                state = cGen.next(foundX);
+            }
+            assert.strictEqual(
+                state.value,
+                stmt.forEachChild(n => {
+                    return n;
+                }),
+            );
+        });
+    });
+
+    test("childrenIter works with async generators", async () => {
+        await withFirstStatementAsync("class X { p: any }", async (stmt, sf, api, checker) => {
+            async function* visitNodeForFirstAnyChild(node: Node): AsyncGenerator<Node | undefined, Node | undefined, Node | undefined> {
+                for (const n of node.childrenIter()) {
+                    const t = await checker.getTypeAtLocation(n);
+                    if (t.flags & TypeFlags.Any) return n;
+                    const res = yield* visitNodeForFirstAnyChild(n);
+                    if (res) return res;
+                }
+            }
+            const res = (await visitNodeForFirstAnyChild(stmt).next()).value;
+            assert.strictEqual(res!.getText(), "p: any");
+        });
+    });
+
+    test("childrenIter skips empty NodeArrays", () => {
+        withFirstStatement("function f() {}", stmt => {
+            const body = findFirstOfKind(stmt, SyntaxKind.Block)!;
+            assert.deepStrictEqual([...body.childrenIter()], []);
+        });
+    });
 
     test("getChildren materializes the punctuation/keyword tokens the AST omits", () => {
         withFirstStatement("if (x) {}", stmt => {
