@@ -13,9 +13,11 @@ drafts[0].tags!.push("preview");
 
 console.log(drafts[0]); // { title: 'Autumn', tags: [ 'preview' ] }
 
-const published = new Map<string, Release>().get("winter");
+let published = new Map<string, Release>().get("winter");
 
-// An absent published release should stay absent.
+// All three operations are abandoned, so their defaults are never stored.
 published?.title = "Winter";
+published!.tags!.push?(null as string?);
+published!.title ?= null as string?;
 
 console.log(published); // undefined

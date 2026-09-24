@@ -8971,5 +8971,9 @@
     "KVS optional invocation supports only fixed tuple spreads.": {
         "category": "Error",
         "code": 100085
+    },
+    "A destructured parameter cannot traverse a nullable source. Bind the parameter first and destructure it in the function body.": {
+        "category": "Error",
+        "code": 100090
     }
 }

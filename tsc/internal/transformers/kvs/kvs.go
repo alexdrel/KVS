@@ -85,6 +85,11 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 			return result
 		}
 	case ast.KindVariableDeclaration:
+		if ast.IsBindingPattern(node.Name()) && node.Initializer() != nil {
+			if result := transformers.RewriteNullableDestructuringBinding(&tx.Transformer, node, tx.resolver.KvsDestructuringPatternSourceNullable); result != nil {
+				return result
+			}
+		}
 		if ast.IsKvsCatchSplitBindingPattern(node.AsVariableDeclaration().Name()) {
 			declaration := node.AsVariableDeclaration()
 			pattern := declaration.Name().AsBindingPattern()
@@ -260,14 +265,42 @@ func (tx *transformer) transformOptionalMutation(target *ast.Node, mutate func(*
 		break
 	}
 	slices.Reverse(segments)
-	var lower func(int, *ast.Node) *ast.Node
-	lower = func(index int, receiver *ast.Node) *ast.Node {
+	var lower func(int, *ast.Node, []*ast.Node) *ast.Node
+	lower = func(index int, receiver *ast.Node, commits []*ast.Node) *ast.Node {
 		if index == len(segments) {
-			return mutate(receiver)
+			result := mutate(receiver)
+			for _, commit := range slices.Backward(commits) {
+				result = factory.NewCommaExpression(commit, result)
+			}
+			return result
 		}
 		segment := segments[index]
 		if segment.isDefault {
-			return lower(index+1, tx.transformDefaultValue(segment.node.AsKvsDefaultExpression(), receiver))
+			staged := false
+			for _, later := range segments[index+1:] {
+				if later.optional {
+					staged = true
+					break
+				}
+			}
+			if !staged || !tx.resolver.KvsDefaultWritesBack(segment.node) {
+				return lower(index+1, tx.transformDefaultValue(segment.node.AsKvsDefaultExpression(), receiver), commits)
+			}
+
+			capture, stableReceiver := tx.captureOptionalMutationTarget(receiver)
+			valueTemp := factory.NewTempVariable()
+			missingTemp := factory.NewTempVariable()
+			tx.declareTemp(valueTemp)
+			tx.declareTemp(missingTemp)
+			value := factory.NewAssignmentExpression(valueTemp, stableReceiver)
+			if capture != nil {
+				value = factory.NewCommaExpression(capture, value)
+			}
+			missing := factory.NewAssignmentExpression(missingTemp, factory.NewBinaryExpression(nil, value, nil, factory.NewToken(ast.KindEqualsEqualsToken), factory.NewKeywordExpression(ast.KindNullKeyword)))
+			fallback := tx.makeDefaultValue(segment.node.AsKvsDefaultExpression())
+			resolved := factory.NewConditionalExpression(missing, factory.NewToken(ast.KindQuestionToken), factory.NewAssignmentExpression(valueTemp, fallback), factory.NewToken(ast.KindColonToken), valueTemp)
+			commit := factory.NewConditionalExpression(missingTemp, factory.NewToken(ast.KindQuestionToken), factory.NewAssignmentExpression(stableReceiver, valueTemp), factory.NewToken(ast.KindColonToken), valueTemp)
+			return lower(index+1, resolved, append(commits, commit))
 		}
 		makeAccess := func(base *ast.Node) *ast.Node {
 			if ast.IsPropertyAccessExpression(segment.node) {
@@ -276,15 +309,103 @@ func (tx *transformer) transformOptionalMutation(target *ast.Node, mutate func(*
 			return factory.NewElementAccessExpression(base, nil, tx.Visitor().VisitNode(segment.node.AsElementAccessExpression().ArgumentExpression), ast.NodeFlagsNone)
 		}
 		if !segment.optional {
-			return lower(index+1, makeAccess(receiver))
+			return lower(index+1, makeAccess(receiver), commits)
 		}
 		temp := factory.NewTempVariable()
 		tx.declareTemp(temp)
 		captured := factory.NewAssignmentExpression(temp, receiver)
 		condition := factory.NewBinaryExpression(nil, captured, nil, factory.NewToken(ast.KindExclamationEqualsToken), factory.NewKeywordExpression(ast.KindNullKeyword))
-		return factory.NewConditionalExpression(condition, factory.NewToken(ast.KindQuestionToken), lower(index+1, makeAccess(temp)), factory.NewToken(ast.KindColonToken), factory.NewKeywordExpression(ast.KindNullKeyword))
+		return factory.NewConditionalExpression(condition, factory.NewToken(ast.KindQuestionToken), lower(index+1, makeAccess(temp), commits), factory.NewToken(ast.KindColonToken), factory.NewKeywordExpression(ast.KindNullKeyword))
 	}
-	return lower(0, tx.Visitor().VisitNode(current))
+	return lower(0, tx.Visitor().VisitNode(current), nil)
+}
+
+func (tx *transformer) captureOptionalMutationTarget(target *ast.Node) (prefix *ast.Node, stable *ast.Node) {
+	factory := tx.Factory()
+	if ast.IsPropertyAccessExpression(target) {
+		base := factory.NewTempVariable()
+		tx.declareTemp(base)
+		prefix = factory.NewAssignmentExpression(base, target.Expression())
+		stable = factory.NewPropertyAccessExpression(base, nil, target.Name(), ast.NodeFlagsNone)
+		return prefix, stable
+	}
+	if ast.IsElementAccessExpression(target) {
+		base := factory.NewTempVariable()
+		index := factory.NewTempVariable()
+		tx.declareTemp(base)
+		tx.declareTemp(index)
+		prefix = factory.NewCommaExpression(
+			factory.NewAssignmentExpression(base, target.Expression()),
+			factory.NewAssignmentExpression(index, target.AsElementAccessExpression().ArgumentExpression),
+		)
+		stable = factory.NewElementAccessExpression(base, nil, index, ast.NodeFlagsNone)
+		return prefix, stable
+	}
+	return nil, target
+}
+
+func (tx *transformer) transformStagedCallReceiver(target *ast.Node) (*ast.Node, []*ast.Node) {
+	factory := tx.Factory()
+	segments := make([]optionalWriteSegment, 0, 4)
+	current := target
+	for {
+		if ast.IsAccessExpression(current) {
+			segments = append(segments, optionalWriteSegment{node: current})
+			current = current.Expression()
+			continue
+		}
+		if current.Kind == ast.KindKvsDefaultExpression {
+			segments = append(segments, optionalWriteSegment{node: current, isDefault: true})
+			current = current.Expression()
+			continue
+		}
+		break
+	}
+	slices.Reverse(segments)
+	value := tx.Visitor().VisitNode(current)
+	commits := make([]*ast.Node, 0, 2)
+	for _, segment := range segments {
+		if !segment.isDefault {
+			var questionDot *ast.Node
+			flags := ast.NodeFlagsNone
+			if segment.node.QuestionDotToken() != nil {
+				questionDot = factory.NewToken(ast.KindQuestionDotToken)
+				flags = ast.NodeFlagsOptionalChain
+			}
+			if ast.IsPropertyAccessExpression(segment.node) {
+				value = factory.NewPropertyAccessExpression(value, questionDot, tx.Visitor().VisitNode(segment.node.Name()), flags)
+			} else {
+				value = factory.NewElementAccessExpression(value, questionDot, tx.Visitor().VisitNode(segment.node.AsElementAccessExpression().ArgumentExpression), flags)
+			}
+			continue
+		}
+		defaultNode := segment.node.AsKvsDefaultExpression()
+		if !tx.resolver.KvsDefaultWritesBack(segment.node) {
+			value = tx.transformDefaultValueWithoutWriteback(defaultNode, value)
+			continue
+		}
+		capture, stable := tx.captureOptionalMutationTarget(value)
+		valueTemp := factory.NewTempVariable()
+		missingTemp := factory.NewTempVariable()
+		tx.declareTemp(valueTemp)
+		tx.declareTemp(missingTemp)
+		read := factory.NewAssignmentExpression(valueTemp, stable)
+		if capture != nil {
+			read = factory.NewCommaExpression(capture, read)
+		}
+		missing := factory.NewAssignmentExpression(missingTemp, factory.NewBinaryExpression(nil, read, nil, factory.NewToken(ast.KindEqualsEqualsToken), factory.NewKeywordExpression(ast.KindNullKeyword)))
+		fallback := tx.makeDefaultValue(defaultNode)
+		value = factory.NewConditionalExpression(missing, factory.NewToken(ast.KindQuestionToken), factory.NewAssignmentExpression(valueTemp, fallback), factory.NewToken(ast.KindColonToken), valueTemp)
+		commits = append(commits, factory.NewConditionalExpression(missingTemp, factory.NewToken(ast.KindQuestionToken), factory.NewAssignmentExpression(stable, valueTemp), factory.NewToken(ast.KindColonToken), valueTemp))
+	}
+	return value, commits
+}
+
+func (tx *transformer) prependMaterializationCommits(result *ast.Node, commits []*ast.Node) *ast.Node {
+	for _, commit := range slices.Backward(commits) {
+		result = tx.Factory().NewCommaExpression(commit, result)
+	}
+	return result
 }
 
 func (tx *transformer) transformExtantCall(node *ast.CallExpression) *ast.Node {
@@ -323,6 +444,7 @@ func (tx *transformer) transformExtantCall(node *ast.CallExpression) *ast.Node {
 	var callee *ast.Node
 	var prefix *ast.Node
 	var receiver *ast.Node
+	var materializationCommits []*ast.Node
 	if info.CallableNullable {
 		callableTemp := factory.NewTempVariable()
 		tx.declareTemp(callableTemp)
@@ -331,7 +453,9 @@ func (tx *transformer) transformExtantCall(node *ast.CallExpression) *ast.Node {
 			tx.declareTemp(receiverTemp)
 			receiver = receiverTemp
 			base := node.Expression.Expression()
-			receiverAssignment := factory.NewAssignmentExpression(receiverTemp, tx.Visitor().VisitNode(base))
+			transformedBase, commits := tx.transformStagedCallReceiver(base)
+			materializationCommits = commits
+			receiverAssignment := factory.NewAssignmentExpression(receiverTemp, transformedBase)
 			questionDot := factory.NewToken(ast.KindQuestionDotToken)
 			var member *ast.Node
 			if ast.IsPropertyAccessExpression(node.Expression) {
@@ -380,6 +504,7 @@ func (tx *transformer) transformExtantCall(node *ast.CallExpression) *ast.Node {
 			callee = factory.NewPropertyAccessExpression(callee, nil, factory.NewIdentifier("call"), ast.NodeFlagsNone)
 		}
 		result := factory.NewCallExpression(callee, nil, tx.Visitor().VisitNodes(node.TypeArguments), factory.NewNodeList(callArgs), ast.NodeFlagsNone)
+		result = tx.prependMaterializationCommits(result, materializationCommits)
 		for _, step := range slices.Backward(steps) {
 			if step.guarded {
 				present := factory.NewBinaryExpression(nil, step.assignment, nil, factory.NewToken(ast.KindExclamationEqualsToken), factory.NewKeywordExpression(ast.KindNullKeyword))
@@ -404,6 +529,7 @@ func (tx *transformer) transformExtantCall(node *ast.CallExpression) *ast.Node {
 		callee = factory.NewPropertyAccessExpression(callee, nil, factory.NewIdentifier("call"), ast.NodeFlagsNone)
 	}
 	result := factory.NewCallExpression(callee, nil, tx.Visitor().VisitNodes(node.TypeArguments), factory.NewNodeList(callArgs), ast.NodeFlagsNone)
+	result = tx.prependMaterializationCommits(result, materializationCommits)
 
 	if argsTemp == nil {
 		present := factory.NewBinaryExpression(nil, prefix, nil, factory.NewToken(ast.KindExclamationEqualsToken), factory.NewKeywordExpression(ast.KindNullKeyword))
@@ -1125,31 +1251,45 @@ func (tx *transformer) transformDefault(node *ast.KvsDefaultExpression) *ast.Nod
 }
 
 func (tx *transformer) transformDefaultValue(node *ast.KvsDefaultExpression, value *ast.Node) *ast.Node {
-	factory := tx.Factory()
-	var fallback *ast.Node
-	switch tx.resolver.GetKvsDefaultKind(node.AsNode()) {
-	case ast.KvsDefaultKindString:
-		fallback = factory.NewStringLiteral("", ast.TokenFlagsNone)
-	case ast.KvsDefaultKindNumber:
-		fallback = factory.NewNumericLiteral("0", ast.TokenFlagsNone)
-	case ast.KvsDefaultKindBoolean:
-		fallback = factory.NewKeywordExpression(ast.KindFalseKeyword)
-	case ast.KvsDefaultKindBigInt:
-		fallback = factory.NewBigIntLiteral("0n", ast.TokenFlagsNone)
-	case ast.KvsDefaultKindArray:
-		fallback = factory.NewArrayLiteralExpression(nil, false)
-	case ast.KvsDefaultKindConstructor:
-		fallback = tx.makeDefaultConstructor(nil, node.AsNode())
-	case ast.KvsDefaultKindObject:
-		fallback = tx.makeTypedObjectDefaults(tx.resolver.GetKvsTypedObjectDefaults(node.AsNode()))
-	default:
+	return tx.transformDefaultValueWithWriteback(node, value, tx.resolver.KvsDefaultWritesBack(node.AsNode()))
+}
+
+func (tx *transformer) transformDefaultValueWithoutWriteback(node *ast.KvsDefaultExpression, value *ast.Node) *ast.Node {
+	return tx.transformDefaultValueWithWriteback(node, value, false)
+}
+
+func (tx *transformer) transformDefaultValueWithWriteback(node *ast.KvsDefaultExpression, value *ast.Node, writeback bool) *ast.Node {
+	fallback := tx.makeDefaultValue(node)
+	if fallback == nil {
 		return value
 	}
 	operator := ast.KindQuestionQuestionToken
-	if tx.resolver.KvsDefaultWritesBack(node.AsNode()) {
+	if writeback {
 		operator = ast.KindQuestionQuestionEqualsToken
 	}
-	return factory.NewBinaryExpression(nil, value, nil, factory.NewToken(operator), fallback)
+	return tx.Factory().NewBinaryExpression(nil, value, nil, tx.Factory().NewToken(operator), fallback)
+}
+
+func (tx *transformer) makeDefaultValue(node *ast.KvsDefaultExpression) *ast.Node {
+	factory := tx.Factory()
+	switch tx.resolver.GetKvsDefaultKind(node.AsNode()) {
+	case ast.KvsDefaultKindString:
+		return factory.NewStringLiteral("", ast.TokenFlagsNone)
+	case ast.KvsDefaultKindNumber:
+		return factory.NewNumericLiteral("0", ast.TokenFlagsNone)
+	case ast.KvsDefaultKindBoolean:
+		return factory.NewKeywordExpression(ast.KindFalseKeyword)
+	case ast.KvsDefaultKindBigInt:
+		return factory.NewBigIntLiteral("0n", ast.TokenFlagsNone)
+	case ast.KvsDefaultKindArray:
+		return factory.NewArrayLiteralExpression(nil, false)
+	case ast.KvsDefaultKindConstructor:
+		return tx.makeDefaultConstructor(nil, node.AsNode())
+	case ast.KvsDefaultKindObject:
+		return tx.makeTypedObjectDefaults(tx.resolver.GetKvsTypedObjectDefaults(node.AsNode()))
+	default:
+		return nil
+	}
 }
 
 func (tx *transformer) makeTypedObjectDefaults(items []printer.KvsTypedObjectDefault) *ast.Node {

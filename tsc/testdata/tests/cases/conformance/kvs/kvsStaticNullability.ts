@@ -26,6 +26,11 @@ let request? = "ready";
 request = null;
 request = "ready";
 
+let explicitNullable: string?;
+const initiallyAbsent = explicitNullable;
+explicitNullable = "ready";
+explicitNullable = null;
+
 const required! = "ready";
 let current! = "ready";
 current = "next";

@@ -229,28 +229,68 @@ const computedMethod = service[methodName()]?(maybeText);
 >methodName : Symbol(methodName, Decl(kvsExtantInvocation.ts, 57, 49))
 >maybeText : Symbol(maybeText, Decl(kvsExtantInvocation.ts, 5, 13))
 
+declare let items: string[]?;
+>items : Symbol(items, Decl(kvsExtantInvocation.ts, 61, 11))
+
+const materializedReceiver = items!.push?(maybeText);
+>materializedReceiver : Symbol(materializedReceiver, Decl(kvsExtantInvocation.ts, 62, 5))
+>items!.push : Symbol(Array.push, Decl(lib.es5.d.ts, --, --))
+>items : Symbol(items, Decl(kvsExtantInvocation.ts, 61, 11))
+>push : Symbol(Array.push, Decl(lib.es5.d.ts, --, --))
+>maybeText : Symbol(maybeText, Decl(kvsExtantInvocation.ts, 5, 13))
+
+const stillNullableItems = items;
+>stillNullableItems : Symbol(stillNullableItems, Decl(kvsExtantInvocation.ts, 63, 5))
+>items : Symbol(items, Decl(kvsExtantInvocation.ts, 61, 11))
+
+interface Buffer {
+>Buffer : Symbol(Buffer, Decl(kvsExtantInvocation.ts, 63, 33))
+
+    values: string[];
+>values : Symbol(Buffer.values, Decl(kvsExtantInvocation.ts, 65, 18))
+
+    append?: (value: string) => number;
+>append : Symbol(Buffer.append, Decl(kvsExtantInvocation.ts, 66, 21))
+>value : Symbol(value, Decl(kvsExtantInvocation.ts, 67, 14))
+}
+
+declare let buffer: Buffer?;
+>buffer : Symbol(buffer, Decl(kvsExtantInvocation.ts, 70, 11))
+>Buffer : Symbol(Buffer, Decl(kvsExtantInvocation.ts, 63, 33))
+
+const materializedNullableMethod = buffer!.append?(maybeText);
+>materializedNullableMethod : Symbol(materializedNullableMethod, Decl(kvsExtantInvocation.ts, 71, 5))
+>buffer!.append : Symbol(Buffer.append, Decl(kvsExtantInvocation.ts, 66, 21))
+>buffer : Symbol(buffer, Decl(kvsExtantInvocation.ts, 70, 11))
+>append : Symbol(Buffer.append, Decl(kvsExtantInvocation.ts, 66, 21))
+>maybeText : Symbol(maybeText, Decl(kvsExtantInvocation.ts, 5, 13))
+
+const stillNullableBuffer = buffer;
+>stillNullableBuffer : Symbol(stillNullableBuffer, Decl(kvsExtantInvocation.ts, 72, 5))
+>buffer : Symbol(buffer, Decl(kvsExtantInvocation.ts, 70, 11))
+
 declare const tuple: [string?, number];
->tuple : Symbol(tuple, Decl(kvsExtantInvocation.ts, 61, 13))
+>tuple : Symbol(tuple, Decl(kvsExtantInvocation.ts, 74, 13))
 
 const tupleSpread = required?(...tuple);
->tupleSpread : Symbol(tupleSpread, Decl(kvsExtantInvocation.ts, 62, 5))
+>tupleSpread : Symbol(tupleSpread, Decl(kvsExtantInvocation.ts, 75, 5))
 >required : Symbol(required, Decl(kvsExtantInvocation.ts, 0, 0))
->tuple : Symbol(tuple, Decl(kvsExtantInvocation.ts, 61, 13))
+>tuple : Symbol(tuple, Decl(kvsExtantInvocation.ts, 74, 13))
 
 declare const values: string[];
->values : Symbol(values, Decl(kvsExtantInvocation.ts, 64, 13))
+>values : Symbol(values, Decl(kvsExtantInvocation.ts, 77, 13))
 
 declare function variadic(...values: string[]): string;
->variadic : Symbol(variadic, Decl(kvsExtantInvocation.ts, 64, 31))
->values : Symbol(values, Decl(kvsExtantInvocation.ts, 65, 26))
+>variadic : Symbol(variadic, Decl(kvsExtantInvocation.ts, 77, 31))
+>values : Symbol(values, Decl(kvsExtantInvocation.ts, 78, 26))
 
 const unsupportedIterableSpread = variadic?(...values);
->unsupportedIterableSpread : Symbol(unsupportedIterableSpread, Decl(kvsExtantInvocation.ts, 66, 5))
->variadic : Symbol(variadic, Decl(kvsExtantInvocation.ts, 64, 31))
->values : Symbol(values, Decl(kvsExtantInvocation.ts, 64, 13))
+>unsupportedIterableSpread : Symbol(unsupportedIterableSpread, Decl(kvsExtantInvocation.ts, 79, 5))
+>variadic : Symbol(variadic, Decl(kvsExtantInvocation.ts, 77, 31))
+>values : Symbol(values, Decl(kvsExtantInvocation.ts, 77, 13))
 
 async function asyncInvocation() {
->asyncInvocation : Symbol(asyncInvocation, Decl(kvsExtantInvocation.ts, 66, 55))
+>asyncInvocation : Symbol(asyncInvocation, Decl(kvsExtantInvocation.ts, 79, 55))
 
     return await required?(maybeText, build());
 >required : Symbol(required, Decl(kvsExtantInvocation.ts, 0, 0))
@@ -260,7 +300,7 @@ async function asyncInvocation() {
 
 // Whitespace keeps `?` and `(` separate rather than forming an extant call.
 const separated = required ? ("value") : build();
->separated : Symbol(separated, Decl(kvsExtantInvocation.ts, 73, 5))
+>separated : Symbol(separated, Decl(kvsExtantInvocation.ts, 86, 5))
 >required : Symbol(required, Decl(kvsExtantInvocation.ts, 0, 0))
 >build : Symbol(build, Decl(kvsExtantInvocation.ts, 1, 65))
 

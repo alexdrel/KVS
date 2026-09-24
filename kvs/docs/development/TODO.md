@@ -1,9 +1,9 @@
 # KVS Implementation Checklist
 
-This is a working implementation aid, not a language specification or feature
-order. The language documents remain authoritative for accepted semantics.
+This is a working implementation aid, not a language specification or feature order. The language
+documents remain authoritative for accepted semantics.
 
-Progress: **271 of 377 items complete (71.9%)**; **106 remain open**.
+Progress: **276 of 377 items complete (73.2%)**; **101 remain open**.
 
 - `[x]` means implemented with focused compiler evidence.
 - `[ ]` means unimplemented, incomplete, or not yet deliberately validated.
@@ -15,54 +15,51 @@ Implemented vertical slices:
 
 - Extant return: `return? expression`.
 - Eager `collect` with `yield` and `yield?`.
-- Eager `select` with first-production exit, including production from nested
-  ordinary loops.
+- Eager `select` with first-production exit, including production from nested ordinary loops.
 - Synchronous expression-valued `for` with scalar, tuple, and object results.
 - Extant assignment: `target ?= value`.
-- Producer head paths through ordinary expression tails and named object-field
-  values.
-- Static nullability assertions and inferred binding suffixes: `as?`, `as!`,
-  `let value?`, and `const`/`let value!`.
-- Nullable property and indexed reads propagate absence through their access
-  path.
-- Optional invocation suppresses nullable callables and absent required
-  arguments while preserving source-order argument effects.
+- Producer head paths through ordinary expression tails and named object-field values.
+- Static nullability assertions and inferred binding suffixes: `as?`, `as!`, `let value?`, and
+  `const`/`let value!`, including explicit uninitialized nullable bindings and nullable-source
+  destructuring.
+- Nullable property and indexed reads propagate absence through their access path.
+- Optional invocation suppresses nullable callables and absent required arguments while preserving
+  source-order argument effects and staging writable receiver materialization until invocation.
 - Nulling operator: `condition ?: expression`.
 - Nullability type operators: `T?` and `T!`.
 - Successful-branch binding: `if (const value = expression)`.
-- Type-directed defaults and materialization for strings, numbers, booleans,
-  bigints, and ordinary arrays: postfix `value!`.
-- Nullable sources for synchronous `for...of`, eager `collect`, and `select`.
+- Type-directed defaults and materialization for primitive, collection, constructor-backed, and
+  concrete structural types: postfix `value!`, including writable named and indexed paths and staged
+  optional writes.
+- Nullable sources for synchronous and asynchronous `for...of`, eager `collect`, and `select`.
 - Implicit subjects for synchronous `for`, eager `collect`, and `select`.
 - Arithmetic operators lifted over absence.
 - Presence-aware array literals: `?[...]`.
 - Conditional placement in array and object literals.
 - Presence-aware object literals: `?{...}`.
 - Sieve: prefix `~~value`.
-- Filtered bindings and assignment: `const`/`let value ~= expression` and
-  `target ~= expression`.
-- Finite and runtime comparison alternatives, comparison chains, and nullable
-  equality diagnostics.
+- Filtered bindings and assignment: `const`/`let value ~= expression` and `target ~= expression`.
+- Finite and runtime comparison alternatives, comparison chains, and nullable equality diagnostics.
 - Catch-and-split bindings: `value~error` declarations and assignment.
-- Failure demotion: `expression ~ pattern` for returned sentinels and selected
-  exception types.
-- Failure promotion: `expression ~~ error`, including non-nullable results and
-  caught-cause preservation.
+- Failure demotion: `expression ~ pattern` for returned sentinels and selected exception types.
+- Failure promotion: `expression ~~ error`, including non-nullable results and caught-cause
+  preservation.
 - Placeholder lambdas in contextual callback arguments: `%`.
-- Typed construction for concrete defaultable interfaces and object type aliases,
-  including inherited fields and closed generic instantiations.
-- Typed spread during construction, with target-selected fields, presence-aware
-  copying, and wider-source projection.
+- Typed construction for concrete defaultable interfaces and object type aliases, including
+  inherited fields and closed generic instantiations.
+- Typed spread during construction, with target-selected fields, presence-aware copying, and
+  wider-source projection.
+- Typed in-place projection: `target ...= source`.
 - Terminal structural defaults for the same concrete POD types: `maybeProfile!`.
+- Numeric ranges with exclusive or inclusive upper bounds.
+- Lazy `collect*` with iterator-local production.
 
 Known semantic debts:
 
 - Producer assignment RHSs currently run before their assignment targets.
-- Object-field producers are lifted before the whole containing initializer;
-  earlier property values, computed names, and spreads may therefore run late.
-- Extant assignment is currently RHS-first and skips target evaluation when
-  the RHS is absent.
-- Asynchronous iteration is not implemented.
+- Object-field producers are lifted before the whole containing initializer; earlier property
+  values, computed names, and spreads may therefore run late.
+- Extant assignment is currently RHS-first and skips target evaluation when the RHS is absent.
 
 Focused conformance inputs:
 
@@ -72,14 +69,20 @@ Focused conformance inputs:
 - `tsc/testdata/tests/cases/conformance/kvs/kvsSelect.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsForExpression.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsExtantAssignment.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsExtantInvocation.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsDefault.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsDefaultConstructorImports.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsDefaultInvalidTargets.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsStaticNullability.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsNullableDestructuring.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsNulling.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsNullabilityTypes.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsIfBinding.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsNullableOperators.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsNullableEquality.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsNullableIteration.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsNullableAccess.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsOptionalWrite.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsSieve.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsSieveImportHelpers.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsSieveNoEmitHelpers.ts`
@@ -94,6 +97,7 @@ Focused conformance inputs:
 - `tsc/testdata/tests/cases/conformance/kvs/kvsFailurePromotion.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsPlaceholderLambda.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsPlaceholderLambdaClosure.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsRange.ts`
 
 Run all implemented KVS slices together:
 
@@ -101,8 +105,8 @@ Run all implemented KVS slices together:
 go -C ./tsc test -run='TestLocal/kvs' ./internal/testrunner
 ```
 
-Runnable examples live in `kvs/examples/`. Build the compiler before compiling
-them; generated example `.js` files are intentionally ignored.
+Runnable examples live in `kvs/examples/`. Build the compiler before compiling them; generated
+example `.js` files are intentionally ignored.
 
 ## 0. Compiler plumbing
 
@@ -134,8 +138,8 @@ them; generated example `.js` files are intentionally ignored.
 - [x] `let value? = ...`
 - [x] `const value! = ...`
 - [x] `let value! = ...`
-- [ ] Explicit nullable uninitialized binding
-- [ ] Destructuring propagates source nullability
+- [x] Explicit nullable uninitialized binding
+- [x] Destructuring propagates source nullability
 
 ### Conditions
 
@@ -247,8 +251,7 @@ them; generated example `.js` files are intentionally ignored.
 
 ### Keyed iteration
 
-- [ ] `_%` companion coordinate for implicit `for`, `collect`, `collect*`, and
-  `select`
+- [ ] `_%` companion coordinate for implicit `for`, `collect`, `collect*`, and `select`
 - [ ] Arrays, tuples, and typed arrays expose numeric indexes
 - [ ] Maps expose keys while `_` remains the mapped value
 - [ ] Records expose own enumerable string keys in JavaScript property order
@@ -379,7 +382,7 @@ them; generated example `.js` files are intentionally ignored.
 - [x] Extant falsy RHS commits
 - [x] Assignment expression result remains RHS
 - [x] Ordinary writable-target checking
-- [ ] Materialized target interaction
+- [x] Materialized target interaction
 - [ ] Preserve defined evaluation-order semantics (prototype is RHS-first)
 - [x] No extant compound-assignment family
 
@@ -484,8 +487,8 @@ them; generated example `.js` files are intentionally ignored.
 - [x] Arguments evaluate in source order until blocking absence
 - [x] Stop evaluating later arguments after blocking absence
 - [x] Statically extant receiver/method lookup may be delayed until invocation
-- [ ] Materialization staging
-- [ ] Materialization commit semantics
+- [x] Materialization staging
+- [x] Materialization commit semantics
 
 ### Fluent receiver-first calls
 

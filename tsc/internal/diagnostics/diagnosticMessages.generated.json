@@ -2232,5 +2232,6 @@
     "KVS_in_a_value_expression_must_be_terminal_100086": "KVS '!' in a value expression must be terminal.",
     "KVS_cannot_be_the_target_of_an_assignment_or_update_100087": "KVS '!' cannot be the target of an assignment or update.",
     "KVS_on_an_assignment_or_update_target_requires_a_writable_proper_base_100088": "KVS '!' on an assignment or update target requires a writable proper base.",
-    "KVS_on_a_typed_in_place_spread_target_requires_a_writable_target_100089": "KVS '!' on a typed in-place spread target requires a writable target."
+    "KVS_on_a_typed_in_place_spread_target_requires_a_writable_target_100089": "KVS '!' on a typed in-place spread target requires a writable target.",
+    "A_destructured_parameter_cannot_traverse_a_nullable_source_Bind_the_parameter_first_and_destructure__100090": "A destructured parameter cannot traverse a nullable source. Bind the parameter first and destructure it in the function body."
 }

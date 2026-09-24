@@ -1,0 +1,109 @@
+//// [tests/cases/conformance/kvs/kvsNullableDestructuring.ts] ////
+
+=== kvsNullableDestructuring.ts ===
+interface Metadata {
+    label: string;
+>label : string
+}
+
+interface Card {
+    id: string;
+>id : string
+
+    metadata: Metadata?;
+>metadata : Metadata | null | undefined
+
+    tags: string[];
+>tags : string[]
+}
+
+declare const card: Card?;
+>card : Card | null | undefined
+
+declare const presentCard: Card;
+>presentCard : Card
+
+declare const tuple: [string, number]?;
+>tuple : [string, number] | null | undefined
+
+const { id, metadata } = card;
+>id : string | null | undefined
+>metadata : Metadata | null | undefined
+>card : Card | null | undefined
+
+const { metadata: { label } } = card;
+>metadata : any
+>label : string | null | undefined
+>card : Card | null | undefined
+
+const { metadata: { label: nestedNullableLabel } } = presentCard;
+>metadata : any
+>label : any
+>nestedNullableLabel : string | null | undefined
+>presentCard : Card
+
+const { id: idWithDefault = "missing" } = card;
+>id : any
+>idWithDefault : string
+>"missing" : "missing"
+>card : Card | null | undefined
+
+const { id: renamed, ...rest } = card;
+>id : any
+>renamed : string | null | undefined
+>rest : { metadata: Metadata?; tags: string[]; }
+>card : Card | null | undefined
+
+const [firstTag, ...remainingTags] = card.tags;
+>firstTag : string | null | undefined
+>remainingTags : string[]
+>card.tags : string[] | null | undefined
+>card : Card | null | undefined
+>tags : string[] | null | undefined
+
+const { tags: [nestedFirstTag, ...nestedRemainingTags] } = card;
+>tags : any
+>nestedFirstTag : string | null | undefined
+>nestedRemainingTags : string[]
+>card : Card | null | undefined
+
+const [tupleName, tupleCount] = tuple;
+>tupleName : string | null | undefined
+>tupleCount : number | null | undefined
+>tuple : [string, number] | null | undefined
+
+const {} = card;
+>card : Card | null | undefined
+
+const [] = tuple;
+>tuple : [string, number] | null | undefined
+
+const { metadata: {} } = presentCard;
+>metadata : any
+>presentCard : Card
+
+function rejectNullableParameter({ id }: Card?) {
+>rejectNullableParameter : ({ id }: Card?) => string | null | undefined
+>id : string | null | undefined
+
+    return id;
+>id : string | null | undefined
+}
+
+function rejectNestedNullableParameter({ metadata: { label } }: Card) {
+>rejectNestedNullableParameter : ({ metadata: { label } }: Card) => string | null | undefined
+>metadata : any
+>label : string | null | undefined
+
+    return label;
+>label : string | null | undefined
+}
+
+function acceptNullableLeaf({ metadata }: Card) {
+>acceptNullableLeaf : ({ metadata }: Card) => Metadata | null | undefined
+>metadata : Metadata | null | undefined
+
+    return metadata;
+>metadata : Metadata | null | undefined
+}
+

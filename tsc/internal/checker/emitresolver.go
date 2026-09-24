@@ -220,6 +220,15 @@ func (r *EmitResolver) IsKvsNullableExpression(node *ast.Node) bool {
 	return isKvsNullableType(r.checker.checkExpression(node))
 }
 
+func (r *EmitResolver) KvsDestructuringPatternSourceNullable(node *ast.Node) bool {
+	r.checkerMu.Lock()
+	defer r.checkerMu.Unlock()
+	if ast.IsVariableDeclaration(node) {
+		return node.Initializer() != nil && isKvsNullableType(r.checker.checkExpression(node.Initializer()))
+	}
+	return ast.IsBindingElement(node) && isKvsNullableType(r.checker.getTypeForBindingElement(node))
+}
+
 func (r *EmitResolver) GetKvsSieveKind(node *ast.Node) printer.KvsSieveKind {
 	r.checkerMu.Lock()
 	defer r.checkerMu.Unlock()

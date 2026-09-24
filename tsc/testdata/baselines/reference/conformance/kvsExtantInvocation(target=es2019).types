@@ -264,6 +264,47 @@ const computedMethod = service[methodName()]?(maybeText);
 >methodName : () => "run"
 >maybeText : string | null | undefined
 
+declare let items: string[]?;
+>items : string[] | null | undefined
+
+const materializedReceiver = items!.push?(maybeText);
+>materializedReceiver : number | null
+>items!.push?(maybeText) : number | null
+>items!.push : (...items: string[]) => number
+>items! : string[]
+>items : string[] | null | undefined
+>push : (...items: string[]) => number
+>maybeText : string | null | undefined
+
+const stillNullableItems = items;
+>stillNullableItems : string[] | null | undefined
+>items : string[] | null | undefined
+
+interface Buffer {
+    values: string[];
+>values : string[]
+
+    append?: (value: string) => number;
+>append : ((value: string) => number) | undefined
+>value : string
+}
+
+declare let buffer: Buffer?;
+>buffer : Buffer | null | undefined
+
+const materializedNullableMethod = buffer!.append?(maybeText);
+>materializedNullableMethod : number | null
+>buffer!.append?(maybeText) : number | null
+>buffer!.append : ((value: string) => number) | undefined
+>buffer! : Buffer
+>buffer : Buffer | null | undefined
+>append : ((value: string) => number) | undefined
+>maybeText : string | null | undefined
+
+const stillNullableBuffer = buffer;
+>stillNullableBuffer : Buffer | null | undefined
+>buffer : Buffer | null | undefined
+
 declare const tuple: [string?, number];
 >tuple : [string | null | undefined, number]
 

@@ -62,6 +62,19 @@ const elementMethod = service["run"]?(maybeText);
 declare function methodName(): "run";
 const computedMethod = service[methodName()]?(maybeText);
 
+declare let items: string[]?;
+const materializedReceiver = items!.push?(maybeText);
+const stillNullableItems = items;
+
+interface Buffer {
+    values: string[];
+    append?: (value: string) => number;
+}
+
+declare let buffer: Buffer?;
+const materializedNullableMethod = buffer!.append?(maybeText);
+const stillNullableBuffer = buffer;
+
 declare const tuple: [string?, number];
 const tupleSpread = required?(...tuple);
 
@@ -82,7 +95,7 @@ maybeRequired("value", build());
 
 //// [kvsExtantInvocation.js]
 "use strict";
-var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2, _3, _4, _5, _6, _7;
+var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13;
 const nullableCallable = (_a = maybeRequired) != null ? _a("ready", build()) : null;
 const nullableCallableAndArgument = (_b = maybeRequired) != null ? (_c = maybeText) != null ? _b(_c, build()) : null : null;
 const guardedArgument = (_d = maybeText) != null ? required(_d, build()) : null;
@@ -107,7 +120,11 @@ const nullableMethod = (_w = service, _v = _w?.maybeRun) != null ? (_x = maybeTe
 const receiverOnce = (_z = getService(), _y = _z?.run) != null ? (_0 = maybeText) != null ? _y.call(_z, _0) : null : null;
 const elementMethod = (_2 = service, _1 = _2?.["run"]) != null ? (_3 = maybeText) != null ? _1.call(_2, _3) : null : null;
 const computedMethod = (_5 = service, _4 = _5?.[methodName()]) != null ? (_6 = maybeText) != null ? _4.call(_5, _6) : null : null;
-const tupleSpread = (_7 = [], _7.push(...tuple), _7[0] != null ? required(..._7) : null);
+const materializedReceiver = (_7 = maybeText) != null ? (items ?? (items = [])).push(_7) : null;
+const stillNullableItems = items;
+const materializedNullableMethod = (_9 = (_11 = (_10 = buffer) == null) ? _10 = { values: [] } : _10, _8 = _9?.append) != null ? (_12 = maybeText) != null ? (_11 ? buffer = _10 : _10, _8.call(_9, _12)) : null : null;
+const stillNullableBuffer = buffer;
+const tupleSpread = (_13 = [], _13.push(...tuple), _13[0] != null ? required(..._13) : null);
 const unsupportedIterableSpread = variadic(...values);
 async function asyncInvocation() {
     var _a;

@@ -1,4 +1,4 @@
-kvsOptionalWrite.ts(51,1): error TS18049: 'user' is possibly 'null' or 'undefined'.
+kvsOptionalWrite.ts(59,1): error TS18049: 'user' is possibly 'null' or 'undefined'.
 
 
 ==== kvsOptionalWrite.ts (1 errors) ====
@@ -8,6 +8,10 @@ kvsOptionalWrite.ts(51,1): error TS18049: 'user' is possibly 'null' or 'undefine
     
     interface User {
         profile: Profile?;
+    }
+    
+    interface Workspace {
+        user: User?;
     }
     
     interface Preferences {
@@ -27,6 +31,7 @@ kvsOptionalWrite.ts(51,1): error TS18049: 'user' is possibly 'null' or 'undefine
     declare let members: Member[]?;
     declare let optionalThenMaterialized: User?;
     declare let materializedThenOptional: User?;
+    declare let nestedMaterializedThenOptional: Workspace?;
     declare let counter: Counter?;
     declare let counters: Counter[]?;
     declare let valueEffects: number;
@@ -44,6 +49,9 @@ kvsOptionalWrite.ts(51,1): error TS18049: 'user' is possibly 'null' or 'undefine
     materializedThenOptional!.profile?.theme = "materialize then optional";
     const materializedUser = materializedThenOptional;
     const stillNullableProfile = materializedThenOptional.profile;
+    
+    nestedMaterializedThenOptional!.user!.profile?.theme = "stage nested materialization";
+    const stillNullableWorkspace = nestedMaterializedThenOptional;
     
     members?.[indexEffects++]!.preferences!.contrast = 2;
     

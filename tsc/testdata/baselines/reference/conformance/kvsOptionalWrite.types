@@ -11,6 +11,11 @@ interface User {
 >profile : Profile | null | undefined
 }
 
+interface Workspace {
+    user: User?;
+>user : User | null | undefined
+}
+
 interface Preferences {
     contrast: number;
 >contrast : number
@@ -40,6 +45,9 @@ declare let optionalThenMaterialized: User?;
 
 declare let materializedThenOptional: User?;
 >materializedThenOptional : User | null | undefined
+
+declare let nestedMaterializedThenOptional: Workspace?;
+>nestedMaterializedThenOptional : Workspace | null | undefined
 
 declare let counter: Counter?;
 >counter : Counter | null | undefined
@@ -127,14 +135,31 @@ materializedThenOptional!.profile?.theme = "materialize then optional";
 >"materialize then optional" : "materialize then optional"
 
 const materializedUser = materializedThenOptional;
->materializedUser : User
->materializedThenOptional : User
+>materializedUser : User | null | undefined
+>materializedThenOptional : User | null | undefined
 
 const stillNullableProfile = materializedThenOptional.profile;
 >stillNullableProfile : Profile | null | undefined
 >materializedThenOptional.profile : Profile | null | undefined
->materializedThenOptional : User
+>materializedThenOptional : User | null | undefined
 >profile : Profile | null | undefined
+
+nestedMaterializedThenOptional!.user!.profile?.theme = "stage nested materialization";
+>nestedMaterializedThenOptional!.user!.profile?.theme = "stage nested materialization" : "stage nested materialization"
+>nestedMaterializedThenOptional!.user!.profile?.theme : string | undefined
+>nestedMaterializedThenOptional!.user!.profile : Profile | null | undefined
+>nestedMaterializedThenOptional!.user! : User
+>nestedMaterializedThenOptional!.user : User | null | undefined
+>nestedMaterializedThenOptional! : Workspace
+>nestedMaterializedThenOptional : Workspace | null | undefined
+>user : User | null | undefined
+>profile : Profile | null | undefined
+>theme : string | undefined
+>"stage nested materialization" : "stage nested materialization"
+
+const stillNullableWorkspace = nestedMaterializedThenOptional;
+>stillNullableWorkspace : Workspace | null | undefined
+>nestedMaterializedThenOptional : Workspace | null | undefined
 
 members?.[indexEffects++]!.preferences!.contrast = 2;
 >members?.[indexEffects++]!.preferences!.contrast = 2 : 2

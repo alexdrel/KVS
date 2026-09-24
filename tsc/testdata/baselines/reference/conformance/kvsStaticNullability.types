@@ -110,6 +110,22 @@ request = "ready";
 >request : string | null | undefined
 >"ready" : "ready"
 
+let explicitNullable: string?;
+>explicitNullable : string | null | undefined
+
+const initiallyAbsent = explicitNullable;
+>initiallyAbsent : string | null | undefined
+>explicitNullable : string | null | undefined
+
+explicitNullable = "ready";
+>explicitNullable = "ready" : "ready"
+>explicitNullable : string | null | undefined
+>"ready" : "ready"
+
+explicitNullable = null;
+>explicitNullable = null : null
+>explicitNullable : string | null | undefined
+
 const required! = "ready";
 >required : "ready"
 >"ready" : "ready"

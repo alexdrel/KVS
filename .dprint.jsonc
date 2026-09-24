@@ -37,6 +37,12 @@
         // This would be good to do in known-JSONC files, but VS Code warns on trailing commas.
         "trailingCommas": "never"
     },
+    "markdown": {
+        "associations": ["kvs/**/*.md"],
+        "lineWidth": 100,
+        "textWrap": "always",
+        "codeBlock.skipFormat": true
+    },
     "gofumpt": {
         "langVersion": "go1.26",
         "modulePath": "github.com/microsoft/TypeScript/tsc"
@@ -44,6 +50,8 @@
     "excludes": [
         "**/.git",
         "**/node_modules",
+        "**/*.md",
+        "!kvs/**/*.md",
         "**/*-lock.json",
         "**/testdata",
         "kvs/examples/**/*.ts",
@@ -66,6 +74,7 @@
     "plugins": [
         "npm:@dprint/typescript",
         "npm:@dprint/json",
+        "npm:@dprint/markdown",
         "npm:dprint-plugin-yaml",
         "npm:@jakebailey/dprint-plugin-gofumpt"
     ]

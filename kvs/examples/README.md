@@ -1,17 +1,15 @@
 # KVS examples
 
-Normal examples demonstrate currently implemented language concepts and should
-compile. Add to a concept-oriented file as a compiler slice expands that
-concept.
+Normal examples demonstrate currently implemented language concepts and should compile. Add to a
+concept-oriented file as a compiler slice expands that concept.
 
-The `goalposts/` directory holds coherent prospective programs and records
-which of their language dependencies remain unimplemented. The `showcase/`
-directory holds coherent programs that compile and run with the current
-compiler. When a goalpost is fully supported, move it to the showcase.
+The `goalposts/` directory holds coherent prospective programs and records which of their language
+dependencies remain unimplemented. The `showcase/` directory holds coherent programs that compile
+and run with the current compiler. When a goalpost is fully supported, move it to the showcase.
 
-`npx hereby test:smoke` compiles and runs every normal and showcase example.
-Expected stdout is reviewed and accepted manually under `baselines/`; every
-runnable `.ts` file must have a matching `.stdout` file.
+`npx hereby test:smoke` compiles and runs every normal and showcase example. Expected stdout is
+reviewed and accepted manually under `baselines/`; every runnable `.ts` file must have a matching
+`.stdout` file.
 
 - [Extant operations](extant.ts)
 - [Eager collection](collect.ts)

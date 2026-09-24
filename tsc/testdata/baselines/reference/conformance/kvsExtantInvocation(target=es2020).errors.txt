@@ -1,6 +1,6 @@
-kvsExtantInvocation.ts(67,45): error TS100085: KVS optional invocation supports only fixed tuple spreads.
-kvsExtantInvocation.ts(74,19): error TS2774: This condition will always return true since this function is always defined. Did you mean to call it instead?
-kvsExtantInvocation.ts(77,1): error TS2723: Cannot invoke an object which is possibly 'null' or 'undefined'.
+kvsExtantInvocation.ts(80,45): error TS100085: KVS optional invocation supports only fixed tuple spreads.
+kvsExtantInvocation.ts(87,19): error TS2774: This condition will always return true since this function is always defined. Did you mean to call it instead?
+kvsExtantInvocation.ts(90,1): error TS2723: Cannot invoke an object which is possibly 'null' or 'undefined'.
 
 
 ==== kvsExtantInvocation.ts (3 errors) ====
@@ -64,6 +64,19 @@ kvsExtantInvocation.ts(77,1): error TS2723: Cannot invoke an object which is pos
     const elementMethod = service["run"]?(maybeText);
     declare function methodName(): "run";
     const computedMethod = service[methodName()]?(maybeText);
+    
+    declare let items: string[]?;
+    const materializedReceiver = items!.push?(maybeText);
+    const stillNullableItems = items;
+    
+    interface Buffer {
+        values: string[];
+        append?: (value: string) => number;
+    }
+    
+    declare let buffer: Buffer?;
+    const materializedNullableMethod = buffer!.append?(maybeText);
+    const stillNullableBuffer = buffer;
     
     declare const tuple: [string?, number];
     const tupleSpread = required?(...tuple);

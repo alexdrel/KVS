@@ -1,0 +1,47 @@
+kvsNullableDestructuring.ts(27,34): error TS100090: A destructured parameter cannot traverse a nullable source. Bind the parameter first and destructure it in the function body.
+kvsNullableDestructuring.ts(31,40): error TS100090: A destructured parameter cannot traverse a nullable source. Bind the parameter first and destructure it in the function body.
+
+
+==== kvsNullableDestructuring.ts (2 errors) ====
+    interface Metadata {
+        label: string;
+    }
+    
+    interface Card {
+        id: string;
+        metadata: Metadata?;
+        tags: string[];
+    }
+    
+    declare const card: Card?;
+    declare const presentCard: Card;
+    declare const tuple: [string, number]?;
+    
+    const { id, metadata } = card;
+    const { metadata: { label } } = card;
+    const { metadata: { label: nestedNullableLabel } } = presentCard;
+    const { id: idWithDefault = "missing" } = card;
+    const { id: renamed, ...rest } = card;
+    const [firstTag, ...remainingTags] = card.tags;
+    const { tags: [nestedFirstTag, ...nestedRemainingTags] } = card;
+    const [tupleName, tupleCount] = tuple;
+    const {} = card;
+    const [] = tuple;
+    const { metadata: {} } = presentCard;
+    
+    function rejectNullableParameter({ id }: Card?) {
+                                     ~~~~~~
+!!! error TS100090: A destructured parameter cannot traverse a nullable source. Bind the parameter first and destructure it in the function body.
+        return id;
+    }
+    
+    function rejectNestedNullableParameter({ metadata: { label } }: Card) {
+                                           ~~~~~~~~~~~~~~~~~~~~~~~
+!!! error TS100090: A destructured parameter cannot traverse a nullable source. Bind the parameter first and destructure it in the function body.
+        return label;
+    }
+    
+    function acceptNullableLeaf({ metadata }: Card) {
+        return metadata;
+    }
+    

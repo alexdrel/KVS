@@ -4470,6 +4470,8 @@ var KVS_on_an_assignment_or_update_target_requires_a_writable_proper_base = &Mes
 
 var KVS_on_a_typed_in_place_spread_target_requires_a_writable_target = &Message{code: 100089, category: CategoryError, key: "KVS_on_a_typed_in_place_spread_target_requires_a_writable_target_100089", text: "KVS '!' on a typed in-place spread target requires a writable target."}
 
+var A_destructured_parameter_cannot_traverse_a_nullable_source_Bind_the_parameter_first_and_destructure_it_in_the_function_body = &Message{code: 100090, category: CategoryError, key: "A_destructured_parameter_cannot_traverse_a_nullable_source_Bind_the_parameter_first_and_destructure__100090", text: "A destructured parameter cannot traverse a nullable source. Bind the parameter first and destructure it in the function body."}
+
 var allMessages = [...]**Message{
 	&Unterminated_string_literal,
 	&Identifier_expected,
@@ -6705,4 +6707,5 @@ var allMessages = [...]**Message{
 	&KVS_cannot_be_the_target_of_an_assignment_or_update,
 	&KVS_on_an_assignment_or_update_target_requires_a_writable_proper_base,
 	&KVS_on_a_typed_in_place_spread_target_requires_a_writable_target,
+	&A_destructured_parameter_cannot_traverse_a_nullable_source_Bind_the_parameter_first_and_destructure_it_in_the_function_body,
 }

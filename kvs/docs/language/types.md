@@ -1,6 +1,8 @@
 # Lightweight Type-System Additions
 
-KVS adds inexpensive static information where it can remain compatible with ordinary JavaScript values. The main addition here is `distinct`: a primitive value can carry a domain without a runtime wrapper.
+KVS adds inexpensive static information where it can remain compatible with ordinary JavaScript
+values. The main addition here is `distinct`: a primitive value can carry a domain without a runtime
+wrapper.
 
 Nullable type operators, expression inference, and assertions are covered in
 [Nullability, Values, and Defaults](values.md).
@@ -17,8 +19,8 @@ const screenRect: Rect<Pixel>;
 const gridRect: Rect<Cell>;
 ```
 
-KVS rejects accidentally passing cell coordinates where pixels are expected.
-The same distinction is useful for strings:
+KVS rejects accidentally passing cell coordinates where pixels are expected. The same distinction is
+useful for strings:
 
 ```kvs
 type OrderId = distinct string;
@@ -37,17 +39,20 @@ type Celsius = distinct number;
 type Email = distinct string;
 ```
 
-The initial proposal supports `number`, `bigint`, and `string`. A normal alias of a distinct type retains the same domain rather than creating another one:
+The initial proposal supports `number`, `bigint`, and `string`. A normal alias of a distinct type
+retains the same domain rather than creating another one:
 
 ```kvs
 type ScreenPixel = Pixel; // same domain as Pixel
 ```
 
-Distinct information is erased during transpilation. A `Pixel` has the runtime representation and behavior of a JavaScript number.
+Distinct information is erased during transpilation. A `Pixel` has the runtime representation and
+behavior of a JavaScript number.
 
 ## Neutral primitive values
 
-An ordinary primitive value is neutral. It may be used where a domain over that primitive is required:
+An ordinary primitive value is neutral. It may be used where a domain over that primitive is
+required:
 
 ```kvs
 function moveX(distance: Pixel) { ... }
@@ -56,7 +61,8 @@ moveX(20);          // valid
 moveX(config.step); // valid when step is number
 ```
 
-This permits gradual adoption: code gains protection as values acquire domains without requiring every input and literal to be converted first.
+This permits gradual adoption: code gains protection as values acquire domains without requiring
+every input and literal to be converted first.
 
 A value from another distinct domain is not neutral:
 
@@ -64,17 +70,21 @@ A value from another distinct domain is not neutral:
 moveX(cellWidth); // error: Cell is not Pixel
 ```
 
-A distinct value may be used as its primitive base. An explicit base annotation therefore forms a domain-erasing boundary:
+A distinct value may be used as its primitive base. An explicit base annotation therefore forms a
+domain-erasing boundary:
 
 ```kvs
 const raw: number = pixel;
 ```
 
-Code can deliberately erase and later reapply a domain, so this is not an opaque-type security boundary. Its purpose is to catch direct accidental mixing while remaining compatible with JavaScript APIs.
+Code can deliberately erase and later reapply a domain, so this is not an opaque-type security
+boundary. Its purpose is to catch direct accidental mixing while remaining compatible with
+JavaScript APIs.
 
 ## Contagious operations
 
-When an operation consumes values from one distinct domain and normally returns that domain's primitive base, its result retains the domain:
+When an operation consumes values from one distinct domain and normally returns that domain's
+primitive base, its result retains the domain:
 
 ```kvs
 celsius + 2                    // Celsius
@@ -101,11 +111,15 @@ email.split("@")     // string[]
 kelvin.toFixed(2)    // string
 ```
 
-KVS does not infer dimensions or meanings within a domain. Operations such as `Pixel * Pixel`, `Kelvin + Kelvin`, and `Kelvin / Kelvin` still produce the same distinct domain when JavaScript would produce `number`. The domain says where a number belongs, not what physical quantity it represents.
+KVS does not infer dimensions or meanings within a domain. Operations such as `Pixel * Pixel`,
+`Kelvin + Kelvin`, and `Kelvin / Kelvin` still produce the same distinct domain when JavaScript
+would produce `number`. The domain says where a number belongs, not what physical quantity it
+represents.
 
 ## Domain conflicts
 
-One operation cannot consume two different distinct domains, even when they have the same primitive base:
+One operation cannot consume two different distinct domains, even when they have the same primitive
+base:
 
 ```kvs
 pixels + cells              // error
@@ -114,13 +128,15 @@ email == orderId            // error
 Math.min(celsius, kelvin)   // error
 ```
 
-Bare unions of distinct domains are not supported. Their runtime representations provide no discriminator with which to narrow the union:
+Bare unions of distinct domains are not supported. Their runtime representations provide no
+discriminator with which to narrow the union:
 
 ```kvs
 Kelvin | Celsius // error
 ```
 
-When a value genuinely belongs to one of several domains, an explicitly discriminated structure represents that fact:
+When a value genuinely belongs to one of several domains, an explicitly discriminated structure
+represents that fact:
 
 ```kvs
 type Temperature =
@@ -136,7 +152,8 @@ let reading: Kelvin?;
 
 ## Function signatures
 
-A function parameter written as a primitive base accepts values from any one corresponding domain. If the function returns that same primitive base, the call preserves the participating domain:
+A function parameter written as a primitive base accepts values from any one corresponding domain.
+If the function returns that same primitive base, the call preserves the participating domain:
 
 ```kvs
 function clamp(value: number, low: number, high: number): number;
@@ -145,9 +162,13 @@ clamp(pixel, 0, 1000) // Pixel
 clamp(pixel, 0, cell) // error
 ```
 
-This rule lets ordinary base-typed libraries preserve domains without separate overloads. It applies only when a distinct argument substitutes for a parameter of its exact primitive base type. Passing a distinct value through `any`, `unknown`, or an unrelated generic parameter does not contaminate the result.
+This rule lets ordinary base-typed libraries preserve domains without separate overloads. It applies
+only when a distinct argument substitutes for a parameter of its exact primitive base type. Passing
+a distinct value through `any`, `unknown`, or an unrelated generic parameter does not contaminate
+the result.
 
-A signature that names a distinct domain may explicitly return its neutral base type. This is the domain-aware escape hatch for an operation whose meaning genuinely changes:
+A signature that names a distinct domain may explicitly return its neutral base type. This is the
+domain-aware escape hatch for an operation whose meaning genuinely changes:
 
 ```kvs
 function temperatureRatio(value: Kelvin): number;
@@ -164,8 +185,10 @@ const cells = pixels as Cell;
 const raw = pixels as number;
 ```
 
-These conversions have no runtime effect and perform no validation. Direct conversion between distinct domains is permitted precisely because `as` makes the otherwise forbidden boundary visible.
+These conversions have no runtime effect and perform no validation. Direct conversion between
+distinct domains is permitted precisely because `as` makes the otherwise forbidden boundary visible.
 
 ---
 
-[← Failure policy](errors.md) · [Contents](README.md#reading-guide) · [Next: Typed context →](context.md)
+[← Failure policy](errors.md) · [Contents](README.md#reading-guide) ·
+[Next: Typed context →](context.md)

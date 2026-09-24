@@ -72,6 +72,81 @@ func FlattenDestructuringBinding(
 	return f.flattenDestructuringBinding(node, rval, skipInitializer)
 }
 
+// RewriteNullableDestructuringBinding preserves native binding patterns and
+// splits out only nested patterns whose selected source is nullable.
+func RewriteNullableDestructuringBinding(tx *Transformer, node *ast.Node, needsFallback func(*ast.Node) bool) *ast.Node {
+	factory := tx.Factory()
+	var needsRewrite func(*ast.Node, *ast.Node) bool
+	needsRewrite = func(parent *ast.Node, pattern *ast.Node) bool {
+		if needsFallback(parent) {
+			return true
+		}
+		for _, element := range pattern.Elements() {
+			if ast.IsBindingElement(element) && ast.IsBindingPattern(element.Name()) && needsRewrite(element, element.Name()) {
+				return true
+			}
+		}
+		return false
+	}
+	if !needsRewrite(node, node.Name()) {
+		return nil
+	}
+
+	applyFallback := func(pattern *ast.Node, value *ast.Node) *ast.Node {
+		var fallback *ast.Node
+		if pattern.Kind == ast.KindObjectBindingPattern {
+			fallback = factory.NewObjectLiteralExpression(nil, false)
+		} else {
+			fallback = factory.NewArrayLiteralExpression(nil, false)
+		}
+		return factory.NewBinaryExpression(nil, value, nil, factory.NewToken(ast.KindQuestionQuestionToken), fallback)
+	}
+
+	var rewritePattern func(*ast.Node) (*ast.Node, []*ast.Node)
+	rewritePattern = func(pattern *ast.Node) (*ast.Node, []*ast.Node) {
+		var following []*ast.Node
+		elements := make([]*ast.Node, 0, len(pattern.Elements()))
+		for _, element := range pattern.Elements() {
+			if !ast.IsBindingElement(element) || !ast.IsBindingPattern(element.Name()) {
+				elements = append(elements, tx.Visitor().VisitNode(element))
+				continue
+			}
+
+			nestedPattern, nestedFollowing := rewritePattern(element.Name())
+			bindingElement := element.AsBindingElement()
+			name := nestedPattern
+			if needsFallback(element) {
+				temp := factory.NewTempVariable()
+				name = temp
+				declaration := factory.NewVariableDeclaration(nestedPattern, nil, nil, applyFallback(nestedPattern, temp))
+				declaration.Loc = element.Loc
+				following = append(following, declaration)
+			}
+			elements = append(elements, factory.UpdateBindingElement(
+				bindingElement,
+				bindingElement.DotDotDotToken,
+				tx.Visitor().VisitNode(bindingElement.PropertyName),
+				name,
+				tx.Visitor().VisitNode(bindingElement.Initializer),
+			))
+			following = append(following, nestedFollowing...)
+		}
+		return factory.UpdateBindingPattern(pattern.AsBindingPattern(), factory.NewNodeList(elements)), following
+	}
+
+	pattern, following := rewritePattern(node.Name())
+	initializer := tx.Visitor().VisitNode(node.Initializer())
+	if needsFallback(node) {
+		initializer = applyFallback(pattern, initializer)
+	}
+	declarations := []*ast.Node{factory.UpdateVariableDeclaration(node.AsVariableDeclaration(), pattern, nil, nil, initializer)}
+	declarations = append(declarations, following...)
+	if len(declarations) == 1 {
+		return declarations[0]
+	}
+	return factory.NewSyntaxList(declarations)
+}
+
 // flattener encapsulates the state and logic for flattening destructuring patterns.
 // It is equivalent to TypeScript's FlattenContext in destructuring.ts.
 type flattener struct {

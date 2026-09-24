@@ -2710,6 +2710,9 @@ func (c *Checker) checkParameter(node *ast.Node) {
 	c.checkGrammarModifiers(node)
 	c.checkVariableLikeDeclaration(node)
 	fn := ast.GetContainingFunction(node)
+	if fn.Body() != nil && ast.IsBindingPattern(node.Name()) && c.destructuredParameterTraversesNullableSource(node) {
+		c.error(node.Name(), diagnostics.A_destructured_parameter_cannot_traverse_a_nullable_source_Bind_the_parameter_first_and_destructure_it_in_the_function_body)
+	}
 	var paramName string
 	if node.Name() != nil && ast.IsIdentifier(node.Name()) {
 		paramName = node.Name().Text()
@@ -2747,6 +2750,25 @@ func (c *Checker) checkParameter(node *ast.Node) {
 	if hasDotDotDotToken(node) && !ast.IsBindingPattern(node.Name()) && !c.isTypeAssignableTo(c.getReducedType(c.getTypeOfSymbol(node.Symbol())), c.anyReadonlyArrayType) {
 		c.error(node, diagnostics.A_rest_parameter_must_be_of_an_array_type)
 	}
+}
+
+func (c *Checker) destructuredParameterTraversesNullableSource(parameter *ast.Node) bool {
+	if parameter.Symbol() != nil && isKvsNullableType(c.getTypeOfVariableOrParameterOrProperty(parameter.Symbol())) {
+		return true
+	}
+	var visitsNullablePattern func(*ast.Node) bool
+	visitsNullablePattern = func(pattern *ast.Node) bool {
+		for _, element := range pattern.Elements() {
+			if !ast.IsBindingPattern(element.Name()) {
+				continue
+			}
+			if isKvsNullableType(c.getTypeForBindingElement(element)) || visitsNullablePattern(element.Name()) {
+				return true
+			}
+		}
+		return false
+	}
+	return visitsNullablePattern(parameter.Name())
 }
 
 func (c *Checker) checkPropertyDeclaration(node *ast.Node) {
@@ -6109,14 +6131,14 @@ func (c *Checker) checkVariableLikeDeclaration(node *ast.Node) {
 			widenedType := c.getWidenedTypeForVariableLikeDeclaration(node, false /*reportErrors*/)
 			if needCheckInitializer {
 				initializerType := c.checkExpressionCached(initializer)
-				if c.strictNullChecks && needCheckWidenedType {
+				if c.strictNullChecks && needCheckWidenedType && !isKvsNullableType(initializerType) {
 					c.checkNonNullNonVoidType(initializerType, node)
 				} else {
 					c.checkTypeAssignableToAndOptionallyElaborate(initializerType, c.getWidenedTypeForVariableLikeDeclaration(node, false), node, initializer, nil, nil)
 				}
 			}
 			// check the binding pattern with empty elements
-			if needCheckWidenedType {
+			if needCheckWidenedType && !isKvsNullableType(widenedType) {
 				if ast.IsArrayBindingPattern(name) {
 					parent := node.Parent.Parent
 					absenceOnlyForOf := ast.IsForOfStatement(parent) &&
@@ -19377,6 +19399,10 @@ func (c *Checker) getBindingElementTypeFromParentType(declaration *ast.Node, par
 	} else if c.strictNullChecks && pattern.Parent.Initializer() != nil && !c.hasTypeFacts(c.getTypeOfInitializer(pattern.Parent.Initializer()), TypeFactsEQUndefined) {
 		parentType = c.getTypeWithFacts(parentType, TypeFactsNEUndefined)
 	}
+	sourceNullable := isKvsNullableType(parentType)
+	if sourceNullable {
+		parentType = c.GetNonNullableType(parentType)
+	}
 	accessFlags := AccessFlagsExpressionPosition | core.IfElse(noTupleBoundsCheck || c.hasDefaultValue(declaration), AccessFlagsAllowMissing, 0)
 	var t *Type
 	switch pattern.Kind {
@@ -19437,6 +19463,9 @@ func (c *Checker) getBindingElementTypeFromParentType(declaration *ast.Node, par
 		panic("Unhandled case in getBindingElementTypeFromParentType")
 	}
 	if declaration.Initializer() == nil {
+		if sourceNullable && !hasDotDotDotToken(declaration) {
+			t = c.getNullableType(t, TypeFlagsNullable)
+		}
 		return t
 	}
 	if ast.WalkUpBindingElementsAndPatterns(declaration).Type() != nil {

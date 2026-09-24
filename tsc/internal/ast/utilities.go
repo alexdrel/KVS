@@ -294,6 +294,33 @@ func IsKvsOptionalWritePath(node *Node) bool {
 	}
 }
 
+func IsKvsDefaultMaterializationStaged(node *Node) bool {
+	current := node
+	for current != nil {
+		parent := current.Parent
+		switch {
+		case parent == nil:
+			return false
+		case IsOuterExpression(parent, OEKAssertions|OEKParentheses) && parent.Expression() == current:
+			current = parent
+		case parent.Kind == KindKvsDefaultExpression && parent.Expression() == current:
+			current = parent
+		case IsAccessExpression(parent) && parent.Expression() == current:
+			if parent.QuestionDotToken() != nil {
+				return true
+			}
+			current = parent
+		case IsCallExpression(parent) && parent.Expression() == current:
+			return IsKvsExtantCall(parent)
+		case parent.Kind == KindKvsExtantAssignmentExpression && parent.AsKvsExtantAssignmentExpression().Left == current:
+			return true
+		default:
+			return false
+		}
+	}
+	return false
+}
+
 func IsLogicalBinaryOperator(token Kind) bool {
 	return token == KindBarBarToken || token == KindAmpersandAmpersandToken
 }

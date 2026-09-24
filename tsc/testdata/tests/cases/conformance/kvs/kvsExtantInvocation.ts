@@ -62,6 +62,19 @@ const elementMethod = service["run"]?(maybeText);
 declare function methodName(): "run";
 const computedMethod = service[methodName()]?(maybeText);
 
+declare let items: string[]?;
+const materializedReceiver = items!.push?(maybeText);
+const stillNullableItems = items;
+
+interface Buffer {
+    values: string[];
+    append?: (value: string) => number;
+}
+
+declare let buffer: Buffer?;
+const materializedNullableMethod = buffer!.append?(maybeText);
+const stillNullableBuffer = buffer;
+
 declare const tuple: [string?, number];
 const tupleSpread = required?(...tuple);
 

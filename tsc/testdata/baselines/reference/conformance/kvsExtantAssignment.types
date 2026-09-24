@@ -57,6 +57,35 @@ function assignProperty(target: { value: string }, candidate?: string) {
 >candidate : string | undefined
 }
 
+interface Profile {
+    nickname: string;
+>nickname : string
+}
+
+function assignThroughMaterializedTarget(profile: Profile?, candidate?: string) {
+>assignThroughMaterializedTarget : (profile: Profile?, candidate?: string) => { result: string | undefined; stillNullableProfile: Profile | null | undefined; }
+>profile : Profile | null | undefined
+>candidate : string | undefined
+
+    const result = profile!.nickname ?= candidate;
+>result : string | undefined
+>profile!.nickname ?= candidate : string | undefined
+>profile!.nickname : string
+>profile! : Profile
+>profile : Profile | null | undefined
+>nickname : string
+>candidate : string | undefined
+
+    const stillNullableProfile = profile;
+>stillNullableProfile : Profile | null | undefined
+>profile : Profile | null | undefined
+
+    return { result, stillNullableProfile };
+>{ result, stillNullableProfile } : { result: string | undefined; stillNullableProfile: Profile | null | undefined; }
+>result : string | undefined
+>stillNullableProfile : Profile | null | undefined
+}
+
 function showPrototypeEvaluationOrder(
 >showPrototypeEvaluationOrder : (getTarget: () => { values: string[]; }, getKey: () => number, getCandidate: () => string | undefined) => string | undefined
 

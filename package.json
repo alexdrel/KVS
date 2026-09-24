@@ -25,6 +25,7 @@
     },
     "devDependencies": {
         "@dprint/json": "^0.23.0",
+        "@dprint/markdown": "^0.24.0",
         "@dprint/typescript": "^0.96.1",
         "@jakebailey/dprint-plugin-gofumpt": "^0.0.18",
         "@types/node": "^22.20.1",

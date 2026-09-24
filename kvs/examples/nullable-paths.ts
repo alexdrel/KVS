@@ -21,3 +21,8 @@ const missing = me.parents[1].siblings[0].children[0].name;
 
 console.log(cousin); // Maya
 console.log(missing); // undefined
+
+let visitor: Person?;
+const { name: visitorName, parents, children: [ child, ...restChildren ] } = visitor;
+
+console.log(visitorName); // undefined

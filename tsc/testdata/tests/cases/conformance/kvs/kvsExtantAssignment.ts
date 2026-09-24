@@ -17,6 +17,16 @@ function assignProperty(target: { value: string }, candidate?: string) {
     return target.value ?= candidate;
 }
 
+interface Profile {
+    nickname: string;
+}
+
+function assignThroughMaterializedTarget(profile: Profile?, candidate?: string) {
+    const result = profile!.nickname ?= candidate;
+    const stillNullableProfile = profile;
+    return { result, stillNullableProfile };
+}
+
 function showPrototypeEvaluationOrder(
     getTarget: () => { values: string[] },
     getKey: () => number,

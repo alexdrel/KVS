@@ -18,6 +18,16 @@ function assignProperty(target: { value: string }, candidate?: string) {
     return target.value ?= candidate;
 }
 
+interface Profile {
+    nickname: string;
+}
+
+function assignThroughMaterializedTarget(profile: Profile?, candidate?: string) {
+    const result = profile!.nickname ?= candidate;
+    const stillNullableProfile = profile;
+    return { result, stillNullableProfile };
+}
+
 function showPrototypeEvaluationOrder(
     getTarget: () => { values: string[] },
     getKey: () => number,
@@ -55,6 +65,12 @@ function assignFalsy(candidate) {
 function assignProperty(target, candidate) {
     var _a;
     return (_a = candidate) != null ? target.value = _a : _a;
+}
+function assignThroughMaterializedTarget(profile, candidate) {
+    var _a;
+    const result = (_a = candidate) != null ? (profile ??= { nickname: "" }).nickname = _a : _a;
+    const stillNullableProfile = profile;
+    return { result, stillNullableProfile };
 }
 function showPrototypeEvaluationOrder(getTarget, getKey, getCandidate) {
     var _a;

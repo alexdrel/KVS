@@ -1,6 +1,8 @@
 # Whole Programs
 
-These four examples combine the language themes in application code. Domain APIs such as repositories, renderers, and error factories are assumed; each example stands independently. Follow the chapter links for the rules behind the syntax.
+These four examples combine the language themes in application code. Domain APIs such as
+repositories, renderers, and error factories are assumed; each example stands independently. Follow
+the chapter links for the rules behind the syntax.
 
 ## Preparing an invoice
 
@@ -75,9 +77,11 @@ The main line remains visible:
 find order -> get customer -> price lines -> calculate tax -> build invoice
 ```
 
-Missing business data flows through the calculation, while the endpoint decides whether an invoice is required. Auditing is a local detour around the same computation.
+Missing business data flows through the calculation, while the endpoint decides whether an invoice
+is required. Auditing is a local detour around the same computation.
 
-See [values and defaults](values.md), [accumulator loops](flow.md#returning-final-loop-state), [optional calls](calls.md#optional-invocation), and [failure policy](errors.md).
+See [values and defaults](values.md), [accumulator loops](flow.md#returning-final-loop-state),
+[optional calls](calls.md#optional-invocation), and [failure policy](errors.md).
 
 ### Equivalent TypeScript shape
 
@@ -189,9 +193,13 @@ function buildCards(photos: ImportedPhoto[]?): Card[] {
 }
 ```
 
-The loop selects photos and constructs the cards it wants to produce. Typed spread keeps import-only fields out of the local photo object, extant assignment stores a normalized caption only when one is present, and the final default makes the public result an array even when no source was supplied.
+The loop selects photos and constructs the cards it wants to produce. Typed spread keeps import-only
+fields out of the local photo object, extant assignment stores a normalized caption only when one is
+present, and the final default makes the public result an array even when no source was supplied.
 
-See [collecting](flow.md#collect), [extant assignment](flow.md#extant-assignment), [POD construction and typed spread](data.md#pod-construction), and [failure demotion](errors.md#demoting-outcomes-to-null-).
+See [collecting](flow.md#collect), [extant assignment](flow.md#extant-assignment),
+[POD construction and typed spread](data.md#pod-construction), and
+[failure demotion](errors.md#demoting-outcomes-to-null-).
 
 ## Request-scoped configuration
 
@@ -220,9 +228,8 @@ async function greetingEndpoint(request: GreetingRequest): string {
 }
 ```
 
-The entry point establishes request information. The operation supplies a
-fallback for a missing translation and reports an unavailable user at its own
-boundary.
+The entry point establishes request information. The operation supplies a fallback for a missing
+translation and reports an unavailable user at its own boundary.
 
 See [typed context](context.md) and [failure policy](errors.md).
 
@@ -253,8 +260,11 @@ function exportFirst(documents: Document[], level: number): string? {
 }
 ```
 
-Selection remains an ordinary loop with an explicit first result. If it produces nothing, absence flows through the transformation; otherwise the chain reads in execution order, using receiver-first functions and one small placeholder operation.
+Selection remains an ordinary loop with an explicit first result. If it produces nothing, absence
+flows through the transformation; otherwise the chain reads in execution order, using receiver-first
+functions and one small placeholder operation.
 
-See [first production](flow.md#select), [nullable dataflow](values.md#nullable-dataflow), and [fluent calls and placeholders](calls.md#fluent-calls).
+See [first production](flow.md#select), [nullable dataflow](values.md#nullable-dataflow), and
+[fluent calls and placeholders](calls.md#fluent-calls).
 
 [Back to the reading guide](README.md#reading-guide)

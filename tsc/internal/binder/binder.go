@@ -1742,7 +1742,7 @@ func (b *Binder) bindChildren(node *ast.Node) {
 		b.bindEachChild(node)
 	case ast.KindKvsDefaultExpression:
 		b.bind(node.Expression())
-		if ast.IsKvsPotentiallyMaterializingDefaultExpression(node) && !ast.IsKvsOptionalWritePath(node.Expression()) {
+		if ast.IsKvsPotentiallyMaterializingDefaultExpression(node) && !ast.IsKvsOptionalWritePath(node.Expression()) && !ast.IsKvsDefaultMaterializationStaged(node) {
 			b.bindAssignmentTargetFlow(node.Expression())
 			b.hasFlowEffects = true
 		}

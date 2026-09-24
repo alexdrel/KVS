@@ -1,11 +1,11 @@
 kvsStaticNullability.ts(21,7): error TS2322: Type '[]' is not assignable to type '[boolean | null | undefined, string]'.
   Source has 0 element(s) but target requires 2.
-kvsStaticNullability.ts(30,1): error TS2322: Type 'string | null | undefined' is not assignable to type 'string'.
+kvsStaticNullability.ts(35,1): error TS2322: Type 'string | null | undefined' is not assignable to type 'string'.
   Type 'undefined' is not assignable to type 'string'.
-kvsStaticNullability.ts(32,7): error TS2322: Type 'string | null | undefined' is not assignable to type 'string'.
+kvsStaticNullability.ts(37,7): error TS2322: Type 'string | null | undefined' is not assignable to type 'string'.
   Type 'undefined' is not assignable to type 'string'.
-kvsStaticNullability.ts(37,51): error TS1110: Type expected.
-kvsStaticNullability.ts(38,46): error TS1110: Type expected.
+kvsStaticNullability.ts(42,51): error TS1110: Type expected.
+kvsStaticNullability.ts(43,46): error TS1110: Type expected.
 
 
 ==== kvsStaticNullability.ts (5 errors) ====
@@ -37,6 +37,11 @@ kvsStaticNullability.ts(38,46): error TS1110: Type expected.
     let request? = "ready";
     request = null;
     request = "ready";
+    
+    let explicitNullable: string?;
+    const initiallyAbsent = explicitNullable;
+    explicitNullable = "ready";
+    explicitNullable = null;
     
     const required! = "ready";
     let current! = "ready";

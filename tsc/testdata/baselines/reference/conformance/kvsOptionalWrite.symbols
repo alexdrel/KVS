@@ -16,157 +16,182 @@ interface User {
 >Profile : Symbol(Profile, Decl(kvsOptionalWrite.ts, 0, 0))
 }
 
+interface Workspace {
+>Workspace : Symbol(Workspace, Decl(kvsOptionalWrite.ts, 6, 1))
+
+    user: User?;
+>user : Symbol(Workspace.user, Decl(kvsOptionalWrite.ts, 8, 21))
+>User : Symbol(User, Decl(kvsOptionalWrite.ts, 2, 1))
+}
+
 interface Preferences {
->Preferences : Symbol(Preferences, Decl(kvsOptionalWrite.ts, 6, 1))
+>Preferences : Symbol(Preferences, Decl(kvsOptionalWrite.ts, 10, 1))
 
     contrast: number;
->contrast : Symbol(Preferences.contrast, Decl(kvsOptionalWrite.ts, 8, 23))
+>contrast : Symbol(Preferences.contrast, Decl(kvsOptionalWrite.ts, 12, 23))
 }
 
 interface Member {
->Member : Symbol(Member, Decl(kvsOptionalWrite.ts, 10, 1))
+>Member : Symbol(Member, Decl(kvsOptionalWrite.ts, 14, 1))
 
     preferences: Preferences?;
->preferences : Symbol(Member.preferences, Decl(kvsOptionalWrite.ts, 12, 18))
->Preferences : Symbol(Preferences, Decl(kvsOptionalWrite.ts, 6, 1))
+>preferences : Symbol(Member.preferences, Decl(kvsOptionalWrite.ts, 16, 18))
+>Preferences : Symbol(Preferences, Decl(kvsOptionalWrite.ts, 10, 1))
 }
 
 interface Counter {
->Counter : Symbol(Counter, Decl(kvsOptionalWrite.ts, 14, 1))
+>Counter : Symbol(Counter, Decl(kvsOptionalWrite.ts, 18, 1))
 
     count: number;
->count : Symbol(Counter.count, Decl(kvsOptionalWrite.ts, 16, 19))
+>count : Symbol(Counter.count, Decl(kvsOptionalWrite.ts, 20, 19))
 }
 
 declare let user: User?;
->user : Symbol(user, Decl(kvsOptionalWrite.ts, 20, 11))
+>user : Symbol(user, Decl(kvsOptionalWrite.ts, 24, 11))
 >User : Symbol(User, Decl(kvsOptionalWrite.ts, 2, 1))
 
 declare let users: User[]?;
->users : Symbol(users, Decl(kvsOptionalWrite.ts, 21, 11))
+>users : Symbol(users, Decl(kvsOptionalWrite.ts, 25, 11))
 >User : Symbol(User, Decl(kvsOptionalWrite.ts, 2, 1))
 
 declare let members: Member[]?;
->members : Symbol(members, Decl(kvsOptionalWrite.ts, 22, 11))
->Member : Symbol(Member, Decl(kvsOptionalWrite.ts, 10, 1))
+>members : Symbol(members, Decl(kvsOptionalWrite.ts, 26, 11))
+>Member : Symbol(Member, Decl(kvsOptionalWrite.ts, 14, 1))
 
 declare let optionalThenMaterialized: User?;
->optionalThenMaterialized : Symbol(optionalThenMaterialized, Decl(kvsOptionalWrite.ts, 23, 11))
+>optionalThenMaterialized : Symbol(optionalThenMaterialized, Decl(kvsOptionalWrite.ts, 27, 11))
 >User : Symbol(User, Decl(kvsOptionalWrite.ts, 2, 1))
 
 declare let materializedThenOptional: User?;
->materializedThenOptional : Symbol(materializedThenOptional, Decl(kvsOptionalWrite.ts, 24, 11))
+>materializedThenOptional : Symbol(materializedThenOptional, Decl(kvsOptionalWrite.ts, 28, 11))
 >User : Symbol(User, Decl(kvsOptionalWrite.ts, 2, 1))
 
+declare let nestedMaterializedThenOptional: Workspace?;
+>nestedMaterializedThenOptional : Symbol(nestedMaterializedThenOptional, Decl(kvsOptionalWrite.ts, 29, 11))
+>Workspace : Symbol(Workspace, Decl(kvsOptionalWrite.ts, 6, 1))
+
 declare let counter: Counter?;
->counter : Symbol(counter, Decl(kvsOptionalWrite.ts, 25, 11))
->Counter : Symbol(Counter, Decl(kvsOptionalWrite.ts, 14, 1))
+>counter : Symbol(counter, Decl(kvsOptionalWrite.ts, 30, 11))
+>Counter : Symbol(Counter, Decl(kvsOptionalWrite.ts, 18, 1))
 
 declare let counters: Counter[]?;
->counters : Symbol(counters, Decl(kvsOptionalWrite.ts, 26, 11))
->Counter : Symbol(Counter, Decl(kvsOptionalWrite.ts, 14, 1))
+>counters : Symbol(counters, Decl(kvsOptionalWrite.ts, 31, 11))
+>Counter : Symbol(Counter, Decl(kvsOptionalWrite.ts, 18, 1))
 
 declare let valueEffects: number;
->valueEffects : Symbol(valueEffects, Decl(kvsOptionalWrite.ts, 27, 11))
+>valueEffects : Symbol(valueEffects, Decl(kvsOptionalWrite.ts, 32, 11))
 
 declare let indexEffects: number;
->indexEffects : Symbol(indexEffects, Decl(kvsOptionalWrite.ts, 28, 11))
+>indexEffects : Symbol(indexEffects, Decl(kvsOptionalWrite.ts, 33, 11))
 
 user?.profile = { theme: "dark" };
 >user?.profile : Symbol(User.profile, Decl(kvsOptionalWrite.ts, 4, 16))
->user : Symbol(user, Decl(kvsOptionalWrite.ts, 20, 11))
+>user : Symbol(user, Decl(kvsOptionalWrite.ts, 24, 11))
 >profile : Symbol(User.profile, Decl(kvsOptionalWrite.ts, 4, 16))
->theme : Symbol(theme, Decl(kvsOptionalWrite.ts, 30, 17))
+>theme : Symbol(theme, Decl(kvsOptionalWrite.ts, 35, 17))
 
 user?.profile?.theme = "light";
 >user?.profile?.theme : Symbol(Profile.theme, Decl(kvsOptionalWrite.ts, 0, 19))
 >user?.profile : Symbol(User.profile, Decl(kvsOptionalWrite.ts, 4, 16))
->user : Symbol(user, Decl(kvsOptionalWrite.ts, 20, 11))
+>user : Symbol(user, Decl(kvsOptionalWrite.ts, 24, 11))
 >profile : Symbol(User.profile, Decl(kvsOptionalWrite.ts, 4, 16))
 >theme : Symbol(Profile.theme, Decl(kvsOptionalWrite.ts, 0, 19))
 
 users?.[indexEffects++]?.profile?.theme = "blue";
 >users?.[indexEffects++]?.profile?.theme : Symbol(Profile.theme, Decl(kvsOptionalWrite.ts, 0, 19))
 >users?.[indexEffects++]?.profile : Symbol(User.profile, Decl(kvsOptionalWrite.ts, 4, 16))
->users : Symbol(users, Decl(kvsOptionalWrite.ts, 21, 11))
->indexEffects : Symbol(indexEffects, Decl(kvsOptionalWrite.ts, 28, 11))
+>users : Symbol(users, Decl(kvsOptionalWrite.ts, 25, 11))
+>indexEffects : Symbol(indexEffects, Decl(kvsOptionalWrite.ts, 33, 11))
 >profile : Symbol(User.profile, Decl(kvsOptionalWrite.ts, 4, 16))
 >theme : Symbol(Profile.theme, Decl(kvsOptionalWrite.ts, 0, 19))
 
 user?.profile = (valueEffects++, { theme: "contrast" });
 >user?.profile : Symbol(User.profile, Decl(kvsOptionalWrite.ts, 4, 16))
->user : Symbol(user, Decl(kvsOptionalWrite.ts, 20, 11))
+>user : Symbol(user, Decl(kvsOptionalWrite.ts, 24, 11))
 >profile : Symbol(User.profile, Decl(kvsOptionalWrite.ts, 4, 16))
->valueEffects : Symbol(valueEffects, Decl(kvsOptionalWrite.ts, 27, 11))
->theme : Symbol(theme, Decl(kvsOptionalWrite.ts, 33, 34))
+>valueEffects : Symbol(valueEffects, Decl(kvsOptionalWrite.ts, 32, 11))
+>theme : Symbol(theme, Decl(kvsOptionalWrite.ts, 38, 34))
 
 optionalThenMaterialized?.profile!.theme = "optional then materialize";
 >optionalThenMaterialized?.profile!.theme : Symbol(Profile.theme, Decl(kvsOptionalWrite.ts, 0, 19))
 >optionalThenMaterialized?.profile : Symbol(User.profile, Decl(kvsOptionalWrite.ts, 4, 16))
->optionalThenMaterialized : Symbol(optionalThenMaterialized, Decl(kvsOptionalWrite.ts, 23, 11))
+>optionalThenMaterialized : Symbol(optionalThenMaterialized, Decl(kvsOptionalWrite.ts, 27, 11))
 >profile : Symbol(User.profile, Decl(kvsOptionalWrite.ts, 4, 16))
 >theme : Symbol(Profile.theme, Decl(kvsOptionalWrite.ts, 0, 19))
 
 const stillOptionalUser = optionalThenMaterialized;
->stillOptionalUser : Symbol(stillOptionalUser, Decl(kvsOptionalWrite.ts, 36, 5))
->optionalThenMaterialized : Symbol(optionalThenMaterialized, Decl(kvsOptionalWrite.ts, 23, 11))
+>stillOptionalUser : Symbol(stillOptionalUser, Decl(kvsOptionalWrite.ts, 41, 5))
+>optionalThenMaterialized : Symbol(optionalThenMaterialized, Decl(kvsOptionalWrite.ts, 27, 11))
 
 const stillOptionalProfile = optionalThenMaterialized.profile;
->stillOptionalProfile : Symbol(stillOptionalProfile, Decl(kvsOptionalWrite.ts, 37, 5))
+>stillOptionalProfile : Symbol(stillOptionalProfile, Decl(kvsOptionalWrite.ts, 42, 5))
 >optionalThenMaterialized.profile : Symbol(User.profile, Decl(kvsOptionalWrite.ts, 4, 16))
->optionalThenMaterialized : Symbol(optionalThenMaterialized, Decl(kvsOptionalWrite.ts, 23, 11))
+>optionalThenMaterialized : Symbol(optionalThenMaterialized, Decl(kvsOptionalWrite.ts, 27, 11))
 >profile : Symbol(User.profile, Decl(kvsOptionalWrite.ts, 4, 16))
 
 materializedThenOptional!.profile?.theme = "materialize then optional";
 >materializedThenOptional!.profile?.theme : Symbol(Profile.theme, Decl(kvsOptionalWrite.ts, 0, 19))
 >materializedThenOptional!.profile : Symbol(User.profile, Decl(kvsOptionalWrite.ts, 4, 16))
->materializedThenOptional : Symbol(materializedThenOptional, Decl(kvsOptionalWrite.ts, 24, 11))
+>materializedThenOptional : Symbol(materializedThenOptional, Decl(kvsOptionalWrite.ts, 28, 11))
 >profile : Symbol(User.profile, Decl(kvsOptionalWrite.ts, 4, 16))
 >theme : Symbol(Profile.theme, Decl(kvsOptionalWrite.ts, 0, 19))
 
 const materializedUser = materializedThenOptional;
->materializedUser : Symbol(materializedUser, Decl(kvsOptionalWrite.ts, 40, 5))
->materializedThenOptional : Symbol(materializedThenOptional, Decl(kvsOptionalWrite.ts, 24, 11))
+>materializedUser : Symbol(materializedUser, Decl(kvsOptionalWrite.ts, 45, 5))
+>materializedThenOptional : Symbol(materializedThenOptional, Decl(kvsOptionalWrite.ts, 28, 11))
 
 const stillNullableProfile = materializedThenOptional.profile;
->stillNullableProfile : Symbol(stillNullableProfile, Decl(kvsOptionalWrite.ts, 41, 5))
+>stillNullableProfile : Symbol(stillNullableProfile, Decl(kvsOptionalWrite.ts, 46, 5))
 >materializedThenOptional.profile : Symbol(User.profile, Decl(kvsOptionalWrite.ts, 4, 16))
->materializedThenOptional : Symbol(materializedThenOptional, Decl(kvsOptionalWrite.ts, 24, 11))
+>materializedThenOptional : Symbol(materializedThenOptional, Decl(kvsOptionalWrite.ts, 28, 11))
 >profile : Symbol(User.profile, Decl(kvsOptionalWrite.ts, 4, 16))
 
+nestedMaterializedThenOptional!.user!.profile?.theme = "stage nested materialization";
+>nestedMaterializedThenOptional!.user!.profile?.theme : Symbol(Profile.theme, Decl(kvsOptionalWrite.ts, 0, 19))
+>nestedMaterializedThenOptional!.user!.profile : Symbol(User.profile, Decl(kvsOptionalWrite.ts, 4, 16))
+>nestedMaterializedThenOptional!.user : Symbol(Workspace.user, Decl(kvsOptionalWrite.ts, 8, 21))
+>nestedMaterializedThenOptional : Symbol(nestedMaterializedThenOptional, Decl(kvsOptionalWrite.ts, 29, 11))
+>user : Symbol(Workspace.user, Decl(kvsOptionalWrite.ts, 8, 21))
+>profile : Symbol(User.profile, Decl(kvsOptionalWrite.ts, 4, 16))
+>theme : Symbol(Profile.theme, Decl(kvsOptionalWrite.ts, 0, 19))
+
+const stillNullableWorkspace = nestedMaterializedThenOptional;
+>stillNullableWorkspace : Symbol(stillNullableWorkspace, Decl(kvsOptionalWrite.ts, 49, 5))
+>nestedMaterializedThenOptional : Symbol(nestedMaterializedThenOptional, Decl(kvsOptionalWrite.ts, 29, 11))
+
 members?.[indexEffects++]!.preferences!.contrast = 2;
->members?.[indexEffects++]!.preferences!.contrast : Symbol(Preferences.contrast, Decl(kvsOptionalWrite.ts, 8, 23))
->members?.[indexEffects++]!.preferences : Symbol(Member.preferences, Decl(kvsOptionalWrite.ts, 12, 18))
->members : Symbol(members, Decl(kvsOptionalWrite.ts, 22, 11))
->indexEffects : Symbol(indexEffects, Decl(kvsOptionalWrite.ts, 28, 11))
->preferences : Symbol(Member.preferences, Decl(kvsOptionalWrite.ts, 12, 18))
->contrast : Symbol(Preferences.contrast, Decl(kvsOptionalWrite.ts, 8, 23))
+>members?.[indexEffects++]!.preferences!.contrast : Symbol(Preferences.contrast, Decl(kvsOptionalWrite.ts, 12, 23))
+>members?.[indexEffects++]!.preferences : Symbol(Member.preferences, Decl(kvsOptionalWrite.ts, 16, 18))
+>members : Symbol(members, Decl(kvsOptionalWrite.ts, 26, 11))
+>indexEffects : Symbol(indexEffects, Decl(kvsOptionalWrite.ts, 33, 11))
+>preferences : Symbol(Member.preferences, Decl(kvsOptionalWrite.ts, 16, 18))
+>contrast : Symbol(Preferences.contrast, Decl(kvsOptionalWrite.ts, 12, 23))
 
 const previousCount = counter?.count++;
->previousCount : Symbol(previousCount, Decl(kvsOptionalWrite.ts, 45, 5))
->counter?.count : Symbol(Counter.count, Decl(kvsOptionalWrite.ts, 16, 19))
->counter : Symbol(counter, Decl(kvsOptionalWrite.ts, 25, 11))
->count : Symbol(Counter.count, Decl(kvsOptionalWrite.ts, 16, 19))
+>previousCount : Symbol(previousCount, Decl(kvsOptionalWrite.ts, 53, 5))
+>counter?.count : Symbol(Counter.count, Decl(kvsOptionalWrite.ts, 20, 19))
+>counter : Symbol(counter, Decl(kvsOptionalWrite.ts, 30, 11))
+>count : Symbol(Counter.count, Decl(kvsOptionalWrite.ts, 20, 19))
 
 const nextCount = ++counter?.count;
->nextCount : Symbol(nextCount, Decl(kvsOptionalWrite.ts, 46, 5))
->counter?.count : Symbol(Counter.count, Decl(kvsOptionalWrite.ts, 16, 19))
->counter : Symbol(counter, Decl(kvsOptionalWrite.ts, 25, 11))
->count : Symbol(Counter.count, Decl(kvsOptionalWrite.ts, 16, 19))
+>nextCount : Symbol(nextCount, Decl(kvsOptionalWrite.ts, 54, 5))
+>counter?.count : Symbol(Counter.count, Decl(kvsOptionalWrite.ts, 20, 19))
+>counter : Symbol(counter, Decl(kvsOptionalWrite.ts, 30, 11))
+>count : Symbol(Counter.count, Decl(kvsOptionalWrite.ts, 20, 19))
 
 counters?.[indexEffects++]?.count--;
->counters?.[indexEffects++]?.count : Symbol(Counter.count, Decl(kvsOptionalWrite.ts, 16, 19))
->counters : Symbol(counters, Decl(kvsOptionalWrite.ts, 26, 11))
->indexEffects : Symbol(indexEffects, Decl(kvsOptionalWrite.ts, 28, 11))
->count : Symbol(Counter.count, Decl(kvsOptionalWrite.ts, 16, 19))
+>counters?.[indexEffects++]?.count : Symbol(Counter.count, Decl(kvsOptionalWrite.ts, 20, 19))
+>counters : Symbol(counters, Decl(kvsOptionalWrite.ts, 31, 11))
+>indexEffects : Symbol(indexEffects, Decl(kvsOptionalWrite.ts, 33, 11))
+>count : Symbol(Counter.count, Decl(kvsOptionalWrite.ts, 20, 19))
 
 const stillOptionalCounter = counter;
->stillOptionalCounter : Symbol(stillOptionalCounter, Decl(kvsOptionalWrite.ts, 48, 5))
->counter : Symbol(counter, Decl(kvsOptionalWrite.ts, 25, 11))
+>stillOptionalCounter : Symbol(stillOptionalCounter, Decl(kvsOptionalWrite.ts, 56, 5))
+>counter : Symbol(counter, Decl(kvsOptionalWrite.ts, 30, 11))
 
 user.profile = { theme: "plain" };
 >user.profile : Symbol(User.profile, Decl(kvsOptionalWrite.ts, 4, 16))
->user : Symbol(user, Decl(kvsOptionalWrite.ts, 20, 11))
+>user : Symbol(user, Decl(kvsOptionalWrite.ts, 24, 11))
 >profile : Symbol(User.profile, Decl(kvsOptionalWrite.ts, 4, 16))
->theme : Symbol(theme, Decl(kvsOptionalWrite.ts, 50, 16))
+>theme : Symbol(theme, Decl(kvsOptionalWrite.ts, 58, 16))
 

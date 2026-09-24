@@ -9,6 +9,10 @@ interface User {
     profile: Profile?;
 }
 
+interface Workspace {
+    user: User?;
+}
+
 interface Preferences {
     contrast: number;
 }
@@ -26,6 +30,7 @@ declare let users: User[]?;
 declare let members: Member[]?;
 declare let optionalThenMaterialized: User?;
 declare let materializedThenOptional: User?;
+declare let nestedMaterializedThenOptional: Workspace?;
 declare let counter: Counter?;
 declare let counters: Counter[]?;
 declare let valueEffects: number;
@@ -43,6 +48,9 @@ const stillOptionalProfile = optionalThenMaterialized.profile;
 materializedThenOptional!.profile?.theme = "materialize then optional";
 const materializedUser = materializedThenOptional;
 const stillNullableProfile = materializedThenOptional.profile;
+
+nestedMaterializedThenOptional!.user!.profile?.theme = "stage nested materialization";
+const stillNullableWorkspace = nestedMaterializedThenOptional;
 
 members?.[indexEffects++]!.preferences!.contrast = 2;
 

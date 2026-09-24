@@ -1,6 +1,6 @@
-kvsExtantAssignment.ts(28,5): error TS2322: Type 'number' is not assignable to type 'string'.
-kvsExtantAssignment.ts(33,14): error TS1109: Expression expected.
-kvsExtantAssignment.ts(33,25): error TS1005: ':' expected.
+kvsExtantAssignment.ts(38,5): error TS2322: Type 'number' is not assignable to type 'string'.
+kvsExtantAssignment.ts(43,14): error TS1109: Expression expected.
+kvsExtantAssignment.ts(43,25): error TS1005: ':' expected.
 
 
 ==== kvsExtantAssignment.ts (3 errors) ====
@@ -19,6 +19,16 @@ kvsExtantAssignment.ts(33,25): error TS1005: ':' expected.
     
     function assignProperty(target: { value: string }, candidate?: string) {
         return target.value ?= candidate;
+    }
+    
+    interface Profile {
+        nickname: string;
+    }
+    
+    function assignThroughMaterializedTarget(profile: Profile?, candidate?: string) {
+        const result = profile!.nickname ?= candidate;
+        const stillNullableProfile = profile;
+        return { result, stillNullableProfile };
     }
     
     function showPrototypeEvaluationOrder(

@@ -1,0 +1,113 @@
+//// [tests/cases/conformance/kvs/kvsNullableDestructuring.ts] ////
+
+=== kvsNullableDestructuring.ts ===
+interface Metadata {
+>Metadata : Symbol(Metadata, Decl(kvsNullableDestructuring.ts, 0, 0))
+
+    label: string;
+>label : Symbol(Metadata.label, Decl(kvsNullableDestructuring.ts, 0, 20))
+}
+
+interface Card {
+>Card : Symbol(Card, Decl(kvsNullableDestructuring.ts, 2, 1))
+
+    id: string;
+>id : Symbol(Card.id, Decl(kvsNullableDestructuring.ts, 4, 16))
+
+    metadata: Metadata?;
+>metadata : Symbol(Card.metadata, Decl(kvsNullableDestructuring.ts, 5, 15))
+>Metadata : Symbol(Metadata, Decl(kvsNullableDestructuring.ts, 0, 0))
+
+    tags: string[];
+>tags : Symbol(Card.tags, Decl(kvsNullableDestructuring.ts, 6, 24))
+}
+
+declare const card: Card?;
+>card : Symbol(card, Decl(kvsNullableDestructuring.ts, 10, 13))
+>Card : Symbol(Card, Decl(kvsNullableDestructuring.ts, 2, 1))
+
+declare const presentCard: Card;
+>presentCard : Symbol(presentCard, Decl(kvsNullableDestructuring.ts, 11, 13))
+>Card : Symbol(Card, Decl(kvsNullableDestructuring.ts, 2, 1))
+
+declare const tuple: [string, number]?;
+>tuple : Symbol(tuple, Decl(kvsNullableDestructuring.ts, 12, 13))
+
+const { id, metadata } = card;
+>id : Symbol(id, Decl(kvsNullableDestructuring.ts, 14, 7))
+>metadata : Symbol(metadata, Decl(kvsNullableDestructuring.ts, 14, 11))
+>card : Symbol(card, Decl(kvsNullableDestructuring.ts, 10, 13))
+
+const { metadata: { label } } = card;
+>label : Symbol(label, Decl(kvsNullableDestructuring.ts, 15, 19))
+>card : Symbol(card, Decl(kvsNullableDestructuring.ts, 10, 13))
+
+const { metadata: { label: nestedNullableLabel } } = presentCard;
+>metadata : Symbol(Card.metadata, Decl(kvsNullableDestructuring.ts, 5, 15))
+>nestedNullableLabel : Symbol(nestedNullableLabel, Decl(kvsNullableDestructuring.ts, 16, 19))
+>presentCard : Symbol(presentCard, Decl(kvsNullableDestructuring.ts, 11, 13))
+
+const { id: idWithDefault = "missing" } = card;
+>idWithDefault : Symbol(idWithDefault, Decl(kvsNullableDestructuring.ts, 17, 7))
+>card : Symbol(card, Decl(kvsNullableDestructuring.ts, 10, 13))
+
+const { id: renamed, ...rest } = card;
+>renamed : Symbol(renamed, Decl(kvsNullableDestructuring.ts, 18, 7))
+>rest : Symbol(rest, Decl(kvsNullableDestructuring.ts, 18, 20))
+>card : Symbol(card, Decl(kvsNullableDestructuring.ts, 10, 13))
+
+const [firstTag, ...remainingTags] = card.tags;
+>firstTag : Symbol(firstTag, Decl(kvsNullableDestructuring.ts, 19, 7))
+>remainingTags : Symbol(remainingTags, Decl(kvsNullableDestructuring.ts, 19, 16))
+>card.tags : Symbol(Card.tags, Decl(kvsNullableDestructuring.ts, 6, 24))
+>card : Symbol(card, Decl(kvsNullableDestructuring.ts, 10, 13))
+>tags : Symbol(Card.tags, Decl(kvsNullableDestructuring.ts, 6, 24))
+
+const { tags: [nestedFirstTag, ...nestedRemainingTags] } = card;
+>nestedFirstTag : Symbol(nestedFirstTag, Decl(kvsNullableDestructuring.ts, 20, 15))
+>nestedRemainingTags : Symbol(nestedRemainingTags, Decl(kvsNullableDestructuring.ts, 20, 30))
+>card : Symbol(card, Decl(kvsNullableDestructuring.ts, 10, 13))
+
+const [tupleName, tupleCount] = tuple;
+>tupleName : Symbol(tupleName, Decl(kvsNullableDestructuring.ts, 21, 7))
+>tupleCount : Symbol(tupleCount, Decl(kvsNullableDestructuring.ts, 21, 17))
+>tuple : Symbol(tuple, Decl(kvsNullableDestructuring.ts, 12, 13))
+
+const {} = card;
+>card : Symbol(card, Decl(kvsNullableDestructuring.ts, 10, 13))
+
+const [] = tuple;
+>tuple : Symbol(tuple, Decl(kvsNullableDestructuring.ts, 12, 13))
+
+const { metadata: {} } = presentCard;
+>metadata : Symbol(Card.metadata, Decl(kvsNullableDestructuring.ts, 5, 15))
+>presentCard : Symbol(presentCard, Decl(kvsNullableDestructuring.ts, 11, 13))
+
+function rejectNullableParameter({ id }: Card?) {
+>rejectNullableParameter : Symbol(rejectNullableParameter, Decl(kvsNullableDestructuring.ts, 24, 37))
+>id : Symbol(id, Decl(kvsNullableDestructuring.ts, 26, 34))
+>Card : Symbol(Card, Decl(kvsNullableDestructuring.ts, 2, 1))
+
+    return id;
+>id : Symbol(id, Decl(kvsNullableDestructuring.ts, 26, 34))
+}
+
+function rejectNestedNullableParameter({ metadata: { label } }: Card) {
+>rejectNestedNullableParameter : Symbol(rejectNestedNullableParameter, Decl(kvsNullableDestructuring.ts, 28, 1))
+>metadata : Symbol(Card.metadata, Decl(kvsNullableDestructuring.ts, 5, 15))
+>label : Symbol(label, Decl(kvsNullableDestructuring.ts, 30, 52))
+>Card : Symbol(Card, Decl(kvsNullableDestructuring.ts, 2, 1))
+
+    return label;
+>label : Symbol(label, Decl(kvsNullableDestructuring.ts, 30, 52))
+}
+
+function acceptNullableLeaf({ metadata }: Card) {
+>acceptNullableLeaf : Symbol(acceptNullableLeaf, Decl(kvsNullableDestructuring.ts, 32, 1))
+>metadata : Symbol(metadata, Decl(kvsNullableDestructuring.ts, 34, 29))
+>Card : Symbol(Card, Decl(kvsNullableDestructuring.ts, 2, 1))
+
+    return metadata;
+>metadata : Symbol(metadata, Decl(kvsNullableDestructuring.ts, 34, 29))
+}
+

@@ -78,35 +78,48 @@ request = null;
 request = "ready";
 >request : Symbol(request, Decl(kvsStaticNullability.ts, 22, 3))
 
+let explicitNullable: string?;
+>explicitNullable : Symbol(explicitNullable, Decl(kvsStaticNullability.ts, 26, 3))
+
+const initiallyAbsent = explicitNullable;
+>initiallyAbsent : Symbol(initiallyAbsent, Decl(kvsStaticNullability.ts, 27, 5))
+>explicitNullable : Symbol(explicitNullable, Decl(kvsStaticNullability.ts, 26, 3))
+
+explicitNullable = "ready";
+>explicitNullable : Symbol(explicitNullable, Decl(kvsStaticNullability.ts, 26, 3))
+
+explicitNullable = null;
+>explicitNullable : Symbol(explicitNullable, Decl(kvsStaticNullability.ts, 26, 3))
+
 const required! = "ready";
->required : Symbol(required, Decl(kvsStaticNullability.ts, 26, 5))
+>required : Symbol(required, Decl(kvsStaticNullability.ts, 31, 5))
 
 let current! = "ready";
->current : Symbol(current, Decl(kvsStaticNullability.ts, 27, 3))
+>current : Symbol(current, Decl(kvsStaticNullability.ts, 32, 3))
 
 current = "next";
->current : Symbol(current, Decl(kvsStaticNullability.ts, 27, 3))
+>current : Symbol(current, Decl(kvsStaticNullability.ts, 32, 3))
 
 current = item;
->current : Symbol(current, Decl(kvsStaticNullability.ts, 27, 3))
+>current : Symbol(current, Decl(kvsStaticNullability.ts, 32, 3))
 >item : Symbol(item, Decl(kvsStaticNullability.ts, 0, 13))
 
 const rejectNullableRequired! = item;
->rejectNullableRequired : Symbol(rejectNullableRequired, Decl(kvsStaticNullability.ts, 31, 5))
+>rejectNullableRequired : Symbol(rejectNullableRequired, Decl(kvsStaticNullability.ts, 36, 5))
 >item : Symbol(item, Decl(kvsStaticNullability.ts, 0, 13))
 
 const rejectNullableConst? = "ready";
->rejectNullableConst : Symbol(rejectNullableConst, Decl(kvsStaticNullability.ts, 33, 5))
+>rejectNullableConst : Symbol(rejectNullableConst, Decl(kvsStaticNullability.ts, 38, 5))
 
 let rejectTypedNullable?: string = "ready";
->rejectTypedNullable : Symbol(rejectTypedNullable, Decl(kvsStaticNullability.ts, 34, 3))
+>rejectTypedNullable : Symbol(rejectTypedNullable, Decl(kvsStaticNullability.ts, 39, 3))
 
 const rejectSpacedNullableAssertion = "ready" as ?;
->rejectSpacedNullableAssertion : Symbol(rejectSpacedNullableAssertion, Decl(kvsStaticNullability.ts, 36, 5))
+>rejectSpacedNullableAssertion : Symbol(rejectSpacedNullableAssertion, Decl(kvsStaticNullability.ts, 41, 5))
 > : Symbol(unknown)
 
 const rejectSpacedExtantAssertion = item as !;
->rejectSpacedExtantAssertion : Symbol(rejectSpacedExtantAssertion, Decl(kvsStaticNullability.ts, 37, 5))
+>rejectSpacedExtantAssertion : Symbol(rejectSpacedExtantAssertion, Decl(kvsStaticNullability.ts, 42, 5))
 >item : Symbol(item, Decl(kvsStaticNullability.ts, 0, 13))
 > : Symbol(unknown)
 
