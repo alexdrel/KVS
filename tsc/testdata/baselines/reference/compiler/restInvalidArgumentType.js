@@ -107,8 +107,8 @@ function f(p1, p2) {
     var r11 = __rest(intersection_primitive, []); // Error, intersection with generic type parameter
     var r12 = __rest(num, []); // Error
     var r13 = __rest(str, []); // Error
-    var r14 = __rest(u, []); // error, undefined-only not allowed
-    var r15 = __rest(n, []); // error, null-only not allowed
+    var r14 = __rest(u !== null && u !== void 0 ? u : {}, []); // error, undefined-only not allowed
+    var r15 = __rest(n !== null && n !== void 0 ? n : {}, []); // error, null-only not allowed
     var r16 = __rest(a, []); // OK
     var r17 = __rest(literal_string, []); // Error
     var r18 = __rest(literal_number, []); // Error

@@ -9,5 +9,5 @@
 //// [usingDeclarations.6.js]
 "use strict";
 {
-    using { a } = null;
+    using { a } = null ?? {};
 }

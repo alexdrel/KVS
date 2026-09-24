@@ -62,7 +62,7 @@ var {"prop2": d1} = foo1();
 // An expression of type S is considered assignable to an assignment target V if one of the following is true
 // V is an object assignment pattern and, for each assignment property P in V,
 //      S is the type Any, or
-var { a1 } = undefined;
+var { a1 } = undefined !== null && undefined !== void 0 ? undefined : {};
 var { a2 } = {};
 // V is an object assignment pattern and, for each assignment property P in V,
 //      S has an apparent property with the property name specified in

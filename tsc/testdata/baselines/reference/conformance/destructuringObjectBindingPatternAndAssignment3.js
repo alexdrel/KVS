@@ -17,6 +17,6 @@ var _a;
 var { h, } = Object.assign({}, (_a = 1) != null ? { h: _a } : {});
 var { i } = { i: 2 };
 var { i1 } = { i1: 2 };
-var { f2: { f21 } = { f212: "string" } } = undefined;
+var { f2: { f21 } = { f212: "string" } } = undefined !== null && undefined !== void 0 ? undefined : {};
 var { 1:  } = { 1:  };
 var { "prop":  } = { "prop": 1 };

@@ -16,5 +16,5 @@ function fst({ s } = t) { }
 const fInferred = ({ a = 0 } = {}) => a;
 // const fInferred: ({ a }?: { a?: number; }) => number
 const fAnnotated = ({ a = 0 } = {}) => a;
-const { s } = t;
+const { s } = t !== null && t !== void 0 ? t : {};
 function fst({ s } = t) { }

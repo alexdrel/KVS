@@ -10,5 +10,5 @@
 //// [usingDeclarations.7.js]
 "use strict";
 {
-    using a = null, { b } = null, c = null;
+    using a = null, { b } = null ?? {}, c = null;
 }

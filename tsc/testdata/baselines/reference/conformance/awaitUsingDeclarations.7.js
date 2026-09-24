@@ -10,5 +10,5 @@
 //// [awaitUsingDeclarations.7.js]
 "use strict";
 {
-    await using a = null, { b } = null, c = null;
+    await using a = null, { b } = null ?? {}, c = null;
 }

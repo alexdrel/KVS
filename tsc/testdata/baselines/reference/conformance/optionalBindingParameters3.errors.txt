@@ -1,7 +1,8 @@
 /a.js(9,12): error TS2463: A binding pattern parameter cannot be optional in an implementation signature.
+/a.js(9,12): error TS100090: A destructured parameter cannot traverse a nullable source. Bind the parameter first and destructure it in the function body.
 
 
-==== /a.js (1 errors) ====
+==== /a.js (2 errors) ====
     /**
      * @typedef Foo
      * @property {string} a
@@ -13,4 +14,6 @@
     function f({ a = "a" }) {}
                ~~~~~~~~~~~
 !!! error TS2463: A binding pattern parameter cannot be optional in an implementation signature.
+               ~~~~~~~~~~~
+!!! error TS100090: A destructured parameter cannot traverse a nullable source. Bind the parameter first and destructure it in the function body.
     

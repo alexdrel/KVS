@@ -82,7 +82,7 @@ func RewriteNullableDestructuringBinding(tx *Transformer, node *ast.Node, needsF
 			return true
 		}
 		for _, element := range pattern.Elements() {
-			if ast.IsBindingElement(element) && ast.IsBindingPattern(element.Name()) && needsRewrite(element, element.Name()) {
+			if ast.IsBindingElement(element) && element.Name() != nil && ast.IsBindingPattern(element.Name()) && needsRewrite(element, element.Name()) {
 				return true
 			}
 		}
@@ -107,7 +107,7 @@ func RewriteNullableDestructuringBinding(tx *Transformer, node *ast.Node, needsF
 		var following []*ast.Node
 		elements := make([]*ast.Node, 0, len(pattern.Elements()))
 		for _, element := range pattern.Elements() {
-			if !ast.IsBindingElement(element) || !ast.IsBindingPattern(element.Name()) {
+			if !ast.IsBindingElement(element) || element.Name() == nil || !ast.IsBindingPattern(element.Name()) {
 				elements = append(elements, tx.Visitor().VisitNode(element))
 				continue
 			}

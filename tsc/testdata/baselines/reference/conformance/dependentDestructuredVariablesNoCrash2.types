@@ -6,6 +6,6 @@
 function ([undefined, unknown]: string | undefined = undefined)
 > : ([undefined, unknown]?: string | undefined) => any
 >undefined : any
->unknown : any
+>unknown : string | null | undefined
 >undefined : any
 

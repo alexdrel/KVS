@@ -4,13 +4,13 @@
 // V is an array assignment pattern, S is the type Any or an array-like type (section 3.3.2), and, for each assignment element E in V,
 //      S is the type Any, or
 var [[a0], [[a1]]] = []         // Error
->a0 : any
->a1 : any
+>a0 : null | undefined
+>a1 : null | undefined
 >[] : []
 
 var [[a2], [[a3]]] = undefined  // Error
->a2 : any
->a3 : any
+>a2 : null | undefined
+>a3 : null | undefined
 >undefined : undefined
 
 // V is an array assignment pattern, S is the type Any or an array-like type (section 3.3.2), and, for each assignment element E in V,

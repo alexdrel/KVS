@@ -24,6 +24,6 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 var rest4;
-var rest4 = __rest(nullAndUndefinedUnion, []);
+var rest4 = __rest(nullAndUndefinedUnion !== null && nullAndUndefinedUnion !== void 0 ? nullAndUndefinedUnion : {}, []);
 var rest5;
 var rest5 = __rest(unionWithIntersection, []);

@@ -10,6 +10,6 @@ export {};
 
 //// [awaitUsingDeclarations.6.js]
 {
-    await using { a } = null;
+    await using { a } = null ?? {};
 }
 export {};

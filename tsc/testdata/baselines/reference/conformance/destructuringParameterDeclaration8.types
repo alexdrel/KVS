@@ -12,7 +12,7 @@ function test({
 
     nested: { p = 'c' }
 >nested : any
->p : any
+>p : "a" | "b"
 >'c' : "c"
 
 }: {
@@ -29,7 +29,7 @@ function test({
 >method : "x" | "y"
 
     p
->p : any
+>p : "a" | "b"
 }
 
 test({});

@@ -1,30 +1,26 @@
 destructuringAssignabilityCheck.ts(1,7): error TS2488: Type '{}' must have a '[Symbol.iterator]()' method that returns an iterator.
-destructuringAssignabilityCheck.ts(2,7): error TS2532: Object is possibly 'undefined'.
 destructuringAssignabilityCheck.ts(3,3): error TS2488: Type '{}' must have a '[Symbol.iterator]()' method that returns an iterator.
-destructuringAssignabilityCheck.ts(4,3): error TS2532: Object is possibly 'undefined'.
-destructuringAssignabilityCheck.ts(6,14): error TS2532: Object is possibly 'undefined'.
+destructuringAssignabilityCheck.ts(4,3): error TS100090: A destructured parameter cannot traverse a nullable source. Bind the parameter first and destructure it in the function body.
+destructuringAssignabilityCheck.ts(6,14): error TS100090: A destructured parameter cannot traverse a nullable source. Bind the parameter first and destructure it in the function body.
 destructuringAssignabilityCheck.ts(9,14): error TS2488: Type '{}' must have a '[Symbol.iterator]()' method that returns an iterator.
-destructuringAssignabilityCheck.ts(13,7): error TS2532: Object is possibly 'undefined'.
 destructuringAssignabilityCheck.ts(15,7): error TS2488: Type '{}' must have a '[Symbol.iterator]()' method that returns an iterator.
 
 
-==== destructuringAssignabilityCheck.ts (8 errors) ====
+==== destructuringAssignabilityCheck.ts (6 errors) ====
     const [] = {}; // should be error
           ~~
 !!! error TS2488: Type '{}' must have a '[Symbol.iterator]()' method that returns an iterator.
     const {} = undefined; // error correctly
-          ~~
-!!! error TS2532: Object is possibly 'undefined'.
     (([]) => 0)({}); // should be error
       ~~
 !!! error TS2488: Type '{}' must have a '[Symbol.iterator]()' method that returns an iterator.
     (({}) => 0)(undefined); // should be error
       ~~
-!!! error TS2532: Object is possibly 'undefined'.
+!!! error TS100090: A destructured parameter cannot traverse a nullable source. Bind the parameter first and destructure it in the function body.
     
     function foo({}: undefined) {
-                 ~~~~~~~~~~~~~
-!!! error TS2532: Object is possibly 'undefined'.
+                 ~~
+!!! error TS100090: A destructured parameter cannot traverse a nullable source. Bind the parameter first and destructure it in the function body.
         return 0
     }
     function bar([]: {}) {
@@ -34,8 +30,6 @@ destructuringAssignabilityCheck.ts(15,7): error TS2488: Type '{}' must have a '[
     }
     
     const { }: undefined = 1
-          ~~~
-!!! error TS2532: Object is possibly 'undefined'.
     
     const []: {} = {}
           ~~

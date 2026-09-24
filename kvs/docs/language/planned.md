@@ -62,9 +62,7 @@ is the uniform replacement for the common `Object.entries(record)` case and shou
 enumerable string-keyed entries in normal JavaScript property order.
 
 `_%` belongs to the nearest implicit iteration. A nested implicit iteration shadows both iteration
-values. Subject-form `when` still has its own `_` subject but does not create a coordinate; the
-exact shadowing rule between `when` and an outer `_%` should be fixed when this direction is
-implemented.
+values.
 
 ## Record type shorthand
 

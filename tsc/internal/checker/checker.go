@@ -2753,16 +2753,16 @@ func (c *Checker) checkParameter(node *ast.Node) {
 }
 
 func (c *Checker) destructuredParameterTraversesNullableSource(parameter *ast.Node) bool {
-	if parameter.Symbol() != nil && isKvsNullableType(c.getTypeOfVariableOrParameterOrProperty(parameter.Symbol())) {
+	if parameter.Initializer() == nil && parameter.Symbol() != nil && isKvsNullableType(c.getTypeOfVariableOrParameterOrProperty(parameter.Symbol())) {
 		return true
 	}
 	var visitsNullablePattern func(*ast.Node) bool
 	visitsNullablePattern = func(pattern *ast.Node) bool {
 		for _, element := range pattern.Elements() {
-			if !ast.IsBindingPattern(element.Name()) {
+			if !ast.IsBindingElement(element) || element.Name() == nil || !ast.IsBindingPattern(element.Name()) {
 				continue
 			}
-			if isKvsNullableType(c.getTypeForBindingElement(element)) || visitsNullablePattern(element.Name()) {
+			if element.Initializer() == nil && isKvsNullableType(c.getTypeForBindingElement(element)) || visitsNullablePattern(element.Name()) {
 				return true
 			}
 		}

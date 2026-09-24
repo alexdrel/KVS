@@ -11,4 +11,4 @@ const [value] = data; // Error
 //// [destructuringArrayBindingPatternAndAssignment4.js]
 "use strict";
 // #35497
-const [value] = data; // Error
+const [value] = data !== null && data !== void 0 ? data : []; // Error

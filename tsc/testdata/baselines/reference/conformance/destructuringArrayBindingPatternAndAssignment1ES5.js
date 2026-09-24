@@ -77,8 +77,8 @@ var [c14, c15, c16] = [1, 2, "string"];
 // An expression of type S is considered assignable to an assignment target V if one of the following is true
 // V is an array assignment pattern, S is the type Any or an array-like type (section 3.3.2), and, for each assignment element E in V,
 //      S is the type Any, or
-var [a0, a1] = undefined;
-var [a2 = false, a3 = 1] = undefined;
+var [a0, a1] = undefined !== null && undefined !== void 0 ? undefined : [];
+var [a2 = false, a3 = 1] = undefined !== null && undefined !== void 0 ? undefined : [];
 // V is an array assignment pattern, S is the type Any or an array-like type (section 3.3.2), and, for each assignment element E in V,
 //      S is a tuple- like type (section 3.3.3) with a property named N of a type that is assignable to the target given in E,
 //        where N is the numeric index of E in the array assignment pattern, or

@@ -11,6 +11,6 @@ export {};
 
 //// [awaitUsingDeclarations.5.js]
 {
-    await using a = null, [b] = null, c = null;
+    await using a = null, [b] = null ?? [], c = null;
 }
 export {};

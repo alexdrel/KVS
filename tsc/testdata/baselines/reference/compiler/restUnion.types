@@ -27,7 +27,7 @@ var rest2: {};
 >rest2 : {}
 
 var {n, ...rest2 } = undefinedUnion;
->n : any
+>n : number | null | undefined
 >rest2 : {}
 >undefinedUnion : { n: number; } | undefined
 
@@ -40,7 +40,7 @@ var rest3: {};
 >rest3 : {}
 
 var {n, ...rest3 } = nullUnion;
->n : any
+>n : number | null | undefined
 >rest3 : {}
 >nullUnion : { n: number; } | null
 

@@ -11,5 +11,5 @@
 //// [usingDeclarations.5.js]
 "use strict";
 {
-    using a = null, [b] = null, c = null;
+    using a = null, [b] = null ?? [], c = null;
 }
