@@ -172,6 +172,23 @@ func (r *EmitResolver) IsKvsNullableAccess(node *ast.Node) bool {
 	return r.checker.nodeLinks.Get(node).flags&NodeCheckFlagsKvsNullableAccess != 0
 }
 
+func (r *EmitResolver) GetKvsExtantCallInfo(node *ast.Node) *printer.KvsExtantCallInfo {
+	r.checkerMu.Lock()
+	defer r.checkerMu.Unlock()
+	r.checker.checkExpression(node)
+	info := r.checker.nodeLinks.Get(node).kvsExtantCall
+	if info == nil {
+		return nil
+	}
+	return &printer.KvsExtantCallInfo{
+		CallableNullable:   info.callableNullable,
+		GuardedArguments:   slices.Clone(info.guardedArguments),
+		NullArguments:      slices.Clone(info.nullArguments),
+		UndefinedArguments: slices.Clone(info.undefinedArguments),
+		ArgumentWidths:     slices.Clone(info.argumentWidths),
+	}
+}
+
 func isSyntacticallyKvsAbsent(node *ast.Node) bool {
 	node = ast.SkipParentheses(node)
 	return node.Kind == ast.KindNullKeyword || node.Kind == ast.KindVoidExpression ||

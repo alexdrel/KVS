@@ -4460,6 +4460,8 @@ var A_return_statement_cannot_cross_a_lazy_KVS_collector_boundary = &Message{cod
 
 var A_labeled_jump_cannot_cross_a_lazy_KVS_collector_boundary = &Message{code: 100084, category: CategoryError, key: "A_labeled_jump_cannot_cross_a_lazy_KVS_collector_boundary_100084", text: "A labeled jump cannot cross a lazy KVS collector boundary."}
 
+var KVS_optional_invocation_supports_only_fixed_tuple_spreads = &Message{code: 100085, category: CategoryError, key: "KVS_optional_invocation_supports_only_fixed_tuple_spreads_100085", text: "KVS optional invocation supports only fixed tuple spreads."}
+
 var allMessages = [...]**Message{
 	&Unterminated_string_literal,
 	&Identifier_expected,
@@ -6690,4 +6692,5 @@ var allMessages = [...]**Message{
 	&KVS_typed_in_place_spread_requires_a_concrete_interface_or_object_type_alias_target,
 	&A_return_statement_cannot_cross_a_lazy_KVS_collector_boundary,
 	&A_labeled_jump_cannot_cross_a_lazy_KVS_collector_boundary,
+	&KVS_optional_invocation_supports_only_fixed_tuple_spreads,
 }

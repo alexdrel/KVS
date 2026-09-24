@@ -8951,5 +8951,9 @@
     "A labeled jump cannot cross a lazy KVS collector boundary.": {
         "category": "Error",
         "code": 100084
+    },
+    "KVS optional invocation supports only fixed tuple spreads.": {
+        "category": "Error",
+        "code": 100085
     }
 }

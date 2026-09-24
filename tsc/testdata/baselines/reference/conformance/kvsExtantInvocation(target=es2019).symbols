@@ -1,0 +1,271 @@
+//// [tests/cases/conformance/kvs/kvsExtantInvocation.ts] ////
+
+=== kvsExtantInvocation.ts ===
+declare function required(value: string, later: number): string;
+>required : Symbol(required, Decl(kvsExtantInvocation.ts, 0, 0))
+>value : Symbol(value, Decl(kvsExtantInvocation.ts, 0, 26))
+>later : Symbol(later, Decl(kvsExtantInvocation.ts, 0, 40))
+
+declare function nullable(value: string?, later: number): string;
+>nullable : Symbol(nullable, Decl(kvsExtantInvocation.ts, 0, 64))
+>value : Symbol(value, Decl(kvsExtantInvocation.ts, 1, 26))
+>later : Symbol(later, Decl(kvsExtantInvocation.ts, 1, 41))
+
+declare function build(): number;
+>build : Symbol(build, Decl(kvsExtantInvocation.ts, 1, 65))
+
+declare const maybeRequired: typeof required?;
+>maybeRequired : Symbol(maybeRequired, Decl(kvsExtantInvocation.ts, 4, 13))
+>required : Symbol(required, Decl(kvsExtantInvocation.ts, 0, 0))
+
+declare const maybeText: string?;
+>maybeText : Symbol(maybeText, Decl(kvsExtantInvocation.ts, 5, 13))
+
+declare const maybeOtherText: string?;
+>maybeOtherText : Symbol(maybeOtherText, Decl(kvsExtantInvocation.ts, 6, 13))
+
+const nullableCallable = maybeRequired?("ready", build());
+>nullableCallable : Symbol(nullableCallable, Decl(kvsExtantInvocation.ts, 8, 5))
+>maybeRequired : Symbol(maybeRequired, Decl(kvsExtantInvocation.ts, 4, 13))
+>build : Symbol(build, Decl(kvsExtantInvocation.ts, 1, 65))
+
+const nullableCallableAndArgument = maybeRequired?(maybeText, build());
+>nullableCallableAndArgument : Symbol(nullableCallableAndArgument, Decl(kvsExtantInvocation.ts, 9, 5))
+>maybeRequired : Symbol(maybeRequired, Decl(kvsExtantInvocation.ts, 4, 13))
+>maybeText : Symbol(maybeText, Decl(kvsExtantInvocation.ts, 5, 13))
+>build : Symbol(build, Decl(kvsExtantInvocation.ts, 1, 65))
+
+const guardedArgument = required?(maybeText, build());
+>guardedArgument : Symbol(guardedArgument, Decl(kvsExtantInvocation.ts, 10, 5))
+>required : Symbol(required, Decl(kvsExtantInvocation.ts, 0, 0))
+>maybeText : Symbol(maybeText, Decl(kvsExtantInvocation.ts, 5, 13))
+>build : Symbol(build, Decl(kvsExtantInvocation.ts, 1, 65))
+
+const acceptedAbsence = nullable?(maybeText, build());
+>acceptedAbsence : Symbol(acceptedAbsence, Decl(kvsExtantInvocation.ts, 11, 5))
+>nullable : Symbol(nullable, Decl(kvsExtantInvocation.ts, 0, 64))
+>maybeText : Symbol(maybeText, Decl(kvsExtantInvocation.ts, 5, 13))
+>build : Symbol(build, Decl(kvsExtantInvocation.ts, 1, 65))
+
+const ordinaryLowering = required?("ready", build());
+>ordinaryLowering : Symbol(ordinaryLowering, Decl(kvsExtantInvocation.ts, 12, 5))
+>required : Symbol(required, Decl(kvsExtantInvocation.ts, 0, 0))
+>build : Symbol(build, Decl(kvsExtantInvocation.ts, 1, 65))
+
+declare function acceptsOptional(value?: string): string | undefined;
+>acceptsOptional : Symbol(acceptsOptional, Decl(kvsExtantInvocation.ts, 12, 53))
+>value : Symbol(value, Decl(kvsExtantInvocation.ts, 14, 33))
+
+function acceptsDefault(value = "fallback"): string {
+>acceptsDefault : Symbol(acceptsDefault, Decl(kvsExtantInvocation.ts, 14, 69))
+>value : Symbol(value, Decl(kvsExtantInvocation.ts, 15, 24))
+
+    return value;
+>value : Symbol(value, Decl(kvsExtantInvocation.ts, 15, 24))
+}
+declare function acceptsNull(value: string | null): string | null;
+>acceptsNull : Symbol(acceptsNull, Decl(kvsExtantInvocation.ts, 17, 1))
+>value : Symbol(value, Decl(kvsExtantInvocation.ts, 18, 29))
+
+const optionalArgument = acceptsOptional?(maybeText);
+>optionalArgument : Symbol(optionalArgument, Decl(kvsExtantInvocation.ts, 20, 5))
+>acceptsOptional : Symbol(acceptsOptional, Decl(kvsExtantInvocation.ts, 12, 53))
+>maybeText : Symbol(maybeText, Decl(kvsExtantInvocation.ts, 5, 13))
+
+const defaultedArgument = acceptsDefault?(maybeText);
+>defaultedArgument : Symbol(defaultedArgument, Decl(kvsExtantInvocation.ts, 21, 5))
+>acceptsDefault : Symbol(acceptsDefault, Decl(kvsExtantInvocation.ts, 14, 69))
+>maybeText : Symbol(maybeText, Decl(kvsExtantInvocation.ts, 5, 13))
+
+const nullArgument = acceptsNull?(maybeText);
+>nullArgument : Symbol(nullArgument, Decl(kvsExtantInvocation.ts, 22, 5))
+>acceptsNull : Symbol(acceptsNull, Decl(kvsExtantInvocation.ts, 17, 1))
+>maybeText : Symbol(maybeText, Decl(kvsExtantInvocation.ts, 5, 13))
+
+declare function identity<T>(value: T): T;
+>identity : Symbol(identity, Decl(kvsExtantInvocation.ts, 22, 45))
+>T : Symbol(T, Decl(kvsExtantInvocation.ts, 24, 26))
+>value : Symbol(value, Decl(kvsExtantInvocation.ts, 24, 29))
+>T : Symbol(T, Decl(kvsExtantInvocation.ts, 24, 26))
+>T : Symbol(T, Decl(kvsExtantInvocation.ts, 24, 26))
+
+const explicitGeneric = identity<string>?(maybeText);
+>explicitGeneric : Symbol(explicitGeneric, Decl(kvsExtantInvocation.ts, 25, 5))
+>identity : Symbol(identity, Decl(kvsExtantInvocation.ts, 22, 45))
+>maybeText : Symbol(maybeText, Decl(kvsExtantInvocation.ts, 5, 13))
+
+const inferredGeneric = identity?(maybeText);
+>inferredGeneric : Symbol(inferredGeneric, Decl(kvsExtantInvocation.ts, 26, 5))
+>identity : Symbol(identity, Decl(kvsExtantInvocation.ts, 22, 45))
+>maybeText : Symbol(maybeText, Decl(kvsExtantInvocation.ts, 5, 13))
+
+declare function overloaded(value: string): "text";
+>overloaded : Symbol(overloaded, Decl(kvsExtantInvocation.ts, 26, 45), Decl(kvsExtantInvocation.ts, 28, 51))
+>value : Symbol(value, Decl(kvsExtantInvocation.ts, 28, 28))
+
+declare function overloaded(value: number): "number";
+>overloaded : Symbol(overloaded, Decl(kvsExtantInvocation.ts, 26, 45), Decl(kvsExtantInvocation.ts, 28, 51))
+>value : Symbol(value, Decl(kvsExtantInvocation.ts, 29, 28))
+
+declare const maybeNumber: number?;
+>maybeNumber : Symbol(maybeNumber, Decl(kvsExtantInvocation.ts, 30, 13))
+
+const selectedOverload = overloaded?(maybeNumber);
+>selectedOverload : Symbol(selectedOverload, Decl(kvsExtantInvocation.ts, 31, 5))
+>overloaded : Symbol(overloaded, Decl(kvsExtantInvocation.ts, 26, 45), Decl(kvsExtantInvocation.ts, 28, 51))
+>maybeNumber : Symbol(maybeNumber, Decl(kvsExtantInvocation.ts, 30, 13))
+
+declare function pair(first: string, second: number): string;
+>pair : Symbol(pair, Decl(kvsExtantInvocation.ts, 31, 50))
+>first : Symbol(first, Decl(kvsExtantInvocation.ts, 33, 22))
+>second : Symbol(second, Decl(kvsExtantInvocation.ts, 33, 36))
+
+declare function first(): string;
+>first : Symbol(first, Decl(kvsExtantInvocation.ts, 33, 61))
+
+const guardedSecond = pair?(first(), maybeNumber);
+>guardedSecond : Symbol(guardedSecond, Decl(kvsExtantInvocation.ts, 35, 5))
+>pair : Symbol(pair, Decl(kvsExtantInvocation.ts, 31, 50))
+>first : Symbol(first, Decl(kvsExtantInvocation.ts, 33, 61))
+>maybeNumber : Symbol(maybeNumber, Decl(kvsExtantInvocation.ts, 30, 13))
+
+declare function three(first: string, second: string, third: number): string;
+>three : Symbol(three, Decl(kvsExtantInvocation.ts, 35, 50))
+>first : Symbol(first, Decl(kvsExtantInvocation.ts, 37, 23))
+>second : Symbol(second, Decl(kvsExtantInvocation.ts, 37, 37))
+>third : Symbol(third, Decl(kvsExtantInvocation.ts, 37, 53))
+
+declare function mixed(first: string?, second: string, third: number): string;
+>mixed : Symbol(mixed, Decl(kvsExtantInvocation.ts, 37, 77))
+>first : Symbol(first, Decl(kvsExtantInvocation.ts, 38, 23))
+>second : Symbol(second, Decl(kvsExtantInvocation.ts, 38, 38))
+>third : Symbol(third, Decl(kvsExtantInvocation.ts, 38, 54))
+
+const priorEffectSurvives = three?(first(), maybeText, build());
+>priorEffectSurvives : Symbol(priorEffectSurvives, Decl(kvsExtantInvocation.ts, 39, 5))
+>three : Symbol(three, Decl(kvsExtantInvocation.ts, 35, 50))
+>first : Symbol(first, Decl(kvsExtantInvocation.ts, 33, 61))
+>maybeText : Symbol(maybeText, Decl(kvsExtantInvocation.ts, 5, 13))
+>build : Symbol(build, Decl(kvsExtantInvocation.ts, 1, 65))
+
+const acceptedThenGuarded = mixed?(maybeText, maybeText, build());
+>acceptedThenGuarded : Symbol(acceptedThenGuarded, Decl(kvsExtantInvocation.ts, 40, 5))
+>mixed : Symbol(mixed, Decl(kvsExtantInvocation.ts, 37, 77))
+>maybeText : Symbol(maybeText, Decl(kvsExtantInvocation.ts, 5, 13))
+>maybeText : Symbol(maybeText, Decl(kvsExtantInvocation.ts, 5, 13))
+>build : Symbol(build, Decl(kvsExtantInvocation.ts, 1, 65))
+
+const firstGuardStopsTheRest = three?(maybeText, maybeOtherText, build());
+>firstGuardStopsTheRest : Symbol(firstGuardStopsTheRest, Decl(kvsExtantInvocation.ts, 41, 5))
+>three : Symbol(three, Decl(kvsExtantInvocation.ts, 35, 50))
+>maybeText : Symbol(maybeText, Decl(kvsExtantInvocation.ts, 5, 13))
+>maybeOtherText : Symbol(maybeOtherText, Decl(kvsExtantInvocation.ts, 6, 13))
+>build : Symbol(build, Decl(kvsExtantInvocation.ts, 1, 65))
+
+declare function getRequired(): typeof required?;
+>getRequired : Symbol(getRequired, Decl(kvsExtantInvocation.ts, 41, 74))
+>required : Symbol(required, Decl(kvsExtantInvocation.ts, 0, 0))
+
+const callableBeforeArguments = getRequired()?("ready", build());
+>callableBeforeArguments : Symbol(callableBeforeArguments, Decl(kvsExtantInvocation.ts, 44, 5))
+>getRequired : Symbol(getRequired, Decl(kvsExtantInvocation.ts, 41, 74))
+>build : Symbol(build, Decl(kvsExtantInvocation.ts, 1, 65))
+
+interface Service {
+>Service : Symbol(Service, Decl(kvsExtantInvocation.ts, 44, 65))
+
+    prefix: string;
+>prefix : Symbol(Service.prefix, Decl(kvsExtantInvocation.ts, 46, 19))
+
+    run(value: string): string;
+>run : Symbol(Service.run, Decl(kvsExtantInvocation.ts, 47, 19))
+>value : Symbol(value, Decl(kvsExtantInvocation.ts, 48, 8))
+
+    maybeRun?: (value: string) => string;
+>maybeRun : Symbol(Service.maybeRun, Decl(kvsExtantInvocation.ts, 48, 31))
+>value : Symbol(value, Decl(kvsExtantInvocation.ts, 49, 16))
+}
+
+declare const service: Service?;
+>service : Symbol(service, Decl(kvsExtantInvocation.ts, 52, 13))
+>Service : Symbol(Service, Decl(kvsExtantInvocation.ts, 44, 65))
+
+const nullableReceiver = service.run?(maybeText);
+>nullableReceiver : Symbol(nullableReceiver, Decl(kvsExtantInvocation.ts, 53, 5))
+>service.run : Symbol(Service.run, Decl(kvsExtantInvocation.ts, 47, 19))
+>service : Symbol(service, Decl(kvsExtantInvocation.ts, 52, 13))
+>run : Symbol(Service.run, Decl(kvsExtantInvocation.ts, 47, 19))
+>maybeText : Symbol(maybeText, Decl(kvsExtantInvocation.ts, 5, 13))
+
+const nullableMethod = service.maybeRun?(maybeText);
+>nullableMethod : Symbol(nullableMethod, Decl(kvsExtantInvocation.ts, 54, 5))
+>service.maybeRun : Symbol(Service.maybeRun, Decl(kvsExtantInvocation.ts, 48, 31))
+>service : Symbol(service, Decl(kvsExtantInvocation.ts, 52, 13))
+>maybeRun : Symbol(Service.maybeRun, Decl(kvsExtantInvocation.ts, 48, 31))
+>maybeText : Symbol(maybeText, Decl(kvsExtantInvocation.ts, 5, 13))
+
+declare function getService(): Service?;
+>getService : Symbol(getService, Decl(kvsExtantInvocation.ts, 54, 52))
+>Service : Symbol(Service, Decl(kvsExtantInvocation.ts, 44, 65))
+
+const receiverOnce = getService().run?(maybeText);
+>receiverOnce : Symbol(receiverOnce, Decl(kvsExtantInvocation.ts, 56, 5))
+>getService().run : Symbol(Service.run, Decl(kvsExtantInvocation.ts, 47, 19))
+>getService : Symbol(getService, Decl(kvsExtantInvocation.ts, 54, 52))
+>run : Symbol(Service.run, Decl(kvsExtantInvocation.ts, 47, 19))
+>maybeText : Symbol(maybeText, Decl(kvsExtantInvocation.ts, 5, 13))
+
+const elementMethod = service["run"]?(maybeText);
+>elementMethod : Symbol(elementMethod, Decl(kvsExtantInvocation.ts, 57, 5))
+>service : Symbol(service, Decl(kvsExtantInvocation.ts, 52, 13))
+>maybeText : Symbol(maybeText, Decl(kvsExtantInvocation.ts, 5, 13))
+
+declare function methodName(): "run";
+>methodName : Symbol(methodName, Decl(kvsExtantInvocation.ts, 57, 49))
+
+const computedMethod = service[methodName()]?(maybeText);
+>computedMethod : Symbol(computedMethod, Decl(kvsExtantInvocation.ts, 59, 5))
+>service : Symbol(service, Decl(kvsExtantInvocation.ts, 52, 13))
+>methodName : Symbol(methodName, Decl(kvsExtantInvocation.ts, 57, 49))
+>maybeText : Symbol(maybeText, Decl(kvsExtantInvocation.ts, 5, 13))
+
+declare const tuple: [string?, number];
+>tuple : Symbol(tuple, Decl(kvsExtantInvocation.ts, 61, 13))
+
+const tupleSpread = required?(...tuple);
+>tupleSpread : Symbol(tupleSpread, Decl(kvsExtantInvocation.ts, 62, 5))
+>required : Symbol(required, Decl(kvsExtantInvocation.ts, 0, 0))
+>tuple : Symbol(tuple, Decl(kvsExtantInvocation.ts, 61, 13))
+
+declare const values: string[];
+>values : Symbol(values, Decl(kvsExtantInvocation.ts, 64, 13))
+
+declare function variadic(...values: string[]): string;
+>variadic : Symbol(variadic, Decl(kvsExtantInvocation.ts, 64, 31))
+>values : Symbol(values, Decl(kvsExtantInvocation.ts, 65, 26))
+
+const unsupportedIterableSpread = variadic?(...values);
+>unsupportedIterableSpread : Symbol(unsupportedIterableSpread, Decl(kvsExtantInvocation.ts, 66, 5))
+>variadic : Symbol(variadic, Decl(kvsExtantInvocation.ts, 64, 31))
+>values : Symbol(values, Decl(kvsExtantInvocation.ts, 64, 13))
+
+async function asyncInvocation() {
+>asyncInvocation : Symbol(asyncInvocation, Decl(kvsExtantInvocation.ts, 66, 55))
+
+    return await required?(maybeText, build());
+>required : Symbol(required, Decl(kvsExtantInvocation.ts, 0, 0))
+>maybeText : Symbol(maybeText, Decl(kvsExtantInvocation.ts, 5, 13))
+>build : Symbol(build, Decl(kvsExtantInvocation.ts, 1, 65))
+}
+
+// Whitespace keeps `?` and `(` separate rather than forming an extant call.
+const separated = required ? ("value") : build();
+>separated : Symbol(separated, Decl(kvsExtantInvocation.ts, 73, 5))
+>required : Symbol(required, Decl(kvsExtantInvocation.ts, 0, 0))
+>build : Symbol(build, Decl(kvsExtantInvocation.ts, 1, 65))
+
+// Ordinary calls keep TypeScript's normal nullable-call errors.
+maybeRequired("value", build());
+>maybeRequired : Symbol(maybeRequired, Decl(kvsExtantInvocation.ts, 4, 13))
+>build : Symbol(build, Decl(kvsExtantInvocation.ts, 1, 65))
+

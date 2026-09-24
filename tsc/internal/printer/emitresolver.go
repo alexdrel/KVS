@@ -82,6 +82,7 @@ type EmitResolver interface {
 	IsKvsLiftedBinaryExpression(node *ast.Node) bool
 	IsKvsPlaceholderBoundary(node *ast.Node) bool
 	IsKvsNullableAccess(node *ast.Node) bool
+	GetKvsExtantCallInfo(node *ast.Node) *KvsExtantCallInfo
 	IsKvsLiftedBinaryLeftNullable(node *ast.Node) bool
 	IsKvsLiftedBinaryRightNullable(node *ast.Node) bool
 	IsKvsNullableExpression(node *ast.Node) bool
@@ -138,6 +139,14 @@ type EmitResolver interface {
 	CreateTypeOfExpression(emitContext *EmitContext, expression *ast.Node, enclosingDeclaration *ast.Node, flags nodebuilder.Flags, internalFlags nodebuilder.InternalFlags, tracker nodebuilder.SymbolTracker) *ast.Node
 	CreateLateBoundIndexSignatures(emitContext *EmitContext, container *ast.Node, enclosingDeclaration *ast.Node, flags nodebuilder.Flags, internalFlags nodebuilder.InternalFlags, tracker nodebuilder.SymbolTracker) []*ast.Node
 	TryJSTypeNodeToTypeNode(emitContext *EmitContext, typeNode *ast.Node, enclosingDeclaration *ast.Node, flags nodebuilder.Flags, internalFlags nodebuilder.InternalFlags, tracker nodebuilder.SymbolTracker) *ast.Node
+}
+
+type KvsExtantCallInfo struct {
+	CallableNullable   bool
+	GuardedArguments   []int
+	NullArguments      []int
+	UndefinedArguments []int
+	ArgumentWidths     []int
 }
 
 type KvsTypedObjectDefault struct {

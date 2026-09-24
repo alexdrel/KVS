@@ -384,8 +384,18 @@ type NodeLinks struct {
 	kvsTypedObjectDefaults               []kvsTypedObjectDefault
 	kvsTypedSpreadProperties             []string
 	kvsDefaultConstructorSymbol          *ast.Symbol
+	kvsExtantCall                        *kvsExtantCallInfo
 	declarationRequiresScopeChange       core.Tristate // Set by `useOuterVariableScopeInParameter` in checker when downlevel emit would change the name resolution scope inside of a parameter.
 	hasReportedStatementInAmbientContext bool          // Cache boolean if we report statements in ambient context
+}
+
+type kvsExtantCallInfo struct {
+	callableNullable          bool
+	guardedArguments          []int
+	nullArguments             []int
+	undefinedArguments        []int
+	argumentWidths            []int
+	unsupportedSpreadReported bool
 }
 
 type kvsTypedObjectDefault struct {

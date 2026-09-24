@@ -3,7 +3,7 @@
 This is a working implementation aid, not a language specification or feature
 order. The language documents remain authoritative for accepted semantics.
 
-Progress: **250 of 373 items complete (67.0%)**; **123 remain open**.
+Progress: **258 of 374 items complete (69.0%)**; **116 remain open**.
 
 - `[x]` means implemented with focused compiler evidence.
 - `[ ]` means unimplemented, incomplete, or not yet deliberately validated.
@@ -25,6 +25,8 @@ Implemented vertical slices:
   `let value?`, and `const`/`let value!`.
 - Nullable property and indexed reads propagate absence through their access
   path.
+- Optional invocation suppresses nullable callables and absent required
+  arguments while preserving source-order argument effects.
 - Nulling operator: `condition ?: expression`.
 - Nullability type operators: `T?` and `T!`.
 - Successful-branch binding: `if (const value = expression)`.
@@ -471,13 +473,14 @@ them; generated example `.js` files are intentionally ignored.
 
 ### Optional/extant invocation
 
-- [ ] `f?(...)`
-- [ ] Nullable callable suppresses call
-- [ ] Absent required argument suppresses call
-- [ ] Nullable parameter accepts absence normally
-- [ ] Arguments evaluate left-to-right
-- [ ] Stop evaluating later args after blocking absence
-- [ ] Preserve method receiver / `this`
+- [x] `f?(...)`
+- [x] Nullable callable suppresses call
+- [x] Absent required argument suppresses call
+- [x] Nullable parameter accepts absence normally
+- [x] Absence representation follows the parameter contract
+- [x] Arguments evaluate in source order until blocking absence
+- [x] Stop evaluating later arguments after blocking absence
+- [x] Statically extant receiver/method lookup may be delayed until invocation
 - [ ] Materialization staging
 - [ ] Materialization commit semantics
 

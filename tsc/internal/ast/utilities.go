@@ -375,6 +375,10 @@ func IsOptionalChain(node *Node) bool {
 	return false
 }
 
+func IsKvsExtantCall(node *Node) bool {
+	return IsCallExpression(node) && node.QuestionDotToken() != nil && node.QuestionDotToken().Kind == KindQuestionToken
+}
+
 func getQuestionDotToken(node *Expression) *TokenNode {
 	return node.QuestionDotToken()
 }

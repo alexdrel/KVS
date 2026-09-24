@@ -5961,6 +5961,7 @@ func (p *Parser) parseCallExpressionRest(pos int, expression *ast.Expression) *a
 		expression = p.parseMemberExpressionRest(pos, expression /*allowOptionalChain*/, true)
 		var typeArguments *ast.NodeList
 		questionDotToken := p.parseOptionalToken(ast.KindQuestionDotToken)
+		kvsExtantCall := false
 		if questionDotToken != nil {
 			typeArguments = p.tryParseTypeArgumentsInExpression()
 			if p.isTemplateStartOfTaggedTemplate() {
@@ -5968,16 +5969,21 @@ func (p *Parser) parseCallExpressionRest(pos int, expression *ast.Expression) *a
 				continue
 			}
 		}
+		if questionDotToken == nil && p.token == ast.KindQuestionToken && p.lookAhead((*Parser).nextTokenIsContiguousOpenParen) {
+			questionDotToken = p.parseTokenNode()
+			kvsExtantCall = true
+		}
 		if typeArguments != nil || p.token == ast.KindOpenParenToken {
 			// Absorb type arguments into CallExpression when preceding expression is ExpressionWithTypeArguments
-			if questionDotToken == nil && expression.Kind == ast.KindExpressionWithTypeArguments {
+			if (questionDotToken == nil || kvsExtantCall) && expression.Kind == ast.KindExpressionWithTypeArguments {
 				typeArguments = expression.TypeArgumentList()
 				expression = expression.AsExpressionWithTypeArguments().Expression
 			}
 			inner := expression
 			argumentList := p.parseArgumentList()
-			isOptionalChain := questionDotToken != nil || p.tryReparseOptionalChain(expression)
-			expression = p.checkJSSyntax(p.finishNode(p.factory.NewCallExpression(expression, questionDotToken, typeArguments, argumentList, core.IfElse(isOptionalChain, ast.NodeFlagsOptionalChain, ast.NodeFlagsNone)), pos))
+			isOptionalChain := !kvsExtantCall && (questionDotToken != nil || p.tryReparseOptionalChain(expression))
+			flags := core.IfElse(isOptionalChain, ast.NodeFlagsOptionalChain, ast.NodeFlagsNone)
+			expression = p.checkJSSyntax(p.finishNode(p.factory.NewCallExpression(expression, questionDotToken, typeArguments, argumentList, flags), pos))
 			p.unparseExpressionWithTypeArguments(inner, typeArguments, expression)
 			continue
 		}
@@ -5990,6 +5996,11 @@ func (p *Parser) parseCallExpressionRest(pos int, expression *ast.Expression) *a
 		break
 	}
 	return expression
+}
+
+func (p *Parser) nextTokenIsContiguousOpenParen() bool {
+	questionEnd := p.scanner.TokenEnd()
+	return p.nextToken() == ast.KindOpenParenToken && p.scanner.TokenStart() == questionEnd
 }
 
 func (p *Parser) parseArgumentList() *ast.NodeList {

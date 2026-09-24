@@ -1,0 +1,320 @@
+//// [tests/cases/conformance/kvs/kvsExtantInvocation.ts] ////
+
+=== kvsExtantInvocation.ts ===
+declare function required(value: string, later: number): string;
+>required : (value: string, later: number) => string
+>value : string
+>later : number
+
+declare function nullable(value: string?, later: number): string;
+>nullable : (value: string?, later: number) => string
+>value : string | null | undefined
+>later : number
+
+declare function build(): number;
+>build : () => number
+
+declare const maybeRequired: typeof required?;
+>maybeRequired : ((value: string, later: number) => string) | null | undefined
+>required : (value: string, later: number) => string
+
+declare const maybeText: string?;
+>maybeText : string | null | undefined
+
+declare const maybeOtherText: string?;
+>maybeOtherText : string | null | undefined
+
+const nullableCallable = maybeRequired?("ready", build());
+>nullableCallable : string | null
+>maybeRequired?("ready", build()) : string | null
+>maybeRequired : ((value: string, later: number) => string) | null | undefined
+>"ready" : "ready"
+>build() : number
+>build : () => number
+
+const nullableCallableAndArgument = maybeRequired?(maybeText, build());
+>nullableCallableAndArgument : string | null
+>maybeRequired?(maybeText, build()) : string | null
+>maybeRequired : ((value: string, later: number) => string) | null | undefined
+>maybeText : string | null | undefined
+>build() : number
+>build : () => number
+
+const guardedArgument = required?(maybeText, build());
+>guardedArgument : string | null
+>required?(maybeText, build()) : string | null
+>required : (value: string, later: number) => string
+>maybeText : string | null | undefined
+>build() : number
+>build : () => number
+
+const acceptedAbsence = nullable?(maybeText, build());
+>acceptedAbsence : string
+>nullable?(maybeText, build()) : string
+>nullable : (value: string?, later: number) => string
+>maybeText : string | null | undefined
+>build() : number
+>build : () => number
+
+const ordinaryLowering = required?("ready", build());
+>ordinaryLowering : string
+>required?("ready", build()) : string
+>required : (value: string, later: number) => string
+>"ready" : "ready"
+>build() : number
+>build : () => number
+
+declare function acceptsOptional(value?: string): string | undefined;
+>acceptsOptional : (value?: string) => string | undefined
+>value : string | undefined
+
+function acceptsDefault(value = "fallback"): string {
+>acceptsDefault : (value?: string) => string
+>value : string
+>"fallback" : "fallback"
+
+    return value;
+>value : string
+}
+declare function acceptsNull(value: string | null): string | null;
+>acceptsNull : (value: string | null) => string | null
+>value : string | null
+
+const optionalArgument = acceptsOptional?(maybeText);
+>optionalArgument : string | undefined
+>acceptsOptional?(maybeText) : string | undefined
+>acceptsOptional : (value?: string) => string | undefined
+>maybeText : string | null | undefined
+
+const defaultedArgument = acceptsDefault?(maybeText);
+>defaultedArgument : string
+>acceptsDefault?(maybeText) : string
+>acceptsDefault : (value?: string) => string
+>maybeText : string | null | undefined
+
+const nullArgument = acceptsNull?(maybeText);
+>nullArgument : string | null
+>acceptsNull?(maybeText) : string | null
+>acceptsNull : (value: string | null) => string | null
+>maybeText : string | null | undefined
+
+declare function identity<T>(value: T): T;
+>identity : <T>(value: T) => T
+>value : T
+
+const explicitGeneric = identity<string>?(maybeText);
+>explicitGeneric : string | null
+>identity<string>?(maybeText) : string | null
+>identity : <T>(value: T) => T
+>maybeText : string | null | undefined
+
+const inferredGeneric = identity?(maybeText);
+>inferredGeneric : string | null
+>identity?(maybeText) : string | null
+>identity : <T>(value: T) => T
+>maybeText : string | null | undefined
+
+declare function overloaded(value: string): "text";
+>overloaded : { (value: string): "text"; (value: number): "number"; }
+>value : string
+
+declare function overloaded(value: number): "number";
+>overloaded : { (value: string): "text"; (value: number): "number"; }
+>value : number
+
+declare const maybeNumber: number?;
+>maybeNumber : number | null | undefined
+
+const selectedOverload = overloaded?(maybeNumber);
+>selectedOverload : "number" | null
+>overloaded?(maybeNumber) : "number" | null
+>overloaded : { (value: string): "text"; (value: number): "number"; }
+>maybeNumber : number | null | undefined
+
+declare function pair(first: string, second: number): string;
+>pair : (first: string, second: number) => string
+>first : string
+>second : number
+
+declare function first(): string;
+>first : () => string
+
+const guardedSecond = pair?(first(), maybeNumber);
+>guardedSecond : string | null
+>pair?(first(), maybeNumber) : string | null
+>pair : (first: string, second: number) => string
+>first() : string
+>first : () => string
+>maybeNumber : number | null | undefined
+
+declare function three(first: string, second: string, third: number): string;
+>three : (first: string, second: string, third: number) => string
+>first : string
+>second : string
+>third : number
+
+declare function mixed(first: string?, second: string, third: number): string;
+>mixed : (first: string?, second: string, third: number) => string
+>first : string | null | undefined
+>second : string
+>third : number
+
+const priorEffectSurvives = three?(first(), maybeText, build());
+>priorEffectSurvives : string | null
+>three?(first(), maybeText, build()) : string | null
+>three : (first: string, second: string, third: number) => string
+>first() : string
+>first : () => string
+>maybeText : string | null | undefined
+>build() : number
+>build : () => number
+
+const acceptedThenGuarded = mixed?(maybeText, maybeText, build());
+>acceptedThenGuarded : string | null
+>mixed?(maybeText, maybeText, build()) : string | null
+>mixed : (first: string?, second: string, third: number) => string
+>maybeText : string | null | undefined
+>maybeText : string | null | undefined
+>build() : number
+>build : () => number
+
+const firstGuardStopsTheRest = three?(maybeText, maybeOtherText, build());
+>firstGuardStopsTheRest : string | null
+>three?(maybeText, maybeOtherText, build()) : string | null
+>three : (first: string, second: string, third: number) => string
+>maybeText : string | null | undefined
+>maybeOtherText : string | null | undefined
+>build() : number
+>build : () => number
+
+declare function getRequired(): typeof required?;
+>getRequired : () => typeof required?
+>required : (value: string, later: number) => string
+
+const callableBeforeArguments = getRequired()?("ready", build());
+>callableBeforeArguments : string | null
+>getRequired()?("ready", build()) : string | null
+>getRequired() : ((value: string, later: number) => string) | null | undefined
+>getRequired : () => typeof required?
+>"ready" : "ready"
+>build() : number
+>build : () => number
+
+interface Service {
+    prefix: string;
+>prefix : string
+
+    run(value: string): string;
+>run : (value: string) => string
+>value : string
+
+    maybeRun?: (value: string) => string;
+>maybeRun : ((value: string) => string) | undefined
+>value : string
+}
+
+declare const service: Service?;
+>service : Service | null | undefined
+
+const nullableReceiver = service.run?(maybeText);
+>nullableReceiver : string | null
+>service.run?(maybeText) : string | null
+>service.run : ((value: string) => string) | null | undefined
+>service : Service | null | undefined
+>run : ((value: string) => string) | null | undefined
+>maybeText : string | null | undefined
+
+const nullableMethod = service.maybeRun?(maybeText);
+>nullableMethod : string | null
+>service.maybeRun?(maybeText) : string | null
+>service.maybeRun : ((value: string) => string) | null | undefined
+>service : Service | null | undefined
+>maybeRun : ((value: string) => string) | null | undefined
+>maybeText : string | null | undefined
+
+declare function getService(): Service?;
+>getService : () => Service?
+
+const receiverOnce = getService().run?(maybeText);
+>receiverOnce : string | null
+>getService().run?(maybeText) : string | null
+>getService().run : ((value: string) => string) | null | undefined
+>getService() : Service | null | undefined
+>getService : () => Service?
+>run : ((value: string) => string) | null | undefined
+>maybeText : string | null | undefined
+
+const elementMethod = service["run"]?(maybeText);
+>elementMethod : string | null
+>service["run"]?(maybeText) : string | null
+>service["run"] : ((value: string) => string) | null | undefined
+>service : Service | null | undefined
+>"run" : "run"
+>maybeText : string | null | undefined
+
+declare function methodName(): "run";
+>methodName : () => "run"
+
+const computedMethod = service[methodName()]?(maybeText);
+>computedMethod : string | null
+>service[methodName()]?(maybeText) : string | null
+>service[methodName()] : ((value: string) => string) | null | undefined
+>service : Service | null | undefined
+>methodName() : "run"
+>methodName : () => "run"
+>maybeText : string | null | undefined
+
+declare const tuple: [string?, number];
+>tuple : [string | null | undefined, number]
+
+const tupleSpread = required?(...tuple);
+>tupleSpread : string | null
+>required?(...tuple) : string | null
+>required : (value: string, later: number) => string
+>...tuple : string | number | null | undefined
+>tuple : [string | null | undefined, number]
+
+declare const values: string[];
+>values : string[]
+
+declare function variadic(...values: string[]): string;
+>variadic : (...values: string[]) => string
+>values : string[]
+
+const unsupportedIterableSpread = variadic?(...values);
+>unsupportedIterableSpread : string
+>variadic?(...values) : string
+>variadic : (...values: string[]) => string
+>...values : string
+>values : string[]
+
+async function asyncInvocation() {
+>asyncInvocation : () => Promise<string | null>
+
+    return await required?(maybeText, build());
+>await required?(maybeText, build()) : string | null
+>required?(maybeText, build()) : string | null
+>required : (value: string, later: number) => string
+>maybeText : string | null | undefined
+>build() : number
+>build : () => number
+}
+
+// Whitespace keeps `?` and `(` separate rather than forming an extant call.
+const separated = required ? ("value") : build();
+>separated : number | "value"
+>required ? ("value") : build() : number | "value"
+>required : (value: string, later: number) => string
+>("value") : "value"
+>"value" : "value"
+>build() : number
+>build : () => number
+
+// Ordinary calls keep TypeScript's normal nullable-call errors.
+maybeRequired("value", build());
+>maybeRequired("value", build()) : string
+>maybeRequired : ((value: string, later: number) => string) | null | undefined
+>"value" : "value"
+>build() : number
+>build : () => number
+

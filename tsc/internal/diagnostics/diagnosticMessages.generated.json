@@ -2227,5 +2227,6 @@
     "KVS_typed_construction_requires_a_concrete_defaultable_interface_or_object_type_alias_100081": "KVS typed construction requires a concrete defaultable interface or object type alias.",
     "KVS_typed_in_place_spread_requires_a_concrete_interface_or_object_type_alias_target_100082": "KVS typed in-place spread requires a concrete interface or object type alias target.",
     "A_return_statement_cannot_cross_a_lazy_KVS_collector_boundary_100083": "A return statement cannot cross a lazy KVS collector boundary.",
-    "A_labeled_jump_cannot_cross_a_lazy_KVS_collector_boundary_100084": "A labeled jump cannot cross a lazy KVS collector boundary."
+    "A_labeled_jump_cannot_cross_a_lazy_KVS_collector_boundary_100084": "A labeled jump cannot cross a lazy KVS collector boundary.",
+    "KVS_optional_invocation_supports_only_fixed_tuple_spreads_100085": "KVS optional invocation supports only fixed tuple spreads."
 }

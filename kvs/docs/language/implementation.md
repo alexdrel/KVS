@@ -40,29 +40,28 @@ const normalized = normalize?(user.profile.displayName);
 lowers to:
 
 ```ts
-const $profile = user.profile;
-const $name = $profile == null ? null : $profile.displayName;
-const normalized = $name == null ? null : normalize($name);
+const normalized = ($name = user?.profile?.displayName) != null
+    ? normalize($name)
+    : null;
 ```
 
 Without `?`, the compiler rejects the call because a required argument may be absent.
 
-An optional call guards receiver materialization:
+When only the callable may be absent, no argument array is needed:
 
 ```kvs
-arr!.push?(nullableItem)
+const normalized = maybeNormalize?(value);
 ```
 
 ```ts
-if (nullableItem != null) {
-    arr ??= [];
-    arr.push(nullableItem);
-}
+const normalized = ($fn = maybeNormalize) != null ? $fn(value) : null;
 ```
 
-This shows the observable behavior for a simple variable receiver: an absent
-item does not create the array. The compiler uses hidden temporaries as needed
-to preserve `this` and delay `!` write-backs until required arguments pass.
+Method calls additionally retain their receiver. Calls without a potentially
+absent callable or required argument lower to an ordinary call. One- and
+two-argument calls use direct temporaries; larger calls accumulate evaluated
+arguments into an array. Fixed tuple spreads participate in argument guarding;
+general iterable spreads are not yet supported.
 
 ### Lifted arithmetic and equality
 
@@ -461,30 +460,46 @@ An optional call guards the whole operation, including receiver-path materializa
 arr!.push?(nullableItem)
 ```
 
-The evaluation order is:
+The guaranteed behavior is:
 
-1. Evaluate the receiver and resolve the callable, preserving the receiver for `this`.
-2. When an intermediate `!` encounters absence, continue through a temporary default value and stage—but do not yet perform—the write-back.
-3. If the callable is absent, discard staged materializations and produce null without evaluating arguments.
-4. Evaluate arguments left-to-right.
-5. Stop at the first absent argument corresponding to a required parameter. Discard staged materializations, produce null, and do not evaluate later arguments.
-6. Commit staged `!` write-backs in path order, then invoke the callable with its original receiver.
+1. A potentially absent callable is resolved first. If it is absent, the call
+   produces null without evaluating arguments.
+2. Arguments are evaluated in source order. An argument accepted by an
+   absent-capable parameter is passed normally. An absent argument is
+   canonicalized to `null` or `undefined` when the parameter accepts only that
+   representation; a defaulted parameter is treated as accepting `undefined`.
+   When both representations are accepted, the original representation is
+   preserved. At the first absent argument for a required parameter, the call
+   produces null and later arguments are not evaluated.
+3. Staged `!` materializations are committed only if the call proceeds.
+
+No broader ordering is promised between argument evaluation and a receiver or
+method known statically to be extant. Their evaluation and lookup may be delayed
+until all required arguments have passed. This permits compact lowering that
+accumulates arguments into an array and performs an ordinary spread call only on
+the successful path.
 
 Therefore an absent `nullableItem` does not create an empty array, while an
-absent method prevents argument evaluation just as an optional JavaScript call
-does. Argument effects before a blocking absence remain observable.
+absent callable prevents argument evaluation. Argument effects before a blocking
+absence remain observable.
+
+The current compiler implements the callable and argument guards. Writable
+receiver materialization and its commit staging remain planned.
 
 ```kvs
 object.method?(argument())
 ```
 
-resolves `object.method` before evaluating `argument()` and preserves `object` as the method's `this`. In:
+checks the method before evaluating `argument()` only when the method may be
+absent. When it is statically extant, lookup may be delayed until the call
+proceeds. In:
 
 ```kvs
 arr!.push?(nullableItem)
 ```
 
-an absent array is represented temporarily while `push` is resolved; assignment of the new array to `arr` occurs only after `nullableItem` passes the required-argument check.
+assignment of a newly materialized array to `arr` occurs only after
+`nullableItem` passes the required-argument check.
 
 ### POD construction and typed spread lowering
 

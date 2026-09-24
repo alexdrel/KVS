@@ -2668,8 +2668,13 @@ func (p *Printer) emitCallee(callee *ast.Expression, parentNode *ast.Node) {
 func (p *Printer) emitCallExpression(node *ast.CallExpression) {
 	state := p.enterNode(node.AsNode())
 	p.emitCallee(node.Expression, node.AsNode())
-	p.emitTokenNode(node.QuestionDotToken)
+	if !ast.IsKvsExtantCall(node.AsNode()) {
+		p.emitTokenNode(node.QuestionDotToken)
+	}
 	p.emitTypeArguments(node.AsNode(), node.TypeArguments)
+	if ast.IsKvsExtantCall(node.AsNode()) {
+		p.writePunctuation("?")
+	}
 	p.emitList((*Printer).emitArgument, node.AsNode(), node.Arguments, LFCallExpressionArguments)
 	p.exitNode(node.AsNode(), state)
 }

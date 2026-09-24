@@ -2,6 +2,7 @@ package kvs
 
 import (
 	"slices"
+	"strconv"
 
 	"github.com/microsoft/TypeScript/tsc/internal/ast"
 	"github.com/microsoft/TypeScript/tsc/internal/core"
@@ -190,6 +191,10 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 		if tx.resolver.IsKvsNullableAccess(node) {
 			return tx.transformNullableAccess(node)
 		}
+	case ast.KindCallExpression:
+		if ast.IsKvsExtantCall(node) {
+			return tx.transformExtantCall(node.AsCallExpression())
+		}
 	case ast.KindBinaryExpression:
 		if tx.resolver.IsKvsLiftedBinaryExpression(node) {
 			return tx.transformLiftedBinaryExpression(node.AsBinaryExpression())
@@ -206,6 +211,203 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 		return tx.Factory().NewArrayLiteralExpression(nil, false)
 	}
 	return tx.Visitor().VisitEachChild(node)
+}
+
+func (tx *transformer) transformExtantCall(node *ast.CallExpression) *ast.Node {
+	factory := tx.Factory()
+	info := tx.resolver.GetKvsExtantCallInfo(node.AsNode())
+	if info == nil {
+		info = &printer.KvsExtantCallInfo{}
+	}
+
+	guarded := make(map[int]bool, len(info.GuardedArguments))
+	for _, index := range info.GuardedArguments {
+		guarded[index] = true
+	}
+	nullArguments := make(map[int]bool, len(info.NullArguments))
+	for _, index := range info.NullArguments {
+		nullArguments[index] = true
+	}
+	undefinedArguments := make(map[int]bool, len(info.UndefinedArguments))
+	for _, index := range info.UndefinedArguments {
+		undefinedArguments[index] = true
+	}
+	requiresArgumentHandling := len(guarded) != 0 || len(nullArguments) != 0 || len(undefinedArguments) != 0
+
+	if !requiresArgumentHandling && !info.CallableNullable {
+		callee := tx.Visitor().VisitNode(node.Expression)
+		return factory.NewCallExpression(callee, nil, tx.Visitor().VisitNodes(node.TypeArguments), tx.Visitor().VisitNodes(node.Arguments), ast.NodeFlagsNone)
+	}
+
+	specializedArguments := len(node.Arguments.Nodes) <= 2 && !slices.ContainsFunc(node.Arguments.Nodes, ast.IsSpreadElement)
+	var argsTemp *ast.Node
+	if requiresArgumentHandling && !specializedArguments {
+		temp := factory.NewTempVariable()
+		tx.declareTemp(temp)
+		argsTemp = temp
+	}
+	var callee *ast.Node
+	var prefix *ast.Node
+	var receiver *ast.Node
+	if info.CallableNullable {
+		callableTemp := factory.NewTempVariable()
+		tx.declareTemp(callableTemp)
+		if ast.IsPropertyAccessExpression(node.Expression) || ast.IsElementAccessExpression(node.Expression) {
+			receiverTemp := factory.NewTempVariable()
+			tx.declareTemp(receiverTemp)
+			receiver = receiverTemp
+			base := node.Expression.Expression()
+			receiverAssignment := factory.NewAssignmentExpression(receiverTemp, tx.Visitor().VisitNode(base))
+			questionDot := factory.NewToken(ast.KindQuestionDotToken)
+			var member *ast.Node
+			if ast.IsPropertyAccessExpression(node.Expression) {
+				member = factory.NewPropertyAccessExpression(receiverTemp, questionDot, tx.Visitor().VisitNode(node.Expression.Name()), ast.NodeFlagsOptionalChain)
+			} else {
+				member = factory.NewElementAccessExpression(receiverTemp, questionDot, tx.Visitor().VisitNode(node.Expression.AsElementAccessExpression().ArgumentExpression), ast.NodeFlagsOptionalChain)
+			}
+			prefix = factory.NewCommaExpression(receiverAssignment, factory.NewAssignmentExpression(callableTemp, member))
+		} else {
+			prefix = factory.NewAssignmentExpression(callableTemp, tx.Visitor().VisitNode(node.Expression))
+		}
+		callee = callableTemp
+	} else {
+		callee = tx.Visitor().VisitNode(node.Expression)
+	}
+	if specializedArguments && requiresArgumentHandling {
+		lastGuard := -1
+		if len(info.GuardedArguments) != 0 {
+			lastGuard = info.GuardedArguments[len(info.GuardedArguments)-1]
+		}
+		callArgs := make([]*ast.Node, len(node.Arguments.Nodes))
+		type directCallStep struct {
+			assignment *ast.Node
+			guarded    bool
+		}
+		steps := make([]directCallStep, 0, lastGuard+1)
+		for i, arg := range node.Arguments.Nodes {
+			value := tx.Visitor().VisitNode(arg)
+			if nullArguments[i] || undefinedArguments[i] {
+				value = tx.normalizeExtantCallArgument(value, undefinedArguments[i])
+			}
+			if i <= lastGuard {
+				temp := factory.NewTempVariable()
+				tx.declareTemp(temp)
+				callArgs[i] = temp
+				steps = append(steps, directCallStep{
+					assignment: factory.NewAssignmentExpression(temp, value),
+					guarded:    guarded[i],
+				})
+			} else {
+				callArgs[i] = value
+			}
+		}
+		if receiver != nil {
+			callArgs = append([]*ast.Node{receiver}, callArgs...)
+			callee = factory.NewPropertyAccessExpression(callee, nil, factory.NewIdentifier("call"), ast.NodeFlagsNone)
+		}
+		result := factory.NewCallExpression(callee, nil, tx.Visitor().VisitNodes(node.TypeArguments), factory.NewNodeList(callArgs), ast.NodeFlagsNone)
+		for _, step := range slices.Backward(steps) {
+			if step.guarded {
+				present := factory.NewBinaryExpression(nil, step.assignment, nil, factory.NewToken(ast.KindExclamationEqualsToken), factory.NewKeywordExpression(ast.KindNullKeyword))
+				result = factory.NewConditionalExpression(present, factory.NewToken(ast.KindQuestionToken), result, factory.NewToken(ast.KindColonToken), factory.NewKeywordExpression(ast.KindNullKeyword))
+			} else {
+				result = factory.NewCommaExpression(step.assignment, result)
+			}
+		}
+		if info.CallableNullable {
+			present := factory.NewBinaryExpression(nil, prefix, nil, factory.NewToken(ast.KindExclamationEqualsToken), factory.NewKeywordExpression(ast.KindNullKeyword))
+			result = factory.NewConditionalExpression(present, factory.NewToken(ast.KindQuestionToken), result, factory.NewToken(ast.KindColonToken), factory.NewKeywordExpression(ast.KindNullKeyword))
+		}
+		return result
+	}
+
+	callArgs := tx.Visitor().VisitNodes(node.Arguments).Nodes
+	if argsTemp != nil {
+		callArgs = []*ast.Node{factory.NewSpreadElement(argsTemp)}
+	}
+	if receiver != nil {
+		callArgs = append([]*ast.Node{receiver}, callArgs...)
+		callee = factory.NewPropertyAccessExpression(callee, nil, factory.NewIdentifier("call"), ast.NodeFlagsNone)
+	}
+	result := factory.NewCallExpression(callee, nil, tx.Visitor().VisitNodes(node.TypeArguments), factory.NewNodeList(callArgs), ast.NodeFlagsNone)
+
+	if argsTemp == nil {
+		present := factory.NewBinaryExpression(nil, prefix, nil, factory.NewToken(ast.KindExclamationEqualsToken), factory.NewKeywordExpression(ast.KindNullKeyword))
+		return factory.NewConditionalExpression(present, factory.NewToken(ast.KindQuestionToken), result, factory.NewToken(ast.KindColonToken), factory.NewKeywordExpression(ast.KindNullKeyword))
+	}
+
+	effectiveIndex := 0
+	type callStep struct {
+		push    *ast.Node
+		present *ast.Node
+	}
+	steps := make([]callStep, 0, len(node.Arguments.Nodes))
+	for i, arg := range node.Arguments.Nodes {
+		width := 1
+		if i < len(info.ArgumentWidths) {
+			width = info.ArgumentWidths[i]
+		}
+		var pushArg *ast.Node
+		spread := ast.IsSpreadElement(arg)
+		if spread {
+			pushArg = factory.NewSpreadElement(tx.Visitor().VisitNode(arg.Expression()))
+		} else {
+			pushArg = tx.Visitor().VisitNode(arg)
+			if nullArguments[effectiveIndex] || undefinedArguments[effectiveIndex] {
+				pushArg = tx.normalizeExtantCallArgument(pushArg, undefinedArguments[effectiveIndex])
+			}
+		}
+		push := factory.NewCallExpression(factory.NewPropertyAccessExpression(argsTemp, nil, factory.NewIdentifier("push"), ast.NodeFlagsNone), nil, nil, factory.NewNodeList([]*ast.Node{pushArg}), ast.NodeFlagsNone)
+		effect := push
+		for offset := range width {
+			index := effectiveIndex + offset
+			if spread && (nullArguments[index] || undefinedArguments[index]) {
+				value := factory.NewElementAccessExpression(argsTemp, nil, factory.NewNumericLiteral(strconv.Itoa(index), ast.TokenFlagsNone), ast.NodeFlagsNone)
+				normalized := tx.normalizeExtantCallArgument(value, undefinedArguments[index])
+				effect = factory.NewCommaExpression(effect, factory.NewAssignmentExpression(value, normalized))
+			}
+		}
+		var present *ast.Node
+		for offset := range width {
+			if guarded[effectiveIndex+offset] {
+				value := factory.NewElementAccessExpression(argsTemp, nil, factory.NewNumericLiteral(strconv.Itoa(effectiveIndex+offset), ast.TokenFlagsNone), ast.NodeFlagsNone)
+				check := factory.NewBinaryExpression(nil, value, nil, factory.NewToken(ast.KindExclamationEqualsToken), factory.NewKeywordExpression(ast.KindNullKeyword))
+				if present == nil {
+					present = check
+				} else {
+					present = factory.NewBinaryExpression(nil, present, nil, factory.NewToken(ast.KindAmpersandAmpersandToken), check)
+				}
+			}
+		}
+		steps = append(steps, callStep{push: effect, present: present})
+		effectiveIndex += width
+	}
+	for _, step := range slices.Backward(steps) {
+		next := result
+		if step.present != nil {
+			next = factory.NewConditionalExpression(step.present, factory.NewToken(ast.KindQuestionToken), next, factory.NewToken(ast.KindColonToken), factory.NewKeywordExpression(ast.KindNullKeyword))
+		}
+		result = factory.NewCommaExpression(step.push, next)
+	}
+	result = factory.NewCommaExpression(factory.NewAssignmentExpression(argsTemp, factory.NewArrayLiteralExpression(nil, false)), result)
+	if info.CallableNullable {
+		present := factory.NewBinaryExpression(nil, prefix, nil, factory.NewToken(ast.KindExclamationEqualsToken), factory.NewKeywordExpression(ast.KindNullKeyword))
+		result = factory.NewConditionalExpression(present, factory.NewToken(ast.KindQuestionToken), result, factory.NewToken(ast.KindColonToken), factory.NewKeywordExpression(ast.KindNullKeyword))
+	}
+	return result
+}
+
+func (tx *transformer) normalizeExtantCallArgument(value *ast.Node, toUndefined bool) *ast.Node {
+	factory := tx.Factory()
+	temp := factory.NewTempVariable()
+	tx.declareTemp(temp)
+	assignment := factory.NewAssignmentExpression(temp, value)
+	absent := factory.NewKeywordExpression(ast.KindNullKeyword)
+	if toUndefined {
+		absent = factory.NewVoidExpression(factory.NewNumericLiteral("0", ast.TokenFlagsNone))
+	}
+	test := factory.NewBinaryExpression(nil, assignment, nil, factory.NewToken(ast.KindEqualsEqualsToken), factory.NewKeywordExpression(ast.KindNullKeyword))
+	return factory.NewConditionalExpression(test, factory.NewToken(ast.KindQuestionToken), absent, factory.NewToken(ast.KindColonToken), temp)
 }
 
 func (tx *transformer) transformNullableAccess(node *ast.Node) *ast.Node {

@@ -7621,7 +7621,7 @@ func (c *Checker) getQuickTypeOfExpression(node *ast.Node) *Type {
 		return nil
 	// Optimize for the common case of a call to a function with a single non-generic call
 	// signature where we can just fetch the return type without checking the arguments.
-	case ast.IsCallExpression(expr) && expr.Expression().Kind != ast.KindSuperKeyword && !ast.IsRequireCall(expr, true /*requireStringLiteralLikeArgument*/) && !c.isSymbolOrSymbolForCall(expr) && !ast.IsImportCall(expr):
+	case ast.IsCallExpression(expr) && !ast.IsKvsExtantCall(expr) && expr.Expression().Kind != ast.KindSuperKeyword && !ast.IsRequireCall(expr, true /*requireStringLiteralLikeArgument*/) && !c.isSymbolOrSymbolForCall(expr) && !ast.IsImportCall(expr):
 		if isCallChain(expr) {
 			return c.getReturnTypeOfSingleNonGenericSignatureOfCallChain(expr)
 		}
@@ -9082,12 +9082,19 @@ func (c *Checker) checkCallExpression(node *ast.Node, checkMode CheckMode) *Type
 		return c.resolveExternalModuleTypeByLiteral(node.Arguments()[0])
 	}
 	returnType := c.getReturnTypeOfSignature(signature)
+	if ast.IsKvsExtantCall(node) {
+		c.recordKvsExtantCallInfo(node, signature)
+		info := c.nodeLinks.Get(node).kvsExtantCall
+		if info != nil && (info.callableNullable || len(info.guardedArguments) != 0) {
+			returnType = c.getNullableType(returnType, TypeFlagsNull)
+		}
+	}
 	// Treat any call to the global 'Symbol' function that is part of a const variable or readonly property
 	// as a fresh unique symbol literal type.
 	if returnType.flags&TypeFlagsESSymbolLike != 0 && c.isSymbolOrSymbolForCall(node) {
 		return c.getESSymbolLikeTypeForNode(ast.WalkUpParenthesizedExpressions(node.Parent))
 	}
-	if ast.IsCallExpression(node) && node.QuestionDotToken() == nil && ast.IsExpressionStatement(node.Parent) && returnType.flags&TypeFlagsVoid != 0 && c.getTypePredicateOfSignature(signature) != nil {
+	if ast.IsCallExpression(node) && (node.QuestionDotToken() == nil || ast.IsKvsExtantCall(node)) && ast.IsExpressionStatement(node.Parent) && returnType.flags&TypeFlagsVoid != 0 && c.getTypePredicateOfSignature(signature) != nil {
 		if !ast.IsDottedName(node.Expression()) {
 			c.error(node.Expression(), diagnostics.Assertions_require_the_call_target_to_be_an_identifier_or_qualified_name)
 		} else if c.getEffectsSignature(node) == nil {
@@ -9107,6 +9114,66 @@ func (c *Checker) checkDeprecatedSignature(sig *Signature, node *ast.Node) {
 		name := tryGetPropertyAccessOrIdentifierToString(ast.GetInvokedExpression(node))
 		c.addDeprecatedSuggestionWithSignature(suggestionNode, sig.declaration, name, c.signatureToString(sig))
 	}
+}
+
+func (c *Checker) recordKvsExtantCallInfo(node *ast.Node, signature *Signature) {
+	links := c.nodeLinks.Get(node)
+	info := links.kvsExtantCall
+	if info == nil {
+		info = &kvsExtantCallInfo{}
+		links.kvsExtantCall = info
+	}
+	effectiveArgs := c.getEffectiveCallArguments(node)
+	info.guardedArguments = info.guardedArguments[:0]
+	info.nullArguments = info.nullArguments[:0]
+	info.undefinedArguments = info.undefinedArguments[:0]
+	for i, arg := range effectiveArgs {
+		if ast.IsOmittedExpression(arg) {
+			continue
+		}
+		argType := c.checkExpressionCached(arg)
+		paramType := c.getTypeAtPosition(signature, i)
+		if isKvsNullableType(argType) {
+			acceptsNull, acceptsUndefined := c.kvsCallParameterAbsence(signature, i, paramType)
+			switch {
+			case !acceptsNull && !acceptsUndefined:
+				info.guardedArguments = append(info.guardedArguments, i)
+			case acceptsNull && !acceptsUndefined && c.maybeTypeOfKind(argType, TypeFlagsUndefined):
+				info.nullArguments = append(info.nullArguments, i)
+			case acceptsUndefined && !acceptsNull && c.maybeTypeOfKind(argType, TypeFlagsNull):
+				info.undefinedArguments = append(info.undefinedArguments, i)
+			}
+		}
+	}
+	info.argumentWidths = info.argumentWidths[:0]
+	for _, arg := range node.Arguments() {
+		width := 1
+		if ast.IsSpreadElement(arg) {
+			spreadType := c.checkExpressionCached(arg.Expression())
+			if isTupleType(spreadType) {
+				width = len(c.getElementTypes(spreadType))
+			} else {
+				width = -1
+				if !info.unsupportedSpreadReported {
+					c.error(arg, diagnostics.KVS_optional_invocation_supports_only_fixed_tuple_spreads)
+					info.unsupportedSpreadReported = true
+				}
+			}
+		}
+		info.argumentWidths = append(info.argumentWidths, width)
+	}
+}
+
+func (c *Checker) kvsCallParameterAbsence(signature *Signature, position int, paramType *Type) (acceptsNull bool, acceptsUndefined bool) {
+	acceptsNull = c.maybeTypeOfKind(paramType, TypeFlagsNull)
+	acceptsUndefined = c.maybeTypeOfKind(paramType, TypeFlagsUndefined)
+	if position < len(signature.parameters) {
+		declaration := signature.parameters[position].ValueDeclaration
+		if declaration != nil && ast.IsParameterDeclaration(declaration) && (declaration.QuestionToken() != nil || declaration.Initializer() != nil) {
+			acceptsUndefined = true
+		}
+	}
+	return acceptsNull, acceptsUndefined
 }
 
 func (c *Checker) addDeprecatedSuggestionWithSignature(location *ast.Node, declaration *ast.Node, deprecatedEntity string, signatureString string) *ast.Diagnostic {
@@ -9231,6 +9298,10 @@ func (c *Checker) resolveCallExpression(node *ast.Node, candidatesOutArray *[]*S
 	}
 	var callChainFlags SignatureFlags
 	funcType := c.checkExpression(node.Expression())
+	if ast.IsKvsExtantCall(node) {
+		c.nodeLinks.Get(node).kvsExtantCall = &kvsExtantCallInfo{callableNullable: isKvsNullableType(funcType)}
+		funcType = c.GetNonNullableType(funcType)
+	}
 	if isCallChain(node) {
 		nonOptionalType := c.getOptionalExpressionType(funcType, node.Expression())
 		switch {
@@ -9808,7 +9879,7 @@ func (c *Checker) chooseOverload(s *CallState, relation *Relation) *Signature {
 				inferenceFlags := core.IfElse(s.recursiveResolution && len(s.candidates) == 1, InferenceFlagsNoConstraintChecks, InferenceFlagsNone) |
 					core.IfElse(ast.IsInJSFile(s.node), InferenceFlagsAnyDefault, InferenceFlagsNone)
 				inferenceContext = c.newInferenceContext(candidate.typeParameters, candidate, inferenceFlags /*flags*/, nil)
-				typeArgumentTypes = c.inferTypeArguments(s.node, candidate, s.args, s.argCheckMode|CheckModeSkipGenericFunctions, inferenceContext)
+				typeArgumentTypes = c.inferTypeArguments(s.node, candidate, c.kvsExtantInferenceArguments(s.node, s.args), s.argCheckMode|CheckModeSkipGenericFunctions, inferenceContext)
 				if inferenceContext.flags&InferenceFlagsSkippedGenericFunction != 0 {
 					s.argCheckMode |= CheckModeSkipGenericFunctions
 				}
@@ -9838,7 +9909,7 @@ func (c *Checker) chooseOverload(s *CallState, relation *Relation) *Signature {
 			// round of type inference and applicability checking for this particular candidate.
 			s.argCheckMode = CheckModeNormal
 			if inferenceContext != nil {
-				typeArgumentTypes := c.inferTypeArguments(s.node, candidate, s.args, s.argCheckMode, inferenceContext)
+				typeArgumentTypes := c.inferTypeArguments(s.node, candidate, c.kvsExtantInferenceArguments(s.node, s.args), s.argCheckMode, inferenceContext)
 				checkCandidate = c.getSignatureInstantiation(candidate, typeArgumentTypes, ast.IsInJSFile(candidate.declaration), inferenceContext.inferredTypeParameters)
 				// If the original signature has a generic rest type, instantiation may produce a
 				// signature with different arity and we need to perform another arity check.
@@ -9857,6 +9928,20 @@ func (c *Checker) chooseOverload(s *CallState, relation *Relation) *Signature {
 		return checkCandidate
 	}
 	return nil
+}
+
+func (c *Checker) kvsExtantInferenceArguments(node *ast.Node, args []*ast.Node) []*ast.Node {
+	if !ast.IsKvsExtantCall(node) {
+		return args
+	}
+	result := slices.Clone(args)
+	for i, arg := range result {
+		argType := c.checkExpressionCached(arg)
+		if isKvsNullableType(argType) {
+			result[i] = c.createSyntheticExpression(arg, c.GetNonNullableType(argType), isSpreadArgument(arg), nil)
+		}
+	}
+	return result
 }
 
 func (c *Checker) hasCorrectArity(node *ast.Node, args []*ast.Node, signature *Signature, signatureHelpTrailingComma bool) bool {
@@ -10052,6 +10137,16 @@ func (c *Checker) isSignatureApplicable(node *ast.Node, args []*ast.Node, signat
 				checkArgType = c.getRegularTypeOfObjectLiteral(argType)
 			} else {
 				checkArgType = argType
+			}
+			if ast.IsKvsExtantCall(node) && isKvsNullableType(checkArgType) {
+				acceptsNull, acceptsUndefined := c.kvsCallParameterAbsence(signature, i, paramType)
+				checkArgType = c.GetNonNullableType(checkArgType)
+				if acceptsNull {
+					checkArgType = c.getNullableType(checkArgType, TypeFlagsNull)
+				}
+				if acceptsUndefined {
+					checkArgType = c.getNullableType(checkArgType, TypeFlagsUndefined)
+				}
 			}
 			effectiveCheckArgumentNode := c.getEffectiveCheckNode(arg)
 			if !c.checkTypeRelatedToAndOptionallyElaborate(checkArgType, paramType, relation, core.IfElse(reportErrors, effectiveCheckArgumentNode, nil), effectiveCheckArgumentNode, headMessage, diagnosticOutput) {
@@ -12151,7 +12246,7 @@ func (c *Checker) isKvsPropagatingAccess(node *ast.Node, receiverType *Type) boo
 	return isKvsNullableType(receiverType) &&
 		getAssignmentTargetKind(path) == AssignmentKindNone &&
 		(path.Parent == nil || path.Parent.Kind != ast.KindDeleteExpression) &&
-		!(ast.IsCallExpression(path.Parent) && path.Parent.Expression() == path)
+		!(ast.IsCallExpression(path.Parent) && path.Parent.Expression() == path && !ast.IsKvsExtantCall(path.Parent))
 }
 
 func (c *Checker) checkPropertyAccessChain(node *ast.Node, checkMode CheckMode) *Type {

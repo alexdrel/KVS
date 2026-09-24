@@ -96,7 +96,6 @@ jobs:
           - runner: ubuntu-26.04-arm
             name: 'linux arm64'
             os: linux
-            coverage: true
             skip: ${{ github.event_name == 'merge_group' }}
           - runner: windows-11-arm
             name: 'windows arm64'
