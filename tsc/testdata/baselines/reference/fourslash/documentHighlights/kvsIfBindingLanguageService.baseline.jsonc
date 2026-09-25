@@ -1,0 +1,8 @@
+// === documentHighlights ===
+// === /kvsIfBindingLanguageService.ts ===
+// declare function realRoots(a: number, b: number, c: number): number[];
+// declare const [|eq|]: { a: number; b: number; c: number };
+// 
+// if (const roots ~= realRoots([|eq|].a, [|eq|].b, [|eq|]/*HIGHLIGHTS*/.c)) {
+//     console.log(roots);
+// }

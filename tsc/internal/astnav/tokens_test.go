@@ -110,6 +110,25 @@ func TestGetTokenAtPosition(t *testing.T) {
 	})
 }
 
+func TestGetTokenAtPositionKvsProducerKeyword(t *testing.T) {
+	t.Parallel()
+	tests := []struct {
+		text string
+		kind ast.Kind
+	}{
+		{"collect ([1]) { yield _; }", ast.KindKvsCollectExpression},
+		{"collect* ([1]) { yield _; }", ast.KindKvsLazyCollectExpression},
+		{"select ([1]) { yield _; }", ast.KindKvsSelectExpression},
+	}
+	for _, test := range tests {
+		file := parser.ParseSourceFile(ast.SourceFileParseOptions{FileName: "/test.ts", Path: "/test.ts"}, test.text, core.ScriptKindTS)
+		token := astnav.GetTouchingPropertyName(file, 1)
+		if token.Kind != test.kind {
+			t.Errorf("%q: expected %s, got %s", test.text, test.kind, token.Kind)
+		}
+	}
+}
+
 func TestGetTouchingPropertyName(t *testing.T) {
 	t.Parallel()
 	jstest.SkipIfNoNodeJS(t)

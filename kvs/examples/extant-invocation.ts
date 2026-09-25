@@ -2,7 +2,7 @@ function formatDate(date: Date): string {
     return date.toISOString().slice(0, 10);
 }
 
-const releases = new Map<string, Date>([
+const releases = new Map([
     ["alpha", new Date("2026-09-24T00:00:00Z")],
 ]);
 

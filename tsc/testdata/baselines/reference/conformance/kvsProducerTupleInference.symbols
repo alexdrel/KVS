@@ -1,0 +1,198 @@
+//// [tests/cases/conformance/kvs/kvsProducerTupleInference.ts] ////
+
+=== kvsProducerTupleInference.ts ===
+declare const keys: string[];
+>keys : Symbol(keys, Decl(kvsProducerTupleInference.ts, 0, 13))
+
+declare const maybePair: [string, number] | null;
+>maybePair : Symbol(maybePair, Decl(kvsProducerTupleInference.ts, 1, 13))
+
+declare const arrayValue: (string | number)[];
+>arrayValue : Symbol(arrayValue, Decl(kvsProducerTupleInference.ts, 2, 13))
+
+function toMap<K, V>(entries: Iterable<[K, V]>) {
+>toMap : Symbol(toMap, Decl(kvsProducerTupleInference.ts, 2, 46))
+>K : Symbol(K, Decl(kvsProducerTupleInference.ts, 4, 15))
+>V : Symbol(V, Decl(kvsProducerTupleInference.ts, 4, 17))
+>entries : Symbol(entries, Decl(kvsProducerTupleInference.ts, 4, 21))
+>Iterable : Symbol(Iterable, Decl(lib.es2015.iterable.d.ts, --, --))
+>K : Symbol(K, Decl(kvsProducerTupleInference.ts, 4, 15))
+>V : Symbol(V, Decl(kvsProducerTupleInference.ts, 4, 17))
+
+    return new Map(entries);
+>Map : Symbol(Map, Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.iterable.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --))
+>entries : Symbol(entries, Decl(kvsProducerTupleInference.ts, 4, 21))
+}
+
+const collectedPairs = collect (keys) {
+>collectedPairs : Symbol(collectedPairs, Decl(kvsProducerTupleInference.ts, 8, 5))
+>keys : Symbol(keys, Decl(kvsProducerTupleInference.ts, 0, 13))
+
+    yield [_, _.length];
+>_ : Symbol(_, Decl(kvsProducerTupleInference.ts, 9, 11))
+>_.length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+>_ : Symbol(_, Decl(kvsProducerTupleInference.ts, 9, 11))
+>length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+
+};
+const collectedPairsExpected: [string, number][] = collectedPairs;
+>collectedPairsExpected : Symbol(collectedPairsExpected, Decl(kvsProducerTupleInference.ts, 11, 5))
+>collectedPairs : Symbol(collectedPairs, Decl(kvsProducerTupleInference.ts, 8, 5))
+
+const lazyPairs = collect* (keys) {
+>lazyPairs : Symbol(lazyPairs, Decl(kvsProducerTupleInference.ts, 13, 5))
+>keys : Symbol(keys, Decl(kvsProducerTupleInference.ts, 0, 13))
+
+    yield [_, _.length];
+>_ : Symbol(_, Decl(kvsProducerTupleInference.ts, 14, 11))
+>_.length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+>_ : Symbol(_, Decl(kvsProducerTupleInference.ts, 14, 11))
+>length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+
+};
+const lazyPairsExpected: Generator<[string, number], void, unknown> = lazyPairs;
+>lazyPairsExpected : Symbol(lazyPairsExpected, Decl(kvsProducerTupleInference.ts, 16, 5))
+>Generator : Symbol(Generator, Decl(lib.es2015.generator.d.ts, --, --))
+>lazyPairs : Symbol(lazyPairs, Decl(kvsProducerTupleInference.ts, 13, 5))
+
+const pairMap: Map<string, number> = toMap(lazyPairs);
+>pairMap : Symbol(pairMap, Decl(kvsProducerTupleInference.ts, 17, 5))
+>Map : Symbol(Map, Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.iterable.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --))
+>toMap : Symbol(toMap, Decl(kvsProducerTupleInference.ts, 2, 46))
+>lazyPairs : Symbol(lazyPairs, Decl(kvsProducerTupleInference.ts, 13, 5))
+
+const selectedPair = select (keys) {
+>selectedPair : Symbol(selectedPair, Decl(kvsProducerTupleInference.ts, 19, 5))
+>keys : Symbol(keys, Decl(kvsProducerTupleInference.ts, 0, 13))
+
+    yield [_, _.length];
+>_ : Symbol(_, Decl(kvsProducerTupleInference.ts, 20, 11))
+>_.length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+>_ : Symbol(_, Decl(kvsProducerTupleInference.ts, 20, 11))
+>length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+
+};
+const selectedPairExpected: [string, number] | null = selectedPair;
+>selectedPairExpected : Symbol(selectedPairExpected, Decl(kvsProducerTupleInference.ts, 22, 5))
+>selectedPair : Symbol(selectedPair, Decl(kvsProducerTupleInference.ts, 19, 5))
+
+const optionalPairs = collect (keys) {
+>optionalPairs : Symbol(optionalPairs, Decl(kvsProducerTupleInference.ts, 24, 5))
+>keys : Symbol(keys, Decl(kvsProducerTupleInference.ts, 0, 13))
+
+    yield? maybePair;
+>maybePair : Symbol(maybePair, Decl(kvsProducerTupleInference.ts, 1, 13))
+
+};
+const optionalPairsExpected: [string, number][] = optionalPairs;
+>optionalPairsExpected : Symbol(optionalPairsExpected, Decl(kvsProducerTupleInference.ts, 27, 5))
+>optionalPairs : Symbol(optionalPairs, Decl(kvsProducerTupleInference.ts, 24, 5))
+
+const collectedTupleUnion = collect (keys) {
+>collectedTupleUnion : Symbol(collectedTupleUnion, Decl(kvsProducerTupleInference.ts, 29, 5))
+>keys : Symbol(keys, Decl(kvsProducerTupleInference.ts, 0, 13))
+
+    if (_.length > 3) yield [_, _.length];
+>_.length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+>_ : Symbol(_, Decl(kvsProducerTupleInference.ts, 30, 8))
+>length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+>_ : Symbol(_, Decl(kvsProducerTupleInference.ts, 30, 8))
+>_.length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+>_ : Symbol(_, Decl(kvsProducerTupleInference.ts, 30, 8))
+>length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+
+    yield [_.length, _];
+>_.length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+>_ : Symbol(_, Decl(kvsProducerTupleInference.ts, 30, 8))
+>length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+>_ : Symbol(_, Decl(kvsProducerTupleInference.ts, 30, 8))
+
+};
+const collectedTupleUnionExpected: ([string, number] | [number, string])[] = collectedTupleUnion;
+>collectedTupleUnionExpected : Symbol(collectedTupleUnionExpected, Decl(kvsProducerTupleInference.ts, 33, 5))
+>collectedTupleUnion : Symbol(collectedTupleUnion, Decl(kvsProducerTupleInference.ts, 29, 5))
+
+const lazyTupleUnion = collect* (keys) {
+>lazyTupleUnion : Symbol(lazyTupleUnion, Decl(kvsProducerTupleInference.ts, 35, 5))
+>keys : Symbol(keys, Decl(kvsProducerTupleInference.ts, 0, 13))
+
+    if (_.length > 3) yield [_, _.length];
+>_.length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+>_ : Symbol(_, Decl(kvsProducerTupleInference.ts, 36, 8))
+>length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+>_ : Symbol(_, Decl(kvsProducerTupleInference.ts, 36, 8))
+>_.length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+>_ : Symbol(_, Decl(kvsProducerTupleInference.ts, 36, 8))
+>length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+
+    yield [_.length, _];
+>_.length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+>_ : Symbol(_, Decl(kvsProducerTupleInference.ts, 36, 8))
+>length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+>_ : Symbol(_, Decl(kvsProducerTupleInference.ts, 36, 8))
+
+};
+const lazyTupleUnionExpected: Generator<[string, number] | [number, string], void, unknown> = lazyTupleUnion;
+>lazyTupleUnionExpected : Symbol(lazyTupleUnionExpected, Decl(kvsProducerTupleInference.ts, 39, 5))
+>Generator : Symbol(Generator, Decl(lib.es2015.generator.d.ts, --, --))
+>lazyTupleUnion : Symbol(lazyTupleUnion, Decl(kvsProducerTupleInference.ts, 35, 5))
+
+const selectedTupleUnion = select (keys) {
+>selectedTupleUnion : Symbol(selectedTupleUnion, Decl(kvsProducerTupleInference.ts, 41, 5))
+>keys : Symbol(keys, Decl(kvsProducerTupleInference.ts, 0, 13))
+
+    if (_.length > 3) yield [_, _.length];
+>_.length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+>_ : Symbol(_, Decl(kvsProducerTupleInference.ts, 42, 8))
+>length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+>_ : Symbol(_, Decl(kvsProducerTupleInference.ts, 42, 8))
+>_.length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+>_ : Symbol(_, Decl(kvsProducerTupleInference.ts, 42, 8))
+>length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+
+    yield [_.length, _];
+>_.length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+>_ : Symbol(_, Decl(kvsProducerTupleInference.ts, 42, 8))
+>length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+>_ : Symbol(_, Decl(kvsProducerTupleInference.ts, 42, 8))
+
+};
+const selectedTupleUnionExpected: [string, number] | [number, string] | null = selectedTupleUnion;
+>selectedTupleUnionExpected : Symbol(selectedTupleUnionExpected, Decl(kvsProducerTupleInference.ts, 45, 5))
+>selectedTupleUnion : Symbol(selectedTupleUnion, Decl(kvsProducerTupleInference.ts, 41, 5))
+
+const collectedMixedUnion = collect (keys) {
+>collectedMixedUnion : Symbol(collectedMixedUnion, Decl(kvsProducerTupleInference.ts, 47, 5))
+>keys : Symbol(keys, Decl(kvsProducerTupleInference.ts, 0, 13))
+
+    if (_.length > 3) yield [_, _.length];
+>_.length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+>_ : Symbol(_, Decl(kvsProducerTupleInference.ts, 48, 8))
+>length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+>_ : Symbol(_, Decl(kvsProducerTupleInference.ts, 48, 8))
+>_.length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+>_ : Symbol(_, Decl(kvsProducerTupleInference.ts, 48, 8))
+>length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+
+    yield _.length;
+>_.length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+>_ : Symbol(_, Decl(kvsProducerTupleInference.ts, 48, 8))
+>length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+
+};
+const collectedMixedUnionExpected: ([string, number] | number)[] = collectedMixedUnion;
+>collectedMixedUnionExpected : Symbol(collectedMixedUnionExpected, Decl(kvsProducerTupleInference.ts, 51, 5))
+>collectedMixedUnion : Symbol(collectedMixedUnion, Decl(kvsProducerTupleInference.ts, 47, 5))
+
+const collectedArrays = collect (keys) {
+>collectedArrays : Symbol(collectedArrays, Decl(kvsProducerTupleInference.ts, 53, 5))
+>keys : Symbol(keys, Decl(kvsProducerTupleInference.ts, 0, 13))
+
+    yield arrayValue;
+>arrayValue : Symbol(arrayValue, Decl(kvsProducerTupleInference.ts, 2, 13))
+
+};
+const collectedArraysExpected: (string | number)[][] = collectedArrays;
+>collectedArraysExpected : Symbol(collectedArraysExpected, Decl(kvsProducerTupleInference.ts, 56, 5))
+>collectedArrays : Symbol(collectedArrays, Decl(kvsProducerTupleInference.ts, 53, 5))
+

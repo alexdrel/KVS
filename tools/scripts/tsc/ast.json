@@ -1639,6 +1639,7 @@
                 ]
             },
             "KvsExtantReturnStatement": {
+                "generateSubtreeFacts": true,
                 "extends": [
                     "StatementBase",
                     "CompositeBase"
@@ -1652,6 +1653,7 @@
                 "arena": true
             },
             "KvsYieldStatement": {
+                "generateSubtreeFacts": true,
                 "extends": [
                     "StatementBase",
                     "CompositeBase"
@@ -1665,6 +1667,7 @@
                 "arena": true
             },
             "KvsExtantYieldStatement": {
+                "generateSubtreeFacts": true,
                 "extends": [
                     "StatementBase",
                     "CompositeBase"
@@ -1678,6 +1681,7 @@
                 "arena": true
             },
             "KvsIfBindingStatement": {
+                "generateSubtreeFacts": true,
                 "extends": [
                     "StatementBase",
                     "CompositeBase"
@@ -1696,6 +1700,7 @@
                 "arena": true
             },
             "KvsIfBindingClause": {
+                "generateSubtreeFacts": true,
                 "extends": [
                     "NodeBase",
                     "LocalsContainerBase",
@@ -1753,6 +1758,7 @@
                 "arena": true
             },
             "KvsExtantAssignmentExpression": {
+                "generateSubtreeFacts": true,
                 "extends": [
                     "ExpressionBase",
                     "CompositeBase"
@@ -1778,6 +1784,7 @@
                 "arena": true
             },
             "KvsTypedSpreadAssignmentExpression": {
+                "generateSubtreeFacts": true,
                 "extends": [
                     "ExpressionBase",
                     "CompositeBase"
@@ -1816,6 +1823,7 @@
                 "arena": true
             },
             "KvsSieveExpression": {
+                "generateSubtreeFacts": true,
                 "extends": [
                     "ExpressionBase",
                     "CompositeBase"
@@ -1837,6 +1845,7 @@
                 "arena": true
             },
             "KvsPlaceholderLambdaExpression": {
+                "generateSubtreeFacts": true,
                 "extends": [
                     "ExpressionBase",
                     "CompositeBase"
@@ -1850,6 +1859,7 @@
                 "arena": true
             },
             "KvsIterationCoordinateExpression": {
+                "generateSubtreeFacts": true,
                 "extends": [
                     "ExpressionBase",
                     "CompositeBase"
@@ -1858,6 +1868,7 @@
                 "arena": true
             },
             "KvsSieveBindingInitializer": {
+                "generateSubtreeFacts": true,
                 "extends": [
                     "ExpressionBase",
                     "CompositeBase"
@@ -1879,6 +1890,7 @@
                 "arena": true
             },
             "KvsSieveAssignmentExpression": {
+                "generateSubtreeFacts": true,
                 "extends": [
                     "ExpressionBase",
                     "CompositeBase"
@@ -1950,6 +1962,7 @@
                 "arena": true
             },
             "KvsCatchSplitExpression": {
+                "generateSubtreeFacts": true,
                 "extends": [
                     "ExpressionBase",
                     "CompositeBase"
@@ -1963,6 +1976,7 @@
                 "arena": true
             },
             "KvsCatchSplitAssignmentExpression": {
+                "generateSubtreeFacts": true,
                 "extends": [
                     "ExpressionBase",
                     "CompositeBase"
@@ -2040,6 +2054,7 @@
                 "arena": true
             },
             "KvsNullingExpression": {
+                "generateSubtreeFacts": true,
                 "extends": [
                     "ExpressionBase",
                     "CompositeBase"
@@ -2176,6 +2191,7 @@
                 "arena": true
             },
             "KvsCollectExpression": {
+                "generateSubtreeFacts": true,
                 "extends": [
                     "ExpressionBase",
                     "LocalsContainerBase",
@@ -2203,6 +2219,7 @@
                 "arena": true
             },
             "KvsLazyCollectExpression": {
+                "generateSubtreeFacts": true,
                 "extends": [
                     "ExpressionBase",
                     "LocalsContainerBase",
@@ -2230,6 +2247,7 @@
                 "arena": true
             },
             "KvsSelectExpression": {
+                "generateSubtreeFacts": true,
                 "extends": [
                     "ExpressionBase",
                     "LocalsContainerBase",
@@ -2257,6 +2275,7 @@
                 "arena": true
             },
             "KvsForExpression": {
+                "generateSubtreeFacts": true,
                 "extends": [
                     "ExpressionBase",
                     "LocalsContainerBase",

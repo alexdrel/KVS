@@ -1275,8 +1275,9 @@ func (p *Parser) parseIfStatement() *ast.Node {
 	if p.token == ast.KindConstKeyword {
 		p.nextToken()
 		declaration := p.parseVariableDeclaration()
+		declarations := p.newNodeList(core.NewTextRange(declaration.Pos(), declaration.End()), []*ast.Node{declaration})
 		declarationList := p.finishNode(
-			p.factory.NewVariableDeclarationList(p.factory.NewNodeList([]*ast.Node{declaration}), ast.NodeFlagsConst),
+			p.factory.NewVariableDeclarationList(declarations, ast.NodeFlagsConst),
 			declaration.Pos(),
 		)
 		name := declaration.Name()
@@ -1694,9 +1695,10 @@ func (p *Parser) parseVariableDeclarationWorker(allowExclamation bool) *ast.Node
 		errorPos := p.nodePos()
 		errorName := p.parseBindingIdentifier()
 		errorElement := p.finishNode(p.factory.NewBindingElement(nil, nil, errorName, nil), errorPos)
+		elements := p.newNodeList(core.NewTextRange(valueElement.Pos(), errorElement.End()), []*ast.Node{valueElement, errorElement})
 		name = p.finishNode(p.factory.NewBindingPattern(
 			ast.KindKvsCatchSplitBindingPattern,
-			p.factory.NewNodeList([]*ast.Node{valueElement, errorElement}),
+			elements,
 		), pos)
 		p.parseExpected(ast.KindEqualsToken)
 		expression := p.parseAssignmentExpressionOrHigher()
@@ -6418,7 +6420,8 @@ func (p *Parser) parseKvsProducerExpression() *ast.Expression {
 func (p *Parser) newKvsImplicitSubjectInitializer(source *ast.Node, statement *ast.Node) *ast.Node {
 	name := p.factory.NewIdentifier("_")
 	declaration := p.factory.NewVariableDeclaration(name, nil, nil, nil)
-	initializer := p.factory.NewVariableDeclarationList(p.factory.NewNodeList([]*ast.Node{declaration}), ast.NodeFlagsConst)
+	declarations := p.factory.NewNodeList([]*ast.Node{declaration})
+	initializer := p.factory.NewVariableDeclarationList(declarations, ast.NodeFlagsConst)
 	anchor := source
 	var findAnchor func(*ast.Node) bool
 	findAnchor = func(node *ast.Node) bool {
@@ -6437,6 +6440,7 @@ func (p *Parser) newKvsImplicitSubjectInitializer(source *ast.Node, statement *a
 	}
 	name.Loc = loc
 	declaration.Loc = loc
+	declarations.Loc = loc
 	initializer.Loc = loc
 	name.Flags |= ast.NodeFlagsSynthesized
 	declaration.Flags |= ast.NodeFlagsSynthesized

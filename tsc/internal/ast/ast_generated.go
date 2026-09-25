@@ -1617,6 +1617,10 @@ func (node *KvsExtantReturnStatement) Clone(f NodeFactoryCoercible) *Node {
 	return cloneNode(f.AsNodeFactory().NewKvsExtantReturnStatement(node.Expression), node.AsNode(), f.AsNodeFactory().hooks)
 }
 
+func (node *KvsExtantReturnStatement) computeSubtreeFacts() SubtreeFacts {
+	return propagateSubtreeFacts(node.Expression)
+}
+
 func IsKvsExtantReturnStatement(node *Node) bool {
 	return node.Kind == KindKvsExtantReturnStatement
 }
@@ -1656,6 +1660,10 @@ func (node *KvsYieldStatement) Clone(f NodeFactoryCoercible) *Node {
 	return cloneNode(f.AsNodeFactory().NewKvsYieldStatement(node.Expression), node.AsNode(), f.AsNodeFactory().hooks)
 }
 
+func (node *KvsYieldStatement) computeSubtreeFacts() SubtreeFacts {
+	return propagateSubtreeFacts(node.Expression)
+}
+
 func IsKvsYieldStatement(node *Node) bool {
 	return node.Kind == KindKvsYieldStatement
 }
@@ -1693,6 +1701,10 @@ func (node *KvsExtantYieldStatement) VisitEachChild(v *NodeVisitor) *Node {
 
 func (node *KvsExtantYieldStatement) Clone(f NodeFactoryCoercible) *Node {
 	return cloneNode(f.AsNodeFactory().NewKvsExtantYieldStatement(node.Expression), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func (node *KvsExtantYieldStatement) computeSubtreeFacts() SubtreeFacts {
+	return propagateSubtreeFacts(node.Expression)
 }
 
 func IsKvsExtantYieldStatement(node *Node) bool {
@@ -1736,6 +1748,11 @@ func (node *KvsIfBindingStatement) Clone(f NodeFactoryCoercible) *Node {
 	return cloneNode(f.AsNodeFactory().NewKvsIfBindingStatement(node.Clause, node.ElseStatement), node.AsNode(), f.AsNodeFactory().hooks)
 }
 
+func (node *KvsIfBindingStatement) computeSubtreeFacts() SubtreeFacts {
+	return propagateSubtreeFacts(node.Clause) |
+		propagateSubtreeFacts(node.ElseStatement)
+}
+
 func IsKvsIfBindingStatement(node *Node) bool {
 	return node.Kind == KindKvsIfBindingStatement
 }
@@ -1777,6 +1794,11 @@ func (node *KvsIfBindingClause) VisitEachChild(v *NodeVisitor) *Node {
 
 func (node *KvsIfBindingClause) Clone(f NodeFactoryCoercible) *Node {
 	return cloneNode(f.AsNodeFactory().NewKvsIfBindingClause(node.DeclarationList, node.Statement), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func (node *KvsIfBindingClause) computeSubtreeFacts() SubtreeFacts {
+	return propagateSubtreeFacts(node.DeclarationList) |
+		propagateSubtreeFacts(node.Statement)
 }
 
 func IsKvsIfBindingClause(node *Node) bool {
@@ -1909,6 +1931,13 @@ func (node *KvsExtantAssignmentExpression) Clone(f NodeFactoryCoercible) *Node {
 	return cloneNode(f.AsNodeFactory().NewKvsExtantAssignmentExpression(node.Left, node.QuestionToken, node.EqualsToken, node.Right), node.AsNode(), f.AsNodeFactory().hooks)
 }
 
+func (node *KvsExtantAssignmentExpression) computeSubtreeFacts() SubtreeFacts {
+	return propagateSubtreeFacts(node.Left) |
+		propagateSubtreeFacts(node.QuestionToken) |
+		propagateSubtreeFacts(node.EqualsToken) |
+		propagateSubtreeFacts(node.Right)
+}
+
 func IsKvsExtantAssignmentExpression(node *Node) bool {
 	return node.Kind == KindKvsExtantAssignmentExpression
 }
@@ -1955,6 +1984,13 @@ func (node *KvsTypedSpreadAssignmentExpression) VisitEachChild(v *NodeVisitor) *
 
 func (node *KvsTypedSpreadAssignmentExpression) Clone(f NodeFactoryCoercible) *Node {
 	return cloneNode(f.AsNodeFactory().NewKvsTypedSpreadAssignmentExpression(node.Left, node.DotDotDotToken, node.EqualsToken, node.Right), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func (node *KvsTypedSpreadAssignmentExpression) computeSubtreeFacts() SubtreeFacts {
+	return propagateSubtreeFacts(node.Left) |
+		propagateSubtreeFacts(node.DotDotDotToken) |
+		propagateSubtreeFacts(node.EqualsToken) |
+		propagateSubtreeFacts(node.Right)
 }
 
 func IsKvsTypedSpreadAssignmentExpression(node *Node) bool {
@@ -2039,6 +2075,12 @@ func (node *KvsSieveExpression) Clone(f NodeFactoryCoercible) *Node {
 	return cloneNode(f.AsNodeFactory().NewKvsSieveExpression(node.FirstTildeToken, node.SecondTildeToken, node.Expression), node.AsNode(), f.AsNodeFactory().hooks)
 }
 
+func (node *KvsSieveExpression) computeSubtreeFacts() SubtreeFacts {
+	return propagateSubtreeFacts(node.FirstTildeToken) |
+		propagateSubtreeFacts(node.SecondTildeToken) |
+		propagateSubtreeFacts(node.Expression)
+}
+
 func IsKvsSieveExpression(node *Node) bool {
 	return node.Kind == KindKvsSieveExpression
 }
@@ -2078,6 +2120,10 @@ func (node *KvsPlaceholderLambdaExpression) Clone(f NodeFactoryCoercible) *Node 
 	return cloneNode(f.AsNodeFactory().NewKvsPlaceholderLambdaExpression(node.Arrow), node.AsNode(), f.AsNodeFactory().hooks)
 }
 
+func (node *KvsPlaceholderLambdaExpression) computeSubtreeFacts() SubtreeFacts {
+	return propagateSubtreeFacts(node.Arrow)
+}
+
 func IsKvsPlaceholderLambdaExpression(node *Node) bool {
 	return node.Kind == KindKvsPlaceholderLambdaExpression
 }
@@ -2098,6 +2144,10 @@ func (f *NodeFactory) NewKvsIterationCoordinateExpression() *Node {
 
 func (node *KvsIterationCoordinateExpression) Clone(f NodeFactoryCoercible) *Node {
 	return cloneNode(f.AsNodeFactory().NewKvsIterationCoordinateExpression(), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func (node *KvsIterationCoordinateExpression) computeSubtreeFacts() SubtreeFacts {
+	return SubtreeFactsNone
 }
 
 func IsKvsIterationCoordinateExpression(node *Node) bool {
@@ -2141,6 +2191,12 @@ func (node *KvsSieveBindingInitializer) VisitEachChild(v *NodeVisitor) *Node {
 
 func (node *KvsSieveBindingInitializer) Clone(f NodeFactoryCoercible) *Node {
 	return cloneNode(f.AsNodeFactory().NewKvsSieveBindingInitializer(node.TildeToken, node.EqualsToken, node.Expression), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func (node *KvsSieveBindingInitializer) computeSubtreeFacts() SubtreeFacts {
+	return propagateSubtreeFacts(node.TildeToken) |
+		propagateSubtreeFacts(node.EqualsToken) |
+		propagateSubtreeFacts(node.Expression)
 }
 
 func IsKvsSieveBindingInitializer(node *Node) bool {
@@ -2189,6 +2245,13 @@ func (node *KvsSieveAssignmentExpression) VisitEachChild(v *NodeVisitor) *Node {
 
 func (node *KvsSieveAssignmentExpression) Clone(f NodeFactoryCoercible) *Node {
 	return cloneNode(f.AsNodeFactory().NewKvsSieveAssignmentExpression(node.Left, node.TildeToken, node.EqualsToken, node.Right), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func (node *KvsSieveAssignmentExpression) computeSubtreeFacts() SubtreeFacts {
+	return propagateSubtreeFacts(node.Left) |
+		propagateSubtreeFacts(node.TildeToken) |
+		propagateSubtreeFacts(node.EqualsToken) |
+		propagateSubtreeFacts(node.Right)
 }
 
 func IsKvsSieveAssignmentExpression(node *Node) bool {
@@ -2321,6 +2384,10 @@ func (node *KvsCatchSplitExpression) Clone(f NodeFactoryCoercible) *Node {
 	return cloneNode(f.AsNodeFactory().NewKvsCatchSplitExpression(node.Expression), node.AsNode(), f.AsNodeFactory().hooks)
 }
 
+func (node *KvsCatchSplitExpression) computeSubtreeFacts() SubtreeFacts {
+	return propagateSubtreeFacts(node.Expression)
+}
+
 func IsKvsCatchSplitExpression(node *Node) bool {
 	return node.Kind == KindKvsCatchSplitExpression
 }
@@ -2370,6 +2437,14 @@ func (node *KvsCatchSplitAssignmentExpression) VisitEachChild(v *NodeVisitor) *N
 
 func (node *KvsCatchSplitAssignmentExpression) Clone(f NodeFactoryCoercible) *Node {
 	return cloneNode(f.AsNodeFactory().NewKvsCatchSplitAssignmentExpression(node.ValueTarget, node.TildeToken, node.ErrorTarget, node.EqualsToken, node.Expression), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func (node *KvsCatchSplitAssignmentExpression) computeSubtreeFacts() SubtreeFacts {
+	return propagateSubtreeFacts(node.ValueTarget) |
+		propagateSubtreeFacts(node.TildeToken) |
+		propagateSubtreeFacts(node.ErrorTarget) |
+		propagateSubtreeFacts(node.EqualsToken) |
+		propagateSubtreeFacts(node.Expression)
 }
 
 func IsKvsCatchSplitAssignmentExpression(node *Node) bool {
@@ -2519,6 +2594,13 @@ func (node *KvsNullingExpression) VisitEachChild(v *NodeVisitor) *Node {
 
 func (node *KvsNullingExpression) Clone(f NodeFactoryCoercible) *Node {
 	return cloneNode(f.AsNodeFactory().NewKvsNullingExpression(node.Condition, node.QuestionToken, node.ColonToken, node.WhenTrue), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func (node *KvsNullingExpression) computeSubtreeFacts() SubtreeFacts {
+	return propagateSubtreeFacts(node.Condition) |
+		propagateSubtreeFacts(node.QuestionToken) |
+		propagateSubtreeFacts(node.ColonToken) |
+		propagateSubtreeFacts(node.WhenTrue)
 }
 
 func IsKvsNullingExpression(node *Node) bool {
@@ -2811,6 +2893,12 @@ func (node *KvsCollectExpression) Clone(f NodeFactoryCoercible) *Node {
 	return cloneNode(f.AsNodeFactory().NewKvsCollectExpression(node.Initializer, node.Expression, node.Keyed, node.Statement), node.AsNode(), f.AsNodeFactory().hooks)
 }
 
+func (node *KvsCollectExpression) computeSubtreeFacts() SubtreeFacts {
+	return propagateSubtreeFacts(node.Initializer) |
+		propagateSubtreeFacts(node.Expression) |
+		propagateSubtreeFacts(node.Statement)
+}
+
 func IsKvsCollectExpression(node *Node) bool {
 	return node.Kind == KindKvsCollectExpression
 }
@@ -2857,6 +2945,12 @@ func (node *KvsLazyCollectExpression) Clone(f NodeFactoryCoercible) *Node {
 	return cloneNode(f.AsNodeFactory().NewKvsLazyCollectExpression(node.Initializer, node.Expression, node.Keyed, node.Statement), node.AsNode(), f.AsNodeFactory().hooks)
 }
 
+func (node *KvsLazyCollectExpression) computeSubtreeFacts() SubtreeFacts {
+	return propagateSubtreeFacts(node.Initializer) |
+		propagateSubtreeFacts(node.Expression) |
+		propagateSubtreeFacts(node.Statement)
+}
+
 func IsKvsLazyCollectExpression(node *Node) bool {
 	return node.Kind == KindKvsLazyCollectExpression
 }
@@ -2901,6 +2995,12 @@ func (node *KvsSelectExpression) VisitEachChild(v *NodeVisitor) *Node {
 
 func (node *KvsSelectExpression) Clone(f NodeFactoryCoercible) *Node {
 	return cloneNode(f.AsNodeFactory().NewKvsSelectExpression(node.Initializer, node.Expression, node.Keyed, node.Statement), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func (node *KvsSelectExpression) computeSubtreeFacts() SubtreeFacts {
+	return propagateSubtreeFacts(node.Initializer) |
+		propagateSubtreeFacts(node.Expression) |
+		propagateSubtreeFacts(node.Statement)
 }
 
 func IsKvsSelectExpression(node *Node) bool {
@@ -2962,6 +3062,15 @@ func (node *KvsForExpression) VisitEachChild(v *NodeVisitor) *Node {
 
 func (node *KvsForExpression) Clone(f NodeFactoryCoercible) *Node {
 	return cloneNode(f.AsNodeFactory().NewKvsForExpression(node.Initializer, node.Condition, node.Incrementor, node.Expression, node.Result, node.TupleResult, node.ObjectResult, node.ForIn, node.Statement), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func (node *KvsForExpression) computeSubtreeFacts() SubtreeFacts {
+	return propagateSubtreeFacts(node.Initializer) |
+		propagateSubtreeFacts(node.Condition) |
+		propagateSubtreeFacts(node.Incrementor) |
+		propagateSubtreeFacts(node.Expression) |
+		propagateSubtreeFacts(node.Result) |
+		propagateSubtreeFacts(node.Statement)
 }
 
 func IsKvsForExpression(node *Node) bool {

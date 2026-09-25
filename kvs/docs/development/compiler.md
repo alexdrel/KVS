@@ -41,6 +41,24 @@ not needed to establish this slice.
 Adding a genuine syntax node affects both the Go compiler and its generated TypeScript API.
 `return?` now uses the accepted `KvsExtantReturnStatement` node.
 
+### Language-service invariants
+
+Language-service requests traverse syntax more broadly than compilation alone. Every composite KVS
+node must therefore implement subtree-fact computation. Declare `generateSubtreeFacts` in
+`tools/scripts/tsc/ast.json` and regenerate the AST rather than adding methods to generated Go code.
+Missing facts may leave compilation apparently healthy while hover or source navigation panics.
+
+Hidden bindings used to reuse ordinary binder and checker behavior still need source-shaped
+locations. Assign a valid location to the synthetic declaration, its name, its declaration list, and
+any other list exposed through traversal. Navigation must skip a hidden node when the corresponding
+source text belongs to the surrounding KVS construct rather than pretend that the synthesized name
+was authored there.
+
+Contextual KVS expressions do not necessarily have ordinary symbols. Hover for implicit `_`, keyed
+`#`, and placeholder `%` obtains the type computed for their enclosing iteration or placeholder
+boundary. Explicitly written KVS nullable types retain their postfix spelling in symbol hover;
+inferred nullable types use the ordinary expanded union representation.
+
 ### Binding-suffix token retention
 
 The static-nullability prototype stores the `let value?` binding suffix as a flag on the ordinary

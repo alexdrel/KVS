@@ -1209,7 +1209,7 @@ async function runSmokeTest() {
         for (const example of examples) {
             const source = path.join(examplesDir, example);
             const exampleOutputDir = path.join(outputDir, example.replace(/\.ts$/, ""));
-            await run("./built/local/tsc", [source, "--target", "es2020", "--module", "commonjs", "--outDir", exampleOutputDir]);
+            await run("./built/local/tsc", [source, "--strict", "--target", "esnext", "--module", "nodenext", "--outDir", exampleOutputDir]);
             const emitted = path.join(exampleOutputDir, path.basename(example, ".ts") + ".js");
             const result = await runOutput(process.execPath, [emitted]);
             assert.strictEqual(result.stderr, "", `${example} wrote to stderr`);

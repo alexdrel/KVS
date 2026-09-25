@@ -406,7 +406,7 @@ func shouldGetType(node *ast.Node) bool {
 		// If we're in a JSDoc node with no associated symbol, no binding has taken place for the node and
 		// we can't answer questions about types of declaration nodes (such as property declarations).
 		return !(node.Flags&ast.NodeFlagsJSDoc != 0 && ast.IsDeclarationName(node)) && !ast.IsLabelName(node) && !ast.IsTagName(node) && !ast.IsConstTypeReference(node.Parent)
-	case ast.KindThisKeyword, ast.KindThisType, ast.KindSuperKeyword, ast.KindNamedTupleMember:
+	case ast.KindThisKeyword, ast.KindThisType, ast.KindSuperKeyword, ast.KindNamedTupleMember, ast.KindKvsIterationCoordinateExpression:
 		return true
 	case ast.KindMetaProperty:
 		return ast.IsImportMeta(node)
@@ -459,6 +459,13 @@ func getQuickInfoAndDeclarationAtLocation(c *checker.Checker, symbol *ast.Symbol
 		p := printer.NewPrinter(printer.PrinterOptions{NewLine: core.NewLineKindLF}, printer.PrintHandlers{}, emitContext)
 		p.IdToSymbol = idToSymbol
 		tempDpw := newDisplayPartsWriter(true)
+		p.Write(typeNode, sourceFile, tempDpw, nil)
+		dpw.WriteFrom(tempDpw)
+	}
+	writeTypeNodeClassified := func(typeNode *ast.Node) {
+		emitContext := printer.NewEmitContext()
+		p := printer.NewPrinter(printer.PrinterOptions{NewLine: core.NewLineKindLF}, printer.PrintHandlers{}, emitContext)
+		tempDpw := newDisplayPartsWriter(vsCapability)
 		p.Write(typeNode, sourceFile, tempDpw, nil)
 		dpw.WriteFrom(tempDpw)
 	}
@@ -532,6 +539,21 @@ func getQuickInfoAndDeclarationAtLocation(c *checker.Checker, symbol *ast.Symbol
 		dpw.WritePunctuation(": ")
 		writeTypeClassified(c.GetTypeAtLocation(node), container, typeFormatFlags)
 		return symbolDisplayInfo{displayParts: dpw}
+	}
+	if node.Kind == ast.KindKvsIterationCoordinateExpression {
+		dpw.WritePunctuation("#")
+		dpw.WritePunctuation(": ")
+		writeTypeClassified(c.GetTypeAtLocation(node), container, typeFormatFlags)
+		return symbolDisplayInfo{displayParts: dpw}
+	}
+	if ast.IsIdentifier(node) && node.AsIdentifier().Text == "__kvsPlaceholder" && !ast.IsDeclarationName(node) {
+		if placeholderType := c.GetKvsPlaceholderTypeAtLocation(node); placeholderType != nil {
+			dpw.WritePunctuation("(parameter) ")
+			dpw.WriteParameter("%")
+			dpw.WritePunctuation(": ")
+			writeTypeClassified(placeholderType, container, typeFormatFlags)
+			return symbolDisplayInfo{displayParts: dpw}
+		}
 	}
 	if symbol == nil {
 		if shouldGetType(node) {
@@ -734,10 +756,17 @@ func getQuickInfoAndDeclarationAtLocation(c *checker.Checker, symbol *ast.Symbol
 				writeSignatureClassified(c.GetResolvedSignature(callNode), container, flags)
 			} else {
 				t := c.GetTypeOfSymbolAtLocation(symbol, node)
+				declaration := symbol.ValueDeclaration
+				if declaration != nil {
+					declaration = ast.GetRootDeclaration(declaration)
+				}
+				explicitKvsType := getExplicitKvsTypeAnnotation(declaration)
 				// If the type is a constrained type parameter, support expansion:
 				// Level 0: show just "T", signal canIncreaseVerbosity
 				// Level 1+: show "T extends Constraint" with the constraint expanded at level-1
-				if vc != nil && t.Symbol() != nil && t.Symbol().Flags&ast.SymbolFlagsTypeParameter != 0 && c.GetConstraintOfTypeParameter(t) != nil {
+				if explicitKvsType != nil {
+					writeTypeNodeClassified(explicitKvsType)
+				} else if vc != nil && t.Symbol() != nil && t.Symbol().Flags&ast.SymbolFlagsTypeParameter != 0 && c.GetConstraintOfTypeParameter(t) != nil {
 					if vc.Level > 0 {
 						expandVC := &checker.VerbosityContext{
 							Level:               vc.Level - 1,
@@ -947,6 +976,30 @@ func getQuickInfoAndDeclarationAtLocation(c *checker.Checker, symbol *ast.Symbol
 	return symbolDisplayInfo{displayParts: dpw, declaration: firstDeclaration}
 }
 
+func getExplicitKvsTypeAnnotation(declaration *ast.Node) *ast.Node {
+	if declaration == nil || !(ast.IsParameterDeclaration(declaration) || ast.IsVariableDeclaration(declaration) || ast.IsPropertySignatureDeclaration(declaration) || ast.IsPropertyDeclaration(declaration)) {
+		return nil
+	}
+	typeNode := declaration.Type()
+	if typeNode == nil {
+		return nil
+	}
+	found := false
+	var visit func(*ast.Node) bool
+	visit = func(node *ast.Node) bool {
+		if node.Kind == ast.KindKvsNullableType || node.Kind == ast.KindKvsExtantType {
+			found = true
+			return true
+		}
+		return node.ForEachChild(visit)
+	}
+	visit(typeNode)
+	if found {
+		return typeNode
+	}
+	return nil
+}
+
 // typeParameterToString renders a type parameter declaration (e.g., "T extends FooType").
 func typeParameterToString(c *checker.Checker, t *checker.Type, enclosingDeclaration *ast.Node, vc *checker.VerbosityContext) string {
 	return c.TypeParameterToStringEx(t, enclosingDeclaration, vc)
@@ -964,6 +1017,29 @@ func getNodeForQuickInfo(node *ast.Node) *ast.Node {
 	}
 	if ast.IsImportMeta(node.Parent) && node.Parent.Name() == node {
 		return node.Parent
+	}
+	if node.Parent.Kind == ast.KindKvsIterationCoordinateExpression {
+		return node.Parent
+	}
+	if ast.IsIdentifier(node) && node.AsIdentifier().Text == "__kvsPlaceholder" && ast.IsParameterDeclaration(node.Parent) {
+		placeholder := ast.FindAncestor(node, func(parent *ast.Node) bool {
+			return parent.Kind == ast.KindKvsPlaceholderLambdaExpression
+		})
+		if placeholder != nil {
+			var sourcePlaceholder *ast.Node
+			var findSourcePlaceholder func(child *ast.Node) bool
+			findSourcePlaceholder = func(child *ast.Node) bool {
+				if ast.IsIdentifier(child) && child.AsIdentifier().Text == "__kvsPlaceholder" && child.Pos() == node.Pos() && !ast.IsDeclarationName(child) {
+					sourcePlaceholder = child
+					return true
+				}
+				return child.ForEachChild(findSourcePlaceholder)
+			}
+			placeholder.AsKvsPlaceholderLambdaExpression().Arrow.AsArrowFunction().Body.ForEachChild(findSourcePlaceholder)
+			if sourcePlaceholder != nil {
+				return sourcePlaceholder
+			}
+		}
 	}
 	if ast.IsJsxNamespacedName(node.Parent) {
 		return node.Parent

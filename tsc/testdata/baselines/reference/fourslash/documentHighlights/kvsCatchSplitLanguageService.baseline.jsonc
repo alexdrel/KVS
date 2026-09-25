@@ -1,0 +1,10 @@
+// === documentHighlights ===
+// === /kvsCatchSplitLanguageService.ts ===
+// async function loadLabel(): Promise<string> {
+//     throw "offline";
+// }
+// 
+// async function reportLabel() {
+//     const label~/*HIGHLIGHTS*/[|labelError|] = await loadLabel();
+//     console.log(label, [|labelError|]);
+// }

@@ -1,7 +1,8 @@
 {
     "recommendations": [
         "dprint.dprint",
-        "golang.go"
+        "golang.go",
+        "TypeScriptTeam.native-preview"
     ],
     "unwantedRecommendations": [
         "ms-vscode.vscode-typescript-tslint-plugin"

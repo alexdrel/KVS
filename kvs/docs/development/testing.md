@@ -26,6 +26,22 @@ corresponding file under `kvs/examples/baselines/`. Baseline changes are reviewe
 manually. Goalposts are deliberately outside this runnable set. These checks complement the normal
 compiler baseline suite; they do not replace it.
 
+### Bootstrap compiler for TypeScript harnesses
+
+The TypeScript API and VS Code extension implementations are ordinary TypeScript infrastructure, not
+KVS programs. Their build and test scripts use the repository's bundled TypeScript 7 compiler. This
+avoids interpreting intentional TypeScript syntax collisions, notably postfix non-null assertions,
+as KVS operations.
+
+This boundary does not bypass the compiler under test. API runtime tests launch `built/local/tsc
+--api`, exercise parsing, checking, AST transport, cloning, navigation, and printing, and include
+KVS-specific round trips. The bundled compiler checks the TypeScript harness; the local compiler
+supplies the behavior tested through that harness.
+
+Language-service changes need focused Fourslash coverage for hover and document highlights, plus
+lower-level parser or AST-navigation tests when synthetic locations or token lookup are involved.
+Compiler conformance baselines alone do not exercise these requests.
+
 Every runnable example should be readable on its own: add short comments that identify the language
 behavior being demonstrated, log the meaningful result, and show the expected output in nearby
 comments. The matching `.stdout` file remains the executable assertion; the inline output is the

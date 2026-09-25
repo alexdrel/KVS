@@ -34,6 +34,8 @@
         ".git-blame-ignore-revs"
     ],
     "js/ts.preferences.importModuleSpecifierEnding": "js",
+    "js/ts.experimental.useTsgo": true,
+    "js/ts.tsdk.path": "./built/local",
     "js/ts.unstable": {
         "organizeImportsCollation": "unicode",
         "organizeImportsCaseFirst": "upper",

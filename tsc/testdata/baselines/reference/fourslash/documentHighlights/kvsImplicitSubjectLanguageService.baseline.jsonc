@@ -1,0 +1,25 @@
+// === documentHighlights ===
+// === /kvsImplicitSubjectLanguageService.ts ===
+// const [|histo|]: number?[] = [7, null, 18];
+// 
+// for (/*HIGHLIGHTS*/[|histo|]) {
+//     console.log(#, _!);
+// }
+// 
+// --- (line: 7) skipped ---
+
+
+
+// === documentHighlights ===
+// === /kvsImplicitSubjectLanguageService.ts ===
+// --- (line: 7) skipped ---
+//     amount: number;
+//     paid: boolean;
+// }
+// declare const [|orders|]: Order[];
+// 
+// const summary = for (/*HIGHLIGHTS*/[|orders|]; {count = 0, revenue = 0}) {
+//     if (!_.paid) continue;
+//     count++;
+//     revenue += _.amount;
+// };

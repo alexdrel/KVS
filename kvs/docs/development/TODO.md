@@ -3,7 +3,7 @@
 This is a working implementation aid, not a language specification or feature order. The language
 documents remain authoritative for accepted semantics.
 
-Progress: **290 of 377 items complete (76.9%)**; **87 remain open**.
+Progress: **296 of 382 items complete (77.5%)**; **86 remain open**.
 
 - `[x]` means implemented with focused compiler evidence.
 - `[ ]` means unimplemented, incomplete, or not yet deliberately validated.
@@ -53,8 +53,12 @@ Implemented vertical slices:
 - Terminal structural defaults for the same concrete POD types: `maybeProfile!`.
 - Numeric ranges with exclusive or inclusive upper bounds.
 - Lazy `collect*` with iterator-local production.
+- Tuple inference for array literals yielded directly from `collect`, `collect*`, and `select`,
+  including unions across multiple yield sites.
 - Keyed iteration across implicit loops and destructuring `in`, with static array, Map, record, and
   general-iterable categories.
+- Native language-service support for implemented KVS syntax, including typed hover, document
+  highlights, and safe source navigation through synthetic compiler nodes.
 
 Known semantic debts:
 
@@ -68,6 +72,7 @@ Focused conformance inputs:
 - `tsc/testdata/tests/cases/conformance/kvs/kvsExtantReturn.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsCollect.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsLazyCollect.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsProducerTupleInference.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsSelect.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsForExpression.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsExtantAssignment.ts`
@@ -102,6 +107,15 @@ Focused conformance inputs:
 - `tsc/testdata/tests/cases/conformance/kvs/kvsRange.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsKeyedIteration.ts`
 
+Focused language-service inputs:
+
+- `tsc/internal/fourslash/tests/kvsCatchSplitLanguageService_test.go`
+- `tsc/internal/fourslash/tests/kvsExplicitTypeHover_test.go`
+- `tsc/internal/fourslash/tests/kvsIfBindingLanguageService_test.go`
+- `tsc/internal/fourslash/tests/kvsImplicitSubjectLanguageService_test.go`
+- `tsc/internal/fourslash/tests/kvsPlaceholderLambdaLanguageService_test.go`
+- `tsc/internal/fourslash/tests/kvsTypedSpreadLanguageService_test.go`
+
 Run all implemented KVS slices together:
 
 ```sh
@@ -123,7 +137,12 @@ example `.js` files are intentionally ignored.
 - [ ] Handle declaration emit for KVS syntax
 - [x] Add `conformance/kvs/` test subtree
 - [x] Add runtime/evaluation-order test mechanism
-- [ ] Add language-service/Fourslash coverage
+- [x] Add language-service/Fourslash coverage
+- [x] Wire VS Code Native Preview to the local KVS compiler
+- [x] Hover types for implicit `_`, keyed `#`, and placeholder `%`
+- [x] Preserve explicit KVS nullable type spelling in symbol hover
+- [x] Document highlights for synthetic KVS binding forms
+- [x] Source navigation tolerates synthetic nodes and contextual producer keywords
 
 ## 1. Absence and extant values
 

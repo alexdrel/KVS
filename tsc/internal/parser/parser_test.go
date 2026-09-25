@@ -43,6 +43,24 @@ func BenchmarkParse(b *testing.B) {
 	}
 }
 
+func TestKvsSyntaxSubtreeFacts(t *testing.T) {
+	t.Parallel()
+	root := filepath.Join(repo.TestDataPath(), "tests/cases/conformance/kvs")
+	for file := range allParsableFiles(t, root) {
+		t.Run(file.name, func(t *testing.T) {
+			t.Parallel()
+			sourceText, err := os.ReadFile(file.path)
+			assert.NilError(t, err)
+			fileName := tspath.GetNormalizedAbsolutePath(file.path, "/")
+			parsed := parser.ParseSourceFile(ast.SourceFileParseOptions{
+				FileName: fileName,
+				Path:     tspath.ToPath(fileName, "/", osvfs.FS().UseCaseSensitiveFileNames()),
+			}, string(sourceText), core.ScriptKindTS)
+			parsed.AsNode().SubtreeFacts()
+		})
+	}
+}
+
 type parsableFile struct {
 	path string
 	name string

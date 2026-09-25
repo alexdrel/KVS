@@ -50,7 +50,7 @@ function announceLaunchWindow(launchWindow: string | number | undefined) {
 announceLaunchWindow("night");
 
 // Terminal defaults: replace absence using the value type's default.
-function announceCrew(callSign: string | null, crew: readonly string[] | undefined) {
+function announceCrew(callSign: string?, crew?: readonly string[]) {
     const displayCallSign = callSign!;
     const assignedCrew = crew!;
     console.log(displayCallSign.toUpperCase(), assignedCrew.join(", "));

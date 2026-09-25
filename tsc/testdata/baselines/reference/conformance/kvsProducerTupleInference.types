@@ -1,0 +1,219 @@
+//// [tests/cases/conformance/kvs/kvsProducerTupleInference.ts] ////
+
+=== kvsProducerTupleInference.ts ===
+declare const keys: string[];
+>keys : string[]
+
+declare const maybePair: [string, number] | null;
+>maybePair : [string, number] | null
+
+declare const arrayValue: (string | number)[];
+>arrayValue : (string | number)[]
+
+function toMap<K, V>(entries: Iterable<[K, V]>) {
+>toMap : <K, V>(entries: Iterable<[K, V]>) => Map<K, V>
+>entries : Iterable<[K, V]>
+
+    return new Map(entries);
+>new Map(entries) : Map<K, V>
+>Map : MapConstructor
+>entries : Iterable<[K, V]>
+}
+
+const collectedPairs = collect (keys) {
+>collectedPairs : [string, number][]
+>collect (keys) {    yield [_, _.length];} : [string, number][]
+>keys : string[]
+
+    yield [_, _.length];
+>[_, _.length] : (string | number)[]
+>_ : string
+>_.length : number
+>_ : string
+>length : number
+
+};
+const collectedPairsExpected: [string, number][] = collectedPairs;
+>collectedPairsExpected : [string, number][]
+>collectedPairs : [string, number][]
+
+const lazyPairs = collect* (keys) {
+>lazyPairs : Generator<[string, number], void, unknown>
+>collect* (keys) {    yield [_, _.length];} : Generator<[string, number], void, unknown>
+>keys : string[]
+
+    yield [_, _.length];
+>[_, _.length] : (string | number)[]
+>_ : string
+>_.length : number
+>_ : string
+>length : number
+
+};
+const lazyPairsExpected: Generator<[string, number], void, unknown> = lazyPairs;
+>lazyPairsExpected : Generator<[string, number], void, unknown>
+>lazyPairs : Generator<[string, number], void, unknown>
+
+const pairMap: Map<string, number> = toMap(lazyPairs);
+>pairMap : Map<string, number>
+>toMap(lazyPairs) : Map<string, number>
+>toMap : <K, V>(entries: Iterable<[K, V]>) => Map<K, V>
+>lazyPairs : Generator<[string, number], void, unknown>
+
+const selectedPair = select (keys) {
+>selectedPair : [string, number] | null
+>select (keys) {    yield [_, _.length];} : [string, number] | null
+>keys : string[]
+
+    yield [_, _.length];
+>[_, _.length] : (string | number)[]
+>_ : string
+>_.length : number
+>_ : string
+>length : number
+
+};
+const selectedPairExpected: [string, number] | null = selectedPair;
+>selectedPairExpected : [string, number] | null
+>selectedPair : [string, number] | null
+
+const optionalPairs = collect (keys) {
+>optionalPairs : [string, number][]
+>collect (keys) {    yield? maybePair;} : [string, number][]
+>keys : string[]
+
+    yield? maybePair;
+>maybePair : [string, number] | null
+
+};
+const optionalPairsExpected: [string, number][] = optionalPairs;
+>optionalPairsExpected : [string, number][]
+>optionalPairs : [string, number][]
+
+const collectedTupleUnion = collect (keys) {
+>collectedTupleUnion : ([string, number] | [number, string])[]
+>collect (keys) {    if (_.length > 3) yield [_, _.length];    yield [_.length, _];} : ([string, number] | [number, string])[]
+>keys : string[]
+
+    if (_.length > 3) yield [_, _.length];
+>_.length > 3 : boolean
+>_.length : number
+>_ : string
+>length : number
+>3 : 3
+>[_, _.length] : (string | number)[]
+>_ : string
+>_.length : number
+>_ : string
+>length : number
+
+    yield [_.length, _];
+>[_.length, _] : (string | number)[]
+>_.length : number
+>_ : string
+>length : number
+>_ : string
+
+};
+const collectedTupleUnionExpected: ([string, number] | [number, string])[] = collectedTupleUnion;
+>collectedTupleUnionExpected : ([string, number] | [number, string])[]
+>collectedTupleUnion : ([string, number] | [number, string])[]
+
+const lazyTupleUnion = collect* (keys) {
+>lazyTupleUnion : Generator<[string, number] | [number, string], void, unknown>
+>collect* (keys) {    if (_.length > 3) yield [_, _.length];    yield [_.length, _];} : Generator<[string, number] | [number, string], void, unknown>
+>keys : string[]
+
+    if (_.length > 3) yield [_, _.length];
+>_.length > 3 : boolean
+>_.length : number
+>_ : string
+>length : number
+>3 : 3
+>[_, _.length] : (string | number)[]
+>_ : string
+>_.length : number
+>_ : string
+>length : number
+
+    yield [_.length, _];
+>[_.length, _] : (string | number)[]
+>_.length : number
+>_ : string
+>length : number
+>_ : string
+
+};
+const lazyTupleUnionExpected: Generator<[string, number] | [number, string], void, unknown> = lazyTupleUnion;
+>lazyTupleUnionExpected : Generator<[string, number] | [number, string], void, unknown>
+>lazyTupleUnion : Generator<[string, number] | [number, string], void, unknown>
+
+const selectedTupleUnion = select (keys) {
+>selectedTupleUnion : [string, number] | [number, string] | null
+>select (keys) {    if (_.length > 3) yield [_, _.length];    yield [_.length, _];} : [string, number] | [number, string] | null
+>keys : string[]
+
+    if (_.length > 3) yield [_, _.length];
+>_.length > 3 : boolean
+>_.length : number
+>_ : string
+>length : number
+>3 : 3
+>[_, _.length] : (string | number)[]
+>_ : string
+>_.length : number
+>_ : string
+>length : number
+
+    yield [_.length, _];
+>[_.length, _] : (string | number)[]
+>_.length : number
+>_ : string
+>length : number
+>_ : string
+
+};
+const selectedTupleUnionExpected: [string, number] | [number, string] | null = selectedTupleUnion;
+>selectedTupleUnionExpected : [string, number] | [number, string] | null
+>selectedTupleUnion : [string, number] | [number, string] | null
+
+const collectedMixedUnion = collect (keys) {
+>collectedMixedUnion : (number | [string, number])[]
+>collect (keys) {    if (_.length > 3) yield [_, _.length];    yield _.length;} : (number | [string, number])[]
+>keys : string[]
+
+    if (_.length > 3) yield [_, _.length];
+>_.length > 3 : boolean
+>_.length : number
+>_ : string
+>length : number
+>3 : 3
+>[_, _.length] : (string | number)[]
+>_ : string
+>_.length : number
+>_ : string
+>length : number
+
+    yield _.length;
+>_.length : number
+>_ : string
+>length : number
+
+};
+const collectedMixedUnionExpected: ([string, number] | number)[] = collectedMixedUnion;
+>collectedMixedUnionExpected : (number | [string, number])[]
+>collectedMixedUnion : (number | [string, number])[]
+
+const collectedArrays = collect (keys) {
+>collectedArrays : (string | number)[][]
+>collect (keys) {    yield arrayValue;} : (string | number)[][]
+>keys : string[]
+
+    yield arrayValue;
+>arrayValue : (string | number)[]
+
+};
+const collectedArraysExpected: (string | number)[][] = collectedArrays;
+>collectedArraysExpected : (string | number)[][]
+>collectedArrays : (string | number)[][]
+

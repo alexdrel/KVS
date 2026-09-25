@@ -336,28 +336,34 @@ const updatedAlias = updated;
 
 const updateResult = updated ...= rectangle;
 >updateResult : Point
->updated : any
->rectangle : any
+>updated ...= rectangle : Point
+>updated : Point
+>rectangle : Rectangle
 
 updated ...= optionalPoint;
->updated : any
->optionalPoint : any
+>updated ...= optionalPoint : Point
+>updated : Point
+>optionalPoint : { x?: number; y?: number; }
 
 updated ...= incompatible;
->updated : any
->incompatible : any
+>updated ...= incompatible : Point
+>updated : Point
+>incompatible : { x: string; }
 
 updated ...= nullablePoint;
->updated : any
->nullablePoint : any
+>updated ...= nullablePoint : Point
+>updated : Point
+>nullablePoint : { x: number?; y: number; }
 
 updated ...= unrelated;
->updated : any
->unrelated : any
+>updated ...= unrelated : Point
+>updated : Point
+>unrelated : { width: number; }
 
 updated ...= unknownSource;
->updated : any
->unknownSource : any
+>updated ...= unknownSource : Point
+>updated : Point
+>unknownSource : unknown
 
 interface PointHolder {
     point: Point;
@@ -368,10 +374,11 @@ let holder = PointHolder{};
 >PointHolder{} : PointHolder
 
 holder.point ...= rectangle;
+>holder.point ...= rectangle : Point
 >holder.point : Point
 >holder : PointHolder
 >point : Point
->rectangle : any
+>rectangle : Rectangle
 
 interface ReadonlyPointHolder {
     readonly point: Point;
@@ -382,23 +389,26 @@ let readonlyHolder = ReadonlyPointHolder{};
 >ReadonlyPointHolder{} : ReadonlyPointHolder
 
 readonlyHolder.point ...= rectangle;
+>readonlyHolder.point ...= rectangle : Point
 >readonlyHolder.point : any
 >readonlyHolder : ReadonlyPointHolder
 >point : any
->rectangle : any
+>rectangle : Rectangle
 
 const constantPoint = Point{};
 >constantPoint : Point
 >Point{} : Point
 
 constantPoint ...= rectangle;
+>constantPoint ...= rectangle : Point
 >constantPoint : any
->rectangle : any
+>rectangle : Rectangle
 
 getPoint() ...= rectangle;
+>getPoint() ...= rectangle : Point
 >getPoint() : Point
 >getPoint : () => Point
->rectangle : any
+>rectangle : Rectangle
 
 interface ReadonlyPoint {
     readonly x: number;
@@ -412,20 +422,23 @@ let readonlyPoint = ReadonlyPoint{};
 >ReadonlyPoint{} : ReadonlyPoint
 
 readonlyPoint ...= rectangle;
->readonlyPoint : any
->rectangle : any
+>readonlyPoint ...= rectangle : ReadonlyPoint
+>readonlyPoint : ReadonlyPoint
+>rectangle : Rectangle
 
 let maybePoint: Point?;
 >maybePoint : Point | null | undefined
 
 maybePoint ...= rectangle;
->maybePoint : any
->rectangle : any
+>maybePoint ...= rectangle : Point | null | undefined
+>maybePoint : Point | null | undefined
+>rectangle : Rectangle
 
 maybePoint! ...= rectangle;
+>maybePoint! ...= rectangle : Point
 >maybePoint! : Point
 >maybePoint : Point | null | undefined
->rectangle : any
+>rectangle : Rectangle
 
 const materializedPoint = maybePoint;
 >materializedPoint : Point
@@ -435,9 +448,10 @@ declare const fixedMaybePoint: Point?;
 >fixedMaybePoint : Point | null | undefined
 
 fixedMaybePoint! ...= rectangle;
+>fixedMaybePoint! ...= rectangle : Point
 >fixedMaybePoint! : Point
 >fixedMaybePoint : Point | null | undefined
->rectangle : any
+>rectangle : Rectangle
 
 Point{ ...incompatible };
 >Point{ ...incompatible } : Point

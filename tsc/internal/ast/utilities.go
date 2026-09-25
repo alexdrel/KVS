@@ -545,6 +545,7 @@ func isExpressionKind(kind Kind) bool {
 		KindKvsExtantAssertionExpression,
 		KindKvsExtantAssignmentExpression,
 		KindKvsSieveAssignmentExpression,
+		KindKvsTypedSpreadAssignmentExpression,
 		KindKvsFailureDemotionExpression, KindKvsFailurePromotionExpression,
 		KindKvsCatchSplitExpression,
 		KindKvsCatchSplitAssignmentExpression,
@@ -553,6 +554,7 @@ func isExpressionKind(kind Kind) bool {
 		KindKvsConditionalElement,
 		KindKvsCompactObjectExpression, KindKvsTypedObjectExpression,
 		KindKvsRangeExpression,
+		KindKvsIterationCoordinateExpression,
 		KindKvsCollectExpression,
 		KindKvsLazyCollectExpression,
 		KindKvsSelectExpression,
@@ -2130,8 +2132,8 @@ func IsExpressionNode(node *Node) bool {
 		KindCallExpression, KindNewExpression, KindTaggedTemplateExpression, KindAsExpression, KindTypeAssertionExpression,
 		KindSatisfiesExpression, KindNonNullExpression, KindParenthesizedExpression, KindFunctionExpression,
 		KindClassExpression, KindArrowFunction, KindVoidExpression, KindDeleteExpression, KindTypeOfExpression,
-		KindPrefixUnaryExpression, KindPostfixUnaryExpression, KindBinaryExpression, KindConditionalExpression, KindKvsDefaultExpression, KindKvsSieveExpression, KindKvsSieveBindingInitializer, KindKvsSieveAssignmentExpression, KindKvsFailureDemotionExpression, KindKvsFailurePromotionExpression, KindKvsCatchSplitExpression, KindKvsCatchSplitAssignmentExpression, KindKvsNullingExpression, KindKvsConditionalElement, KindKvsRangeExpression,
-		KindSpreadElement, KindTemplateExpression, KindOmittedExpression, KindJsxElement, KindJsxSelfClosingElement,
+		KindPrefixUnaryExpression, KindPostfixUnaryExpression, KindBinaryExpression, KindConditionalExpression, KindKvsDefaultExpression, KindKvsSieveExpression, KindKvsSieveBindingInitializer, KindKvsSieveAssignmentExpression, KindKvsTypedSpreadAssignmentExpression, KindKvsFailureDemotionExpression, KindKvsFailurePromotionExpression, KindKvsCatchSplitExpression, KindKvsCatchSplitAssignmentExpression, KindKvsNullingExpression, KindKvsConditionalElement, KindKvsRangeExpression,
+		KindSpreadElement, KindTemplateExpression, KindOmittedExpression, KindJsxElement, KindJsxSelfClosingElement, KindKvsIterationCoordinateExpression,
 		KindJsxFragment, KindYieldExpression, KindKvsNullableAssertionExpression, KindKvsExtantAssertionExpression, KindKvsExtantAssignmentExpression, KindKvsCollectExpression, KindKvsLazyCollectExpression, KindKvsSelectExpression, KindKvsForExpression, KindAwaitExpression:
 		return true
 	case KindMetaProperty:

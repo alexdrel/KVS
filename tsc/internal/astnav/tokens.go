@@ -102,7 +102,7 @@ func getTokenAtPosition(
 	visitNode := func(node *ast.Node, _ *ast.NodeVisitor) *ast.Node {
 		// We can't abort visiting children, so once a match is found, we set `next`
 		// and do nothing on subsequent visits.
-		if node == nil || node.Flags&ast.NodeFlagsReparsed != 0 {
+		if node == nil || node.Flags&ast.NodeFlagsReparsed != 0 || isKvsImplicitSubjectInitializer(node) {
 			return nil
 		}
 		if nodeAfterLeft == nil {
@@ -251,6 +251,9 @@ func getTokenAtPosition(
 						if ast.IsJSDocKind(current.Kind) {
 							return current
 						}
+						if isKvsProducerKeyword(current, scanner.TokenValue()) {
+							return current
+						}
 						panic(fmt.Sprintf("did not expect %s to have %s in its trivia", current.Kind.String(), token.String()))
 					}
 					return sourceFile.GetOrCreateToken(token, tokenFullStart, tokenEnd, current, flags)
@@ -271,6 +274,18 @@ func getTokenAtPosition(
 		nodeAfterLeft = nil
 		next = nil
 	}
+}
+
+func isKvsProducerKeyword(node *ast.Node, text string) bool {
+	return text == "collect" && (node.Kind == ast.KindKvsCollectExpression || node.Kind == ast.KindKvsLazyCollectExpression) ||
+		text == "select" && node.Kind == ast.KindKvsSelectExpression
+}
+
+func isKvsImplicitSubjectInitializer(node *ast.Node) bool {
+	parent := node.Parent
+	return parent != nil &&
+		parent.Flags&ast.NodeFlagsKvsImplicitSubject != 0 &&
+		parent.Initializer() == node
 }
 
 func getPosition(node *ast.Node, sourceFile *ast.SourceFile, allowPositionInLeadingTrivia bool) int {

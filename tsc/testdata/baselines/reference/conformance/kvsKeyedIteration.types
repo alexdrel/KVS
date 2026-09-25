@@ -34,6 +34,7 @@ for (items) {
 
     const index = #;
 >index : number
+># : number
 
     const item = _;
 >item : string
@@ -45,6 +46,7 @@ for (scores) {
 
     const key = #;
 >key : string
+># : string
 
     const score = _;
 >score : number
@@ -56,6 +58,7 @@ for (users) {
 
     const id = #;
 >id : string
+># : string
 
     const user = _;
 >user : { active: boolean; }
@@ -67,6 +70,7 @@ for (values) {
 
     const ordinal = #;
 >ordinal : number
+># : number
 
     const value = _;
 >value : boolean
@@ -78,6 +82,7 @@ for (pairs) {
 
     const pairOrdinal = #;
 >pairOrdinal : number
+># : number
 
     const yieldedPair = _;
 >yieldedPair : readonly [string, number]
@@ -89,6 +94,7 @@ for (bytes) {
 
     const byteIndex = #;
 >byteIndex : number
+># : number
 
     const byte = _;
 >byte : number
@@ -178,6 +184,7 @@ const indexed = collect (items) {
     yield [#, _] as const;
 >[#, _] as const : readonly [number, string]
 >[#, _] : readonly [number, string]
+># : number
 >_ : string
 
 };
@@ -190,6 +197,7 @@ const nullableIndexed = collect (maybeItems) {
     yield [#, _] as const;
 >[#, _] as const : readonly [number, string]
 >[#, _] : readonly [number, string]
+># : number
 >_ : string
 
 };
@@ -202,6 +210,7 @@ const lazy = collect* (values) {
     yield [#, _] as const;
 >[#, _] as const : readonly [number, boolean]
 >[#, _] : readonly [number, boolean]
+># : number
 >_ : boolean
 
 };
@@ -215,6 +224,7 @@ const selected = select (scores) {
 >_ > 10 : boolean
 >_ : number
 >10 : 10
+># : string
 
 };
 
@@ -229,6 +239,7 @@ const lastIndex = for (items; last = -1) {
     last = #;
 >last = # : number
 >last : number
+># : number
 
 };
 
@@ -253,15 +264,18 @@ for (items) {
 
     const outer = #;
 >outer : number
+># : number
 
     for (items.slice(#)) {
 >items.slice(#) : string[]
 >items.slice : (start?: number, end?: number) => string[]
 >items : string[]
 >slice : (start?: number, end?: number) => string[]
+># : number
 
         const inner = #;
 >inner : number
+># : number
 
         const sliced = _;
 >sliced : string
@@ -269,6 +283,7 @@ for (items) {
     }
     const outerAgain = #;
 >outerAgain : number
+># : number
 }
 
 async function consume() {
@@ -279,6 +294,7 @@ async function consume() {
 
         const ordinal = #;
 >ordinal : number
+># : number
 
         const value = _;
 >value : string
@@ -291,6 +307,7 @@ for (ambiguous) {
 
     const rejectedCoordinate = #;
 >rejectedCoordinate : any
+># : any
 
     const rejectedValue = _;
 >rejectedValue : any
@@ -299,6 +316,7 @@ for (ambiguous) {
 
 const invalid = #;
 >invalid : any
+># : any
 
 const invalidKeyedProducer = collect (const key in users) yield key;
 >invalidKeyedProducer : never[]

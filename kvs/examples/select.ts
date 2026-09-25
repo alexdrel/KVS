@@ -1,6 +1,6 @@
 interface GroundStation {
     name: string;
-    channels: (number | null)[];
+    channels: number?[];
 }
 
 const stations: GroundStation[] = [

@@ -364,12 +364,28 @@ const updatedAlias = updated;
 
 const updateResult = updated ...= rectangle;
 >updateResult : Symbol(updateResult, Decl(kvsTypedConstruction.ts, 124, 5))
+>updated : Symbol(updated, Decl(kvsTypedConstruction.ts, 122, 3))
+>rectangle : Symbol(rectangle, Decl(kvsTypedConstruction.ts, 76, 13))
 
 updated ...= optionalPoint;
+>updated : Symbol(updated, Decl(kvsTypedConstruction.ts, 122, 3))
+>optionalPoint : Symbol(optionalPoint, Decl(kvsTypedConstruction.ts, 83, 13))
+
 updated ...= incompatible;
+>updated : Symbol(updated, Decl(kvsTypedConstruction.ts, 122, 3))
+>incompatible : Symbol(incompatible, Decl(kvsTypedConstruction.ts, 78, 13))
+
 updated ...= nullablePoint;
+>updated : Symbol(updated, Decl(kvsTypedConstruction.ts, 122, 3))
+>nullablePoint : Symbol(nullablePoint, Decl(kvsTypedConstruction.ts, 84, 13))
+
 updated ...= unrelated;
+>updated : Symbol(updated, Decl(kvsTypedConstruction.ts, 122, 3))
+>unrelated : Symbol(unrelated, Decl(kvsTypedConstruction.ts, 80, 13))
+
 updated ...= unknownSource;
+>updated : Symbol(updated, Decl(kvsTypedConstruction.ts, 122, 3))
+>unknownSource : Symbol(unknownSource, Decl(kvsTypedConstruction.ts, 81, 13))
 
 interface PointHolder {
 >PointHolder : Symbol(PointHolder, Decl(kvsTypedConstruction.ts, 129, 27))
@@ -386,6 +402,7 @@ holder.point ...= rectangle;
 >holder.point : Symbol(PointHolder.point, Decl(kvsTypedConstruction.ts, 131, 23))
 >holder : Symbol(holder, Decl(kvsTypedConstruction.ts, 134, 3))
 >point : Symbol(PointHolder.point, Decl(kvsTypedConstruction.ts, 131, 23))
+>rectangle : Symbol(rectangle, Decl(kvsTypedConstruction.ts, 76, 13))
 
 interface ReadonlyPointHolder {
 >ReadonlyPointHolder : Symbol(ReadonlyPointHolder, Decl(kvsTypedConstruction.ts, 135, 28))
@@ -402,14 +419,19 @@ readonlyHolder.point ...= rectangle;
 >readonlyHolder.point : Symbol(ReadonlyPointHolder.point, Decl(kvsTypedConstruction.ts, 137, 31))
 >readonlyHolder : Symbol(readonlyHolder, Decl(kvsTypedConstruction.ts, 140, 3))
 >point : Symbol(ReadonlyPointHolder.point, Decl(kvsTypedConstruction.ts, 137, 31))
+>rectangle : Symbol(rectangle, Decl(kvsTypedConstruction.ts, 76, 13))
 
 const constantPoint = Point{};
 >constantPoint : Symbol(constantPoint, Decl(kvsTypedConstruction.ts, 143, 5))
 >Point : Symbol(Point, Decl(kvsTypedConstruction.ts, 58, 1))
 
 constantPoint ...= rectangle;
+>constantPoint : Symbol(constantPoint, Decl(kvsTypedConstruction.ts, 143, 5))
+>rectangle : Symbol(rectangle, Decl(kvsTypedConstruction.ts, 76, 13))
+
 getPoint() ...= rectangle;
 >getPoint : Symbol(getPoint, Decl(kvsTypedConstruction.ts, 85, 44))
+>rectangle : Symbol(rectangle, Decl(kvsTypedConstruction.ts, 76, 13))
 
 interface ReadonlyPoint {
 >ReadonlyPoint : Symbol(ReadonlyPoint, Decl(kvsTypedConstruction.ts, 145, 26))
@@ -425,14 +447,20 @@ let readonlyPoint = ReadonlyPoint{};
 >ReadonlyPoint : Symbol(ReadonlyPoint, Decl(kvsTypedConstruction.ts, 145, 26))
 
 readonlyPoint ...= rectangle;
+>readonlyPoint : Symbol(readonlyPoint, Decl(kvsTypedConstruction.ts, 151, 3))
+>rectangle : Symbol(rectangle, Decl(kvsTypedConstruction.ts, 76, 13))
 
 let maybePoint: Point?;
 >maybePoint : Symbol(maybePoint, Decl(kvsTypedConstruction.ts, 154, 3))
 >Point : Symbol(Point, Decl(kvsTypedConstruction.ts, 58, 1))
 
 maybePoint ...= rectangle;
+>maybePoint : Symbol(maybePoint, Decl(kvsTypedConstruction.ts, 154, 3))
+>rectangle : Symbol(rectangle, Decl(kvsTypedConstruction.ts, 76, 13))
+
 maybePoint! ...= rectangle;
 >maybePoint : Symbol(maybePoint, Decl(kvsTypedConstruction.ts, 154, 3))
+>rectangle : Symbol(rectangle, Decl(kvsTypedConstruction.ts, 76, 13))
 
 const materializedPoint = maybePoint;
 >materializedPoint : Symbol(materializedPoint, Decl(kvsTypedConstruction.ts, 157, 5))
@@ -444,6 +472,7 @@ declare const fixedMaybePoint: Point?;
 
 fixedMaybePoint! ...= rectangle;
 >fixedMaybePoint : Symbol(fixedMaybePoint, Decl(kvsTypedConstruction.ts, 158, 13))
+>rectangle : Symbol(rectangle, Decl(kvsTypedConstruction.ts, 76, 13))
 
 Point{ ...incompatible };
 >Point : Symbol(Point, Decl(kvsTypedConstruction.ts, 58, 1))

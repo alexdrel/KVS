@@ -12277,6 +12277,18 @@ func (c *Checker) checkKvsPlaceholderLambdaExpression(node *ast.KvsPlaceholderLa
 	return result
 }
 
+func (c *Checker) GetKvsPlaceholderTypeAtLocation(node *ast.Node) *Type {
+	for parent := node.Parent; parent != nil; parent = parent.Parent {
+		if parent.Kind == ast.KindKvsPlaceholderLambdaExpression {
+			links := c.nodeLinks.Get(parent)
+			if links.flags&NodeCheckFlagsKvsPlaceholderBoundary != 0 {
+				return links.kvsPlaceholderType
+			}
+		}
+	}
+	return nil
+}
+
 func (c *Checker) findKvsPlaceholderBoundary(node *ast.Node) *NodeLinks {
 	for parent := node.Parent; parent != nil; parent = parent.Parent {
 		if parent.Kind == ast.KindKvsPlaceholderLambdaExpression {
@@ -19345,7 +19357,7 @@ func (c *Checker) checkKvsProducerElementType(node *ast.Node, initializer *ast.F
 			return false
 		}
 		if current.Kind == ast.KindKvsYieldStatement || current.Kind == ast.KindKvsExtantYieldStatement {
-			t := c.checkExpressionCached(current.Expression())
+			t := c.checkKvsYieldExpression(current.Expression())
 			if current.Kind == ast.KindKvsExtantYieldStatement {
 				t = c.GetNonNullableType(t)
 			}
@@ -19363,6 +19375,13 @@ func (c *Checker) checkKvsProducerElementType(node *ast.Node, initializer *ast.F
 		return c.neverType
 	}
 	return c.getUnionType(yieldTypes)
+}
+
+func (c *Checker) checkKvsYieldExpression(expression *ast.Node) *Type {
+	if ast.IsArrayLiteralExpression(ast.SkipParentheses(expression)) {
+		return c.checkExpressionCachedEx(expression, CheckModeForceTuple)
+	}
+	return c.checkExpressionCached(expression)
 }
 
 func (c *Checker) checkKvsRangeExpression(node *ast.KvsRangeExpression, checkMode CheckMode) *Type {
@@ -19478,7 +19497,7 @@ func (c *Checker) checkKvsProducerExpression(node *ast.Node, initializer *ast.Fo
 			return false
 		}
 		if current.Kind == ast.KindKvsYieldStatement || current.Kind == ast.KindKvsExtantYieldStatement {
-			t := c.checkExpressionCached(current.Expression())
+			t := c.checkKvsYieldExpression(current.Expression())
 			if current.Kind == ast.KindKvsExtantYieldStatement {
 				t = c.GetNonNullableType(t)
 			}

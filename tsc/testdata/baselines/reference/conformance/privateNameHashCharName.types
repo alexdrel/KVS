@@ -2,6 +2,7 @@
 
 === privateNameHashCharName.ts ===
 #
+># : any
 
 class C {
 >C : C

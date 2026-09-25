@@ -220,6 +220,17 @@ KVS is centered on application data and control flow.
 
 Structured concurrency, signature/type unification, ownership, packages, and metaprogramming remain outside the current proposals.
 
+## VS Code
+
+VS Code can use the local KVS compiler for language features such as diagnostics, hover, and document highlights:
+
+1. Install the recommended **TypeScript (Native Preview)** extension.
+2. Build the local compiler with `npx hereby tsc:build`.
+3. Copy `.vscode/settings.template.json` to `.vscode/settings.json`, or merge its settings into your existing workspace settings.
+4. Reload the VS Code window. Reload it again after rebuilding the compiler.
+
+The template enables the native TypeScript language service and points it to `./built/local`. The resulting `.vscode/settings.json` remains ignored so personal workspace settings are not committed.
+
 ## Upstream
 
 KVS is built as a fork of [Microsoft TypeScript](https://github.com/microsoft/TypeScript) and retains its Apache-2.0 license.
