@@ -293,6 +293,22 @@ Run it with:
 go -C ./tsc test -run='TestLocal/kvsImplicitSubject' ./internal/testrunner
 ```
 
+## Keyed-iteration slice
+
+`kvsKeyedIteration.ts` covers implicit `#` across arrays, typed arrays, maps, records, synchronous
+and asynchronous iterables, all producer forms, expression-valued `for`, nullable sources, nested
+shadowing, and an outer coordinate used by a nested source. It also checks explicit destructuring
+`in`, unchanged native `for...in`, pair-valued iterables, ambiguous source categories, and `#`
+outside an implicit iteration. The JavaScript baseline verifies direct Map entry iteration,
+record-key and ordinal wrappers, iterator closure forwarding, and omission of keyed adaptation for
+an ordinal loop that does not use `#`.
+
+Run it with:
+
+```sh
+go -C ./tsc test -run='TestLocal/kvsKeyedIteration' ./internal/testrunner
+```
+
 ## Extant-assignment slice
 
 `kvsExtantAssignment.ts` checks nullable expression typing, assignment of falsy present values,

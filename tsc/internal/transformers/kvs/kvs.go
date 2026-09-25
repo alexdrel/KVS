@@ -27,6 +27,7 @@ type transformer struct {
 	// while the rest of that value is visited.
 	headReplacements map[*ast.Node]*ast.Node
 	placeholderNames []*ast.IdentifierNode
+	coordinateNames  []*ast.IdentifierNode
 }
 
 func NewTransformer(opts *transformers.TransformOptions) *transformers.Transformer {
@@ -47,6 +48,11 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 		return replacement
 	}
 	switch node.Kind {
+	case ast.KindKvsIterationCoordinateExpression:
+		if len(tx.coordinateNames) != 0 {
+			return tx.coordinateNames[len(tx.coordinateNames)-1]
+		}
+		return tx.Factory().NewIdentifier("undefined")
 	case ast.KindIdentifier:
 		if node.AsIdentifier().Text == "__kvsPlaceholder" {
 			if len(tx.placeholderNames) != 0 {
@@ -58,6 +64,10 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 		return tx.Visitor().VisitEachChild(node)
 	case ast.KindForOfStatement:
 		return tx.transformForOfStatement(node.AsForInOrOfStatement())
+	case ast.KindForInStatement:
+		if ast.IsKvsKeyedIterationInitializer(node.Initializer()) {
+			return tx.transformForOfStatement(node.AsForInOrOfStatement())
+		}
 	case ast.KindKvsIfBindingStatement:
 		return tx.transformIfBindingStatement(node.AsKvsIfBindingStatement())
 	case ast.KindKvsExtantReturnStatement:
@@ -648,6 +658,14 @@ func (tx *transformer) transformRangeExpression(node *ast.KvsRangeExpression) *a
 
 func (tx *transformer) transformLazyCollectExpression(node *ast.KvsLazyCollectExpression) *ast.Node {
 	factory := tx.Factory()
+	implicitSubject := node.Flags&ast.NodeFlagsKvsImplicitSubject != 0
+	coordinateUsed := implicitSubject && containsIterationCoordinateReference(node.Statement)
+	iterationKind := printer.KvsKeyedIterationKindOrdinal
+	if implicitSubject || node.Keyed {
+		iterationKind = tx.resolver.GetKvsKeyedIterationKind(node.Expression)
+	}
+	keyed := node.Keyed || implicitSubject && (coordinateUsed || iterationKind != printer.KvsKeyedIterationKindOrdinal)
+	coordinate := factory.NewUniqueName("coordinate")
 	sourceName := factory.NewUniqueName("source")
 	parameter := factory.NewParameterDeclaration(nil, nil, sourceName, nil, nil, nil)
 
@@ -657,7 +675,13 @@ func (tx *transformer) transformLazyCollectExpression(node *ast.KvsLazyCollectEx
 	tx.lazyProducer = true
 	tx.lazyLabels = collectLazyLabels(node.Statement)
 	tx.producerTemporaries = nil
+	if coordinateUsed {
+		tx.coordinateNames = append(tx.coordinateNames, coordinate)
+	}
 	body := tx.Visitor().VisitNode(node.Statement)
+	if coordinateUsed {
+		tx.coordinateNames = tx.coordinateNames[:len(tx.coordinateNames)-1]
+	}
 	temporaries := tx.producerTemporaries
 	tx.lazyProducer = savedLazy
 	tx.lazyLabels = savedLabels
@@ -672,7 +696,20 @@ func (tx *transformer) transformLazyCollectExpression(node *ast.KvsLazyCollectEx
 		statements = append(statements, factory.NewVariableStatement(nil, factory.NewVariableDeclarationList(factory.NewNodeList(declarations), ast.NodeFlagsNone)))
 	}
 	source := factory.NewBinaryExpression(nil, sourceName, nil, factory.NewToken(ast.KindQuestionQuestionToken), factory.NewArrayLiteralExpression(nil, false))
-	loop := factory.NewForInOrOfStatement(ast.KindForOfStatement, nil, tx.transformIterationInitializer(node.Initializer, node.Flags&ast.NodeFlagsKvsImplicitSubject != 0), source, body)
+	if keyed {
+		if iterationKind != printer.KvsKeyedIterationKindMap {
+			source = factory.NewKvsKeyedIterationHelper(source, iterationKind == printer.KvsKeyedIterationKindRecord, false)
+		}
+	}
+	initializer := tx.transformIterationInitializer(node.Initializer, false)
+	if implicitSubject {
+		if keyed {
+			initializer = tx.newKvsImplicitKeyedInitializer(coordinate, coordinateUsed)
+		} else {
+			initializer = tx.transformIterationInitializer(node.Initializer, true)
+		}
+	}
+	loop := factory.NewForInOrOfStatement(ast.KindForOfStatement, nil, initializer, source, body)
 	statements = append(statements, loop)
 	function := factory.NewFunctionExpression(nil, factory.NewToken(ast.KindAsteriskToken), nil, nil, factory.NewNodeList([]*ast.Node{parameter}), nil, nil, factory.NewBlock(factory.NewNodeList(statements), true))
 	return factory.NewCallExpression(function, nil, nil, factory.NewNodeList([]*ast.Node{tx.Visitor().VisitNode(node.Expression)}), ast.NodeFlagsNone)
@@ -1178,13 +1215,20 @@ func (tx *transformer) transformLiftedBinaryExpression(node *ast.BinaryExpressio
 
 func (tx *transformer) transformForOfStatement(node *ast.ForInOrOfStatement) *ast.Node {
 	implicitSubject := node.Flags&ast.NodeFlagsKvsImplicitSubject != 0
+	explicitKeyed := node.Kind == ast.KindForInStatement && ast.IsKvsKeyedIterationInitializer(node.Initializer)
+	coordinateUsed := implicitSubject && containsIterationCoordinateReference(node.Statement)
+	iterationKind := printer.KvsKeyedIterationKindOrdinal
+	if implicitSubject || explicitKeyed {
+		iterationKind = tx.resolver.GetKvsKeyedIterationKind(node.Expression)
+	}
+	keyed := explicitKeyed || implicitSubject && (coordinateUsed || iterationKind != printer.KvsKeyedIterationKindOrdinal)
 	// An empty declaration list is parser recovery for malformed TypeScript such
 	// as `for (var of source)`. It may not have reached semantic checking, so an
 	// emit-resolver query here could introduce diagnostics after the pre-emit
 	// snapshot.
 	validInitializer := !ast.IsVariableDeclarationList(node.Initializer) || len(node.Initializer.AsVariableDeclarationList().Declarations.Nodes) != 0
 	nullableSource := validInitializer && tx.resolver.IsKvsNullableIterableSource(node.Expression)
-	if !implicitSubject && !nullableSource {
+	if !implicitSubject && !explicitKeyed && !nullableSource {
 		return tx.Visitor().VisitEachChild(node.AsNode())
 	}
 	factory := tx.Factory()
@@ -1200,13 +1244,38 @@ func (tx *transformer) transformForOfStatement(node *ast.ForInOrOfStatement) *as
 	if nullableSource {
 		source = factory.NewBinaryExpression(nil, source, nil, factory.NewToken(ast.KindQuestionQuestionToken), factory.NewArrayLiteralExpression(nil, false))
 	}
+	coordinate := factory.NewUniqueName("coordinate")
+	body := node.Statement
+	if coordinateUsed {
+		tx.coordinateNames = append(tx.coordinateNames, coordinate)
+		body = tx.Visitor().VisitNode(body)
+		tx.coordinateNames = tx.coordinateNames[:len(tx.coordinateNames)-1]
+	} else {
+		body = tx.Visitor().VisitNode(body)
+	}
+	initializer := tx.transformIterationInitializer(node.Initializer, false)
+	if implicitSubject {
+		if keyed {
+			initializer = tx.newKvsImplicitKeyedInitializer(coordinate, coordinateUsed)
+		} else {
+			initializer = tx.transformIterationInitializer(node.Initializer, true)
+		}
+	}
+	if keyed {
+		if iterationKind != printer.KvsKeyedIterationKindMap {
+			source = factory.NewKvsKeyedIterationHelper(source, iterationKind == printer.KvsKeyedIterationKindRecord, node.AwaitModifier != nil)
+		}
+	}
 	result := factory.UpdateForInOrOfStatement(
 		node,
 		node.AwaitModifier,
-		tx.transformIterationInitializer(node.Initializer, implicitSubject),
+		initializer,
 		source,
-		tx.Visitor().VisitNode(node.Statement),
+		body,
 	)
+	if keyed && result.Kind != ast.KindForOfStatement {
+		result = factory.NewForInOrOfStatement(ast.KindForOfStatement, node.AwaitModifier, initializer, source, body)
+	}
 	if implicitSubject {
 		if result == node.AsNode() {
 			result = node.AsNode().Clone(factory)
@@ -1217,6 +1286,20 @@ func (tx *transformer) transformForOfStatement(node *ast.ForInOrOfStatement) *as
 		return factory.NewBlock(factory.NewNodeList([]*ast.Node{sourceStatement, result}), true)
 	}
 	return result
+}
+
+func (tx *transformer) newKvsImplicitKeyedInitializer(coordinate *ast.IdentifierNode, coordinateUsed bool) *ast.Node {
+	factory := tx.Factory()
+	coordinateBinding := factory.NewBindingElement(nil, nil, coordinate, nil)
+	if !coordinateUsed {
+		coordinateBinding = factory.NewOmittedExpression()
+	}
+	pattern := factory.NewBindingPattern(ast.KindArrayBindingPattern, factory.NewNodeList([]*ast.Node{
+		coordinateBinding,
+		factory.NewBindingElement(nil, nil, factory.NewIdentifier("_"), nil),
+	}))
+	declaration := factory.NewVariableDeclaration(pattern, nil, nil, nil)
+	return factory.NewVariableDeclarationList(factory.NewNodeList([]*ast.Node{declaration}), ast.NodeFlagsConst)
 }
 
 func (tx *transformer) transformIterationInitializer(initializer *ast.Node, implicitSubject bool) *ast.Node {
@@ -1243,6 +1326,28 @@ func containsImplicitSubjectReference(node *ast.Node) bool {
 		return found
 	}
 	return visit(node, nil)
+}
+
+func containsIterationCoordinateReference(node *ast.Node) bool {
+	var visit func(*ast.Node, bool) bool
+	visit = func(current *ast.Node, nested bool) bool {
+		if current.Kind == ast.KindKvsIterationCoordinateExpression {
+			return true
+		}
+		if ast.IsFunctionLike(current) {
+			return false
+		}
+		if nested && current.Flags&ast.NodeFlagsKvsImplicitSubject != 0 {
+			return visit(current.Expression(), false)
+		}
+		found := false
+		current.ForEachChild(func(child *ast.Node) bool {
+			found = visit(child, true)
+			return found
+		})
+		return found
+	}
+	return visit(node, false)
 }
 
 func (tx *transformer) transformDefault(node *ast.KvsDefaultExpression) *ast.Node {
@@ -1545,13 +1650,24 @@ func (tx *transformer) lowerProducer(producer *ast.Node, continuation func(*ast.
 	var initializer *ast.ForInitializer
 	var expression *ast.Expression
 	var statement *ast.Statement
+	keyed := false
 	if selectProducer {
 		data := producer.AsKvsSelectExpression()
 		initializer, expression, statement = data.Initializer, data.Expression, data.Statement
+		keyed = data.Keyed
 	} else {
 		data := producer.AsKvsCollectExpression()
 		initializer, expression, statement = data.Initializer, data.Expression, data.Statement
+		keyed = data.Keyed
 	}
+	implicitSubject := producer.Flags&ast.NodeFlagsKvsImplicitSubject != 0
+	coordinateUsed := implicitSubject && containsIterationCoordinateReference(statement)
+	iterationKind := printer.KvsKeyedIterationKindOrdinal
+	if implicitSubject || keyed {
+		iterationKind = tx.resolver.GetKvsKeyedIterationKind(expression)
+	}
+	keyed = keyed || implicitSubject && (coordinateUsed || iterationKind != printer.KvsKeyedIterationKindOrdinal)
+	coordinate := factory.NewUniqueName("coordinate")
 	nullableSource := tx.resolver.IsKvsNullableIterableSource(expression)
 	captureSource := nullableSource || producer.Flags&ast.NodeFlagsKvsImplicitSubject != 0 && containsImplicitSubjectReference(expression)
 	result := factory.NewTempVariable()
@@ -1578,7 +1694,13 @@ func (tx *transformer) lowerProducer(producer *ast.Node, continuation func(*ast.
 		tx.selectLabel = nil
 	}
 	label := tx.selectLabel
+	if coordinateUsed {
+		tx.coordinateNames = append(tx.coordinateNames, coordinate)
+	}
 	body := tx.Visitor().VisitNode(statement)
+	if coordinateUsed {
+		tx.coordinateNames = tx.coordinateNames[:len(tx.coordinateNames)-1]
+	}
 	temporaries := tx.producerTemporaries
 	tx.producerResult = savedResult
 	tx.producerTemporaries = savedTemporaries
@@ -1593,7 +1715,20 @@ func (tx *transformer) lowerProducer(producer *ast.Node, continuation func(*ast.
 	} else {
 		visitedSource = tx.Visitor().VisitNode(expression)
 	}
-	loop := factory.NewForInOrOfStatement(ast.KindForOfStatement, nil, tx.transformIterationInitializer(initializer, producer.Flags&ast.NodeFlagsKvsImplicitSubject != 0), visitedSource, body)
+	if keyed {
+		if iterationKind != printer.KvsKeyedIterationKindMap {
+			visitedSource = factory.NewKvsKeyedIterationHelper(visitedSource, iterationKind == printer.KvsKeyedIterationKindRecord, false)
+		}
+	}
+	visitedInitializer := tx.transformIterationInitializer(initializer, false)
+	if implicitSubject {
+		if keyed {
+			visitedInitializer = tx.newKvsImplicitKeyedInitializer(coordinate, coordinateUsed)
+		} else {
+			visitedInitializer = tx.transformIterationInitializer(initializer, true)
+		}
+	}
+	loop := factory.NewForInOrOfStatement(ast.KindForOfStatement, nil, visitedInitializer, visitedSource, body)
 	if label != nil {
 		loop = factory.NewLabeledStatement(label, loop)
 	}
@@ -1635,6 +1770,15 @@ func (tx *transformer) lowerProducer(producer *ast.Node, continuation func(*ast.
 
 func (tx *transformer) lowerKvsFor(producer *ast.KvsForExpression, continuation func(*ast.Expression) *ast.Node) *ast.Node {
 	factory := tx.Factory()
+	implicitSubject := producer.Flags&ast.NodeFlagsKvsImplicitSubject != 0
+	explicitKeyed := producer.ForIn && ast.IsKvsKeyedIterationInitializer(producer.Initializer)
+	coordinateUsed := implicitSubject && containsIterationCoordinateReference(producer.Statement)
+	iterationKind := printer.KvsKeyedIterationKindOrdinal
+	if producer.Expression != nil && (implicitSubject || explicitKeyed) {
+		iterationKind = tx.resolver.GetKvsKeyedIterationKind(producer.Expression)
+	}
+	keyed := explicitKeyed || implicitSubject && (coordinateUsed || iterationKind != printer.KvsKeyedIterationKindOrdinal)
+	coordinate := factory.NewUniqueName("coordinate")
 	carrier := factory.NewTempVariable()
 	carrierDeclaration := factory.NewVariableDeclaration(carrier, nil, nil, nil)
 	carrierStatement := factory.NewVariableStatement(nil, factory.NewVariableDeclarationList(
@@ -1643,12 +1787,18 @@ func (tx *transformer) lowerKvsFor(producer *ast.KvsForExpression, continuation 
 
 	resultList := tx.Visitor().VisitNode(producer.Result)
 	resultStatement := factory.NewVariableStatement(nil, resultList)
+	if coordinateUsed {
+		tx.coordinateNames = append(tx.coordinateNames, coordinate)
+	}
 	body := tx.Visitor().VisitNode(producer.Statement)
+	if coordinateUsed {
+		tx.coordinateNames = tx.coordinateNames[:len(tx.coordinateNames)-1]
+	}
 	blockStatements := []*ast.Node{resultStatement}
 
 	var loop *ast.Node
 	if producer.Expression != nil {
-		nullableSource := !producer.ForIn && tx.resolver.IsKvsNullableIterableSource(producer.Expression)
+		nullableSource := (!producer.ForIn || keyed) && tx.resolver.IsKvsNullableIterableSource(producer.Expression)
 		source := tx.Visitor().VisitNode(producer.Expression)
 		if producer.Flags&ast.NodeFlagsKvsImplicitSubject != 0 && containsImplicitSubjectReference(producer.Expression) {
 			sourceTemp := factory.NewTempVariable()
@@ -1662,13 +1812,26 @@ func (tx *transformer) lowerKvsFor(producer *ast.KvsForExpression, continuation 
 			source = factory.NewBinaryExpression(nil, source, nil, factory.NewToken(ast.KindQuestionQuestionToken), factory.NewArrayLiteralExpression(nil, false))
 		}
 		kind := ast.KindForOfStatement
-		if producer.ForIn {
+		if producer.ForIn && !keyed {
 			kind = ast.KindForInStatement
+		}
+		if keyed {
+			if iterationKind != printer.KvsKeyedIterationKindMap {
+				source = factory.NewKvsKeyedIterationHelper(source, iterationKind == printer.KvsKeyedIterationKindRecord, false)
+			}
+		}
+		initializer := tx.transformIterationInitializer(producer.Initializer, false)
+		if implicitSubject {
+			if keyed {
+				initializer = tx.newKvsImplicitKeyedInitializer(coordinate, coordinateUsed)
+			} else {
+				initializer = tx.transformIterationInitializer(producer.Initializer, true)
+			}
 		}
 		loop = factory.NewForInOrOfStatement(
 			kind,
 			nil,
-			tx.transformIterationInitializer(producer.Initializer, producer.Flags&ast.NodeFlagsKvsImplicitSubject != 0),
+			initializer,
 			source,
 			body,
 		)

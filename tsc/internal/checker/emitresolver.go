@@ -326,6 +326,13 @@ func (r *EmitResolver) IsKvsNullableIterableElement(node *ast.Node) bool {
 	return elementType != nil && isKvsNullableType(elementType)
 }
 
+func (r *EmitResolver) GetKvsKeyedIterationKind(node *ast.Node) printer.KvsKeyedIterationKind {
+	r.checkerMu.Lock()
+	defer r.checkerMu.Unlock()
+	kind, _, _ := r.checker.getKvsKeyedIterationInfo(node)
+	return kind
+}
+
 func (r *EmitResolver) GetJsxFactoryEntity(location *ast.Node) *ast.Node {
 	r.checkerMu.Lock()
 	defer r.checkerMu.Unlock()

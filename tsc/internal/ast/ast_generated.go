@@ -59,6 +59,7 @@ type NodeFactory struct {
 	kvsForExpressionArena                    core.Arena[KvsForExpression]
 	kvsIfBindingClauseArena                  core.Arena[KvsIfBindingClause]
 	kvsIfBindingStatementArena               core.Arena[KvsIfBindingStatement]
+	kvsIterationCoordinateExpressionArena    core.Arena[KvsIterationCoordinateExpression]
 	kvsLazyCollectExpressionArena            core.Arena[KvsLazyCollectExpression]
 	kvsNullableAssertionExpressionArena      core.Arena[KvsNullableAssertionExpression]
 	kvsNullableTypeArena                     core.Arena[KvsNullableType]
@@ -312,6 +313,7 @@ type (
 	KvsDefaultExpressionNode                = Node
 	KvsSieveExpressionNode                  = Node
 	KvsPlaceholderLambdaExpressionNode      = Node
+	KvsIterationCoordinateExpressionNode    = Node
 	KvsSieveBindingInitializerNode          = Node
 	KvsSieveAssignmentExpressionNode        = Node
 	KvsFailureDemotionExpressionNode        = Node
@@ -2081,6 +2083,28 @@ func IsKvsPlaceholderLambdaExpression(node *Node) bool {
 }
 
 // ──────────────────────────────────────────────────────────────────────
+// KvsIterationCoordinateExpression
+// ──────────────────────────────────────────────────────────────────────
+
+type KvsIterationCoordinateExpression struct {
+	ExpressionBase
+	CompositeBase
+}
+
+func (f *NodeFactory) NewKvsIterationCoordinateExpression() *Node {
+	data := f.kvsIterationCoordinateExpressionArena.New()
+	return f.newNode(KindKvsIterationCoordinateExpression, data)
+}
+
+func (node *KvsIterationCoordinateExpression) Clone(f NodeFactoryCoercible) *Node {
+	return cloneNode(f.AsNodeFactory().NewKvsIterationCoordinateExpression(), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func IsKvsIterationCoordinateExpression(node *Node) bool {
+	return node.Kind == KindKvsIterationCoordinateExpression
+}
+
+// ──────────────────────────────────────────────────────────────────────
 // KvsSieveBindingInitializer
 // ──────────────────────────────────────────────────────────────────────
 
@@ -2755,20 +2779,22 @@ type KvsCollectExpression struct {
 	CompositeBase
 	Initializer *ForInitializer
 	Expression  *Expression
+	Keyed       bool
 	Statement   *Statement
 }
 
-func (f *NodeFactory) NewKvsCollectExpression(initializer *ForInitializer, expression *Expression, statement *Statement) *Node {
+func (f *NodeFactory) NewKvsCollectExpression(initializer *ForInitializer, expression *Expression, keyed bool, statement *Statement) *Node {
 	data := f.kvsCollectExpressionArena.New()
 	data.Initializer = initializer
 	data.Expression = expression
+	data.Keyed = keyed
 	data.Statement = statement
 	return f.newNode(KindKvsCollectExpression, data)
 }
 
-func (f *NodeFactory) UpdateKvsCollectExpression(node *KvsCollectExpression, initializer *ForInitializer, expression *Expression, statement *Statement) *Node {
-	if initializer != node.Initializer || expression != node.Expression || statement != node.Statement {
-		return updateNode(f.NewKvsCollectExpression(initializer, expression, statement), node.AsNode(), f.hooks)
+func (f *NodeFactory) UpdateKvsCollectExpression(node *KvsCollectExpression, initializer *ForInitializer, expression *Expression, keyed bool, statement *Statement) *Node {
+	if initializer != node.Initializer || expression != node.Expression || keyed != node.Keyed || statement != node.Statement {
+		return updateNode(f.NewKvsCollectExpression(initializer, expression, keyed, statement), node.AsNode(), f.hooks)
 	}
 	return node.AsNode()
 }
@@ -2778,11 +2804,11 @@ func (node *KvsCollectExpression) ForEachChild(v Visitor) bool {
 }
 
 func (node *KvsCollectExpression) VisitEachChild(v *NodeVisitor) *Node {
-	return v.Factory.UpdateKvsCollectExpression(node, v.visitNode(node.Initializer), v.visitNode(node.Expression), v.visitIterationBody(node.Statement))
+	return v.Factory.UpdateKvsCollectExpression(node, v.visitNode(node.Initializer), v.visitNode(node.Expression), node.Keyed, v.visitIterationBody(node.Statement))
 }
 
 func (node *KvsCollectExpression) Clone(f NodeFactoryCoercible) *Node {
-	return cloneNode(f.AsNodeFactory().NewKvsCollectExpression(node.Initializer, node.Expression, node.Statement), node.AsNode(), f.AsNodeFactory().hooks)
+	return cloneNode(f.AsNodeFactory().NewKvsCollectExpression(node.Initializer, node.Expression, node.Keyed, node.Statement), node.AsNode(), f.AsNodeFactory().hooks)
 }
 
 func IsKvsCollectExpression(node *Node) bool {
@@ -2799,20 +2825,22 @@ type KvsLazyCollectExpression struct {
 	CompositeBase
 	Initializer *ForInitializer
 	Expression  *Expression
+	Keyed       bool
 	Statement   *Statement
 }
 
-func (f *NodeFactory) NewKvsLazyCollectExpression(initializer *ForInitializer, expression *Expression, statement *Statement) *Node {
+func (f *NodeFactory) NewKvsLazyCollectExpression(initializer *ForInitializer, expression *Expression, keyed bool, statement *Statement) *Node {
 	data := f.kvsLazyCollectExpressionArena.New()
 	data.Initializer = initializer
 	data.Expression = expression
+	data.Keyed = keyed
 	data.Statement = statement
 	return f.newNode(KindKvsLazyCollectExpression, data)
 }
 
-func (f *NodeFactory) UpdateKvsLazyCollectExpression(node *KvsLazyCollectExpression, initializer *ForInitializer, expression *Expression, statement *Statement) *Node {
-	if initializer != node.Initializer || expression != node.Expression || statement != node.Statement {
-		return updateNode(f.NewKvsLazyCollectExpression(initializer, expression, statement), node.AsNode(), f.hooks)
+func (f *NodeFactory) UpdateKvsLazyCollectExpression(node *KvsLazyCollectExpression, initializer *ForInitializer, expression *Expression, keyed bool, statement *Statement) *Node {
+	if initializer != node.Initializer || expression != node.Expression || keyed != node.Keyed || statement != node.Statement {
+		return updateNode(f.NewKvsLazyCollectExpression(initializer, expression, keyed, statement), node.AsNode(), f.hooks)
 	}
 	return node.AsNode()
 }
@@ -2822,11 +2850,11 @@ func (node *KvsLazyCollectExpression) ForEachChild(v Visitor) bool {
 }
 
 func (node *KvsLazyCollectExpression) VisitEachChild(v *NodeVisitor) *Node {
-	return v.Factory.UpdateKvsLazyCollectExpression(node, v.visitNode(node.Initializer), v.visitNode(node.Expression), v.visitIterationBody(node.Statement))
+	return v.Factory.UpdateKvsLazyCollectExpression(node, v.visitNode(node.Initializer), v.visitNode(node.Expression), node.Keyed, v.visitIterationBody(node.Statement))
 }
 
 func (node *KvsLazyCollectExpression) Clone(f NodeFactoryCoercible) *Node {
-	return cloneNode(f.AsNodeFactory().NewKvsLazyCollectExpression(node.Initializer, node.Expression, node.Statement), node.AsNode(), f.AsNodeFactory().hooks)
+	return cloneNode(f.AsNodeFactory().NewKvsLazyCollectExpression(node.Initializer, node.Expression, node.Keyed, node.Statement), node.AsNode(), f.AsNodeFactory().hooks)
 }
 
 func IsKvsLazyCollectExpression(node *Node) bool {
@@ -2843,20 +2871,22 @@ type KvsSelectExpression struct {
 	CompositeBase
 	Initializer *ForInitializer
 	Expression  *Expression
+	Keyed       bool
 	Statement   *Statement
 }
 
-func (f *NodeFactory) NewKvsSelectExpression(initializer *ForInitializer, expression *Expression, statement *Statement) *Node {
+func (f *NodeFactory) NewKvsSelectExpression(initializer *ForInitializer, expression *Expression, keyed bool, statement *Statement) *Node {
 	data := f.kvsSelectExpressionArena.New()
 	data.Initializer = initializer
 	data.Expression = expression
+	data.Keyed = keyed
 	data.Statement = statement
 	return f.newNode(KindKvsSelectExpression, data)
 }
 
-func (f *NodeFactory) UpdateKvsSelectExpression(node *KvsSelectExpression, initializer *ForInitializer, expression *Expression, statement *Statement) *Node {
-	if initializer != node.Initializer || expression != node.Expression || statement != node.Statement {
-		return updateNode(f.NewKvsSelectExpression(initializer, expression, statement), node.AsNode(), f.hooks)
+func (f *NodeFactory) UpdateKvsSelectExpression(node *KvsSelectExpression, initializer *ForInitializer, expression *Expression, keyed bool, statement *Statement) *Node {
+	if initializer != node.Initializer || expression != node.Expression || keyed != node.Keyed || statement != node.Statement {
+		return updateNode(f.NewKvsSelectExpression(initializer, expression, keyed, statement), node.AsNode(), f.hooks)
 	}
 	return node.AsNode()
 }
@@ -2866,11 +2896,11 @@ func (node *KvsSelectExpression) ForEachChild(v Visitor) bool {
 }
 
 func (node *KvsSelectExpression) VisitEachChild(v *NodeVisitor) *Node {
-	return v.Factory.UpdateKvsSelectExpression(node, v.visitNode(node.Initializer), v.visitNode(node.Expression), v.visitIterationBody(node.Statement))
+	return v.Factory.UpdateKvsSelectExpression(node, v.visitNode(node.Initializer), v.visitNode(node.Expression), node.Keyed, v.visitIterationBody(node.Statement))
 }
 
 func (node *KvsSelectExpression) Clone(f NodeFactoryCoercible) *Node {
-	return cloneNode(f.AsNodeFactory().NewKvsSelectExpression(node.Initializer, node.Expression, node.Statement), node.AsNode(), f.AsNodeFactory().hooks)
+	return cloneNode(f.AsNodeFactory().NewKvsSelectExpression(node.Initializer, node.Expression, node.Keyed, node.Statement), node.AsNode(), f.AsNodeFactory().hooks)
 }
 
 func IsKvsSelectExpression(node *Node) bool {
@@ -10742,6 +10772,10 @@ func (n *Node) AsKvsSieveExpression() *KvsSieveExpression {
 
 func (n *Node) AsKvsPlaceholderLambdaExpression() *KvsPlaceholderLambdaExpression {
 	return n.data.(*KvsPlaceholderLambdaExpression)
+}
+
+func (n *Node) AsKvsIterationCoordinateExpression() *KvsIterationCoordinateExpression {
+	return n.data.(*KvsIterationCoordinateExpression)
 }
 
 func (n *Node) AsKvsSieveBindingInitializer() *KvsSieveBindingInitializer {

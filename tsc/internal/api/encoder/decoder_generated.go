@@ -343,6 +343,8 @@ func (d *astDecoder) createChildrenNode(kind ast.Kind, data uint32, childIndices
 		return d.factory.NewKvsSieveExpression(firstTildeToken, secondTildeToken, expression), nil
 	case ast.KindKvsPlaceholderLambdaExpression:
 		return d.factory.NewKvsPlaceholderLambdaExpression(d.singleChild(childIndices)), nil
+	case ast.KindKvsIterationCoordinateExpression:
+		return d.factory.NewKvsIterationCoordinateExpression(), nil
 	case ast.KindKvsSieveBindingInitializer:
 		it := newChildIter(childIndices)
 		tildeToken := d.nodeAt(it.nextIf(mask, 0))
@@ -429,23 +431,26 @@ func (d *astDecoder) createChildrenNode(kind ast.Kind, data uint32, childIndices
 		upper := d.nodeAt(it.nextIf(mask, 2))
 		return d.factory.NewKvsRangeExpression(lower, operatorToken, upper), nil
 	case ast.KindKvsCollectExpression:
+		keyed := commonData&1 != 0
 		it := newChildIter(childIndices)
 		initializer := d.nodeAt(it.nextIf(mask, 0))
 		expression := d.nodeAt(it.nextIf(mask, 1))
 		statement := d.nodeAt(it.nextIf(mask, 2))
-		return d.factory.NewKvsCollectExpression(initializer, expression, statement), nil
+		return d.factory.NewKvsCollectExpression(initializer, expression, keyed, statement), nil
 	case ast.KindKvsLazyCollectExpression:
+		keyed := commonData&1 != 0
 		it := newChildIter(childIndices)
 		initializer := d.nodeAt(it.nextIf(mask, 0))
 		expression := d.nodeAt(it.nextIf(mask, 1))
 		statement := d.nodeAt(it.nextIf(mask, 2))
-		return d.factory.NewKvsLazyCollectExpression(initializer, expression, statement), nil
+		return d.factory.NewKvsLazyCollectExpression(initializer, expression, keyed, statement), nil
 	case ast.KindKvsSelectExpression:
+		keyed := commonData&1 != 0
 		it := newChildIter(childIndices)
 		initializer := d.nodeAt(it.nextIf(mask, 0))
 		expression := d.nodeAt(it.nextIf(mask, 1))
 		statement := d.nodeAt(it.nextIf(mask, 2))
-		return d.factory.NewKvsSelectExpression(initializer, expression, statement), nil
+		return d.factory.NewKvsSelectExpression(initializer, expression, keyed, statement), nil
 	case ast.KindKvsForExpression:
 		tupleResult := commonData&1 != 0
 		objectResult := commonData&2 != 0

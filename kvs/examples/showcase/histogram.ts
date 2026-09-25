@@ -18,7 +18,6 @@ const histo: number?[] = [
 
 const hot = new Set(spikes(histo, 3));
 
-for (const [i, value] of histo.entries())
-    console.log(
-        `${hot.has(i) ? "!" : " "} ${i}: ${"*".repeat(value!)}`
-    );
+for (histo) {
+    console.log(`${hot.has(#) ? "!" : " "} ${#}: ${"*".repeat(_!)}`);
+}

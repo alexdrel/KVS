@@ -73,6 +73,15 @@ const (
 	TypeReferenceSerializationKindObjectType
 )
 
+type KvsKeyedIterationKind uint8
+
+const (
+	KvsKeyedIterationKindOrdinal KvsKeyedIterationKind = iota
+	KvsKeyedIterationKindMap
+	KvsKeyedIterationKindRecord
+	KvsKeyedIterationKindUnsupported
+)
+
 type EmitResolver interface {
 	binder.ReferenceResolver
 	GetKvsDefaultKind(node *ast.Node) ast.KvsDefaultKind
@@ -92,6 +101,7 @@ type EmitResolver interface {
 	IsKvsFailureDemotionErrorPattern(node *ast.Node) bool
 	IsKvsNullableIterableSource(node *ast.Node) bool
 	IsKvsNullableIterableElement(node *ast.Node) bool
+	GetKvsKeyedIterationKind(node *ast.Node) KvsKeyedIterationKind
 	IsReferencedAliasDeclaration(node *ast.Node) bool
 	IsValueAliasDeclaration(node *ast.Node) bool
 	IsTopLevelValueImportEqualsWithEntityName(node *ast.Node) bool

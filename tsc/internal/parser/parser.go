@@ -1359,6 +1359,11 @@ func (p *Parser) parseForOrForInOrForOfStatement() *ast.Node {
 	}
 	var result *ast.Statement
 	switch {
+	case awaitToken != nil && p.token == ast.KindCloseParenToken && initializer != nil && initializer.Pos() < initializer.End() && !ast.IsVariableDeclarationList(initializer):
+		p.nextToken()
+		statement := p.parseStatement()
+		result = p.factory.NewForInOrOfStatement(ast.KindForOfStatement, awaitToken, p.newKvsImplicitSubjectInitializer(initializer, statement), initializer, statement)
+		result.Flags |= ast.NodeFlagsKvsImplicitSubject
 	case awaitToken != nil && p.parseExpected(ast.KindOfKeyword) || awaitToken == nil && p.parseOptional(ast.KindOfKeyword):
 		expression := p.doInContext(ast.NodeFlagsDisallowInContext, false, (*Parser).parseAssignmentExpressionOrHigher)
 		p.parseExpected(ast.KindCloseParenToken)
@@ -3180,6 +3185,10 @@ func (p *Parser) createMissingIdentifier() *ast.Node {
 func (p *Parser) parsePrivateIdentifier() *ast.Node {
 	pos := p.nodePos()
 	text := p.scanner.TokenValue()
+	if text == "#" {
+		start := p.scanner.TokenStart()
+		p.parseErrorAt(start, start+1, diagnostics.Invalid_character)
+	}
 	p.nextToken()
 	return p.finishNode(p.factory.NewPrivateIdentifier(text), pos)
 }
@@ -6125,6 +6134,10 @@ func (p *Parser) parsePrimaryExpression() *ast.Expression {
 		return p.parseKvsForExpression()
 	}
 	switch p.token {
+	case ast.KindHashToken:
+		pos := p.nodePos()
+		p.nextToken()
+		return p.finishNode(p.factory.NewKvsIterationCoordinateExpression(), pos)
 	case ast.KindPercentToken:
 		pos := p.nodePos()
 		p.nextToken()
@@ -6168,6 +6181,11 @@ func (p *Parser) parsePrimaryExpression() *ast.Expression {
 	case ast.KindTemplateHead:
 		return p.parseTemplateExpression(false /*isTaggedTemplate*/)
 	case ast.KindPrivateIdentifier:
+		if p.scanner.TokenValue() == "#" {
+			pos := p.nodePos()
+			p.nextToken()
+			return p.finishNode(p.factory.NewKvsIterationCoordinateExpression(), pos)
+		}
 		return p.parsePrivateIdentifier()
 	}
 	return p.parseIdentifierWithDiagnostic(diagnostics.Expression_expected, nil)
@@ -6356,14 +6374,20 @@ func (p *Parser) parseKvsProducerExpression() *ast.Expression {
 		p.nextToken()
 	}
 	p.parseExpected(ast.KindOpenParenToken)
-	implicitSubject := p.token != ast.KindConstKeyword
+	implicitSubject := p.token != ast.KindConstKeyword && p.token != ast.KindLetKeyword && p.token != ast.KindVarKeyword
 	var initializer *ast.ForInitializer
 	var expression *ast.Expression
+	keyed := false
 	if implicitSubject {
 		expression = p.parseExpressionAllowIn()
 	} else {
 		initializer = p.parseVariableDeclarationList(true)
-		p.parseExpected(ast.KindOfKeyword)
+		keyed = p.token == ast.KindInKeyword
+		if keyed {
+			p.nextToken()
+		} else {
+			p.parseExpected(ast.KindOfKeyword)
+		}
 		expression = p.doInContext(ast.NodeFlagsDisallowInContext, false, (*Parser).parseAssignmentExpressionOrHigher)
 	}
 	p.parseExpected(ast.KindCloseParenToken)
@@ -6379,11 +6403,11 @@ func (p *Parser) parseKvsProducerExpression() *ast.Expression {
 	p.kvsProducerFunctionDepth = saveFunctionDepth
 	var result *ast.Node
 	if kind == "select" {
-		result = p.factory.NewKvsSelectExpression(initializer, expression, statement)
+		result = p.factory.NewKvsSelectExpression(initializer, expression, keyed, statement)
 	} else if lazy {
-		result = p.factory.NewKvsLazyCollectExpression(initializer, expression, statement)
+		result = p.factory.NewKvsLazyCollectExpression(initializer, expression, keyed, statement)
 	} else {
-		result = p.factory.NewKvsCollectExpression(initializer, expression, statement)
+		result = p.factory.NewKvsCollectExpression(initializer, expression, keyed, statement)
 	}
 	if implicitSubject {
 		result.Flags |= ast.NodeFlagsKvsImplicitSubject
@@ -7020,7 +7044,7 @@ func (p *Parser) isStartOfExpression() bool {
 	switch p.token {
 	case ast.KindPlusToken, ast.KindMinusToken, ast.KindTildeToken, ast.KindExclamationToken, ast.KindDeleteKeyword,
 		ast.KindTypeOfKeyword, ast.KindVoidKeyword, ast.KindPlusPlusToken, ast.KindMinusMinusToken, ast.KindLessThanToken,
-		ast.KindAwaitKeyword, ast.KindYieldKeyword, ast.KindPrivateIdentifier, ast.KindAtToken:
+		ast.KindAwaitKeyword, ast.KindYieldKeyword, ast.KindPrivateIdentifier, ast.KindAtToken, ast.KindHashToken:
 		// Yield/await always starts an expression.  Either it is an identifier (in which case
 		// it is definitely an expression).  Or it's a keyword (either because we're in
 		// a generator or async function, or in strict mode (or both)) and it started a yield or await expression.

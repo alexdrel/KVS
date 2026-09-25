@@ -645,6 +645,15 @@ func getNodeCommonData(node *ast.Node) uint32 {
 	case ast.KindKvsTypedObjectExpression:
 		n := node.AsKvsTypedObjectExpression()
 		return uint32(boolToByte(n.MultiLine)) << 24
+	case ast.KindKvsCollectExpression:
+		n := node.AsKvsCollectExpression()
+		return uint32(boolToByte(n.Keyed)) << 24
+	case ast.KindKvsLazyCollectExpression:
+		n := node.AsKvsLazyCollectExpression()
+		return uint32(boolToByte(n.Keyed)) << 24
+	case ast.KindKvsSelectExpression:
+		n := node.AsKvsSelectExpression()
+		return uint32(boolToByte(n.Keyed)) << 24
 	case ast.KindKvsForExpression:
 		n := node.AsKvsForExpression()
 		return uint32(boolToByte(n.TupleResult))<<24 | uint32(boolToByte(n.ObjectResult))<<25 | uint32(boolToByte(n.ForIn))<<26

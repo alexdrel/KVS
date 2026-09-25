@@ -206,6 +206,7 @@ import type {
     KvsForExpression,
     KvsIfBindingClause,
     KvsIfBindingStatement,
+    KvsIterationCoordinateExpression,
     KvsLazyCollectExpression,
     KvsNullableAssertionExpression,
     KvsNullableType,
@@ -663,6 +664,15 @@ export declare namespace isKvsPlaceholderLambdaExpression {
     function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsPlaceholderLambdaExpression>;
 }
 isKvsPlaceholderLambdaExpression.Handle = isKvsPlaceholderLambdaExpression as any;
+
+export function isKvsIterationCoordinateExpression(node: Node): node is KvsIterationCoordinateExpression {
+    return node.kind === SyntaxKind.KvsIterationCoordinateExpression;
+}
+
+export declare namespace isKvsIterationCoordinateExpression {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsIterationCoordinateExpression>;
+}
+isKvsIterationCoordinateExpression.Handle = isKvsIterationCoordinateExpression as any;
 
 export function isKvsSieveBindingInitializer(node: Node): node is KvsSieveBindingInitializer {
     return node.kind === SyntaxKind.KvsSieveBindingInitializer;

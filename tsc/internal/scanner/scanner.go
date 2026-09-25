@@ -926,7 +926,6 @@ func (s *Scanner) Scan() ast.Kind {
 				break
 			}
 			if !s.scanIdentifier(1, identifierVariantStandard) {
-				s.errorAt(diagnostics.Invalid_character, s.pos-1, 1)
 				s.tokenValue = "#"
 			}
 			s.token = ast.KindPrivateIdentifier

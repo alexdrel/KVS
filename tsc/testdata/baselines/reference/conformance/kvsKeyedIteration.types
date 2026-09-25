@@ -1,0 +1,309 @@
+//// [tests/cases/conformance/kvs/kvsKeyedIteration.ts] ////
+
+=== kvsKeyedIteration.ts ===
+declare const items: string[];
+>items : string[]
+
+declare const scores: Map<string, number>;
+>scores : Map<string, number>
+
+declare const users: Record<string, { active: boolean }>;
+>users : Record<string, { active: boolean; }>
+>active : boolean
+
+declare const values: Iterable<boolean>;
+>values : Iterable<boolean>
+
+declare const pairs: Iterable<readonly [string, number]>;
+>pairs : Iterable<readonly [string, number]>
+
+declare const bytes: Uint8Array;
+>bytes : Uint8Array<ArrayBufferLike>
+
+declare const asyncValues: AsyncIterable<string>;
+>asyncValues : AsyncIterable<string>
+
+declare const maybeItems: string[] | null;
+>maybeItems : string[] | null
+
+declare const ambiguous: string[] | Map<string, string>;
+>ambiguous : string[] | Map<string, string>
+
+for (items) {
+>items : string[]
+
+    const index = #;
+>index : number
+
+    const item = _;
+>item : string
+>_ : string
+}
+
+for (scores) {
+>scores : Map<string, number>
+
+    const key = #;
+>key : string
+
+    const score = _;
+>score : number
+>_ : number
+}
+
+for (users) {
+>users : Record<string, { active: boolean; }>
+
+    const id = #;
+>id : string
+
+    const user = _;
+>user : { active: boolean; }
+>_ : { active: boolean; }
+}
+
+for (values) {
+>values : Iterable<boolean>
+
+    const ordinal = #;
+>ordinal : number
+
+    const value = _;
+>value : boolean
+>_ : boolean
+}
+
+for (pairs) {
+>pairs : Iterable<readonly [string, number]>
+
+    const pairOrdinal = #;
+>pairOrdinal : number
+
+    const yieldedPair = _;
+>yieldedPair : readonly [string, number]
+>_ : readonly [string, number]
+}
+
+for (bytes) {
+>bytes : Uint8Array<ArrayBufferLike>
+
+    const byteIndex = #;
+>byteIndex : number
+
+    const byte = _;
+>byte : number
+>_ : number
+}
+
+for (const [key, score] in scores) {
+>key : string
+>score : number
+>scores : Map<string, number>
+
+    const mapKey = key;
+>mapKey : string
+>key : string
+
+    const mapValue = score;
+>mapValue : number
+>score : number
+}
+
+for (const [index, item] in items) {
+>index : number
+>item : string
+>items : string[]
+
+    const arrayIndex = index;
+>arrayIndex : number
+>index : number
+
+    const arrayItem = item;
+>arrayItem : string
+>item : string
+}
+
+for (const property in users) {
+>property : string
+>users : Record<string, { active: boolean; }>
+
+    const nativeProperty = property;
+>nativeProperty : string
+>property : string
+}
+
+for (const [key, score] of scores) {
+>key : string
+>score : number
+>scores : Map<string, number>
+
+    const nativeMapKey = key;
+>nativeMapKey : string
+>key : string
+
+    const nativeMapValue = score;
+>nativeMapValue : number
+>score : number
+}
+
+const rows = collect (const [id, user] in users) {
+>rows : { id: string; user: { active: boolean; }; }[]
+>collect (const [id, user] in users) {    if (user.active) yield { id, user };} : { id: string; user: { active: boolean; }; }[]
+>id : string
+>user : { active: boolean; }
+>users : Record<string, { active: boolean; }>
+
+    if (user.active) yield { id, user };
+>user.active : boolean
+>user : { active: boolean; }
+>active : boolean
+>{ id, user } : { id: string; user: { active: boolean; }; }
+>id : string
+>user : { active: boolean; }
+
+};
+
+const indexed = collect (items) {
+>indexed : (readonly [number, string])[]
+>collect (items) {    if (_.length === 0) continue;    yield [#, _] as const;} : (readonly [number, string])[]
+>items : string[]
+
+    if (_.length === 0) continue;
+>_.length === 0 : boolean
+>_.length : number
+>_ : string
+>length : number
+>0 : 0
+
+    yield [#, _] as const;
+>[#, _] as const : readonly [number, string]
+>[#, _] : readonly [number, string]
+>_ : string
+
+};
+
+const nullableIndexed = collect (maybeItems) {
+>nullableIndexed : (readonly [number, string])[] | null
+>collect (maybeItems) {    yield [#, _] as const;} : (readonly [number, string])[] | null
+>maybeItems : string[] | null
+
+    yield [#, _] as const;
+>[#, _] as const : readonly [number, string]
+>[#, _] : readonly [number, string]
+>_ : string
+
+};
+
+const lazy = collect* (values) {
+>lazy : Generator<readonly [number, boolean], void, unknown>
+>collect* (values) {    yield [#, _] as const;} : Generator<readonly [number, boolean], void, unknown>
+>values : Iterable<boolean>
+
+    yield [#, _] as const;
+>[#, _] as const : readonly [number, boolean]
+>[#, _] : readonly [number, boolean]
+>_ : boolean
+
+};
+
+const selected = select (scores) {
+>selected : string | null
+>select (scores) {    if (_ > 10) yield #;} : string | null
+>scores : Map<string, number>
+
+    if (_ > 10) yield #;
+>_ > 10 : boolean
+>_ : number
+>10 : 10
+
+};
+
+const lastIndex = for (items; last = -1) {
+>lastIndex : number
+>for (items; last = -1) {    last = #;} : number
+>items : string[]
+>last : number
+>-1 : -1
+>1 : 1
+
+    last = #;
+>last = # : number
+>last : number
+
+};
+
+const nullableIndexTotal = for (const [index, item] in maybeItems; total = 0) {
+>nullableIndexTotal : number
+>for (const [index, item] in maybeItems; total = 0) {    total += index;} : number
+>index : number
+>item : string
+>maybeItems : string[] | null
+>total : number
+>0 : 0
+
+    total += index;
+>total += index : number
+>total : number
+>index : number
+
+};
+
+for (items) {
+>items : string[]
+
+    const outer = #;
+>outer : number
+
+    for (items.slice(#)) {
+>items.slice(#) : string[]
+>items.slice : (start?: number, end?: number) => string[]
+>items : string[]
+>slice : (start?: number, end?: number) => string[]
+
+        const inner = #;
+>inner : number
+
+        const sliced = _;
+>sliced : string
+>_ : string
+    }
+    const outerAgain = #;
+>outerAgain : number
+}
+
+async function consume() {
+>consume : () => Promise<void>
+
+    for await (asyncValues) {
+>asyncValues : AsyncIterable<string>
+
+        const ordinal = #;
+>ordinal : number
+
+        const value = _;
+>value : string
+>_ : string
+    }
+}
+
+for (ambiguous) {
+>ambiguous : string[] | Map<string, string>
+
+    const rejectedCoordinate = #;
+>rejectedCoordinate : any
+
+    const rejectedValue = _;
+>rejectedValue : any
+>_ : any
+}
+
+const invalid = #;
+>invalid : any
+
+const invalidKeyedProducer = collect (const key in users) yield key;
+>invalidKeyedProducer : never[]
+>collect (const key in users) yield key; : never[]
+>key : [string, { active: boolean; }]
+>users : Record<string, { active: boolean; }>
+>key : [string, { active: boolean; }]
+

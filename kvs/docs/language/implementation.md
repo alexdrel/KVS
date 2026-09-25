@@ -352,6 +352,16 @@ An iterable-only header lowers with a generated lexical `_` binding. When a nest
 refers to an enclosing `_`, that source is evaluated into a temporary before the inner binding is
 introduced; independent sources need no temporary.
 
+Keyed iteration lowers to ordinary pair iteration. Maps already provide `[key, value]` entries.
+Records use `Object.keys` to produce `[key, source[key]]`, while arrays, typed arrays, and other
+iterables use a small iterator wrapper that pairs each value with a source ordinal. The wrapper
+forwards iterator closure and has an asynchronous form for `for await`. It is emitted once per file.
+
+An implicit ordinal loop that does not use `#` retains the direct `for...of` lowering. Map and
+record loops still use their keyed view so `_` remains the mapped or property value. A destructuring
+`for...in` header lowers to the same ordinary pair iteration; single-binding `for...in` is
+untouched.
+
 When a producing loop heads a larger value expression, its statements are lifted into the
 surrounding scope and its generated result temporary replaces the loop at the start of the ordinary
 expression tail. This does not require a synthetic function boundary.

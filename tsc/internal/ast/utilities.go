@@ -171,6 +171,13 @@ func IsForInOrOfStatement(node *Node) bool {
 	return node != nil && (node.Kind == KindForInStatement || node.Kind == KindForOfStatement)
 }
 
+func IsKvsKeyedIterationInitializer(node *Node) bool {
+	if !IsVariableDeclarationList(node) || len(node.AsVariableDeclarationList().Declarations.Nodes) != 1 {
+		return false
+	}
+	return IsArrayBindingPattern(node.AsVariableDeclarationList().Declarations.Nodes[0].Name())
+}
+
 // A node is an assignment target if it is on the left hand side of an '=' token, if it is parented by a property
 // assignment in an object literal that is an assignment target, or if it is parented by an array literal that is
 // an assignment target. Examples include 'a = xxx', '{ p: a } = xxx', '[{ a }] = xxx'.

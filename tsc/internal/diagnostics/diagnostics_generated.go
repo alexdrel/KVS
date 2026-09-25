@@ -4472,6 +4472,10 @@ var KVS_on_a_typed_in_place_spread_target_requires_a_writable_target = &Message{
 
 var A_destructured_parameter_cannot_traverse_a_nullable_source_Bind_the_parameter_first_and_destructure_it_in_the_function_body = &Message{code: 100090, category: CategoryError, key: "A_destructured_parameter_cannot_traverse_a_nullable_source_Bind_the_parameter_first_and_destructure__100090", text: "A destructured parameter cannot traverse a nullable source. Bind the parameter first and destructure it in the function body."}
 
+var Keyed_iteration_requires_a_source_with_one_statically_determined_coordinate_category = &Message{code: 100091, category: CategoryError, key: "Keyed_iteration_requires_a_source_with_one_statically_determined_coordinate_category_100091", text: "Keyed iteration requires a source with one statically determined coordinate category."}
+
+var A_keyed_producer_header_must_use_an_array_binding_pattern = &Message{code: 100092, category: CategoryError, key: "A_keyed_producer_header_must_use_an_array_binding_pattern_100092", text: "A keyed producer header must use an array binding pattern."}
+
 var allMessages = [...]**Message{
 	&Unterminated_string_literal,
 	&Identifier_expected,
@@ -6708,4 +6712,6 @@ var allMessages = [...]**Message{
 	&KVS_on_an_assignment_or_update_target_requires_a_writable_proper_base,
 	&KVS_on_a_typed_in_place_spread_target_requires_a_writable_target,
 	&A_destructured_parameter_cannot_traverse_a_nullable_source_Bind_the_parameter_first_and_destructure_it_in_the_function_body,
+	&Keyed_iteration_requires_a_source_with_one_statically_determined_coordinate_category,
+	&A_keyed_producer_header_must_use_an_array_binding_pattern,
 }

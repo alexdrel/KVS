@@ -169,6 +169,7 @@ import type {
     KvsForExpression,
     KvsIfBindingClause,
     KvsIfBindingStatement,
+    KvsIterationCoordinateExpression,
     KvsLazyCollectExpression,
     KvsNullableAssertionExpression,
     KvsNullableType,
@@ -519,6 +520,9 @@ export class NodeObject {
     }
     get jsdocPropertyTags(): any {
         return this._data?.jsdocPropertyTags;
+    }
+    get keyed(): any {
+        return this._data?.keyed;
     }
     get keyword(): any {
         return this._data?.keyword;
@@ -965,11 +969,11 @@ function cloneNodeData(node: Node): any {
         case SyntaxKind.KvsRangeExpression:
             return { lower: n.lower, operatorToken: n.operatorToken, upper: n.upper };
         case SyntaxKind.KvsCollectExpression:
-            return { initializer: n.initializer, expression: n.expression, statement: n.statement };
+            return { initializer: n.initializer, expression: n.expression, keyed: n.keyed, statement: n.statement };
         case SyntaxKind.KvsLazyCollectExpression:
-            return { initializer: n.initializer, expression: n.expression, statement: n.statement };
+            return { initializer: n.initializer, expression: n.expression, keyed: n.keyed, statement: n.statement };
         case SyntaxKind.KvsSelectExpression:
-            return { initializer: n.initializer, expression: n.expression, statement: n.statement };
+            return { initializer: n.initializer, expression: n.expression, keyed: n.keyed, statement: n.statement };
         case SyntaxKind.KvsForExpression:
             return { initializer: n.initializer, condition: n.condition, incrementor: n.incrementor, expression: n.expression, result: n.result, tupleResult: n.tupleResult, objectResult: n.objectResult, forIn: n.forIn, statement: n.statement };
         case SyntaxKind.LabeledStatement:
@@ -4835,6 +4839,10 @@ export function createKvsPlaceholderLambdaExpression(arrow: ArrowFunction): KvsP
     }) as unknown as KvsPlaceholderLambdaExpression;
 }
 
+export function createKvsIterationCoordinateExpression(): KvsIterationCoordinateExpression {
+    return new NodeObject(SyntaxKind.KvsIterationCoordinateExpression, undefined) as unknown as KvsIterationCoordinateExpression;
+}
+
 export function createKvsSieveBindingInitializer(tildeToken: TildeToken, equalsToken: EqualsToken, expression: Expression): KvsSieveBindingInitializer {
     return new NodeObject(SyntaxKind.KvsSieveBindingInitializer, {
         tildeToken,
@@ -4950,26 +4958,29 @@ export function createKvsRangeExpression(lower: Expression, operatorToken: Node,
     }) as unknown as KvsRangeExpression;
 }
 
-export function createKvsCollectExpression(initializer: ForInitializer, expression: Expression, statement: Statement): KvsCollectExpression {
+export function createKvsCollectExpression(initializer: ForInitializer, expression: Expression, keyed: boolean = false, statement: Statement): KvsCollectExpression {
     return new NodeObject(SyntaxKind.KvsCollectExpression, {
         initializer,
         expression,
+        keyed,
         statement,
     }) as unknown as KvsCollectExpression;
 }
 
-export function createKvsLazyCollectExpression(initializer: ForInitializer, expression: Expression, statement: Statement): KvsLazyCollectExpression {
+export function createKvsLazyCollectExpression(initializer: ForInitializer, expression: Expression, keyed: boolean = false, statement: Statement): KvsLazyCollectExpression {
     return new NodeObject(SyntaxKind.KvsLazyCollectExpression, {
         initializer,
         expression,
+        keyed,
         statement,
     }) as unknown as KvsLazyCollectExpression;
 }
 
-export function createKvsSelectExpression(initializer: ForInitializer, expression: Expression, statement: Statement): KvsSelectExpression {
+export function createKvsSelectExpression(initializer: ForInitializer, expression: Expression, keyed: boolean = false, statement: Statement): KvsSelectExpression {
     return new NodeObject(SyntaxKind.KvsSelectExpression, {
         initializer,
         expression,
+        keyed,
         statement,
     }) as unknown as KvsSelectExpression;
 }
@@ -6493,15 +6504,15 @@ export function updateKvsRangeExpression(node: KvsRangeExpression, lower: Expres
 }
 
 export function updateKvsCollectExpression(node: KvsCollectExpression, initializer: ForInitializer, expression: Expression, statement: Statement): KvsCollectExpression {
-    return node.initializer !== initializer || node.expression !== expression || node.statement !== statement ? createKvsCollectExpression(initializer, expression, statement) : node;
+    return node.initializer !== initializer || node.expression !== expression || node.statement !== statement ? createKvsCollectExpression(initializer, expression, node.keyed, statement) : node;
 }
 
 export function updateKvsLazyCollectExpression(node: KvsLazyCollectExpression, initializer: ForInitializer, expression: Expression, statement: Statement): KvsLazyCollectExpression {
-    return node.initializer !== initializer || node.expression !== expression || node.statement !== statement ? createKvsLazyCollectExpression(initializer, expression, statement) : node;
+    return node.initializer !== initializer || node.expression !== expression || node.statement !== statement ? createKvsLazyCollectExpression(initializer, expression, node.keyed, statement) : node;
 }
 
 export function updateKvsSelectExpression(node: KvsSelectExpression, initializer: ForInitializer, expression: Expression, statement: Statement): KvsSelectExpression {
-    return node.initializer !== initializer || node.expression !== expression || node.statement !== statement ? createKvsSelectExpression(initializer, expression, statement) : node;
+    return node.initializer !== initializer || node.expression !== expression || node.statement !== statement ? createKvsSelectExpression(initializer, expression, node.keyed, statement) : node;
 }
 
 export function updateKvsForExpression(node: KvsForExpression, initializer: ForInitializer | undefined, condition: Expression | undefined, incrementor: Expression | undefined, expression: Expression | undefined, result: VariableDeclarationList, statement: Statement): KvsForExpression {

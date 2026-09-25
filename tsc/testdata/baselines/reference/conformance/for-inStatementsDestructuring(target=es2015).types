@@ -2,7 +2,7 @@
 
 === for-inStatementsDestructuring.ts ===
 for (var [a, b] in []) {}
->a : string
->b : string
+>a : number
+>b : never
 >[] : never[]
 

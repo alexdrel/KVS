@@ -3414,6 +3414,8 @@ func (p *Printer) emitExpression(node *ast.Expression, precedence ast.OperatorPr
 		p.emitKvsSieveExpression(node.AsKvsSieveExpression())
 	case ast.KindKvsPlaceholderLambdaExpression:
 		p.emitExpression(node.AsKvsPlaceholderLambdaExpression().Arrow.AsArrowFunction().Body, ast.OperatorPrecedenceLowest)
+	case ast.KindKvsIterationCoordinateExpression:
+		p.writePunctuation("#")
 	case ast.KindKvsSieveBindingInitializer:
 		p.emitKvsSieveBindingInitializer(node.AsKvsSieveBindingInitializer())
 	case ast.KindKvsSieveAssignmentExpression:
@@ -3825,7 +3827,7 @@ func (p *Printer) emitKvsCollectExpression(node *ast.KvsCollectExpression) {
 	if node.Flags&ast.NodeFlagsKvsImplicitSubject == 0 {
 		p.emitForInitializer(node.Initializer)
 		p.writeSpace()
-		p.writeKeyword("of")
+		p.writeKeyword(core.IfElse(node.Keyed, "in", "of"))
 		p.writeSpace()
 	}
 	p.emitExpression(node.Expression, ast.OperatorPrecedenceLowest)
@@ -3843,7 +3845,7 @@ func (p *Printer) emitKvsLazyCollectExpression(node *ast.KvsLazyCollectExpressio
 	if node.Flags&ast.NodeFlagsKvsImplicitSubject == 0 {
 		p.emitForInitializer(node.Initializer)
 		p.writeSpace()
-		p.writeKeyword("of")
+		p.writeKeyword(core.IfElse(node.Keyed, "in", "of"))
 		p.writeSpace()
 	}
 	p.emitExpression(node.Expression, ast.OperatorPrecedenceLowest)
@@ -4014,7 +4016,7 @@ func (p *Printer) emitKvsSelectExpression(node *ast.KvsSelectExpression) {
 	if node.Flags&ast.NodeFlagsKvsImplicitSubject == 0 {
 		p.emitForInitializer(node.Initializer)
 		p.writeSpace()
-		p.writeKeyword("of")
+		p.writeKeyword(core.IfElse(node.Keyed, "in", "of"))
 		p.writeSpace()
 	}
 	p.emitExpression(node.Expression, ast.OperatorPrecedenceLowest)

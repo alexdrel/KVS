@@ -1,0 +1,115 @@
+// @strict: true
+// @target: es2020
+
+declare const items: string[];
+declare const scores: Map<string, number>;
+declare const users: Record<string, { active: boolean }>;
+declare const values: Iterable<boolean>;
+declare const pairs: Iterable<readonly [string, number]>;
+declare const bytes: Uint8Array;
+declare const asyncValues: AsyncIterable<string>;
+declare const maybeItems: string[] | null;
+declare const ambiguous: string[] | Map<string, string>;
+
+for (items) {
+    const index = #;
+    const item = _;
+}
+
+for (scores) {
+    const key = #;
+    const score = _;
+}
+
+for (users) {
+    const id = #;
+    const user = _;
+}
+
+for (values) {
+    const ordinal = #;
+    const value = _;
+}
+
+for (pairs) {
+    const pairOrdinal = #;
+    const yieldedPair = _;
+}
+
+for (bytes) {
+    const byteIndex = #;
+    const byte = _;
+}
+
+for (const [key, score] in scores) {
+    const mapKey = key;
+    const mapValue = score;
+}
+
+for (const [index, item] in items) {
+    const arrayIndex = index;
+    const arrayItem = item;
+}
+
+for (const property in users) {
+    const nativeProperty = property;
+}
+
+for (const [key, score] of scores) {
+    const nativeMapKey = key;
+    const nativeMapValue = score;
+}
+
+const rows = collect (const [id, user] in users) {
+    if (user.active) yield { id, user };
+};
+
+const indexed = collect (items) {
+    if (_.length === 0) continue;
+    yield [#, _] as const;
+};
+
+const nullableIndexed = collect (maybeItems) {
+    yield [#, _] as const;
+};
+
+const lazy = collect* (values) {
+    yield [#, _] as const;
+};
+
+const selected = select (scores) {
+    if (_ > 10) yield #;
+};
+
+const lastIndex = for (items; last = -1) {
+    last = #;
+};
+
+const nullableIndexTotal = for (const [index, item] in maybeItems; total = 0) {
+    total += index;
+};
+
+for (items) {
+    const outer = #;
+    for (items.slice(#)) {
+        const inner = #;
+        const sliced = _;
+    }
+    const outerAgain = #;
+}
+
+async function consume() {
+    for await (asyncValues) {
+        const ordinal = #;
+        const value = _;
+    }
+}
+
+for (ambiguous) {
+    const rejectedCoordinate = #;
+    const rejectedValue = _;
+}
+
+const invalid = #;
+
+const invalidKeyedProducer = collect (const key in users) yield key;

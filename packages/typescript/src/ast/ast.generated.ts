@@ -649,6 +649,9 @@ export interface KvsPlaceholderLambdaExpression extends ExpressionBase {
     readonly kind: SyntaxKind.KvsPlaceholderLambdaExpression;
     readonly arrow: ArrowFunction;
 }
+export interface KvsIterationCoordinateExpression extends ExpressionBase {
+    readonly kind: SyntaxKind.KvsIterationCoordinateExpression;
+}
 export interface KvsSieveBindingInitializer extends ExpressionBase {
     readonly kind: SyntaxKind.KvsSieveBindingInitializer;
     readonly tildeToken: TildeToken;
@@ -740,18 +743,21 @@ export interface KvsCollectExpression extends ExpressionBase {
     readonly kind: SyntaxKind.KvsCollectExpression;
     readonly initializer: ForInitializer;
     readonly expression: Expression;
+    readonly keyed: boolean;
     readonly statement: Statement;
 }
 export interface KvsLazyCollectExpression extends ExpressionBase {
     readonly kind: SyntaxKind.KvsLazyCollectExpression;
     readonly initializer: ForInitializer;
     readonly expression: Expression;
+    readonly keyed: boolean;
     readonly statement: Statement;
 }
 export interface KvsSelectExpression extends ExpressionBase {
     readonly kind: SyntaxKind.KvsSelectExpression;
     readonly initializer: ForInitializer;
     readonly expression: Expression;
+    readonly keyed: boolean;
     readonly statement: Statement;
 }
 export interface KvsForExpression extends ExpressionBase {

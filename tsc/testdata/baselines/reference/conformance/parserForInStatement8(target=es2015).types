@@ -4,7 +4,7 @@
 // repro from https://github.com/microsoft/TypeScript/issues/54769
 
 for (let [x = 'a' in {}] in { '': 0 }) console.log(x)
->x : string | boolean
+>x : number | boolean
 >'a' in {} : boolean
 >'a' : "a"
 >{} : {}
@@ -15,7 +15,7 @@ for (let [x = 'a' in {}] in { '': 0 }) console.log(x)
 >console.log : (...data: any[]) => void
 >console : Console
 >log : (...data: any[]) => void
->x : string | boolean
+>x : number | boolean
 
 for (let {x = 'a' in {}} in { '': 0 }) console.log(x)
 >x : any

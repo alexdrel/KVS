@@ -296,6 +296,7 @@
             "KvsDefaultExpression",
             "KvsSieveExpression",
             "KvsPlaceholderLambdaExpression",
+            "KvsIterationCoordinateExpression",
             "KvsSieveBindingInitializer",
             "KvsSieveAssignmentExpression",
             "KvsFailureDemotionExpression",
@@ -1848,6 +1849,14 @@
                 ],
                 "arena": true
             },
+            "KvsIterationCoordinateExpression": {
+                "extends": [
+                    "ExpressionBase",
+                    "CompositeBase"
+                ],
+                "members": [],
+                "arena": true
+            },
             "KvsSieveBindingInitializer": {
                 "extends": [
                     "ExpressionBase",
@@ -2182,6 +2191,10 @@
                         "type": "Expression"
                     },
                     {
+                        "name": "Keyed",
+                        "type": "bool"
+                    },
+                    {
                         "name": "Statement",
                         "type": "Statement",
                         "visit": "iterationBody"
@@ -2205,6 +2218,10 @@
                         "type": "Expression"
                     },
                     {
+                        "name": "Keyed",
+                        "type": "bool"
+                    },
+                    {
                         "name": "Statement",
                         "type": "Statement",
                         "visit": "iterationBody"
@@ -2226,6 +2243,10 @@
                     {
                         "name": "Expression",
                         "type": "Expression"
+                    },
+                    {
+                        "name": "Keyed",
+                        "type": "bool"
                     },
                     {
                         "name": "Statement",

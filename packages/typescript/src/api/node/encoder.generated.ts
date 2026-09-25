@@ -15,9 +15,12 @@ import type {
     JSDocParameterOrPropertyTag,
     JSDocTypeLiteral,
     JsxText,
+    KvsCollectExpression,
     KvsCompactArrayExpression,
     KvsCompactObjectExpression,
     KvsForExpression,
+    KvsLazyCollectExpression,
+    KvsSelectExpression,
     KvsTypedObjectExpression,
     MetaProperty,
     ModuleDeclaration,
@@ -68,6 +71,12 @@ export function getNodeCommonData(node: Node): number {
             return ((node as KvsCompactObjectExpression).multiLine ? 1 : 0) << 24;
         case SyntaxKind.KvsTypedObjectExpression:
             return ((node as KvsTypedObjectExpression).multiLine ? 1 : 0) << 24;
+        case SyntaxKind.KvsCollectExpression:
+            return ((node as KvsCollectExpression).keyed ? 1 : 0) << 24;
+        case SyntaxKind.KvsLazyCollectExpression:
+            return ((node as KvsLazyCollectExpression).keyed ? 1 : 0) << 24;
+        case SyntaxKind.KvsSelectExpression:
+            return ((node as KvsSelectExpression).keyed ? 1 : 0) << 24;
         case SyntaxKind.KvsForExpression:
             return ((node as KvsForExpression).tupleResult ? 1 : 0) << 24 | ((node as KvsForExpression).objectResult ? 1 : 0) << 25 | ((node as KvsForExpression).forIn ? 1 : 0) << 26;
         case SyntaxKind.Block:

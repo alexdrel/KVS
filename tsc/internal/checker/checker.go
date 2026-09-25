@@ -4057,39 +4057,44 @@ func (c *Checker) checkForStatement(node *ast.Node) {
 
 func (c *Checker) checkForInStatement(node *ast.Node) {
 	data := node.AsForInOrOfStatement()
-	c.checkGrammarForInOrForOfStatement(data)
-	rightType := c.getNonNullableTypeIfNeeded(c.checkExpression(data.Expression))
-	// TypeScript 1.0 spec (April 2014): 5.4
-	// In a 'for-in' statement of the form
-	// for (let VarDecl in Expr) Statement
-	//   VarDecl must be a variable declaration without a type annotation that declares a variable of type Any,
-	//   and Expr must be an expression of type Any, an object type, or a type parameter type.
-	if ast.IsVariableDeclarationList(data.Initializer) {
-		declarations := data.Initializer.AsVariableDeclarationList().Declarations.Nodes
-		if len(declarations) != 0 && ast.IsBindingPattern(declarations[0].Name()) {
-			c.error(declarations[0].Name(), diagnostics.The_left_hand_side_of_a_for_in_statement_cannot_be_a_destructuring_pattern)
-		}
+	if ast.IsKvsKeyedIterationInitializer(data.Initializer) {
 		c.checkVariableDeclarationList(data.Initializer)
+		c.checkExpression(data.Expression)
 	} else {
+		c.checkGrammarForInOrForOfStatement(data)
+		rightType := c.getNonNullableTypeIfNeeded(c.checkExpression(data.Expression))
+		// TypeScript 1.0 spec (April 2014): 5.4
 		// In a 'for-in' statement of the form
-		// for (Var in Expr) Statement
-		//   Var must be an expression classified as a reference of type Any or the String primitive type,
+		// for (let VarDecl in Expr) Statement
+		//   VarDecl must be a variable declaration without a type annotation that declares a variable of type Any,
 		//   and Expr must be an expression of type Any, an object type, or a type parameter type.
-		varExpr := data.Initializer
-		leftType := c.checkExpression(varExpr)
-		if ast.IsArrayLiteralExpression(varExpr) || ast.IsObjectLiteralExpression(varExpr) {
-			c.error(varExpr, diagnostics.The_left_hand_side_of_a_for_in_statement_cannot_be_a_destructuring_pattern)
-		} else if !c.isTypeAssignableTo(c.getIndexTypeOrString(rightType), leftType) {
-			c.error(varExpr, diagnostics.The_left_hand_side_of_a_for_in_statement_must_be_of_type_string_or_any)
+		if ast.IsVariableDeclarationList(data.Initializer) {
+			declarations := data.Initializer.AsVariableDeclarationList().Declarations.Nodes
+			if len(declarations) != 0 && ast.IsBindingPattern(declarations[0].Name()) {
+				c.error(declarations[0].Name(), diagnostics.The_left_hand_side_of_a_for_in_statement_cannot_be_a_destructuring_pattern)
+			}
+			c.checkVariableDeclarationList(data.Initializer)
 		} else {
-			// run check only former check succeeded to avoid cascading errors
-			c.checkReferenceExpression(varExpr, diagnostics.The_left_hand_side_of_a_for_in_statement_must_be_a_variable_or_a_property_access, diagnostics.The_left_hand_side_of_a_for_in_statement_may_not_be_an_optional_property_access)
+			// In a 'for-in' statement of the form
+			// for (Var in Expr) Statement
+			//   Var must be an expression classified as a reference of type Any or the String primitive type,
+			//   and Expr must be an expression of type Any, an object type, or a type parameter type.
+			varExpr := data.Initializer
+			leftType := c.checkExpression(varExpr)
+			if ast.IsArrayLiteralExpression(varExpr) || ast.IsObjectLiteralExpression(varExpr) {
+				c.error(varExpr, diagnostics.The_left_hand_side_of_a_for_in_statement_cannot_be_a_destructuring_pattern)
+			} else if !c.isTypeAssignableTo(c.getIndexTypeOrString(rightType), leftType) {
+				c.error(varExpr, diagnostics.The_left_hand_side_of_a_for_in_statement_must_be_of_type_string_or_any)
+			} else {
+				// run check only former check succeeded to avoid cascading errors
+				c.checkReferenceExpression(varExpr, diagnostics.The_left_hand_side_of_a_for_in_statement_must_be_a_variable_or_a_property_access, diagnostics.The_left_hand_side_of_a_for_in_statement_may_not_be_an_optional_property_access)
+			}
 		}
-	}
-	// unknownType is returned i.e. if node.expression is identifier whose name cannot be resolved
-	// in this case error about missing name is already reported - do not report extra one
-	if rightType == c.neverType || !c.isTypeAssignableToKind(rightType, TypeFlagsNonPrimitive|TypeFlagsInstantiableNonPrimitive) {
-		c.error(data.Expression, diagnostics.The_right_hand_side_of_a_for_in_statement_must_be_of_type_any_an_object_type_or_a_type_parameter_but_here_has_type_0, c.TypeToString(rightType))
+		// unknownType is returned i.e. if node.expression is identifier whose name cannot be resolved
+		// in this case error about missing name is already reported - do not report extra one
+		if rightType == c.neverType || !c.isTypeAssignableToKind(rightType, TypeFlagsNonPrimitive|TypeFlagsInstantiableNonPrimitive) {
+			c.error(data.Expression, diagnostics.The_right_hand_side_of_a_for_in_statement_must_be_of_type_any_an_object_type_or_a_type_parameter_but_here_has_type_0, c.TypeToString(rightType))
+		}
 	}
 	c.checkSourceElement(data.Statement)
 	if node.Locals() != nil {
@@ -4104,43 +4109,48 @@ func (c *Checker) getIndexTypeOrString(t *Type) *Type {
 
 func (c *Checker) checkForOfStatement(node *ast.Node) {
 	data := node.AsForInOrOfStatement()
-	c.checkGrammarForInOrForOfStatement(data)
-	container := getContainingFunctionOrClassStaticBlock(node)
-	if data.AwaitModifier != nil {
-		if container != nil && ast.IsClassStaticBlockDeclaration(container) {
-			c.grammarErrorOnNode(data.AwaitModifier, diagnostics.X_for_await_loops_cannot_be_used_inside_a_class_static_block)
-		} else {
-			functionFlags := ast.GetFunctionFlags(container)
-			if functionFlags&(ast.FunctionFlagsInvalid|ast.FunctionFlagsAsync) == ast.FunctionFlagsAsync && c.languageVersion < LanguageFeatureMinimumTarget.ForAwaitOf {
-				// for..await..of in an async function or async generator function prior to ESNext requires the __asyncValues helper
-				c.checkExternalEmitHelpers(node, ExternalEmitHelpersForAwaitOfIncludes)
-			}
-		}
-	} // Check the LHS and RHS
-	// If the LHS is a declaration, just check it as a variable declaration, which will in turn check the RHS
-	// via checkRightHandSideOfForOf.
-	// If the LHS is an expression, check the LHS, as a destructuring assignment or as a reference.
-	// Then check that the RHS is assignable to it.
-	if ast.IsVariableDeclarationList(data.Initializer) {
+	if node.Flags&ast.NodeFlagsKvsImplicitSubject != 0 {
 		c.checkVariableDeclarationList(data.Initializer)
+		c.getKvsKeyedIterationInfo(data.Expression)
 	} else {
-		varExpr := data.Initializer
-		iteratedType := c.checkRightHandSideOfForOf(node)
-		// There may be a destructuring assignment on the left side
-		if ast.IsArrayLiteralExpression(varExpr) || ast.IsObjectLiteralExpression(varExpr) {
-			// iteratedType may be undefined. In this case, we still want to check the structure of
-			// varExpr, in particular making sure it's a valid LeftHandSideExpression. But we'd like
-			// to short circuit the type relation checking as much as possible, so we pass the unknownType.
-			c.checkDestructuringAssignment(varExpr, core.OrElse(iteratedType, c.errorType), CheckModeNormal, false)
+		c.checkGrammarForInOrForOfStatement(data)
+		container := getContainingFunctionOrClassStaticBlock(node)
+		if data.AwaitModifier != nil {
+			if container != nil && ast.IsClassStaticBlockDeclaration(container) {
+				c.grammarErrorOnNode(data.AwaitModifier, diagnostics.X_for_await_loops_cannot_be_used_inside_a_class_static_block)
+			} else {
+				functionFlags := ast.GetFunctionFlags(container)
+				if functionFlags&(ast.FunctionFlagsInvalid|ast.FunctionFlagsAsync) == ast.FunctionFlagsAsync && c.languageVersion < LanguageFeatureMinimumTarget.ForAwaitOf {
+					// for..await..of in an async function or async generator function prior to ESNext requires the __asyncValues helper
+					c.checkExternalEmitHelpers(node, ExternalEmitHelpersForAwaitOfIncludes)
+				}
+			}
+		} // Check the LHS and RHS
+		// If the LHS is a declaration, just check it as a variable declaration, which will in turn check the RHS
+		// via checkRightHandSideOfForOf.
+		// If the LHS is an expression, check the LHS, as a destructuring assignment or as a reference.
+		// Then check that the RHS is assignable to it.
+		if ast.IsVariableDeclarationList(data.Initializer) {
+			c.checkVariableDeclarationList(data.Initializer)
 		} else {
-			leftType := c.checkExpression(varExpr)
-			c.checkReferenceExpression(varExpr, diagnostics.The_left_hand_side_of_a_for_of_statement_must_be_a_variable_or_a_property_access, diagnostics.The_left_hand_side_of_a_for_of_statement_may_not_be_an_optional_property_access)
-			// iteratedType will be undefined if the rightType was missing properties/signatures
-			// required to get its iteratedType (like [Symbol.iterator] or next). This may be
-			// because we accessed properties from anyType, or it may have led to an error inside
-			// getElementTypeOfIterable.
-			if iteratedType != nil {
-				c.checkTypeAssignableToAndOptionallyElaborate(iteratedType, leftType, varExpr, data.Expression, nil, nil)
+			varExpr := data.Initializer
+			iteratedType := c.checkRightHandSideOfForOf(node)
+			// There may be a destructuring assignment on the left side
+			if ast.IsArrayLiteralExpression(varExpr) || ast.IsObjectLiteralExpression(varExpr) {
+				// iteratedType may be undefined. In this case, we still want to check the structure of
+				// varExpr, in particular making sure it's a valid LeftHandSideExpression. But we'd like
+				// to short circuit the type relation checking as much as possible, so we pass the unknownType.
+				c.checkDestructuringAssignment(varExpr, core.OrElse(iteratedType, c.errorType), CheckModeNormal, false)
+			} else {
+				leftType := c.checkExpression(varExpr)
+				c.checkReferenceExpression(varExpr, diagnostics.The_left_hand_side_of_a_for_of_statement_must_be_a_variable_or_a_property_access, diagnostics.The_left_hand_side_of_a_for_of_statement_may_not_be_an_optional_property_access)
+				// iteratedType will be undefined if the rightType was missing properties/signatures
+				// required to get its iteratedType (like [Symbol.iterator] or next). This may be
+				// because we accessed properties from anyType, or it may have led to an error inside
+				// getElementTypeOfIterable.
+				if iteratedType != nil {
+					c.checkTypeAssignableToAndOptionallyElaborate(iteratedType, leftType, varExpr, data.Expression, nil, nil)
+				}
 			}
 		}
 	}
@@ -8121,6 +8131,8 @@ func (c *Checker) checkExpressionWorker(node *ast.Node, checkMode CheckMode) *Ty
 		return c.checkKvsSieveExpression(node, checkMode)
 	case ast.KindKvsPlaceholderLambdaExpression:
 		return c.checkKvsPlaceholderLambdaExpression(node.AsKvsPlaceholderLambdaExpression(), checkMode)
+	case ast.KindKvsIterationCoordinateExpression:
+		return c.checkKvsIterationCoordinateExpression(node)
 	case ast.KindKvsCatchSplitExpression:
 		return c.checkKvsCatchSplitExpression(node.AsKvsCatchSplitExpression(), checkMode)
 	case ast.KindKvsCatchSplitAssignmentExpression:
@@ -18064,21 +18076,56 @@ func (c *Checker) getTypeForVariableLikeDeclaration(declaration *ast.Node, inclu
 		grandParent := declaration.Parent.Parent
 		switch grandParent.Kind {
 		case ast.KindForInStatement:
+			if ast.IsKvsKeyedIterationInitializer(grandParent.Initializer()) {
+				_, coordinateType, valueType := c.getKvsKeyedIterationInfo(grandParent.Expression())
+				return c.createTupleType([]*Type{coordinateType, valueType})
+			}
 			indexType := c.getIndexType(c.getNonNullableTypeIfNeeded(c.checkExpressionEx(grandParent.Expression(), checkMode /*checkMode*/)))
 			if indexType.flags&(TypeFlagsTypeParameter|TypeFlagsIndex) != 0 {
 				return c.getExtractStringType(indexType)
 			}
 			return c.stringType
-		case ast.KindForOfStatement, ast.KindKvsCollectExpression, ast.KindKvsLazyCollectExpression, ast.KindKvsSelectExpression:
+		case ast.KindForOfStatement:
 			// checkRightHandSideOfForOf will return undefined if the for-of expression type was
 			// missing properties/signatures required to get its iteratedType (like
 			// [Symbol.iterator] or next). This may be because we accessed properties from anyType,
 			// or it may have led to an error inside getElementTypeOfIterable.
+			if grandParent.Flags&ast.NodeFlagsKvsImplicitSubject != 0 {
+				_, _, valueType := c.getKvsKeyedIterationInfo(grandParent.Expression())
+				return valueType
+			}
+			return c.checkRightHandSideOfForOf(grandParent)
+		case ast.KindKvsCollectExpression, ast.KindKvsLazyCollectExpression, ast.KindKvsSelectExpression:
+			keyed := false
+			switch grandParent.Kind {
+			case ast.KindKvsCollectExpression:
+				keyed = grandParent.AsKvsCollectExpression().Keyed
+			case ast.KindKvsLazyCollectExpression:
+				keyed = grandParent.AsKvsLazyCollectExpression().Keyed
+			case ast.KindKvsSelectExpression:
+				keyed = grandParent.AsKvsSelectExpression().Keyed
+			}
+			if grandParent.Flags&ast.NodeFlagsKvsImplicitSubject != 0 {
+				_, _, valueType := c.getKvsKeyedIterationInfo(grandParent.Expression())
+				return valueType
+			}
+			if keyed {
+				_, coordinateType, valueType := c.getKvsKeyedIterationInfo(grandParent.Expression())
+				return c.createTupleType([]*Type{coordinateType, valueType})
+			}
 			return c.checkRightHandSideOfForOf(grandParent)
 		case ast.KindKvsForExpression:
 			loop := grandParent.AsKvsForExpression()
 			if loop.Expression != nil && declaration.Parent == loop.Initializer {
+				if grandParent.Flags&ast.NodeFlagsKvsImplicitSubject != 0 {
+					_, _, valueType := c.getKvsKeyedIterationInfo(loop.Expression)
+					return valueType
+				}
 				if loop.ForIn {
+					if ast.IsArrayBindingPattern(declaration.Name()) {
+						_, coordinateType, valueType := c.getKvsKeyedIterationInfo(loop.Expression)
+						return c.createTupleType([]*Type{coordinateType, valueType})
+					}
 					sourceType := c.checkNonNullType(c.checkExpressionEx(loop.Expression, checkMode), loop.Expression)
 					indexType := c.getIndexType(sourceType)
 					if indexType.flags&(TypeFlagsTypeParameter|TypeFlagsIndex) != 0 {
@@ -19144,17 +19191,107 @@ func (c *Checker) checkRightHandSideOfForOf(statement *ast.Node) *Type {
 	return c.checkIteratedTypeOrElementType(use, sourceType, c.undefinedType, statement.Expression())
 }
 
+func (c *Checker) getKvsImplicitIteration(node *ast.Node) *ast.Node {
+	child := node
+	for parent := node.Parent; parent != nil; child, parent = parent, parent.Parent {
+		if ast.IsFunctionLikeDeclaration(parent) {
+			return nil
+		}
+		if parent.Flags&ast.NodeFlagsKvsImplicitSubject != 0 && child != parent.Expression() {
+			return parent
+		}
+	}
+	return nil
+}
+
+func (c *Checker) checkKvsIterationCoordinateExpression(node *ast.Node) *Type {
+	iteration := c.getKvsImplicitIteration(node)
+	if iteration == nil {
+		c.error(node, diagnostics.Cannot_find_name_0, "#")
+		return c.errorType
+	}
+	_, coordinateType, _ := c.getKvsKeyedIterationInfo(iteration.Expression())
+	return coordinateType
+}
+
+func (c *Checker) getKvsKeyedIterationInfo(source *ast.Node) (printer.KvsKeyedIterationKind, *Type, *Type) {
+	sourceType := c.GetNonNullableType(c.checkExpression(source))
+	kind := printer.KvsKeyedIterationKindUnsupported
+	parts := []*Type{sourceType}
+	if sourceType.flags&TypeFlagsUnion != 0 {
+		parts = sourceType.Types()
+	}
+	for _, part := range parts {
+		partKind := printer.KvsKeyedIterationKindOrdinal
+		if c.isKvsMapType(part) {
+			partKind = printer.KvsKeyedIterationKindMap
+		} else if c.getIndexInfoOfType(part, c.stringType) != nil && !c.isArrayLikeType(part) {
+			partKind = printer.KvsKeyedIterationKindRecord
+		}
+		if kind == printer.KvsKeyedIterationKindUnsupported {
+			kind = partKind
+		} else if kind != partKind {
+			c.error(source, diagnostics.Keyed_iteration_requires_a_source_with_one_statically_determined_coordinate_category)
+			return printer.KvsKeyedIterationKindUnsupported, c.errorType, c.errorType
+		}
+	}
+	if kind == printer.KvsKeyedIterationKindRecord {
+		indexInfo := c.getIndexInfoOfType(sourceType, c.stringType)
+		return printer.KvsKeyedIterationKindRecord, c.stringType, indexInfo.valueType
+	}
+	use := IterationUseForOf
+	for parent := source.Parent; parent != nil; parent = parent.Parent {
+		if ast.IsForOfStatement(parent) && parent.AsForInOrOfStatement().AwaitModifier != nil {
+			use = IterationUseForAwaitOf
+			break
+		}
+		if ast.IsFunctionLikeDeclaration(parent) {
+			break
+		}
+	}
+	valueType := c.checkIteratedTypeOrElementType(use, sourceType, c.undefinedType, source)
+	if valueType == nil {
+		valueType = c.errorType
+	}
+	if kind == printer.KvsKeyedIterationKindOrdinal {
+		return printer.KvsKeyedIterationKindOrdinal, c.numberType, valueType
+	}
+	if kind == printer.KvsKeyedIterationKindMap {
+		keyType := c.getTypeOfPropertyOfType(valueType, "0")
+		mappedType := c.getTypeOfPropertyOfType(valueType, "1")
+		if keyType != nil && mappedType != nil {
+			return printer.KvsKeyedIterationKindMap, keyType, mappedType
+		}
+	}
+	return printer.KvsKeyedIterationKindOrdinal, c.numberType, valueType
+}
+
+func (c *Checker) isKvsMapType(t *Type) bool {
+	t = c.getReducedType(t)
+	if t.symbol == nil || (t.symbol.Name != "Map" && t.symbol.Name != "ReadonlyMap") {
+		return false
+	}
+	global := c.globals[t.symbol.Name]
+	return global != nil && c.getSymbolIfSameReference(t.symbol, global) != nil
+}
+
 func (c *Checker) isKvsAbsenceOnlyType(t *Type) bool {
 	return t.flags&TypeFlagsNullable != 0 && c.GetNonNullableType(t).flags&TypeFlagsNever != 0
 }
 
 func (c *Checker) checkKvsCollectExpression(node *ast.Node) *Type {
 	data := node.AsKvsCollectExpression()
+	if data.Keyed && !ast.IsKvsKeyedIterationInitializer(data.Initializer) {
+		c.error(data.Initializer, diagnostics.A_keyed_producer_header_must_use_an_array_binding_pattern)
+	}
 	return c.checkKvsProducerExpression(node, data.Initializer, data.Expression, data.Statement, false)
 }
 
 func (c *Checker) checkKvsLazyCollectExpression(node *ast.Node) *Type {
 	data := node.AsKvsLazyCollectExpression()
+	if data.Keyed && !ast.IsKvsKeyedIterationInitializer(data.Initializer) {
+		c.error(data.Initializer, diagnostics.A_keyed_producer_header_must_use_an_array_binding_pattern)
+	}
 	if !ast.IsKvsProducerHeadPosition(node) {
 		c.error(node, diagnostics.KVS_collect_must_be_at_the_head_of_a_supported_value_expression)
 	}
@@ -19238,6 +19375,9 @@ func (c *Checker) checkKvsRangeExpression(node *ast.KvsRangeExpression, checkMod
 
 func (c *Checker) checkKvsSelectExpression(node *ast.Node) *Type {
 	data := node.AsKvsSelectExpression()
+	if data.Keyed && !ast.IsKvsKeyedIterationInitializer(data.Initializer) {
+		c.error(data.Initializer, diagnostics.A_keyed_producer_header_must_use_an_array_binding_pattern)
+	}
 	return c.checkKvsProducerExpression(node, data.Initializer, data.Expression, data.Statement, true)
 }
 
@@ -19248,7 +19388,10 @@ func (c *Checker) checkKvsForExpression(node *ast.Node) *Type {
 	}
 	c.checkVariableDeclarationList(data.Result)
 	if data.Expression != nil {
-		if data.ForIn {
+		if data.ForIn && ast.IsKvsKeyedIterationInitializer(data.Initializer) {
+			c.checkVariableDeclarationList(data.Initializer)
+			c.checkExpression(data.Expression)
+		} else if data.ForIn {
 			rightType := c.checkNonNullType(c.checkExpression(data.Expression), data.Expression)
 			if ast.IsVariableDeclarationList(data.Initializer) {
 				c.checkVariableDeclarationList(data.Initializer)

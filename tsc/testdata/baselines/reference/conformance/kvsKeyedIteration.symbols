@@ -1,0 +1,294 @@
+//// [tests/cases/conformance/kvs/kvsKeyedIteration.ts] ////
+
+=== kvsKeyedIteration.ts ===
+declare const items: string[];
+>items : Symbol(items, Decl(kvsKeyedIteration.ts, 0, 13))
+
+declare const scores: Map<string, number>;
+>scores : Symbol(scores, Decl(kvsKeyedIteration.ts, 1, 13))
+>Map : Symbol(Map, Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.iterable.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --))
+
+declare const users: Record<string, { active: boolean }>;
+>users : Symbol(users, Decl(kvsKeyedIteration.ts, 2, 13))
+>Record : Symbol(Record, Decl(lib.es5.d.ts, --, --))
+>active : Symbol(active, Decl(kvsKeyedIteration.ts, 2, 37))
+
+declare const values: Iterable<boolean>;
+>values : Symbol(values, Decl(kvsKeyedIteration.ts, 3, 13))
+>Iterable : Symbol(Iterable, Decl(lib.es2015.iterable.d.ts, --, --))
+
+declare const pairs: Iterable<readonly [string, number]>;
+>pairs : Symbol(pairs, Decl(kvsKeyedIteration.ts, 4, 13))
+>Iterable : Symbol(Iterable, Decl(lib.es2015.iterable.d.ts, --, --))
+
+declare const bytes: Uint8Array;
+>bytes : Symbol(bytes, Decl(kvsKeyedIteration.ts, 5, 13))
+>Uint8Array : Symbol(Uint8Array, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --), Decl(lib.es2015.core.d.ts, --, --), Decl(lib.es2015.iterable.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --) ... and 1 more)
+
+declare const asyncValues: AsyncIterable<string>;
+>asyncValues : Symbol(asyncValues, Decl(kvsKeyedIteration.ts, 6, 13))
+>AsyncIterable : Symbol(AsyncIterable, Decl(lib.es2018.asynciterable.d.ts, --, --))
+
+declare const maybeItems: string[] | null;
+>maybeItems : Symbol(maybeItems, Decl(kvsKeyedIteration.ts, 7, 13))
+
+declare const ambiguous: string[] | Map<string, string>;
+>ambiguous : Symbol(ambiguous, Decl(kvsKeyedIteration.ts, 8, 13))
+>Map : Symbol(Map, Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.iterable.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --))
+
+for (items) {
+>items : Symbol(items, Decl(kvsKeyedIteration.ts, 0, 13))
+
+    const index = #;
+>index : Symbol(index, Decl(kvsKeyedIteration.ts, 11, 9))
+
+    const item = _;
+>item : Symbol(item, Decl(kvsKeyedIteration.ts, 12, 9))
+>_ : Symbol(_, Decl(kvsKeyedIteration.ts, 12, 16))
+}
+
+for (scores) {
+>scores : Symbol(scores, Decl(kvsKeyedIteration.ts, 1, 13))
+
+    const key = #;
+>key : Symbol(key, Decl(kvsKeyedIteration.ts, 16, 9))
+
+    const score = _;
+>score : Symbol(score, Decl(kvsKeyedIteration.ts, 17, 9))
+>_ : Symbol(_, Decl(kvsKeyedIteration.ts, 17, 17))
+}
+
+for (users) {
+>users : Symbol(users, Decl(kvsKeyedIteration.ts, 2, 13))
+
+    const id = #;
+>id : Symbol(id, Decl(kvsKeyedIteration.ts, 21, 9))
+
+    const user = _;
+>user : Symbol(user, Decl(kvsKeyedIteration.ts, 22, 9))
+>_ : Symbol(_, Decl(kvsKeyedIteration.ts, 22, 16))
+}
+
+for (values) {
+>values : Symbol(values, Decl(kvsKeyedIteration.ts, 3, 13))
+
+    const ordinal = #;
+>ordinal : Symbol(ordinal, Decl(kvsKeyedIteration.ts, 26, 9))
+
+    const value = _;
+>value : Symbol(value, Decl(kvsKeyedIteration.ts, 27, 9))
+>_ : Symbol(_, Decl(kvsKeyedIteration.ts, 27, 17))
+}
+
+for (pairs) {
+>pairs : Symbol(pairs, Decl(kvsKeyedIteration.ts, 4, 13))
+
+    const pairOrdinal = #;
+>pairOrdinal : Symbol(pairOrdinal, Decl(kvsKeyedIteration.ts, 31, 9))
+
+    const yieldedPair = _;
+>yieldedPair : Symbol(yieldedPair, Decl(kvsKeyedIteration.ts, 32, 9))
+>_ : Symbol(_, Decl(kvsKeyedIteration.ts, 32, 23))
+}
+
+for (bytes) {
+>bytes : Symbol(bytes, Decl(kvsKeyedIteration.ts, 5, 13))
+
+    const byteIndex = #;
+>byteIndex : Symbol(byteIndex, Decl(kvsKeyedIteration.ts, 36, 9))
+
+    const byte = _;
+>byte : Symbol(byte, Decl(kvsKeyedIteration.ts, 37, 9))
+>_ : Symbol(_, Decl(kvsKeyedIteration.ts, 37, 16))
+}
+
+for (const [key, score] in scores) {
+>key : Symbol(key, Decl(kvsKeyedIteration.ts, 40, 12))
+>score : Symbol(score, Decl(kvsKeyedIteration.ts, 40, 16))
+>scores : Symbol(scores, Decl(kvsKeyedIteration.ts, 1, 13))
+
+    const mapKey = key;
+>mapKey : Symbol(mapKey, Decl(kvsKeyedIteration.ts, 41, 9))
+>key : Symbol(key, Decl(kvsKeyedIteration.ts, 40, 12))
+
+    const mapValue = score;
+>mapValue : Symbol(mapValue, Decl(kvsKeyedIteration.ts, 42, 9))
+>score : Symbol(score, Decl(kvsKeyedIteration.ts, 40, 16))
+}
+
+for (const [index, item] in items) {
+>index : Symbol(index, Decl(kvsKeyedIteration.ts, 45, 12))
+>item : Symbol(item, Decl(kvsKeyedIteration.ts, 45, 18))
+>items : Symbol(items, Decl(kvsKeyedIteration.ts, 0, 13))
+
+    const arrayIndex = index;
+>arrayIndex : Symbol(arrayIndex, Decl(kvsKeyedIteration.ts, 46, 9))
+>index : Symbol(index, Decl(kvsKeyedIteration.ts, 45, 12))
+
+    const arrayItem = item;
+>arrayItem : Symbol(arrayItem, Decl(kvsKeyedIteration.ts, 47, 9))
+>item : Symbol(item, Decl(kvsKeyedIteration.ts, 45, 18))
+}
+
+for (const property in users) {
+>property : Symbol(property, Decl(kvsKeyedIteration.ts, 50, 10))
+>users : Symbol(users, Decl(kvsKeyedIteration.ts, 2, 13))
+
+    const nativeProperty = property;
+>nativeProperty : Symbol(nativeProperty, Decl(kvsKeyedIteration.ts, 51, 9))
+>property : Symbol(property, Decl(kvsKeyedIteration.ts, 50, 10))
+}
+
+for (const [key, score] of scores) {
+>key : Symbol(key, Decl(kvsKeyedIteration.ts, 54, 12))
+>score : Symbol(score, Decl(kvsKeyedIteration.ts, 54, 16))
+>scores : Symbol(scores, Decl(kvsKeyedIteration.ts, 1, 13))
+
+    const nativeMapKey = key;
+>nativeMapKey : Symbol(nativeMapKey, Decl(kvsKeyedIteration.ts, 55, 9))
+>key : Symbol(key, Decl(kvsKeyedIteration.ts, 54, 12))
+
+    const nativeMapValue = score;
+>nativeMapValue : Symbol(nativeMapValue, Decl(kvsKeyedIteration.ts, 56, 9))
+>score : Symbol(score, Decl(kvsKeyedIteration.ts, 54, 16))
+}
+
+const rows = collect (const [id, user] in users) {
+>rows : Symbol(rows, Decl(kvsKeyedIteration.ts, 59, 5))
+>id : Symbol(id, Decl(kvsKeyedIteration.ts, 59, 29))
+>user : Symbol(user, Decl(kvsKeyedIteration.ts, 59, 32))
+>users : Symbol(users, Decl(kvsKeyedIteration.ts, 2, 13))
+
+    if (user.active) yield { id, user };
+>user.active : Symbol(active, Decl(kvsKeyedIteration.ts, 2, 37))
+>user : Symbol(user, Decl(kvsKeyedIteration.ts, 59, 32))
+>active : Symbol(active, Decl(kvsKeyedIteration.ts, 2, 37))
+>id : Symbol(id, Decl(kvsKeyedIteration.ts, 60, 28))
+>user : Symbol(user, Decl(kvsKeyedIteration.ts, 60, 32))
+
+};
+
+const indexed = collect (items) {
+>indexed : Symbol(indexed, Decl(kvsKeyedIteration.ts, 63, 5))
+>items : Symbol(items, Decl(kvsKeyedIteration.ts, 0, 13))
+
+    if (_.length === 0) continue;
+>_.length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+>_ : Symbol(_, Decl(kvsKeyedIteration.ts, 64, 8))
+>length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+
+    yield [#, _] as const;
+>_ : Symbol(_, Decl(kvsKeyedIteration.ts, 64, 8))
+>const : Symbol(const)
+
+};
+
+const nullableIndexed = collect (maybeItems) {
+>nullableIndexed : Symbol(nullableIndexed, Decl(kvsKeyedIteration.ts, 68, 5))
+>maybeItems : Symbol(maybeItems, Decl(kvsKeyedIteration.ts, 7, 13))
+
+    yield [#, _] as const;
+>_ : Symbol(_, Decl(kvsKeyedIteration.ts, 69, 13))
+>const : Symbol(const)
+
+};
+
+const lazy = collect* (values) {
+>lazy : Symbol(lazy, Decl(kvsKeyedIteration.ts, 72, 5))
+>values : Symbol(values, Decl(kvsKeyedIteration.ts, 3, 13))
+
+    yield [#, _] as const;
+>_ : Symbol(_, Decl(kvsKeyedIteration.ts, 73, 13))
+>const : Symbol(const)
+
+};
+
+const selected = select (scores) {
+>selected : Symbol(selected, Decl(kvsKeyedIteration.ts, 76, 5))
+>scores : Symbol(scores, Decl(kvsKeyedIteration.ts, 1, 13))
+
+    if (_ > 10) yield #;
+>_ : Symbol(_, Decl(kvsKeyedIteration.ts, 77, 8))
+
+};
+
+const lastIndex = for (items; last = -1) {
+>lastIndex : Symbol(lastIndex, Decl(kvsKeyedIteration.ts, 80, 5))
+>items : Symbol(items, Decl(kvsKeyedIteration.ts, 0, 13))
+>last : Symbol(last, Decl(kvsKeyedIteration.ts, 80, 29))
+
+    last = #;
+>last : Symbol(last, Decl(kvsKeyedIteration.ts, 80, 29))
+
+};
+
+const nullableIndexTotal = for (const [index, item] in maybeItems; total = 0) {
+>nullableIndexTotal : Symbol(nullableIndexTotal, Decl(kvsKeyedIteration.ts, 84, 5))
+>index : Symbol(index, Decl(kvsKeyedIteration.ts, 84, 39))
+>item : Symbol(item, Decl(kvsKeyedIteration.ts, 84, 45))
+>maybeItems : Symbol(maybeItems, Decl(kvsKeyedIteration.ts, 7, 13))
+>total : Symbol(total, Decl(kvsKeyedIteration.ts, 84, 66))
+
+    total += index;
+>total : Symbol(total, Decl(kvsKeyedIteration.ts, 84, 66))
+>index : Symbol(index, Decl(kvsKeyedIteration.ts, 84, 39))
+
+};
+
+for (items) {
+>items : Symbol(items, Decl(kvsKeyedIteration.ts, 0, 13))
+
+    const outer = #;
+>outer : Symbol(outer, Decl(kvsKeyedIteration.ts, 89, 9))
+
+    for (items.slice(#)) {
+>items.slice : Symbol(Array.slice, Decl(lib.es5.d.ts, --, --))
+>items : Symbol(items, Decl(kvsKeyedIteration.ts, 0, 13))
+>slice : Symbol(Array.slice, Decl(lib.es5.d.ts, --, --))
+
+        const inner = #;
+>inner : Symbol(inner, Decl(kvsKeyedIteration.ts, 91, 13))
+
+        const sliced = _;
+>sliced : Symbol(sliced, Decl(kvsKeyedIteration.ts, 92, 13))
+>_ : Symbol(_, Decl(kvsKeyedIteration.ts, 92, 22))
+    }
+    const outerAgain = #;
+>outerAgain : Symbol(outerAgain, Decl(kvsKeyedIteration.ts, 94, 9))
+}
+
+async function consume() {
+>consume : Symbol(consume, Decl(kvsKeyedIteration.ts, 95, 1))
+
+    for await (asyncValues) {
+>asyncValues : Symbol(asyncValues, Decl(kvsKeyedIteration.ts, 6, 13))
+
+        const ordinal = #;
+>ordinal : Symbol(ordinal, Decl(kvsKeyedIteration.ts, 99, 13))
+
+        const value = _;
+>value : Symbol(value, Decl(kvsKeyedIteration.ts, 100, 13))
+>_ : Symbol(_, Decl(kvsKeyedIteration.ts, 100, 21))
+    }
+}
+
+for (ambiguous) {
+>ambiguous : Symbol(ambiguous, Decl(kvsKeyedIteration.ts, 8, 13))
+
+    const rejectedCoordinate = #;
+>rejectedCoordinate : Symbol(rejectedCoordinate, Decl(kvsKeyedIteration.ts, 105, 9))
+
+    const rejectedValue = _;
+>rejectedValue : Symbol(rejectedValue, Decl(kvsKeyedIteration.ts, 106, 9))
+>_ : Symbol(_, Decl(kvsKeyedIteration.ts, 106, 25))
+}
+
+const invalid = #;
+>invalid : Symbol(invalid, Decl(kvsKeyedIteration.ts, 109, 5))
+
+const invalidKeyedProducer = collect (const key in users) yield key;
+>invalidKeyedProducer : Symbol(invalidKeyedProducer, Decl(kvsKeyedIteration.ts, 111, 5))
+>key : Symbol(key, Decl(kvsKeyedIteration.ts, 111, 43))
+>users : Symbol(users, Decl(kvsKeyedIteration.ts, 2, 13))
+>key : Symbol(key, Decl(kvsKeyedIteration.ts, 111, 43))
+

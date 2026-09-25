@@ -635,6 +635,17 @@ func (f *NodeFactory) NewKvsRangeHelper(lower *ast.Expression, upper *ast.Expres
 	)
 }
 
+func (f *NodeFactory) NewKvsKeyedIterationHelper(source *ast.Expression, record bool, async bool) *ast.Expression {
+	f.emitContext.RequestEmitHelper(KvsKeyedIterationHelper)
+	return f.NewCallExpression(
+		f.NewUnscopedHelperName("__kvsKeyed"),
+		nil,
+		nil,
+		f.NewNodeList([]*ast.Node{source, f.NewKeywordExpression(core.IfElse(record, ast.KindTrueKeyword, ast.KindFalseKeyword)), f.NewKeywordExpression(core.IfElse(async, ast.KindTrueKeyword, ast.KindFalseKeyword))}),
+		ast.NodeFlagsNone,
+	)
+}
+
 func (f *NodeFactory) NewDecorateHelper(decoratorExpressions []*ast.Node, target *ast.Node, memberName *ast.Node, descriptor *ast.Node) *ast.Expression {
 	f.emitContext.RequestEmitHelper(decorateHelper)
 

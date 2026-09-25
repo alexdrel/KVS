@@ -266,6 +266,7 @@ const (
 	KindKvsDefaultExpression
 	KindKvsSieveExpression
 	KindKvsPlaceholderLambdaExpression
+	KindKvsIterationCoordinateExpression
 	KindKvsSieveBindingInitializer
 	KindKvsSieveAssignmentExpression
 	KindKvsFailureDemotionExpression

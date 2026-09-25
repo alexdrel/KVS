@@ -8975,5 +8975,13 @@
     "A destructured parameter cannot traverse a nullable source. Bind the parameter first and destructure it in the function body.": {
         "category": "Error",
         "code": 100090
+    },
+    "Keyed iteration requires a source with one statically determined coordinate category.": {
+        "category": "Error",
+        "code": 100091
+    },
+    "A keyed producer header must use an array binding pattern.": {
+        "category": "Error",
+        "code": 100092
     }
 }

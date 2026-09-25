@@ -43,12 +43,7 @@ const parent = select (nodes) {
 };
 ```
 
-`_` means the current value of the nearest implicit iteration or subject-form `when`. Iterators that
-produce tuples need no special index feature:
-
-```kvs
-const rows = collect (items.entries()) yield renderRow(_[0], _[1]);
-```
+`_` means the current value of the nearest implicit iteration or subject-form `when`.
 
 The explicit destructuring form remains preferable when the components are used repeatedly:
 
@@ -63,6 +58,44 @@ boundary. This keeps an outer implicit iteration visible inside a callback:
 ```kvs
 collect (groups) yield _.members.filter(%.groupId == _.id);
 ```
+
+## Keyed iteration
+
+Inside an implicit iteration, `#` is the coordinate of `_`:
+
+```kvs
+const rows = collect (users) {
+    if (_.active) yield { id: #, user: _ };
+};
+```
+
+| Source                      | `_`            | `#`                          |
+| --------------------------- | -------------- | ---------------------------- |
+| array / tuple / typed array | element        | numeric index                |
+| `Map<K, V>`                 | value          | key                          |
+| record / dictionary         | property value | property key                 |
+| other `Iterable<T>`         | yielded value  | zero-based iteration ordinal |
+
+This view applies to implicit `for`, `collect`, `collect*`, and `select`. Source coordinates do not
+change when the body filters, continues, or skips a production. An iterable that yields pairs still
+has each complete pair as `_`; pair-shaped values are not reinterpreted as entries.
+
+The explicit form names both values with a destructuring `in` header:
+
+```kvs
+for (const [index, value] in items) { ... }
+for (const [key, value] in users) { ... }
+for (const [key, value] in map) { ... }
+```
+
+A destructuring `in` header uses the same coordinate/value view. Single-binding JavaScript
+`for...in` and explicit `for...of` keep their existing behavior.
+
+The source's static type selects the category. A union spanning different categories must first be
+narrowed. Nullable sources retain the ordinary absent-iteration behavior. Records enumerate own
+string-keyed properties in JavaScript property order.
+
+`#` belongs to the nearest implicit iteration. Nested implicit iteration shadows both `_` and `#`.
 
 ## Range expressions
 

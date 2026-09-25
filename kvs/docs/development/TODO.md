@@ -3,7 +3,7 @@
 This is a working implementation aid, not a language specification or feature order. The language
 documents remain authoritative for accepted semantics.
 
-Progress: **276 of 377 items complete (73.2%)**; **101 remain open**.
+Progress: **290 of 377 items complete (76.9%)**; **87 remain open**.
 
 - `[x]` means implemented with focused compiler evidence.
 - `[ ]` means unimplemented, incomplete, or not yet deliberately validated.
@@ -53,6 +53,8 @@ Implemented vertical slices:
 - Terminal structural defaults for the same concrete POD types: `maybeProfile!`.
 - Numeric ranges with exclusive or inclusive upper bounds.
 - Lazy `collect*` with iterator-local production.
+- Keyed iteration across implicit loops and destructuring `in`, with static array, Map, record, and
+  general-iterable categories.
 
 Known semantic debts:
 
@@ -98,6 +100,7 @@ Focused conformance inputs:
 - `tsc/testdata/tests/cases/conformance/kvs/kvsPlaceholderLambda.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsPlaceholderLambdaClosure.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsRange.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsKeyedIteration.ts`
 
 Run all implemented KVS slices together:
 
@@ -251,20 +254,20 @@ example `.js` files are intentionally ignored.
 
 ### Keyed iteration
 
-- [ ] `_%` companion coordinate for implicit `for`, `collect`, `collect*`, and `select`
-- [ ] Arrays, tuples, and typed arrays expose numeric indexes
-- [ ] Maps expose keys while `_` remains the mapped value
-- [ ] Records expose own enumerable string keys in JavaScript property order
-- [ ] Other iterables expose a zero-based source ordinal
-- [ ] Filtering, `continue`, and skipped production do not renumber coordinates
-- [ ] Yielded pair values remain values rather than being guessed as entries
-- [ ] Static source type selects the keyed iteration category
-- [ ] Ambiguous source types require narrowing or explicit iteration
-- [ ] Nullable sources retain the existing absent-iteration behavior
-- [ ] Explicit `for (const [key, value] in source)` keyed form
-- [ ] Existing single-binding `for...in` remains unchanged
-- [ ] Explicit `for...of` retains native iterator semantics
-- [ ] Nested implicit iteration shadows both `_` and `_%`
+- [x] `#` coordinate expression for implicit `for`, `collect`, `collect*`, and `select`
+- [x] Arrays, tuples, and typed arrays expose numeric indexes
+- [x] Maps expose keys while `_` remains the mapped value
+- [x] Records expose own enumerable string keys in JavaScript property order
+- [x] Other iterables expose a zero-based source ordinal
+- [x] Filtering, `continue`, and skipped production do not renumber coordinates
+- [x] Yielded pair values remain values rather than being guessed as entries
+- [x] Static source type selects the keyed iteration category
+- [x] Ambiguous source types require narrowing or explicit iteration
+- [x] Nullable sources retain the existing absent-iteration behavior
+- [x] Explicit `for (const [key, value] in source)` keyed form
+- [x] Existing single-binding `for...in` remains unchanged
+- [x] Explicit `for...of` retains native iterator semantics
+- [x] Nested implicit iteration shadows both `_` and `#`
 
 ### Expression-valued `for`
 
