@@ -15,6 +15,7 @@ const f = ([i, x]: F): undefined => {
 >x : readonly [number] | readonly [number, number] | readonly [number, number, number]
 
     switch (i) {
+>switch (i) {        case 0: {            switch (x.length) {                case 1: case 2: return undefined;            }        }        case 1: {            const _: 2 | 3 = x.length;        }    } : null
 >i : 0 | 1
 
         case 0: {

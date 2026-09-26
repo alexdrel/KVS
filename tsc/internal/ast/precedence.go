@@ -340,6 +340,7 @@ func GetOperatorPrecedence(nodeKind Kind, operatorKind Kind, flags OperatorPrece
 		KindKvsCollectExpression,
 		KindKvsLazyCollectExpression,
 		KindKvsSelectExpression,
+		KindKvsSwitchExpression,
 		KindKvsForExpression,
 		KindObjectLiteralExpression,
 		KindFunctionExpression,

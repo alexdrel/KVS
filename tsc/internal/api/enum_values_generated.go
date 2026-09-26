@@ -587,6 +587,7 @@ func main() {
 			"KvsCollectExpression":                         toInt32(ast.KindKvsCollectExpression),
 			"KvsLazyCollectExpression":                     toInt32(ast.KindKvsLazyCollectExpression),
 			"KvsSelectExpression":                          toInt32(ast.KindKvsSelectExpression),
+			"KvsSwitchExpression":                          toInt32(ast.KindKvsSwitchExpression),
 			"KvsForExpression":                             toInt32(ast.KindKvsForExpression),
 			"SpreadElement":                                toInt32(ast.KindSpreadElement),
 			"ClassExpression":                              toInt32(ast.KindClassExpression),

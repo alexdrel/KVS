@@ -24,6 +24,7 @@ export function evaluate(expression: Expression): boolean {
 >expression : BooleanLogicExpression
 
     switch (operator) {
+>switch (operator) {      case 'and': {        return operands.every((child) => evaluate(child));      }      case 'not': {        return !evaluate(operands[0]);      }      default: {        throw new Error(`${operator} is not a supported operator`);      }    } : never
 >operator : "and" | "not"
 
       case 'and': {

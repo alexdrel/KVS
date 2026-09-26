@@ -2235,5 +2235,8 @@
     "KVS_on_a_typed_in_place_spread_target_requires_a_writable_target_100089": "KVS '!' on a typed in-place spread target requires a writable target.",
     "A_destructured_parameter_cannot_traverse_a_nullable_source_Bind_the_parameter_first_and_destructure__100090": "A destructured parameter cannot traverse a nullable source. Bind the parameter first and destructure it in the function body.",
     "Keyed_iteration_requires_a_source_with_one_statically_determined_coordinate_category_100091": "Keyed iteration requires a source with one statically determined coordinate category.",
-    "A_keyed_producer_header_must_use_an_array_binding_pattern_100092": "A keyed producer header must use an array binding pattern."
+    "A_keyed_producer_header_must_use_an_array_binding_pattern_100092": "A keyed producer header must use an array binding pattern.",
+    "KVS_switch_must_be_at_the_head_of_a_supported_value_expression_100093": "KVS 'switch' must be at the head of a supported value expression.",
+    "A_concise_KVS_switch_arm_must_contain_exactly_one_expression_Use_a_block_and_yield_for_a_procedural__100094": "A concise KVS switch arm must contain exactly one expression. Use a block and yield for a procedural arm.",
+    "A_KVS_switch_binding_must_be_a_single_const_declaration_with_an_initializer_100095": "A KVS switch binding must be a single const declaration with an initializer."
 }

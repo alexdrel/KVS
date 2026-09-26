@@ -314,6 +314,7 @@
             "KvsCollectExpression",
             "KvsLazyCollectExpression",
             "KvsSelectExpression",
+            "KvsSwitchExpression",
             "KvsForExpression",
             "SpreadElement",
             "ClassExpression",
@@ -2270,6 +2271,31 @@
                         "name": "Statement",
                         "type": "Statement",
                         "visit": "iterationBody"
+                    }
+                ],
+                "arena": true
+            },
+            "KvsSwitchExpression": {
+                "generateSubtreeFacts": true,
+                "extends": [
+                    "ExpressionBase",
+                    "LocalsContainerBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "Initializer",
+                        "type": "VariableDeclarationList",
+                        "optional": true
+                    },
+                    {
+                        "name": "Expression",
+                        "type": "Expression",
+                        "optional": true
+                    },
+                    {
+                        "name": "CaseBlock",
+                        "type": "CaseBlock"
                     }
                 ],
                 "arena": true

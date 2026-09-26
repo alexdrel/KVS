@@ -1,0 +1,48 @@
+kvsSwitchErrors.ts(3,20): error TS100093: KVS 'switch' must be at the head of a supported value expression.
+kvsSwitchErrors.ts(8,5): error TS100094: A concise KVS switch arm must contain exactly one expression. Use a block and yield for a procedural arm.
+kvsSwitchErrors.ts(13,32): error TS100095: A KVS switch binding must be a single const declaration with an initializer.
+kvsSwitchErrors.ts(20,9): error TS1105: A 'break' statement can only be used within an enclosing iteration or switch statement.
+kvsSwitchErrors.ts(26,5): error TS1113: A 'default' clause cannot appear more than once in a 'switch' statement.
+
+
+==== kvsSwitchErrors.ts (5 errors) ====
+    declare const value: number;
+    
+    const buried = 1 + switch (value) {
+                       ~~~~~~~~~~~~~~~~
+        case 1: 2;
+    ~~~~~~~~~~~~~~
+    };
+    ~
+!!! error TS100093: KVS 'switch' must be at the head of a supported value expression.
+    
+    const malformedArm = switch (value) {
+        case 1:
+        ~~~~~~~
+!!! error TS100094: A concise KVS switch arm must contain exactly one expression. Use a block and yield for a procedural arm.
+            value;
+            value + 1;
+    };
+    
+    const invalidBinding = switch (const first = value, second = value) {
+                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+!!! error TS100095: A KVS switch binding must be a single const declaration with an initializer.
+        case first > 0: first;
+        default: second;
+    };
+    
+    const invalidBreak = switch {
+        case value > 0: {
+            break;
+            ~~~~~~
+!!! error TS1105: A 'break' statement can only be used within an enclosing iteration or switch statement.
+        }
+    };
+    
+    const duplicateDefault = switch (value) {
+        default: 1;
+        default: 2;
+        ~~~~~~~~
+!!! error TS1113: A 'default' clause cannot appear more than once in a 'switch' statement.
+    };
+    

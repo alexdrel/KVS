@@ -94,12 +94,13 @@ let x: string | undefined;
 >x : string | undefined
 
 switch (true) {
+>switch (true) {  case typeof x !== "undefined":    x.trim();} : string | null
 >true : true
 
   case typeof x !== "undefined":
 >typeof x !== "undefined" : boolean
 >typeof x : "bigint" | "boolean" | "function" | "number" | "object" | "string" | "symbol" | "undefined"
->x : string | undefined
+>x : string
 >"undefined" : "undefined"
 
     x.trim();

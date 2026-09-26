@@ -183,6 +183,7 @@ function f4s(x: symbol | string) {
 >x : string | symbol
 
     switch (x) {
+>switch (x) {        case sym:            x;  // symbol (not narrowed)    } : symbol | null
 >x : string | symbol
 
         case sym:

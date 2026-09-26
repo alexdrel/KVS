@@ -451,6 +451,12 @@ func (d *astDecoder) createChildrenNode(kind ast.Kind, data uint32, childIndices
 		expression := d.nodeAt(it.nextIf(mask, 1))
 		statement := d.nodeAt(it.nextIf(mask, 2))
 		return d.factory.NewKvsSelectExpression(initializer, expression, keyed, statement), nil
+	case ast.KindKvsSwitchExpression:
+		it := newChildIter(childIndices)
+		initializer := d.nodeAt(it.nextIf(mask, 0))
+		expression := d.nodeAt(it.nextIf(mask, 1))
+		caseBlock := d.nodeAt(it.nextIf(mask, 2))
+		return d.factory.NewKvsSwitchExpression(initializer, expression, caseBlock), nil
 	case ast.KindKvsForExpression:
 		tupleResult := commonData&1 != 0
 		objectResult := commonData&2 != 0

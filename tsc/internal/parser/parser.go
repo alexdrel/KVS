@@ -1507,14 +1507,50 @@ func (p *Parser) parseCaseBlock() *ast.Node {
 func (p *Parser) parseSwitchStatement() *ast.Node {
 	pos := p.nodePos()
 	jsdoc := p.jsdocScannerInfo()
-	p.parseExpected(ast.KindSwitchKeyword)
-	p.parseExpected(ast.KindOpenParenToken)
-	expression := p.parseExpressionAllowIn()
-	p.parseExpected(ast.KindCloseParenToken)
-	caseBlock := p.parseCaseBlock()
-	result := p.finishNode(p.factory.NewSwitchStatement(expression, caseBlock), pos)
+	result := p.parseKvsSwitchExpression()
+	data := result.AsKvsSwitchExpression()
+	if data.Initializer == nil && data.Expression != nil && (containsSwitchTargetingBreak(data.CaseBlock) || !hasKvsSwitchArmShape(data.CaseBlock)) {
+		result = p.finishNodeWithEnd(p.factory.NewSwitchStatement(data.Expression, data.CaseBlock), pos, result.End())
+	} else {
+		result = p.finishNodeWithEnd(p.factory.NewExpressionStatement(result), pos, result.End())
+		p.parseSemicolon()
+	}
 	p.withJSDoc(result, jsdoc)
 	return result
+}
+
+func hasKvsSwitchArmShape(caseBlock *ast.Node) bool {
+	clauses := caseBlock.AsCaseBlock().Clauses.Nodes
+	if len(clauses) == 0 {
+		return false
+	}
+	for _, clause := range clauses {
+		statements := clause.Statements()
+		if len(statements) != 1 || statements[0].Kind != ast.KindExpressionStatement && statements[0].Kind != ast.KindBlock {
+			return false
+		}
+	}
+	return true
+}
+
+func containsSwitchTargetingBreak(node *ast.Node) bool {
+	var found bool
+	var visit func(*ast.Node) bool
+	visit = func(current *ast.Node) bool {
+		if found {
+			return true
+		}
+		if current != node && (ast.IsFunctionLike(current) || ast.IsIterationStatement(current, false) || current.Kind == ast.KindSwitchStatement || current.Kind == ast.KindKvsSwitchExpression) {
+			return false
+		}
+		if current.Kind == ast.KindBreakStatement && current.Label() == nil {
+			found = true
+			return true
+		}
+		return current.ForEachChild(visit)
+	}
+	visit(node)
+	return found
 }
 
 func (p *Parser) parseThrowStatement() *ast.Node {
@@ -6120,6 +6156,9 @@ func (p *Parser) parseTemplateSpan(isTaggedTemplate bool) *ast.Node {
 }
 
 func (p *Parser) parsePrimaryExpression() *ast.Expression {
+	if p.token == ast.KindSwitchKeyword {
+		return p.parseKvsSwitchExpression()
+	}
 	if p.token == ast.KindIdentifier && p.scanner.TokenValue() == "collect" && p.lookAhead((*Parser).nextTokenIsContiguousAsteriskAndOpenParen) {
 		return p.parseKvsProducerExpression()
 	}
@@ -6191,6 +6230,41 @@ func (p *Parser) parsePrimaryExpression() *ast.Expression {
 		return p.parsePrivateIdentifier()
 	}
 	return p.parseIdentifierWithDiagnostic(diagnostics.Expression_expected, nil)
+}
+
+func (p *Parser) parseKvsSwitchExpression() *ast.Expression {
+	pos := p.nodePos()
+	p.parseExpected(ast.KindSwitchKeyword)
+	var initializer *ast.VariableDeclarationListNode
+	var expression *ast.Expression
+	if p.token == ast.KindOpenParenToken {
+		p.nextToken()
+		if p.token == ast.KindConstKeyword {
+			initializer = p.parseKvsSwitchBinding()
+		} else {
+			expression = p.parseExpressionAllowIn()
+		}
+		p.parseExpected(ast.KindCloseParenToken)
+	}
+	saveActive := p.kvsProducerActive
+	saveFunctionDepth := p.kvsProducerFunctionDepth
+	p.kvsProducerActive = true
+	p.kvsProducerFunctionDepth = p.functionDepth
+	caseBlock := p.parseCaseBlock()
+	p.kvsProducerActive = saveActive
+	p.kvsProducerFunctionDepth = saveFunctionDepth
+	return p.finishNode(p.factory.NewKvsSwitchExpression(initializer, expression, caseBlock), pos)
+}
+
+func (p *Parser) parseKvsSwitchBinding() *ast.VariableDeclarationListNode {
+	pos := p.nodePos()
+	p.nextToken() // const
+	declarations := []*ast.Node{p.parseVariableDeclaration()}
+	for p.parseOptional(ast.KindCommaToken) {
+		declarations = append(declarations, p.parseVariableDeclaration())
+	}
+	list := p.newNodeList(core.NewTextRange(declarations[0].Pos(), p.nodePos()), declarations)
+	return p.finishNode(p.factory.NewVariableDeclarationList(list, ast.NodeFlagsConst), pos)
 }
 
 func (p *Parser) nextTokenIsContiguousAsteriskAndOpenParen() bool {

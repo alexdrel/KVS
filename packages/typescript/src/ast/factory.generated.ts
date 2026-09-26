@@ -180,6 +180,7 @@ import type {
     KvsSieveAssignmentExpression,
     KvsSieveBindingInitializer,
     KvsSieveExpression,
+    KvsSwitchExpression,
     KvsTypedObjectExpression,
     KvsTypedSpreadAssignmentExpression,
     KvsYieldStatement,
@@ -974,6 +975,8 @@ function cloneNodeData(node: Node): any {
             return { initializer: n.initializer, expression: n.expression, keyed: n.keyed, statement: n.statement };
         case SyntaxKind.KvsSelectExpression:
             return { initializer: n.initializer, expression: n.expression, keyed: n.keyed, statement: n.statement };
+        case SyntaxKind.KvsSwitchExpression:
+            return { initializer: n.initializer, expression: n.expression, caseBlock: n.caseBlock };
         case SyntaxKind.KvsForExpression:
             return { initializer: n.initializer, condition: n.condition, incrementor: n.incrementor, expression: n.expression, result: n.result, tupleResult: n.tupleResult, objectResult: n.objectResult, forIn: n.forIn, statement: n.statement };
         case SyntaxKind.LabeledStatement:
@@ -1458,6 +1461,10 @@ const forEachChildTable: Record<number, ForEachChildFunction> = {
         visitNode(cbNode, data.initializer) ||
         visitNode(cbNode, data.expression) ||
         visitNode(cbNode, data.statement),
+    [SyntaxKind.KvsSwitchExpression]: (data, cbNode, cbNodes) =>
+        visitNode(cbNode, data.initializer) ||
+        visitNode(cbNode, data.expression) ||
+        visitNode(cbNode, data.caseBlock),
     [SyntaxKind.KvsForExpression]: (data, cbNode, cbNodes) =>
         visitNode(cbNode, data.initializer) ||
         visitNode(cbNode, data.condition) ||
@@ -2483,6 +2490,20 @@ const yieldEachChildTable: Record<number, YieldEachChildFunction> = {
         }
         if (data.statement) {
             const res = yield data.statement;
+            if (res) return res;
+        }
+    },
+    [SyntaxKind.KvsSwitchExpression]: function* (data) {
+        if (data.initializer) {
+            const res = yield data.initializer;
+            if (res) return res;
+        }
+        if (data.expression) {
+            const res = yield data.expression;
+            if (res) return res;
+        }
+        if (data.caseBlock) {
+            const res = yield data.caseBlock;
             if (res) return res;
         }
     },
@@ -4985,6 +5006,14 @@ export function createKvsSelectExpression(initializer: ForInitializer, expressio
     }) as unknown as KvsSelectExpression;
 }
 
+export function createKvsSwitchExpression(initializer: VariableDeclarationList | undefined, expression: Expression | undefined, caseBlock: CaseBlock): KvsSwitchExpression {
+    return new NodeObject(SyntaxKind.KvsSwitchExpression, {
+        initializer,
+        expression,
+        caseBlock,
+    }) as unknown as KvsSwitchExpression;
+}
+
 export function createKvsForExpression(initializer: ForInitializer | undefined, condition: Expression | undefined, incrementor: Expression | undefined, expression: Expression | undefined, result: VariableDeclarationList, tupleResult: boolean = false, objectResult: boolean = false, forIn: boolean = false, statement: Statement): KvsForExpression {
     return new NodeObject(SyntaxKind.KvsForExpression, {
         initializer,
@@ -6513,6 +6542,10 @@ export function updateKvsLazyCollectExpression(node: KvsLazyCollectExpression, i
 
 export function updateKvsSelectExpression(node: KvsSelectExpression, initializer: ForInitializer, expression: Expression, statement: Statement): KvsSelectExpression {
     return node.initializer !== initializer || node.expression !== expression || node.statement !== statement ? createKvsSelectExpression(initializer, expression, node.keyed, statement) : node;
+}
+
+export function updateKvsSwitchExpression(node: KvsSwitchExpression, initializer: VariableDeclarationList | undefined, expression: Expression | undefined, caseBlock: CaseBlock): KvsSwitchExpression {
+    return node.initializer !== initializer || node.expression !== expression || node.caseBlock !== caseBlock ? createKvsSwitchExpression(initializer, expression, caseBlock) : node;
 }
 
 export function updateKvsForExpression(node: KvsForExpression, initializer: ForInitializer | undefined, condition: Expression | undefined, incrementor: Expression | undefined, expression: Expression | undefined, result: VariableDeclarationList, statement: Statement): KvsForExpression {

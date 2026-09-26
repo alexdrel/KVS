@@ -362,6 +362,32 @@ record loops still use their keyed view so `_` remains the mapped or property va
 `for...in` header lowers to the same ordinary pair iteration; single-binding `for...in` is
 untouched.
 
+### Value-producing switch
+
+A consumed KVS switch lowers inline to a null-initialized result temporary. When its value is
+discarded, its arm expressions still execute but the temporary and trailing read are omitted.
+Equality switches remain ordinary JavaScript switches; alternative labels become consecutive `case`
+clauses. Subjectless and binding switches become an `if`/`else if` chain. A binding initializer is
+emitted once as a `const` before that chain.
+
+Concise equality arms assign their expression and use an ordinary `break` when another case follows.
+Subjectless and binding arms need no completion jump because their conditional chain cannot fall
+through. In block arms, `yield` performs the same assignment and exits; `yield?` captures its
+operand once and exits only on the present path. A labeled exit is reserved for production that must
+cross an intervening loop or switch, or escape a conditional-form block. Normal completion leaves
+the result null. Nested ordinary loops do not change the production target, while a nested KVS
+producer establishes its own target.
+
+Equality-form arms reuse ordinary switch flow nodes for narrowing without inheriting fallthrough.
+The same flow graph determines whether the end of a procedural arm is reachable, so exhaustive
+branching production excludes `null` while normal completion and a possibly absent `yield?` include
+it. Synthetic completion breaks are omitted when an arm is known to return or throw.
+
+A `switch (expression)` with a switch-targeting `break`, no clauses, or a clause that is not one
+concise expression or one procedural block remains an ordinary JavaScript switch and is not lowered
+as a producer. Breaks inside nested loops or nested switches do not classify the outer switch.
+Subjectless and binding switches always use KVS semantics and reject a switch-targeting break.
+
 When a producing loop heads a larger value expression, its statements are lifted into the
 surrounding scope and its generated result temporary replaces the loop at the start of the ordinary
 expression tail. This does not require a synthetic function boundary.

@@ -217,6 +217,7 @@ import type {
     KvsSieveAssignmentExpression,
     KvsSieveBindingInitializer,
     KvsSieveExpression,
+    KvsSwitchExpression,
     KvsTypedObjectExpression,
     KvsTypedSpreadAssignmentExpression,
     KvsYieldStatement,
@@ -826,6 +827,15 @@ export declare namespace isKvsSelectExpression {
     function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsSelectExpression>;
 }
 isKvsSelectExpression.Handle = isKvsSelectExpression as any;
+
+export function isKvsSwitchExpression(node: Node): node is KvsSwitchExpression {
+    return node.kind === SyntaxKind.KvsSwitchExpression;
+}
+
+export declare namespace isKvsSwitchExpression {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsSwitchExpression>;
+}
+isKvsSwitchExpression.Handle = isKvsSwitchExpression as any;
 
 export function isKvsForExpression(node: Node): node is KvsForExpression {
     return node.kind === SyntaxKind.KvsForExpression;

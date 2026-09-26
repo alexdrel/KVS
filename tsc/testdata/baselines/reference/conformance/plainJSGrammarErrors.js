@@ -357,10 +357,11 @@ var b;
 switch (b) {
     case false:
         console.log('no');
+        break;
     default:
         console.log('yes');
-    default:
-        console.log('wat');
+        break;
+    default: console.log('wat');
 }
 try {
     throw 2;

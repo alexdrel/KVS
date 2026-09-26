@@ -1,0 +1,82 @@
+//// [tests/cases/conformance/kvs/kvsSwitchErrors.ts] ////
+
+=== kvsSwitchErrors.ts ===
+declare const value: number;
+>value : number
+
+const buried = 1 + switch (value) {
+>buried : number | null
+>1 + switch (value) {    case 1: 2;} : number | null
+>1 : 1
+>switch (value) {    case 1: 2;} : 2 | null
+>value : number
+
+    case 1: 2;
+>1 : 1
+>2 : 2
+
+};
+
+const malformedArm = switch (value) {
+>malformedArm : null
+>switch (value) {    case 1:        value;        value + 1;} : null
+>value : number
+
+    case 1:
+>1 : 1
+
+        value;
+>value : 1
+
+        value + 1;
+>value + 1 : number
+>value : 1
+>1 : 1
+
+};
+
+const invalidBinding = switch (const first = value, second = value) {
+>invalidBinding : number
+>switch (const first = value, second = value) {    case first > 0: first;    default: second;} : number
+>first : number
+>value : number
+>second : number
+>value : number
+
+    case first > 0: first;
+>first > 0 : boolean
+>first : number
+>0 : 0
+>first : number
+
+    default: second;
+>second : number
+
+};
+
+const invalidBreak = switch {
+>invalidBreak : null
+>switch {    case value > 0: {        break;    }} : null
+
+    case value > 0: {
+>value > 0 : boolean
+>value : number
+>0 : 0
+
+        break;
+    }
+};
+
+const duplicateDefault = switch (value) {
+>duplicateDefault : 1 | 2
+>switch (value) {    default: 1;    default: 2;} : 1 | 2
+>value : number
+
+    default: 1;
+>1 : 1
+
+    default: 2;
+>2 : 2
+
+};
+

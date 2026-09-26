@@ -3,7 +3,7 @@
 This is a working implementation aid, not a language specification or feature order. The language
 documents remain authoritative for accepted semantics.
 
-Progress: **296 of 382 items complete (77.5%)**; **86 remain open**.
+Progress: **297 of 382 items complete (77.7%)**; **85 remain open**.
 
 - `[x]` means implemented with focused compiler evidence.
 - `[ ]` means unimplemented, incomplete, or not yet deliberately validated.
@@ -364,20 +364,25 @@ example `.js` files are intentionally ignored.
 - [ ] Preserve assignment-target evaluation order before producer
 - [ ] Preserve earlier object-field/computed-key/spread evaluation order
 
-### `when`
+### Value-producing `switch`
 
-- [ ] Subject form
-- [ ] `_` subject
-- [ ] Named subject
-- [ ] Subjectless form
-- [ ] `default`
-- [ ] Nullable conditions
-- [ ] Expression arm
-- [ ] Block arm
-- [ ] Arm-local `return`
-- [ ] No default -> nullable result
-- [ ] Default -> non-nullable result
-- [ ] Surrounding `yield` remains visible through arm
+- [x] Equality subject form
+- [x] Finite `case a | b` alternatives
+- [x] Parenthesized bitwise case expression
+- [x] Subjectless conditional form
+- [x] Single `const` binding form
+- [x] Ordinary truthiness for conditional cases
+- [x] Expression arm
+- [x] Procedural block arm with `yield` and `yield?`
+- [x] No matching arm or normal block completion -> nullable result
+- [x] Default removes the unmatched path
+- [x] KVS switch establishes a production boundary
+- [x] `return` retains containing-function meaning
+- [x] Switch-targeting `break` or a non-KVS arm shape selects classic JavaScript semantics
+- [x] Nested-loop and nested-switch breaks do not classify the outer switch
+- [x] Classic switch remains transparent to an enclosing producer
+- [x] Producer-head placement and ordinary expression tails
+- [x] Precise non-nullability for every structurally exhaustive procedural arm
 
 ## 3. Extant operations
 

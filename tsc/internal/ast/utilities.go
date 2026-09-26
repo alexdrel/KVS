@@ -558,6 +558,7 @@ func isExpressionKind(kind Kind) bool {
 		KindKvsCollectExpression,
 		KindKvsLazyCollectExpression,
 		KindKvsSelectExpression,
+		KindKvsSwitchExpression,
 		KindKvsForExpression,
 		KindYieldExpression,
 		KindArrowFunction,
@@ -2134,7 +2135,7 @@ func IsExpressionNode(node *Node) bool {
 		KindClassExpression, KindArrowFunction, KindVoidExpression, KindDeleteExpression, KindTypeOfExpression,
 		KindPrefixUnaryExpression, KindPostfixUnaryExpression, KindBinaryExpression, KindConditionalExpression, KindKvsDefaultExpression, KindKvsSieveExpression, KindKvsSieveBindingInitializer, KindKvsSieveAssignmentExpression, KindKvsTypedSpreadAssignmentExpression, KindKvsFailureDemotionExpression, KindKvsFailurePromotionExpression, KindKvsCatchSplitExpression, KindKvsCatchSplitAssignmentExpression, KindKvsNullingExpression, KindKvsConditionalElement, KindKvsRangeExpression,
 		KindSpreadElement, KindTemplateExpression, KindOmittedExpression, KindJsxElement, KindJsxSelfClosingElement, KindKvsIterationCoordinateExpression,
-		KindJsxFragment, KindYieldExpression, KindKvsNullableAssertionExpression, KindKvsExtantAssertionExpression, KindKvsExtantAssignmentExpression, KindKvsCollectExpression, KindKvsLazyCollectExpression, KindKvsSelectExpression, KindKvsForExpression, KindAwaitExpression:
+		KindJsxFragment, KindYieldExpression, KindKvsNullableAssertionExpression, KindKvsExtantAssertionExpression, KindKvsExtantAssignmentExpression, KindKvsCollectExpression, KindKvsLazyCollectExpression, KindKvsSelectExpression, KindKvsSwitchExpression, KindKvsForExpression, KindAwaitExpression:
 		return true
 	case KindMetaProperty:
 		// `import.defer` in `import.defer(...)` is not an expression
@@ -2180,6 +2181,8 @@ func IsKvsStatementHeadPosition(node *Node) bool {
 	for current.Parent != nil {
 		parent := current.Parent
 		switch parent.Kind {
+		case KindExpressionStatement:
+			return parent.Expression() == current
 		case KindVariableDeclaration:
 			return parent.Initializer() == current && parent.Parent.Kind == KindVariableDeclarationList && len(parent.Parent.AsVariableDeclarationList().Declarations.Nodes) == 1 && parent.Parent.Parent.Kind == KindVariableStatement
 		case KindReturnStatement, KindKvsExtantReturnStatement, KindKvsYieldStatement, KindKvsExtantYieldStatement:

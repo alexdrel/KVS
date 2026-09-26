@@ -8972,6 +8972,18 @@
         "category": "Error",
         "code": 100085
     },
+    "KVS 'switch' must be at the head of a supported value expression.": {
+        "category": "Error",
+        "code": 100093
+    },
+    "A concise KVS switch arm must contain exactly one expression. Use a block and yield for a procedural arm.": {
+        "category": "Error",
+        "code": 100094
+    },
+    "A KVS switch binding must be a single const declaration with an initializer.": {
+        "category": "Error",
+        "code": 100095
+    },
     "A destructured parameter cannot traverse a nullable source. Bind the parameter first and destructure it in the function body.": {
         "category": "Error",
         "code": 100090

@@ -3448,6 +3448,8 @@ func (p *Printer) emitExpression(node *ast.Expression, precedence ast.OperatorPr
 		p.emitKvsLazyCollectExpression(node.AsKvsLazyCollectExpression())
 	case ast.KindKvsSelectExpression:
 		p.emitKvsSelectExpression(node.AsKvsSelectExpression())
+	case ast.KindKvsSwitchExpression:
+		p.emitKvsSwitchExpression(node.AsKvsSwitchExpression())
 	case ast.KindKvsForExpression:
 		p.emitKvsForExpression(node.AsKvsForExpression())
 	case ast.KindSpreadElement:
@@ -4022,6 +4024,24 @@ func (p *Printer) emitKvsSelectExpression(node *ast.KvsSelectExpression) {
 	p.emitExpression(node.Expression, ast.OperatorPrecedenceLowest)
 	p.writePunctuation(")")
 	p.emitEmbeddedStatement(node.AsNode(), node.Statement)
+	p.exitNode(node.AsNode(), state)
+}
+
+func (p *Printer) emitKvsSwitchExpression(node *ast.KvsSwitchExpression) {
+	state := p.enterNode(node.AsNode())
+	p.writeKeyword("switch")
+	if node.Initializer != nil || node.Expression != nil {
+		p.writeSpace()
+		p.writePunctuation("(")
+		if node.Initializer != nil {
+			p.emitVariableDeclarationList(node.Initializer.AsVariableDeclarationList())
+		} else {
+			p.emitExpression(node.Expression, ast.OperatorPrecedenceLowest)
+		}
+		p.writePunctuation(")")
+	}
+	p.writeSpace()
+	p.emitCaseBlock(node.CaseBlock.AsCaseBlock())
 	p.exitNode(node.AsNode(), state)
 }
 

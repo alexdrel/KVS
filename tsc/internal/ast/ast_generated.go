@@ -70,6 +70,7 @@ type NodeFactory struct {
 	kvsSieveAssignmentExpressionArena        core.Arena[KvsSieveAssignmentExpression]
 	kvsSieveBindingInitializerArena          core.Arena[KvsSieveBindingInitializer]
 	kvsSieveExpressionArena                  core.Arena[KvsSieveExpression]
+	kvsSwitchExpressionArena                 core.Arena[KvsSwitchExpression]
 	kvsTypedSpreadAssignmentExpressionArena  core.Arena[KvsTypedSpreadAssignmentExpression]
 	kvsYieldStatementArena                   core.Arena[KvsYieldStatement]
 	literalTypeNodeArena                     core.Arena[LiteralTypeNode]
@@ -331,6 +332,7 @@ type (
 	KvsCollectExpressionNode                = Node
 	KvsLazyCollectExpressionNode            = Node
 	KvsSelectExpressionNode                 = Node
+	KvsSwitchExpressionNode                 = Node
 	KvsForExpressionNode                    = Node
 	LabeledStatementNode                    = Node
 	ExpressionStatementNode                 = Node
@@ -3005,6 +3007,56 @@ func (node *KvsSelectExpression) computeSubtreeFacts() SubtreeFacts {
 
 func IsKvsSelectExpression(node *Node) bool {
 	return node.Kind == KindKvsSelectExpression
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// KvsSwitchExpression
+// ──────────────────────────────────────────────────────────────────────
+
+type KvsSwitchExpression struct {
+	ExpressionBase
+	LocalsContainerBase
+	CompositeBase
+	Initializer *VariableDeclarationListNode // Optional
+	Expression  *Expression                  // Optional
+	CaseBlock   *CaseBlockNode
+}
+
+func (f *NodeFactory) NewKvsSwitchExpression(initializer *VariableDeclarationListNode, expression *Expression, caseBlock *CaseBlockNode) *Node {
+	data := f.kvsSwitchExpressionArena.New()
+	data.Initializer = initializer
+	data.Expression = expression
+	data.CaseBlock = caseBlock
+	return f.newNode(KindKvsSwitchExpression, data)
+}
+
+func (f *NodeFactory) UpdateKvsSwitchExpression(node *KvsSwitchExpression, initializer *VariableDeclarationListNode, expression *Expression, caseBlock *CaseBlockNode) *Node {
+	if initializer != node.Initializer || expression != node.Expression || caseBlock != node.CaseBlock {
+		return updateNode(f.NewKvsSwitchExpression(initializer, expression, caseBlock), node.AsNode(), f.hooks)
+	}
+	return node.AsNode()
+}
+
+func (node *KvsSwitchExpression) ForEachChild(v Visitor) bool {
+	return visit(v, node.Initializer) || visit(v, node.Expression) || visit(v, node.CaseBlock)
+}
+
+func (node *KvsSwitchExpression) VisitEachChild(v *NodeVisitor) *Node {
+	return v.Factory.UpdateKvsSwitchExpression(node, v.visitNode(node.Initializer), v.visitNode(node.Expression), v.visitNode(node.CaseBlock))
+}
+
+func (node *KvsSwitchExpression) Clone(f NodeFactoryCoercible) *Node {
+	return cloneNode(f.AsNodeFactory().NewKvsSwitchExpression(node.Initializer, node.Expression, node.CaseBlock), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func (node *KvsSwitchExpression) computeSubtreeFacts() SubtreeFacts {
+	return propagateSubtreeFacts(node.Initializer) |
+		propagateSubtreeFacts(node.Expression) |
+		propagateSubtreeFacts(node.CaseBlock)
+}
+
+func IsKvsSwitchExpression(node *Node) bool {
+	return node.Kind == KindKvsSwitchExpression
 }
 
 // ──────────────────────────────────────────────────────────────────────
@@ -10430,6 +10482,8 @@ func (n *Node) ForEachChild(v Visitor) bool {
 		return n.data.(*KvsLazyCollectExpression).ForEachChild(v)
 	case KindKvsSelectExpression:
 		return n.data.(*KvsSelectExpression).ForEachChild(v)
+	case KindKvsSwitchExpression:
+		return n.data.(*KvsSwitchExpression).ForEachChild(v)
 	case KindKvsForExpression:
 		return n.data.(*KvsForExpression).ForEachChild(v)
 	case KindLabeledStatement:
@@ -10953,6 +11007,10 @@ func (n *Node) AsKvsLazyCollectExpression() *KvsLazyCollectExpression {
 
 func (n *Node) AsKvsSelectExpression() *KvsSelectExpression {
 	return n.data.(*KvsSelectExpression)
+}
+
+func (n *Node) AsKvsSwitchExpression() *KvsSwitchExpression {
+	return n.data.(*KvsSwitchExpression)
 }
 
 func (n *Node) AsKvsForExpression() *KvsForExpression {

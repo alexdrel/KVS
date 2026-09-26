@@ -12,7 +12,7 @@ The constructs differ in the result they provide:
 | `for`                  | Final accumulator state            |
 | `collect` / `collect*` | Every production, eagerly / lazily |
 | `select`               | First production                   |
-| `when`                 | Selected production                |
+| `switch`               | Selected production                |
 | `return?`              | Function result, only when present |
 
 These forms use the [value and absence rules](values.md).
@@ -43,7 +43,7 @@ const parent = select (nodes) {
 };
 ```
 
-`_` means the current value of the nearest implicit iteration or subject-form `when`.
+`_` means the current value of the nearest implicit iteration.
 
 The explicit destructuring form remains preferable when the components are used repeatedly:
 
@@ -384,90 +384,125 @@ Variable initializers, assignment right-hand sides, return values, production va
 object fields are value-position boundaries. Evaluation that belongs outside such a boundary retains
 its ordinary language order.
 
-## `when`
+## Value-producing `switch`
 
-`when` evaluates ordered conditions and produces a value.
-
-### Subject form
-
-A subject form exposes its subject as `_`:
+KVS extends JavaScript `switch` into a value-producing construct. The common equality form keeps the
+familiar switch header and case syntax:
 
 ```kvs
-const grade = when (score) {
-    _ >= 90 => "A",
-    _ >= 80 => "B",
-    _ >= 70 => "C",
-    default => "F",
+const word = switch (n) {
+    case 1: "one";
+    case 2 | 3: "few";
+    default: "many";
 };
 ```
 
-Conditions are tested from top to bottom. Only `true` selects an arm; `false` and null continue to
-the next arm. `default` is the catch-all arm. `_` refers exclusively to the current unnamed subject.
-
-The subject may be named:
+The subject is evaluated once. A normal `case` uses JavaScript switch matching. A finite alternative
+list may appear directly in a case label:
 
 ```kvs
-const grade = when (const value = score) {
-    value >= 90 => "A",
-    value >= 80 => "B",
-    value >= 70 => "C",
-    default     => "F",
+case "ready" | "waiting" | "paused": resume;
+```
+
+The alternatives are tried from left to right and use the same matching semantics as separate
+JavaScript case labels. As with [comparison alternatives](values.md#comparison-alternatives), `|` is
+an alternative separator at this grammatical position. Parentheses preserve a single bitwise
+expression: `case (read | write): ...`.
+
+### Conditional forms
+
+A subjectless switch is an ordered conditional expression:
+
+```kvs
+const shipping = switch {
+    case customer.vip: 0;
+    case order.total > 100: 5;
+    case localDelivery: 8;
+    default: 12;
 };
 ```
 
-`when (expression)` is the unnamed form of `when (const value = expression)`. Equality and union
-comparisons express switch-like selection:
+Conditions are evaluated from top to bottom using ordinary JavaScript/TypeScript truthiness. The
+first matching case selects the arm. `default` is optional and is selected only when no earlier case
+matches.
+
+When several conditions need the same computed value, the switch may bind it once:
 
 ```kvs
-const action = when (status) {
-    _ == "ready" | "waiting" => resume,
-    _ == "failed"            => retry,
-    default                   => stop,
+const description = switch (const n = calculate()) {
+    case n < 0: "negative";
+    case n == 0: "zero";
+    case n < 10: "small";
+    default: "large";
 };
 ```
 
-### Subjectless form
-
-A subjectless form is an ordered conditional expression:
-
-```kvs
-const shipping = when {
-    customer.vip      => 0,
-    order.total > 100 => 5,
-    default           => 10,
-};
-```
-
-It uses the same true/false/null rule. There is no implicit subject and therefore no subject `_`.
+The initializer is evaluated once and the `const` binding is visible to the case conditions and arm
+bodies. This is a conditional form: its cases are conditions rather than values matched against the
+initializer. There is no implicit `_` subject in either conditional form.
 
 ### Arm results
 
-An arm may produce an expression or use a block with an explicit arm-local `return`:
+A selected arm does not fall through. A concise expression statement produces the switch result and
+completes the switch:
 
 ```kvs
-const label = when (status) {
-    _ == "ready" => {
-        const label = formatReady(status);
-        audit(label);
-        return label;
-    },
-    default => "Unavailable",
+const label = switch (status) {
+    case "ready": "Ready";
+    case "waiting": formatWaiting();
+    default: "Unavailable";
 };
 ```
 
-`return` exits the arm, not the containing function. `this` and `arguments` remain those of the
-surrounding scope. Arms do not fall through and require no `break`.
+An arm that needs several statements uses a block. `yield` produces the switch result and completes
+the switch:
 
-A `when` expression without a selected arm produces null. Its result is therefore nullable unless it
-has a catch-all arm:
-
-```text
-catch-all arm present -> T
-no catch-all arm      -> T?
+```kvs
+const label = switch (status) {
+    case "failed": {
+        const reason = explainFailure();
+        audit(reason);
+        yield `Failed: ${reason}`;
+    }
+    default: "Unavailable";
+};
 ```
 
-The result type combines the result types of its arms under normal inference. Arm selectors are
-boolean conditions or `default`, allowing direct lowering to JavaScript or TypeScript control flow.
+`yield?` produces and completes the switch only when its value is present. An absent value continues
+execution in the same selected arm; it does not resume case matching.
+
+A KVS switch is a production boundary. `yield` and `yield?` target the nearest enclosing producer,
+so the switch intercepts production inside its arms just as `select` does. Ordinary nested loops do
+not intercept that production; a nested KVS producer does. `return` returns from the containing
+function and `throw` throws normally.
+
+If the selected arm completes without producing a value, the switch result is null. The same is true
+when no case matches and there is no `default`. The result type combines all produced values and
+includes null for every reachable non-producing path.
+
+Like the producing loops, a value-producing switch must begin a value position. Ordinary expression
+tails may follow it, but it may not be buried after evaluation has already begun in the same value
+position. Variable initializers, assignment right-hand sides, return values, production values, and
+named object fields establish value-position boundaries.
+
+### Classic JavaScript `switch`
+
+A `switch (expression)` is value-producing only when every arm has a KVS result shape: either one
+concise expression statement or one procedural block. A bare statement such as `return value` is
+therefore classic, while the same `return` inside an arm block retains its ordinary meaning of
+returning from the containing function. An empty switch is classic too.
+
+A switch-targeting `break` also makes the switch classic. Statement lists, fallthrough, and `break`
+then all behave as in JavaScript. Breaks belonging to nested loops or nested switches do not
+classify the outer switch.
+
+A KVS switch has no switch-targeting `break`. The subjectless and binding forms are always KVS
+forms. A classic switch is not a production boundary, so `yield` inside it continues to target an
+enclosing KVS producer.
+
+The compatibility cost is limited to a breakless `switch (expression)` whose arms already have KVS
+result shapes but rely on JavaScript fallthrough. An ordinary final switch-targeting `break` makes
+classic intent explicit.
 
 ## Shared iteration rules
 
@@ -487,9 +522,8 @@ from the containing function. `collect*` is deferred: when it is consumed, the s
 activation may no longer be running. Consequently, `return` and labeled jumps to targets outside
 `collect*` are prohibited. Local loops and labels inside it remain ordinary JavaScript control flow.
 
-A `when` arm does not create a production boundary, so its `yield` still targets the nearest
-enclosing value-producing loop. Async sources and async iterators are postponed rather than inferred
-from context.
+A KVS switch creates a production boundary; a classic switch does not. Async sources and async
+iterators are postponed rather than inferred from context.
 
 ## Local conditional production
 

@@ -1,0 +1,294 @@
+//// [tests/cases/conformance/kvs/kvsSwitch.ts] ////
+
+=== kvsSwitch.ts ===
+declare function calculate(): number;
+>calculate : Symbol(calculate, Decl(kvsSwitch.ts, 0, 0))
+
+declare function readCache(): string | null;
+>readCache : Symbol(readCache, Decl(kvsSwitch.ts, 0, 37))
+
+declare function audit(value: string): void;
+>audit : Symbol(audit, Decl(kvsSwitch.ts, 1, 44))
+>value : Symbol(value, Decl(kvsSwitch.ts, 2, 23))
+
+declare const count: number;
+>count : Symbol(count, Decl(kvsSwitch.ts, 3, 13))
+
+declare const choice: boolean;
+>choice : Symbol(choice, Decl(kvsSwitch.ts, 4, 13))
+
+declare const maybeText: string | null;
+>maybeText : Symbol(maybeText, Decl(kvsSwitch.ts, 5, 13))
+
+const word = switch (count) {
+>word : Symbol(word, Decl(kvsSwitch.ts, 7, 5))
+>count : Symbol(count, Decl(kvsSwitch.ts, 3, 13))
+
+    case 1: "one";
+    case 2 | 3: "few";
+    default: "many";
+};
+
+const shipping = switch {
+>shipping : Symbol(shipping, Decl(kvsSwitch.ts, 13, 5))
+
+    case word == "one": 0;
+>word : Symbol(word, Decl(kvsSwitch.ts, 7, 5))
+
+    case word == "few": 5;
+>word : Symbol(word, Decl(kvsSwitch.ts, 7, 5))
+
+    default: 12;
+};
+
+const description = switch (const n = calculate()) {
+>description : Symbol(description, Decl(kvsSwitch.ts, 19, 5))
+>n : Symbol(n, Decl(kvsSwitch.ts, 19, 33))
+>calculate : Symbol(calculate, Decl(kvsSwitch.ts, 0, 0))
+
+    case n < 0: "negative";
+>n : Symbol(n, Decl(kvsSwitch.ts, 19, 33))
+
+    case n == 0: "zero";
+>n : Symbol(n, Decl(kvsSwitch.ts, 19, 33))
+
+    case n < 10: "small";
+>n : Symbol(n, Decl(kvsSwitch.ts, 19, 33))
+
+    default: "large";
+};
+
+const cached = switch ("cache") {
+>cached : Symbol(cached, Decl(kvsSwitch.ts, 26, 5))
+
+    case "cache": {
+        yield? readCache();
+>readCache : Symbol(readCache, Decl(kvsSwitch.ts, 0, 37))
+
+        audit("miss");
+>audit : Symbol(audit, Decl(kvsSwitch.ts, 1, 44))
+
+        yield "fallback";
+    }
+    default: "fallback";
+};
+
+const conditionalYield = switch {
+>conditionalYield : Symbol(conditionalYield, Decl(kvsSwitch.ts, 35, 5))
+
+    case count > 0: {
+>count : Symbol(count, Decl(kvsSwitch.ts, 3, 13))
+
+        yield "positive";
+        audit("unreachable");
+>audit : Symbol(audit, Decl(kvsSwitch.ts, 1, 44))
+    }
+    default: "other";
+};
+
+const nestedYield = switch (count) {
+>nestedYield : Symbol(nestedYield, Decl(kvsSwitch.ts, 43, 5))
+>count : Symbol(count, Decl(kvsSwitch.ts, 3, 13))
+
+    case 1: {
+        for (const value of ["one"]) {
+>value : Symbol(value, Decl(kvsSwitch.ts, 45, 18))
+
+            yield value;
+>value : Symbol(value, Decl(kvsSwitch.ts, 45, 18))
+        }
+        yield "fallback";
+    }
+    default: "other";
+};
+
+const exhaustiveProcedural = switch (count) {
+>exhaustiveProcedural : Symbol(exhaustiveProcedural, Decl(kvsSwitch.ts, 53, 5))
+>count : Symbol(count, Decl(kvsSwitch.ts, 3, 13))
+
+    case 1: {
+        if (choice) {
+>choice : Symbol(choice, Decl(kvsSwitch.ts, 4, 13))
+
+            yield "chosen";
+        } else {
+            yield "other";
+        }
+    }
+    default: {
+        throw new Error("unsupported count");
+>Error : Symbol(Error, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --), Decl(lib.es2022.error.d.ts, --, --))
+    }
+};
+
+const completingProcedural = switch {
+>completingProcedural : Symbol(completingProcedural, Decl(kvsSwitch.ts, 66, 5))
+
+    case choice: {
+>choice : Symbol(choice, Decl(kvsSwitch.ts, 4, 13))
+
+        if (count > 0) {
+>count : Symbol(count, Decl(kvsSwitch.ts, 3, 13))
+
+            yield "positive";
+        }
+    }
+    default: "other";
+};
+
+const extantProcedural = switch {
+>extantProcedural : Symbol(extantProcedural, Decl(kvsSwitch.ts, 75, 5))
+
+    case choice: {
+>choice : Symbol(choice, Decl(kvsSwitch.ts, 4, 13))
+
+        yield? maybeText;
+>maybeText : Symbol(maybeText, Decl(kvsSwitch.ts, 5, 13))
+    }
+    default: "other";
+};
+
+const groupedBitwise = switch (3) {
+>groupedBitwise : Symbol(groupedBitwise, Decl(kvsSwitch.ts, 82, 5))
+
+    case (1 | 2): true;
+    default: false;
+};
+
+const nested = switch (count) {
+>nested : Symbol(nested, Decl(kvsSwitch.ts, 87, 5))
+>count : Symbol(count, Decl(kvsSwitch.ts, 3, 13))
+
+    case 1: switch {
+        case count > 0: "positive";
+>count : Symbol(count, Decl(kvsSwitch.ts, 3, 13))
+
+        default: "other";
+    };
+    default: "other";
+};
+
+const collectedThroughClassic = collect ([1, 2]) {
+>collectedThroughClassic : Symbol(collectedThroughClassic, Decl(kvsSwitch.ts, 95, 5))
+
+    switch (_) {
+>_ : Symbol(_, Decl(kvsSwitch.ts, 96, 12))
+
+        case 1:
+            yield "one";
+            break;
+        default:
+            yield "other";
+            break;
+    }
+};
+
+function returnFromArm(value: number) {
+>returnFromArm : Symbol(returnFromArm, Decl(kvsSwitch.ts, 104, 2))
+>value : Symbol(value, Decl(kvsSwitch.ts, 106, 23))
+
+    switch (value) {
+>value : Symbol(value, Decl(kvsSwitch.ts, 106, 23))
+
+        case 1: {
+            return "returned";
+        }
+        default: "continued";
+    };
+    return "after";
+}
+
+function allArmsExit(value: number): string {
+>allArmsExit : Symbol(allArmsExit, Decl(kvsSwitch.ts, 114, 1))
+>value : Symbol(value, Decl(kvsSwitch.ts, 116, 21))
+
+    return switch (value) {
+>value : Symbol(value, Decl(kvsSwitch.ts, 116, 21))
+
+        case 1: {
+            return "returned";
+        }
+        default: {
+            throw new Error("unsupported value");
+>Error : Symbol(Error, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --), Decl(lib.es2022.error.d.ts, --, --))
+        }
+    };
+}
+
+function bareReturnIsClassic(value: number) {
+>bareReturnIsClassic : Symbol(bareReturnIsClassic, Decl(kvsSwitch.ts, 125, 1))
+>value : Symbol(value, Decl(kvsSwitch.ts, 127, 29))
+
+    switch (value) {
+>value : Symbol(value, Decl(kvsSwitch.ts, 127, 29))
+
+        case 1: return "one";
+        default: return "other";
+    }
+}
+
+function classic(kind: number) {
+>classic : Symbol(classic, Decl(kvsSwitch.ts, 132, 1))
+>kind : Symbol(kind, Decl(kvsSwitch.ts, 134, 17))
+
+    switch (kind) {
+>kind : Symbol(kind, Decl(kvsSwitch.ts, 134, 17))
+
+        case 1:
+            audit("one");
+>audit : Symbol(audit, Decl(kvsSwitch.ts, 1, 44))
+
+            break;
+        case 2:
+            audit("two");
+>audit : Symbol(audit, Decl(kvsSwitch.ts, 1, 44))
+
+            break;
+    }
+}
+
+word;
+>word : Symbol(word, Decl(kvsSwitch.ts, 7, 5))
+
+shipping;
+>shipping : Symbol(shipping, Decl(kvsSwitch.ts, 13, 5))
+
+description;
+>description : Symbol(description, Decl(kvsSwitch.ts, 19, 5))
+
+cached;
+>cached : Symbol(cached, Decl(kvsSwitch.ts, 26, 5))
+
+conditionalYield;
+>conditionalYield : Symbol(conditionalYield, Decl(kvsSwitch.ts, 35, 5))
+
+nestedYield;
+>nestedYield : Symbol(nestedYield, Decl(kvsSwitch.ts, 43, 5))
+
+exhaustiveProcedural;
+>exhaustiveProcedural : Symbol(exhaustiveProcedural, Decl(kvsSwitch.ts, 53, 5))
+
+completingProcedural;
+>completingProcedural : Symbol(completingProcedural, Decl(kvsSwitch.ts, 66, 5))
+
+extantProcedural;
+>extantProcedural : Symbol(extantProcedural, Decl(kvsSwitch.ts, 75, 5))
+
+groupedBitwise;
+>groupedBitwise : Symbol(groupedBitwise, Decl(kvsSwitch.ts, 82, 5))
+
+nested;
+>nested : Symbol(nested, Decl(kvsSwitch.ts, 87, 5))
+
+collectedThroughClassic;
+>collectedThroughClassic : Symbol(collectedThroughClassic, Decl(kvsSwitch.ts, 95, 5))
+
+returnFromArm;
+>returnFromArm : Symbol(returnFromArm, Decl(kvsSwitch.ts, 104, 2))
+
+allArmsExit;
+>allArmsExit : Symbol(allArmsExit, Decl(kvsSwitch.ts, 114, 1))
+
+bareReturnIsClassic;
+>bareReturnIsClassic : Symbol(bareReturnIsClassic, Decl(kvsSwitch.ts, 125, 1))
+

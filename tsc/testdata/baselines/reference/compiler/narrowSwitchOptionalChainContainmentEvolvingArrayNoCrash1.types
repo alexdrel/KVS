@@ -6,6 +6,7 @@ let foo = [];
 >[] : never[]
 
 switch (foo?.length) {
+>switch (foo?.length) {  case 1:    foo[0];} : any
 >foo?.length : number
 >foo : any[]
 >length : number
@@ -24,6 +25,7 @@ let bar = [];
 >[] : never[]
 
 switch (bar?.length) {
+>switch (bar?.length) {  case 1: {    bar.push("baz");    const arr: string[] = bar;  }} : null
 >bar?.length : number
 >bar : any[]
 >length : number

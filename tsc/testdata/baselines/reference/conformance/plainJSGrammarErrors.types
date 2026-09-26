@@ -472,6 +472,7 @@ var b
 >b : any
 
 switch (b) {
+>switch (b) {    case false:        console.log('no')    default:        console.log('yes')    default:        console.log('wat')} : void
 >b : undefined
 
     case false:

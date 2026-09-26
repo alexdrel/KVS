@@ -1,0 +1,60 @@
+//// [tests/cases/conformance/kvs/kvsSwitchErrors.ts] ////
+
+=== kvsSwitchErrors.ts ===
+declare const value: number;
+>value : Symbol(value, Decl(kvsSwitchErrors.ts, 0, 13))
+
+const buried = 1 + switch (value) {
+>buried : Symbol(buried, Decl(kvsSwitchErrors.ts, 2, 5))
+>value : Symbol(value, Decl(kvsSwitchErrors.ts, 0, 13))
+
+    case 1: 2;
+};
+
+const malformedArm = switch (value) {
+>malformedArm : Symbol(malformedArm, Decl(kvsSwitchErrors.ts, 6, 5))
+>value : Symbol(value, Decl(kvsSwitchErrors.ts, 0, 13))
+
+    case 1:
+        value;
+>value : Symbol(value, Decl(kvsSwitchErrors.ts, 0, 13))
+
+        value + 1;
+>value : Symbol(value, Decl(kvsSwitchErrors.ts, 0, 13))
+
+};
+
+const invalidBinding = switch (const first = value, second = value) {
+>invalidBinding : Symbol(invalidBinding, Decl(kvsSwitchErrors.ts, 12, 5))
+>first : Symbol(first, Decl(kvsSwitchErrors.ts, 12, 36))
+>value : Symbol(value, Decl(kvsSwitchErrors.ts, 0, 13))
+>second : Symbol(second, Decl(kvsSwitchErrors.ts, 12, 51))
+>value : Symbol(value, Decl(kvsSwitchErrors.ts, 0, 13))
+
+    case first > 0: first;
+>first : Symbol(first, Decl(kvsSwitchErrors.ts, 12, 36))
+>first : Symbol(first, Decl(kvsSwitchErrors.ts, 12, 36))
+
+    default: second;
+>second : Symbol(second, Decl(kvsSwitchErrors.ts, 12, 51))
+
+};
+
+const invalidBreak = switch {
+>invalidBreak : Symbol(invalidBreak, Decl(kvsSwitchErrors.ts, 17, 5))
+
+    case value > 0: {
+>value : Symbol(value, Decl(kvsSwitchErrors.ts, 0, 13))
+
+        break;
+    }
+};
+
+const duplicateDefault = switch (value) {
+>duplicateDefault : Symbol(duplicateDefault, Decl(kvsSwitchErrors.ts, 23, 5))
+>value : Symbol(value, Decl(kvsSwitchErrors.ts, 0, 13))
+
+    default: 1;
+    default: 2;
+};
+

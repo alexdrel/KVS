@@ -685,6 +685,7 @@ function ff(o: O, k: K) {
 >k : K
 
     switch(k) {
+>switch(k) {        case 'c':            k = 'a';    } : "a" | null
 >k : K
 
         case 'c':

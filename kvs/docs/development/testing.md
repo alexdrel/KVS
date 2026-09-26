@@ -626,3 +626,23 @@ Run them with:
 ```sh
 go -C ./tsc test -run='TestLocal/kvs(ConditionalPlacement|CompactObject)' ./internal/testrunner
 ```
+
+## Value-producing-switch slice
+
+`kvsSwitch.ts` checks equality, finite alternatives, a grouped bitwise label, subjectless
+conditions, a once-only `const` binding, concise results, procedural `yield` and `yield?`, producer
+nesting, bare-return classification, and classic switches selected by switch-targeting breaks. Its
+JavaScript baseline records consumed result temporaries, discarded-result lowering, stacked
+alternative cases, conditional chains, ordinary direct-production breaks, and labeled exits only for
+conditional or nested-loop production. `kvsSwitchErrors.ts` covers unsupported placement, malformed
+concise arms, invalid binding headers, duplicate defaults, and switch-targeting breaks in forms that
+are always KVS. Inherited switch baselines additionally guard ordinary switch narrowing for
+equality-form KVS arms. Procedural cases distinguish exhaustive `if`/`else` production from a
+reachable normal completion and from `yield?`, so `null` appears only on reachable non-producing
+paths.
+
+Run them with:
+
+```sh
+go -C ./tsc test -run='TestLocal/kvsSwitch' ./internal/testrunner
+```

@@ -52,6 +52,7 @@ export const childProperties: Readonly<Partial<Record<SyntaxKind, readonly (stri
     [SyntaxKind.KvsCollectExpression]: ["initializer", "expression", "statement"],
     [SyntaxKind.KvsLazyCollectExpression]: ["initializer", "expression", "statement"],
     [SyntaxKind.KvsSelectExpression]: ["initializer", "expression", "statement"],
+    [SyntaxKind.KvsSwitchExpression]: ["initializer", "expression", "caseBlock"],
     [SyntaxKind.KvsForExpression]: ["initializer", "condition", "incrementor", "expression", "result", "statement"],
     [SyntaxKind.LabeledStatement]: ["label", "statement"],
     [SyntaxKind.ExpressionStatement]: ["expression"],

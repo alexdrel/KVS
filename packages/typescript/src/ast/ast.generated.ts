@@ -760,6 +760,12 @@ export interface KvsSelectExpression extends ExpressionBase {
     readonly keyed: boolean;
     readonly statement: Statement;
 }
+export interface KvsSwitchExpression extends ExpressionBase {
+    readonly kind: SyntaxKind.KvsSwitchExpression;
+    readonly initializer?: VariableDeclarationList;
+    readonly expression?: Expression;
+    readonly caseBlock: CaseBlock;
+}
 export interface KvsForExpression extends ExpressionBase {
     readonly kind: SyntaxKind.KvsForExpression;
     readonly initializer?: ForInitializer;

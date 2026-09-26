@@ -284,6 +284,7 @@ const (
 	KindKvsCollectExpression
 	KindKvsLazyCollectExpression
 	KindKvsSelectExpression
+	KindKvsSwitchExpression
 	KindKvsForExpression
 	KindSpreadElement
 	KindClassExpression

@@ -460,8 +460,7 @@ function foo() {
 }
 function ff(o, k) {
     switch (k) {
-        case 'c':
-            k = 'a';
+        case 'c': k = 'a';
     }
     k === 'c'; // Error
     return o[k];

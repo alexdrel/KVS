@@ -21,6 +21,7 @@ class A {
 >v : string
 
             switch(v) {
+>switch(v) {                case "test": use(this);            } : void | null
 >v : string
 
                 case "test": use(this);

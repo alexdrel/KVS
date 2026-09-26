@@ -1689,6 +1689,8 @@ func (b *Binder) bindChildren(node *ast.Node) {
 		b.bindKvsProducerExpression(node, expr.Initializer, expr.Expression, expr.Statement, false)
 	case ast.KindKvsSelectExpression:
 		b.bindKvsSelectExpression(node)
+	case ast.KindKvsSwitchExpression:
+		b.bindKvsSwitchExpression(node)
 	case ast.KindKvsForExpression:
 		b.bindKvsForExpression(node)
 	case ast.KindIfStatement:
@@ -2032,6 +2034,18 @@ func (b *Binder) bindKvsSelectExpression(node *ast.Node) {
 	b.bindKvsProducerExpression(node, expr.Initializer, expr.Expression, expr.Statement, true)
 }
 
+func (b *Binder) bindKvsSwitchExpression(node *ast.Node) {
+	expr := node.AsKvsSwitchExpression()
+	b.bind(expr.Initializer)
+	b.bind(expr.Expression)
+	savePreSwitchCaseFlow := b.preSwitchCaseFlow
+	if expr.Initializer == nil && expr.Expression != nil {
+		b.preSwitchCaseFlow = b.currentFlow
+	}
+	b.bind(expr.CaseBlock)
+	b.preSwitchCaseFlow = savePreSwitchCaseFlow
+}
+
 func (b *Binder) bindKvsForExpression(node *ast.Node) {
 	expr := node.AsKvsForExpression()
 	// Result declarations establish loop state before the ordinary loop begins.
@@ -2356,6 +2370,31 @@ func (b *Binder) bindSwitchStatement(node *ast.Node) {
 
 func (b *Binder) bindCaseBlock(node *ast.Node) {
 	switchStatement := node.Parent
+	if switchStatement.Kind == ast.KindKvsSwitchExpression {
+		preSwitchFlow := b.currentFlow
+		postSwitchLabel := b.createBranchLabel()
+		savedSelectTarget := b.currentKvsSelectTarget
+		b.currentKvsSelectTarget = postSwitchLabel
+		clauses := node.AsCaseBlock().Clauses.Nodes
+		for i, clause := range clauses {
+			if switchStatement.AsKvsSwitchExpression().Initializer == nil && switchStatement.AsKvsSwitchExpression().Expression != nil {
+				b.currentFlow = b.createFlowSwitchClause(b.preSwitchCaseFlow, switchStatement, i, i+1)
+			} else {
+				b.currentFlow = preSwitchFlow
+			}
+			data := clause.AsCaseOrDefaultClause()
+			b.bind(data.Expression)
+			b.bindEach(data.Statements.Nodes)
+			data.FallthroughFlowNode = b.currentFlow
+			b.addAntecedent(postSwitchLabel, b.currentFlow)
+		}
+		b.currentKvsSelectTarget = savedSelectTarget
+		if switchStatement.AsKvsSwitchExpression().Initializer == nil && switchStatement.AsKvsSwitchExpression().Expression != nil && !core.Some(clauses, func(clause *ast.Node) bool { return clause.Kind == ast.KindDefaultClause }) {
+			b.addAntecedent(postSwitchLabel, b.createFlowSwitchClause(b.preSwitchCaseFlow, switchStatement, 0, 0))
+		}
+		b.currentFlow = b.finishFlowLabel(postSwitchLabel)
+		return
+	}
 	clauses := node.AsCaseBlock().Clauses.Nodes
 	isNarrowingSwitch := switchStatement.Expression().Kind == ast.KindTrueKeyword || isNarrowingExpression(switchStatement.Expression())
 	var fallthroughFlow *ast.FlowNode = b.unreachableFlow
@@ -2605,7 +2644,7 @@ func (b *Binder) bindKvsNullingExpressionFlow(node *ast.Node) {
 
 func (b *Binder) bindVariableDeclarationFlow(node *ast.Node) {
 	b.bindEachChild(node)
-	if node.Initializer() != nil || ast.IsForInOrOfStatement(node.Parent.Parent) || node.Parent.Parent.Kind == ast.KindKvsCollectExpression || node.Parent.Parent.Kind == ast.KindKvsLazyCollectExpression || node.Parent.Parent.Kind == ast.KindKvsSelectExpression || node.Parent.Parent.Kind == ast.KindKvsForExpression {
+	if node.Initializer() != nil || ast.IsForInOrOfStatement(node.Parent.Parent) || node.Parent.Parent.Kind == ast.KindKvsCollectExpression || node.Parent.Parent.Kind == ast.KindKvsLazyCollectExpression || node.Parent.Parent.Kind == ast.KindKvsSelectExpression || node.Parent.Parent.Kind == ast.KindKvsSwitchExpression || node.Parent.Parent.Kind == ast.KindKvsForExpression {
 		b.bindInitializedVariableFlow(node)
 	}
 }
@@ -2879,7 +2918,7 @@ func GetContainerFlags(node *ast.Node) ContainerFlags {
 		} else {
 			return ContainerFlagsNone
 		}
-	case ast.KindCatchClause, ast.KindKvsIfBindingClause, ast.KindForStatement, ast.KindForInStatement, ast.KindForOfStatement, ast.KindKvsCollectExpression, ast.KindKvsLazyCollectExpression, ast.KindKvsSelectExpression, ast.KindKvsForExpression, ast.KindCaseBlock:
+	case ast.KindCatchClause, ast.KindKvsIfBindingClause, ast.KindForStatement, ast.KindForInStatement, ast.KindForOfStatement, ast.KindKvsCollectExpression, ast.KindKvsLazyCollectExpression, ast.KindKvsSelectExpression, ast.KindKvsSwitchExpression, ast.KindKvsForExpression, ast.KindCaseBlock:
 		return ContainerFlagsIsBlockScopedContainer | ContainerFlagsHasLocals
 	case ast.KindBlock:
 		if ast.IsFunctionLike(node.Parent) || ast.IsClassStaticBlockDeclaration(node.Parent) {

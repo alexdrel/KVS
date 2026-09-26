@@ -37,11 +37,12 @@ function classy(base: Base, someDerived: Derived1 | Derived2) {
 >someDerived : Derived1 | Derived2
 
     switch (true) {
+>switch (true) {        case base instanceof Derived1:            base.d            // fallthrough        default:            base.basey    } : string
 >true : true
 
         case base instanceof Derived1:
 >base instanceof Derived1 : boolean
->base : Base
+>base : Derived1
 >Derived1 : typeof Derived1
 
             base.d

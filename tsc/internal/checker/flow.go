@@ -1092,7 +1092,7 @@ func (c *Checker) narrowTypeByOptionalChainContainment(f *FlowState, t *Type, op
 
 func (c *Checker) getTypeAtSwitchClause(f *FlowState, flow *ast.FlowNode) FlowType {
 	data := flow.Node.AsFlowSwitchClauseData()
-	expr := ast.SkipParentheses(data.SwitchStatement.Expression())
+	expr := ast.SkipParentheses(getSwitchExpression(data.SwitchStatement))
 	flowType := c.getTypeAtFlowNode(f, flow.Antecedent)
 	t := flowType.t
 	switch {
@@ -1219,7 +1219,7 @@ func (c *Checker) narrowTypeBySwitchOnTypeOf(t *Type, data *ast.FlowSwitchClause
 }
 
 func (c *Checker) narrowTypeBySwitchOnTrue(f *FlowState, t *Type, data *ast.FlowSwitchClauseData) *Type {
-	clauses := data.SwitchStatement.AsSwitchStatement().CaseBlock.AsCaseBlock().Clauses.Nodes
+	clauses := getSwitchCaseBlock(data.SwitchStatement).AsCaseBlock().Clauses.Nodes
 	defaultIndex := core.FindIndex(clauses, func(clause *ast.Node) bool {
 		return clause.Kind == ast.KindDefaultClause
 	})
@@ -1981,12 +1981,13 @@ func (c *Checker) isExhaustiveSwitchStatement(node *ast.Node) bool {
 }
 
 func (c *Checker) computeExhaustiveSwitchStatement(node *ast.Node) bool {
-	if ast.IsTypeOfExpression(node.Expression()) {
+	expression := getSwitchExpression(node)
+	if ast.IsTypeOfExpression(expression) {
 		witnesses := c.getSwitchClauseTypeOfWitnesses(node)
 		if witnesses == nil {
 			return false
 		}
-		operandConstraint := c.getBaseConstraintOrType(c.checkExpressionCached(node.Expression().Expression()))
+		operandConstraint := c.getBaseConstraintOrType(c.checkExpressionCached(expression.Expression()))
 		// Get the not-equal flags for all handled cases.
 		notEqualFacts := c.getNotEqualFactsFromTypeofSwitch(0, 0, witnesses)
 		if operandConstraint.flags&TypeFlagsAnyOrUnknown != 0 {
@@ -1998,7 +1999,7 @@ func (c *Checker) computeExhaustiveSwitchStatement(node *ast.Node) bool {
 			return c.getTypeFacts(t, notEqualFacts) == notEqualFacts
 		})
 	}
-	t := c.getBaseConstraintOrType(c.checkExpressionCached(node.Expression()))
+	t := c.getBaseConstraintOrType(c.checkExpressionCached(expression))
 	if !isLiteralType(t) {
 		return false
 	}
@@ -2023,7 +2024,7 @@ func (c *Checker) eachTypeContainedIn(source *Type, types []*Type) bool {
 func (c *Checker) getSwitchClauseTypeOfWitnesses(node *ast.Node) []string {
 	links := c.switchStatementLinks.Get(node)
 	if !links.witnessesComputed {
-		clauses := node.AsSwitchStatement().CaseBlock.AsCaseBlock().Clauses.Nodes
+		clauses := getSwitchCaseBlock(node).AsCaseBlock().Clauses.Nodes
 		witnesses := make([]string, len(clauses))
 		for i, clause := range clauses {
 			if clause.Kind == ast.KindCaseClause {
@@ -2060,7 +2061,7 @@ func (c *Checker) getNotEqualFactsFromTypeofSwitch(start int, end int, witnesses
 func (c *Checker) getSwitchClauseTypes(node *ast.Node) []*Type {
 	links := c.switchStatementLinks.Get(node)
 	if !links.switchTypesComputed {
-		clauses := node.AsSwitchStatement().CaseBlock.AsCaseBlock().Clauses.Nodes
+		clauses := getSwitchCaseBlock(node).AsCaseBlock().Clauses.Nodes
 		types := make([]*Type, len(clauses))
 		for i, clause := range clauses {
 			types[i] = c.getTypeOfSwitchClause(clause)
@@ -2069,6 +2070,20 @@ func (c *Checker) getSwitchClauseTypes(node *ast.Node) []*Type {
 		links.switchTypesComputed = true
 	}
 	return links.switchTypes
+}
+
+func getSwitchCaseBlock(node *ast.Node) *ast.Node {
+	if node.Kind == ast.KindKvsSwitchExpression {
+		return node.AsKvsSwitchExpression().CaseBlock
+	}
+	return node.AsSwitchStatement().CaseBlock
+}
+
+func getSwitchExpression(node *ast.Node) *ast.Node {
+	if node.Kind == ast.KindKvsSwitchExpression {
+		return node.AsKvsSwitchExpression().Expression
+	}
+	return node.Expression()
 }
 
 func (c *Checker) getTypeOfSwitchClause(clause *ast.Node) *Type {

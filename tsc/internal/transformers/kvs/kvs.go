@@ -231,10 +231,10 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 		if tx.resolver.IsKvsLiftedBinaryExpression(node) {
 			return tx.transformLiftedBinaryExpression(node.AsBinaryExpression())
 		}
-	case ast.KindKvsCollectExpression, ast.KindKvsSelectExpression, ast.KindKvsForExpression:
+	case ast.KindKvsCollectExpression, ast.KindKvsSelectExpression, ast.KindKvsSwitchExpression, ast.KindKvsForExpression:
 		// Unsupported placements are diagnosed by the checker. Emit an empty
 		// recovery value instead of leaking KVS syntax into later transformers.
-		if node.Kind == ast.KindKvsSelectExpression {
+		if node.Kind == ast.KindKvsSelectExpression || node.Kind == ast.KindKvsSwitchExpression {
 			return tx.Factory().NewKeywordExpression(ast.KindNullKeyword)
 		}
 		if node.Kind == ast.KindKvsForExpression {
@@ -719,7 +719,7 @@ func collectLazyLabels(statement *ast.Node) map[string]bool {
 	labels := make(map[string]bool)
 	var visit func(*ast.Node) bool
 	visit = func(node *ast.Node) bool {
-		if node != statement && (ast.IsFunctionLike(node) || node.Kind == ast.KindKvsCollectExpression || node.Kind == ast.KindKvsLazyCollectExpression || node.Kind == ast.KindKvsSelectExpression) {
+		if node != statement && (ast.IsFunctionLike(node) || node.Kind == ast.KindKvsCollectExpression || node.Kind == ast.KindKvsLazyCollectExpression || node.Kind == ast.KindKvsSelectExpression || node.Kind == ast.KindKvsSwitchExpression) {
 			return false
 		}
 		if node.Kind == ast.KindLabeledStatement {
@@ -1494,10 +1494,13 @@ func (tx *transformer) transformNullingExpression(node *ast.KvsNullingExpression
 }
 
 func isKvsProducer(node *ast.Node) bool {
-	return node != nil && (node.Kind == ast.KindKvsCollectExpression || node.Kind == ast.KindKvsSelectExpression || node.Kind == ast.KindKvsForExpression)
+	return node != nil && (node.Kind == ast.KindKvsCollectExpression || node.Kind == ast.KindKvsSelectExpression || node.Kind == ast.KindKvsSwitchExpression || node.Kind == ast.KindKvsForExpression)
 }
 
 func (tx *transformer) transformHeadExpressionStatement(node *ast.ExpressionStatement) *ast.Node {
+	if node.Expression.Kind == ast.KindKvsSwitchExpression {
+		return tx.lowerKvsSwitch(node.Expression.AsKvsSwitchExpression(), nil, true)
+	}
 	return tx.lowerHeadEffects(node.Expression, func(expression *ast.Expression) *ast.Node {
 		return tx.Factory().NewExpressionStatement(expression)
 	})
@@ -1636,6 +1639,9 @@ func (tx *transformer) lowerProducer(producer *ast.Node, continuation func(*ast.
 	if producer.Kind == ast.KindKvsForExpression {
 		return tx.lowerKvsFor(producer.AsKvsForExpression(), continuation)
 	}
+	if producer.Kind == ast.KindKvsSwitchExpression {
+		return tx.lowerKvsSwitch(producer.AsKvsSwitchExpression(), continuation, false)
+	}
 	// Lower the common producer shape
 	//
 	//     collect/select (const item of source) { body }
@@ -1768,6 +1774,192 @@ func (tx *transformer) lowerProducer(producer *ast.Node, continuation func(*ast.
 	return factory.NewSyntaxList(statements)
 }
 
+func (tx *transformer) lowerKvsSwitch(node *ast.KvsSwitchExpression, continuation func(*ast.Expression) *ast.Node, discarded bool) *ast.Node {
+	factory := tx.Factory()
+	var result *ast.IdentifierNode
+	if !discarded {
+		result = factory.NewTempVariable()
+	}
+	label := factory.NewUniqueName("switch")
+
+	savedResult := tx.producerResult
+	savedTemporaries := tx.producerTemporaries
+	savedSelectProducer := tx.selectProducer
+	savedLazyProducer := tx.lazyProducer
+	savedLabel := tx.selectLabel
+	tx.producerResult = result
+	tx.producerTemporaries = nil
+	tx.selectProducer = true
+	tx.lazyProducer = false
+	labelUsed := core.IfElse(node.Expression != nil, selectNeedsLabel(node.CaseBlock), containsKvsSwitchProduction(node.CaseBlock))
+	if labelUsed {
+		tx.selectLabel = label
+	} else {
+		tx.selectLabel = nil
+	}
+
+	armStatements := func(clause *ast.Node, needsCompletionBreak bool) []*ast.Node {
+		statements := clause.Statements()
+		if len(statements) == 1 && statements[0].Kind == ast.KindExpressionStatement {
+			expression := statements[0].Expression()
+			produce := func(value *ast.Expression) *ast.Node {
+				produced := factory.NewExpressionStatement(value)
+				if !discarded {
+					produced = factory.NewExpressionStatement(factory.NewAssignmentExpression(result, value))
+				}
+				if !needsCompletionBreak {
+					return produced
+				}
+				if discarded {
+					return factory.NewSyntaxList([]*ast.Node{
+						produced,
+						factory.NewBreakStatement(nil),
+					})
+				}
+				return factory.NewSyntaxList([]*ast.Node{
+					produced,
+					factory.NewBreakStatement(nil),
+				})
+			}
+			if lowered := tx.lowerHeadEffects(expression, produce); lowered != nil {
+				if lowered.Kind == ast.KindSyntaxList {
+					return lowered.AsSyntaxList().Children
+				}
+				return []*ast.Node{lowered}
+			}
+			produced := produce(tx.Visitor().VisitNode(expression))
+			if produced.Kind == ast.KindSyntaxList {
+				return produced.AsSyntaxList().Children
+			}
+			return []*ast.Node{produced}
+		}
+		visited := make([]*ast.Node, 0, 2)
+		if len(statements) == 1 && statements[0].Kind == ast.KindBlock {
+			visited = append(visited, tx.Visitor().VisitNode(statements[0]))
+		} else {
+			for _, statement := range statements {
+				visited = append(visited, tx.Visitor().VisitNode(statement))
+			}
+		}
+		if needsCompletionBreak && (len(statements) != 1 || !kvsSwitchArmDefinitelyExits(statements[0])) {
+			visited = append(visited, factory.NewBreakStatement(nil))
+		}
+		return visited
+	}
+
+	var lowered *ast.Node
+	clauses := node.CaseBlock.AsCaseBlock().Clauses.Nodes
+	if node.Expression != nil {
+		var emittedClauses []*ast.Node
+		var appendAlternatives func(*ast.Node, []*ast.Node)
+		appendAlternatives = func(expression *ast.Node, statements []*ast.Node) {
+			if expression.Kind == ast.KindBinaryExpression && expression.AsBinaryExpression().OperatorToken.Kind == ast.KindBarToken {
+				binary := expression.AsBinaryExpression()
+				appendAlternatives(binary.Left, nil)
+				appendAlternatives(binary.Right, statements)
+				return
+			}
+			emittedClauses = append(emittedClauses, factory.NewCaseOrDefaultClause(ast.KindCaseClause, tx.Visitor().VisitNode(expression), factory.NewNodeList(statements)))
+		}
+		for i, clause := range clauses {
+			statements := armStatements(clause, i != len(clauses)-1)
+			if clause.Kind == ast.KindDefaultClause {
+				emittedClauses = append(emittedClauses, factory.NewCaseOrDefaultClause(ast.KindDefaultClause, nil, factory.NewNodeList(statements)))
+			} else {
+				appendAlternatives(clause.Expression(), statements)
+			}
+		}
+		caseBlock := factory.NewCaseBlock(factory.NewNodeList(emittedClauses))
+		lowered = factory.NewSwitchStatement(tx.Visitor().VisitNode(node.Expression), caseBlock)
+	} else {
+		var chain *ast.Node
+		for _, clause := range slices.Backward(clauses) {
+			body := factory.NewBlock(factory.NewNodeList(armStatements(clause, false)), true)
+			if clause.Kind == ast.KindDefaultClause {
+				chain = body
+			} else {
+				chain = factory.NewIfStatement(tx.Visitor().VisitNode(clause.Expression()), body, chain)
+			}
+		}
+		if chain == nil {
+			chain = factory.NewEmptyStatement()
+		}
+		lowered = chain
+	}
+	if labelUsed {
+		lowered = factory.NewLabeledStatement(label, lowered)
+	}
+	temporaries := tx.producerTemporaries
+	tx.producerResult = savedResult
+	tx.producerTemporaries = savedTemporaries
+	tx.selectProducer = savedSelectProducer
+	tx.lazyProducer = savedLazyProducer
+	tx.selectLabel = savedLabel
+
+	var statements []*ast.Node
+	if !discarded {
+		statements = append(statements, factory.NewVariableStatement(nil, factory.NewVariableDeclarationList(factory.NewNodeList([]*ast.Node{
+			factory.NewVariableDeclaration(result, nil, nil, factory.NewKeywordExpression(ast.KindNullKeyword)),
+		}), ast.NodeFlagsNone)))
+	}
+	if node.Initializer != nil {
+		initializer := tx.Visitor().VisitNode(node.Initializer)
+		statements = append(statements, factory.NewVariableStatement(nil, initializer))
+	}
+	if len(temporaries) != 0 {
+		declarations := make([]*ast.Node, 0, len(temporaries))
+		for _, temp := range temporaries {
+			declarations = append(declarations, factory.NewVariableDeclaration(temp, nil, nil, nil))
+		}
+		statements = append(statements, factory.NewVariableStatement(nil, factory.NewVariableDeclarationList(factory.NewNodeList(declarations), ast.NodeFlagsNone)))
+	}
+	statements = append(statements, lowered)
+	if !discarded {
+		continued := continuation(result)
+		if continued.Kind == ast.KindSyntaxList {
+			statements = append(statements, continued.AsSyntaxList().Children...)
+		} else {
+			statements = append(statements, continued)
+		}
+	}
+	return factory.NewSyntaxList(statements)
+}
+
+func kvsSwitchArmDefinitelyExits(statement *ast.Node) bool {
+	switch statement.Kind {
+	case ast.KindReturnStatement, ast.KindThrowStatement:
+		return true
+	case ast.KindBlock:
+		statements := statement.Statements()
+		return len(statements) != 0 && kvsSwitchArmDefinitelyExits(statements[len(statements)-1])
+	case ast.KindIfStatement:
+		data := statement.AsIfStatement()
+		return data.ElseStatement != nil && kvsSwitchArmDefinitelyExits(data.ThenStatement) && kvsSwitchArmDefinitelyExits(data.ElseStatement)
+	}
+	return false
+}
+
+func containsKvsSwitchProduction(statement *ast.Node) bool {
+	var found bool
+	var visit func(*ast.Node) bool
+	visit = func(node *ast.Node) bool {
+		if found || node == nil {
+			return found
+		}
+		if node != statement && (ast.IsFunctionLike(node) || isKvsProducer(node)) {
+			return false
+		}
+		if node.Kind == ast.KindKvsYieldStatement || node.Kind == ast.KindKvsExtantYieldStatement {
+			found = true
+			return true
+		}
+		node.ForEachChild(visit)
+		return found
+	}
+	visit(statement)
+	return found
+}
+
 func (tx *transformer) lowerKvsFor(producer *ast.KvsForExpression, continuation func(*ast.Expression) *ast.Node) *ast.Node {
 	factory := tx.Factory()
 	implicitSubject := producer.Flags&ast.NodeFlagsKvsImplicitSubject != 0
@@ -1883,7 +2075,7 @@ func selectNeedsLabel(statement *ast.Node) bool {
 	// their yields belong to a different control-flow scope.
 	var visit func(*ast.Node, bool) bool
 	visit = func(node *ast.Node, beneathBreakTarget bool) bool {
-		if node == nil || ast.IsFunctionLike(node) || node.Kind == ast.KindKvsCollectExpression || node.Kind == ast.KindKvsLazyCollectExpression || node.Kind == ast.KindKvsSelectExpression {
+		if node == nil || ast.IsFunctionLike(node) || node.Kind == ast.KindKvsCollectExpression || node.Kind == ast.KindKvsLazyCollectExpression || node.Kind == ast.KindKvsSelectExpression || node.Kind == ast.KindKvsSwitchExpression {
 			return false
 		}
 		if node.Kind == ast.KindKvsYieldStatement || node.Kind == ast.KindKvsExtantYieldStatement {
@@ -1932,8 +2124,11 @@ func (tx *transformer) transformYieldValue(value *ast.Expression, extant bool) *
 	}
 	if tx.selectProducer {
 		selectValue := func(value *ast.Expression) *ast.Node {
-			assignment := factory.NewExpressionStatement(factory.NewAssignmentExpression(tx.producerResult, value))
-			return factory.NewSyntaxList([]*ast.Node{assignment, factory.NewBreakStatement(tx.selectLabel)})
+			production := factory.NewExpressionStatement(value)
+			if tx.producerResult != nil {
+				production = factory.NewExpressionStatement(factory.NewAssignmentExpression(tx.producerResult, value))
+			}
+			return factory.NewSyntaxList([]*ast.Node{production, factory.NewBreakStatement(tx.selectLabel)})
 		}
 		if !extant {
 			return selectValue(value)

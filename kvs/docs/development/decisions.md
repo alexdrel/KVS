@@ -422,7 +422,7 @@ enclosing implicit subject. Explicit loops introduce no `_` and leave an enclosi
 Most implicit sources lower directly. Only a source expression containing `_` is evaluated into a
 temporary before the inner `const _` is introduced. This avoids JavaScript's self-shadowing temporal
 dead zone while adding no temporary to independent forms such as `for (items)`. The first slice does
-not include `collect*`, placeholder lambdas, or subject-form `when`.
+not include `collect*` or placeholder lambdas.
 
 ## Synchronous expression-valued `for`
 

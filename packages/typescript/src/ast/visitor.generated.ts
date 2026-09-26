@@ -135,6 +135,7 @@ import type {
     KvsSieveAssignmentExpression,
     KvsSieveBindingInitializer,
     KvsSieveExpression,
+    KvsSwitchExpression,
     KvsTypedObjectExpression,
     KvsTypedSpreadAssignmentExpression,
     KvsYieldStatement,
@@ -342,6 +343,7 @@ import {
     updateKvsSieveAssignmentExpression,
     updateKvsSieveBindingInitializer,
     updateKvsSieveExpression,
+    updateKvsSwitchExpression,
     updateKvsTypedObjectExpression,
     updateKvsTypedSpreadAssignmentExpression,
     updateKvsYieldStatement,
@@ -821,6 +823,12 @@ const visitEachChildTable: Record<number, VisitEachChildFunction> = {
         const _expression = visitNode(node.expression, visitor, isExpression);
         const _statement = visitNode(node.statement, visitor, isStatement);
         return updateKvsSelectExpression(node, _initializer, _expression, _statement);
+    },
+    [SyntaxKind.KvsSwitchExpression]: (node: KvsSwitchExpression, visitor: Visitor): KvsSwitchExpression => {
+        const _initializer = visitNode(node.initializer, visitor, isVariableDeclarationList);
+        const _expression = visitNode(node.expression, visitor, isExpression);
+        const _caseBlock = visitNode(node.caseBlock, visitor, isCaseBlock);
+        return updateKvsSwitchExpression(node, _initializer, _expression, _caseBlock);
     },
     [SyntaxKind.KvsForExpression]: (node: KvsForExpression, visitor: Visitor): KvsForExpression => {
         const _initializer = visitNode(node.initializer, visitor, isForInitializer);

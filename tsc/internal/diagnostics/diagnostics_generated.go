@@ -4476,6 +4476,12 @@ var Keyed_iteration_requires_a_source_with_one_statically_determined_coordinate_
 
 var A_keyed_producer_header_must_use_an_array_binding_pattern = &Message{code: 100092, category: CategoryError, key: "A_keyed_producer_header_must_use_an_array_binding_pattern_100092", text: "A keyed producer header must use an array binding pattern."}
 
+var KVS_switch_must_be_at_the_head_of_a_supported_value_expression = &Message{code: 100093, category: CategoryError, key: "KVS_switch_must_be_at_the_head_of_a_supported_value_expression_100093", text: "KVS 'switch' must be at the head of a supported value expression."}
+
+var A_concise_KVS_switch_arm_must_contain_exactly_one_expression_Use_a_block_and_yield_for_a_procedural_arm = &Message{code: 100094, category: CategoryError, key: "A_concise_KVS_switch_arm_must_contain_exactly_one_expression_Use_a_block_and_yield_for_a_procedural__100094", text: "A concise KVS switch arm must contain exactly one expression. Use a block and yield for a procedural arm."}
+
+var A_KVS_switch_binding_must_be_a_single_const_declaration_with_an_initializer = &Message{code: 100095, category: CategoryError, key: "A_KVS_switch_binding_must_be_a_single_const_declaration_with_an_initializer_100095", text: "A KVS switch binding must be a single const declaration with an initializer."}
+
 var allMessages = [...]**Message{
 	&Unterminated_string_literal,
 	&Identifier_expected,
@@ -6714,4 +6720,7 @@ var allMessages = [...]**Message{
 	&A_destructured_parameter_cannot_traverse_a_nullable_source_Bind_the_parameter_first_and_destructure_it_in_the_function_body,
 	&Keyed_iteration_requires_a_source_with_one_statically_determined_coordinate_category,
 	&A_keyed_producer_header_must_use_an_array_binding_pattern,
+	&KVS_switch_must_be_at_the_head_of_a_supported_value_expression,
+	&A_concise_KVS_switch_arm_must_contain_exactly_one_expression_Use_a_block_and_yield_for_a_procedural_arm,
+	&A_KVS_switch_binding_must_be_a_single_const_declaration_with_an_initializer,
 }
