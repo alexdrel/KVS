@@ -2,6 +2,18 @@
 
 This file records accepted project-level decisions. It does not prescribe a feature order.
 
+## Use explicit pipelines for staged composition
+
+Status: accepted and implemented.
+
+KVS uses `|>`, `|?>`, and `|%>` for staged composition instead of receiver-first free-function
+fallback or computed dot operations. Bare callable stages receive the current value, while `%`
+places it explicitly inside a larger stage expression. `|?>` guards the remaining pipeline on
+presence, and `|%>` discards a stage result while retaining the value that entered that stage.
+
+Pipelines remain ordinary expressions and ordinary assignments remain valid stages. The syntax does
+not synthesize members or change JavaScript lookup and receiver rules.
+
 ## Use TypeScript source files during bootstrap
 
 Status: accepted.

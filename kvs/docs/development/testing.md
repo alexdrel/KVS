@@ -163,6 +163,26 @@ Run it with:
 go -C ./tsc test -run='TestLocal/kvsPlaceholderLambda' ./internal/testrunner
 ```
 
+## Pipeline slice
+
+`kvsPipeline.ts` checks bare callable and receiver-preserving member stages, explicitly positioned
+and repeated `%`, nested pipelines, callback shadowing, generic inference, ordinary and compound
+assignment stages, extant continuation and narrowing, `|%>` input retention, and a producer tail.
+Its diagnostic cases reject a non-callable bare stage plus leading and dangling `|%>`.
+
+`TestKvsPipelineLanguageService` checks hover types for a pipeline `%`, a nearer callback `%`, and a
+later pipeline stage. The API roundtrip test guards the ordered pipeline AST and structural printing
+of `%` after transport. The runnable `pipeline.ts` example resolves an optional path alias, encodes
+it, observes it through a void-producing `console.log` stage, and retains it with `|%>` to build a
+link.
+
+Run the focused compiler and language-service cases with:
+
+```sh
+go -C ./tsc test -run='TestLocal/kvsPipeline' ./internal/testrunner
+go -C ./tsc test -run='TestKvsPipelineLanguageService' ./internal/fourslash/tests
+```
+
 ## Typed-construction and projection slice
 
 `kvsTypedConstruction.ts` checks default construction and written fields for concrete interfaces and

@@ -251,6 +251,12 @@ func GetOperatorPrecedence(nodeKind Kind, operatorKind Kind, flags OperatorPrece
 		return OperatorPrecedenceRelational
 	case KindKvsRangeExpression:
 		return OperatorPrecedenceRange
+	case KindKvsPipelineExpression:
+		return OperatorPrecedenceAssignment
+	case KindKvsPlaceholderLambdaExpression:
+		// This parser-created wrapper has no surface syntax; its body supplies the
+		// printed expression and handles its own precedence.
+		return OperatorPrecedencePrimary
 	case KindConditionalExpression, KindKvsNullingExpression:
 		return OperatorPrecedenceConditional
 	case KindBinaryExpression:

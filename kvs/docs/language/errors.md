@@ -160,5 +160,5 @@ The direct binding form handles local inspection without introducing another val
 
 ---
 
-[← Calls, composition, and callbacks](calls.md) · [Contents](README.md#reading-guide) ·
+[← Pipelines and placeholder lambdas](pipelines.md) · [Contents](README.md#reading-guide) ·
 [Next: Lightweight type-system additions →](types.md)

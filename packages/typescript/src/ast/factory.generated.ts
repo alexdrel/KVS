@@ -174,6 +174,7 @@ import type {
     KvsNullableAssertionExpression,
     KvsNullableType,
     KvsNullingExpression,
+    KvsPipelineExpression,
     KvsPlaceholderLambdaExpression,
     KvsRangeExpression,
     KvsSelectExpression,
@@ -969,6 +970,8 @@ function cloneNodeData(node: Node): any {
             return { type: n.type, properties: n.properties, multiLine: n.multiLine };
         case SyntaxKind.KvsRangeExpression:
             return { lower: n.lower, operatorToken: n.operatorToken, upper: n.upper };
+        case SyntaxKind.KvsPipelineExpression:
+            return { head: n.head, elements: n.elements };
         case SyntaxKind.KvsCollectExpression:
             return { initializer: n.initializer, expression: n.expression, keyed: n.keyed, statement: n.statement };
         case SyntaxKind.KvsLazyCollectExpression:
@@ -1449,6 +1452,9 @@ const forEachChildTable: Record<number, ForEachChildFunction> = {
         visitNode(cbNode, data.lower) ||
         visitNode(cbNode, data.operatorToken) ||
         visitNode(cbNode, data.upper),
+    [SyntaxKind.KvsPipelineExpression]: (data, cbNode, cbNodes) =>
+        visitNode(cbNode, data.head) ||
+        visitNodes(cbNode, cbNodes, data.elements),
     [SyntaxKind.KvsCollectExpression]: (data, cbNode, cbNodes) =>
         visitNode(cbNode, data.initializer) ||
         visitNode(cbNode, data.expression) ||
@@ -2448,6 +2454,16 @@ const yieldEachChildTable: Record<number, YieldEachChildFunction> = {
         }
         if (data.upper) {
             const res = yield data.upper;
+            if (res) return res;
+        }
+    },
+    [SyntaxKind.KvsPipelineExpression]: function* (data) {
+        if (data.head) {
+            const res = yield data.head;
+            if (res) return res;
+        }
+        for (const n of data.elements) {
+            const res = yield n;
             if (res) return res;
         }
     },
@@ -4979,6 +4995,13 @@ export function createKvsRangeExpression(lower: Expression, operatorToken: Node,
     }) as unknown as KvsRangeExpression;
 }
 
+export function createKvsPipelineExpression(head: Expression, elements: readonly Node[]): KvsPipelineExpression {
+    return new NodeObject(SyntaxKind.KvsPipelineExpression, {
+        head,
+        elements: createNodeArray(elements),
+    }) as unknown as KvsPipelineExpression;
+}
+
 export function createKvsCollectExpression(initializer: ForInitializer, expression: Expression, keyed: boolean = false, statement: Statement): KvsCollectExpression {
     return new NodeObject(SyntaxKind.KvsCollectExpression, {
         initializer,
@@ -6530,6 +6553,10 @@ export function updateKvsTypedObjectExpression(node: KvsTypedObjectExpression, t
 
 export function updateKvsRangeExpression(node: KvsRangeExpression, lower: Expression, operatorToken: Node, upper: Expression): KvsRangeExpression {
     return node.lower !== lower || node.operatorToken !== operatorToken || node.upper !== upper ? createKvsRangeExpression(lower, operatorToken, upper) : node;
+}
+
+export function updateKvsPipelineExpression(node: KvsPipelineExpression, head: Expression, elements: readonly Node[]): KvsPipelineExpression {
+    return node.head !== head || node.elements !== elements ? createKvsPipelineExpression(head, elements) : node;
 }
 
 export function updateKvsCollectExpression(node: KvsCollectExpression, initializer: ForInitializer, expression: Expression, statement: Statement): KvsCollectExpression {

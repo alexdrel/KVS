@@ -2238,5 +2238,6 @@
     "A_keyed_producer_header_must_use_an_array_binding_pattern_100092": "A keyed producer header must use an array binding pattern.",
     "KVS_switch_must_be_at_the_head_of_a_supported_value_expression_100093": "KVS 'switch' must be at the head of a supported value expression.",
     "A_concise_KVS_switch_arm_must_contain_exactly_one_expression_Use_a_block_and_yield_for_a_procedural__100094": "A concise KVS switch arm must contain exactly one expression. Use a block and yield for a procedural arm.",
-    "A_KVS_switch_binding_must_be_a_single_const_declaration_with_an_initializer_100095": "A KVS switch binding must be a single const declaration with an initializer."
+    "A_KVS_switch_binding_must_be_a_single_const_declaration_with_an_initializer_100095": "A KVS switch binding must be a single const declaration with an initializer.",
+    "KVS_requires_a_preceding_pipeline_stage_100096": "KVS '|%>' requires a preceding pipeline stage."
 }

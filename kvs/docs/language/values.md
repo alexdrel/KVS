@@ -402,6 +402,64 @@ x as! // emit nothing; trust that x is present
 When `x` is present they produce the same value. When it is absent, only `x!` applies the KVS
 defaulting policy.
 
+## Optional invocation
+
+A transformation may need a value that is sometimes absent. An optional call performs the
+transformation when the input exists and otherwise produces absence:
+
+```kvs
+const name = normalize?(user.profile.displayName);
+```
+
+The surrounding computation can use `name` without a separate guard or temporary variable for the
+input. `?(` marks the whole call as optional; no whitespace separates `?` from `(`.
+
+The call runs only when the callable and all arguments corresponding to non-nullable parameters are
+present. Otherwise it produces null. A nullable parameter receives absence normally and does not
+make the call optional:
+
+```kvs
+function display(value: string?): Widget { ... }
+
+const widget = display(name);
+```
+
+An absent argument is passed as `null` or `undefined` according to what the parameter accepts; a
+parameter with a default accepts `undefined`. When either representation is accepted, the original
+value is preserved.
+
+A plain call requires its callable and every required argument to be statically non-nullable:
+
+```kvs
+normalize(user.profile.displayName)
+// error: a required argument may be absent
+```
+
+This generalizes JavaScript optional invocation from a nullable callable to the callable and its
+required inputs. Together, the compound openers form one presence-aware family:
+
+```kvs
+callable?(arguments) // skip the call
+?[elements]         // skip absent elements
+?{properties}       // skip absent properties
+```
+
+### Optional calls and materialization
+
+An optional call guards the whole operation. A potentially absent callable is resolved before its
+arguments. Arguments are then evaluated left-to-right until a required input is absent; later
+arguments are skipped, while earlier effects remain observable. A receiver and method known to be
+present may be resolved after the required arguments have passed.
+
+```kvs
+arr!.push?(nullableItem)
+```
+
+Here an absent item also prevents the new array from being stored in `arr`. Receiver-path defaults
+are committed only when the call can proceed. The
+[evaluation reference](implementation.md#optional-call-evaluation) gives the complete staging
+sequence.
+
 ## Comparison conveniences
 
 The same boolean comparison rules support finite alternatives and readable ranges.

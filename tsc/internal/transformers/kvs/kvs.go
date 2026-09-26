@@ -26,7 +26,7 @@ type transformer struct {
 	// original effect node is then replaced by its generated result temporary
 	// while the rest of that value is visited.
 	headReplacements map[*ast.Node]*ast.Node
-	placeholderNames []*ast.IdentifierNode
+	placeholderNames []*ast.Node
 	coordinateNames  []*ast.IdentifierNode
 }
 
@@ -198,6 +198,8 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 		return tx.transformTypedObjectExpression(node.AsKvsTypedObjectExpression())
 	case ast.KindKvsRangeExpression:
 		return tx.transformRangeExpression(node.AsKvsRangeExpression())
+	case ast.KindKvsPipelineExpression:
+		return tx.transformPipelineExpression(node.AsKvsPipelineExpression())
 	case ast.KindKvsLazyCollectExpression:
 		return tx.transformLazyCollectExpression(node.AsKvsLazyCollectExpression())
 	case ast.KindKvsNullableAssertionExpression, ast.KindKvsExtantAssertionExpression:
@@ -656,6 +658,54 @@ func (tx *transformer) transformRangeExpression(node *ast.KvsRangeExpression) *a
 	)
 }
 
+func (tx *transformer) transformPipelineExpression(node *ast.KvsPipelineExpression) *ast.Node {
+	factory := tx.Factory()
+	current := factory.NewTempVariable()
+	tx.declareTemp(current)
+	initial := factory.NewAssignmentExpression(current, tx.Visitor().VisitNode(node.Head))
+
+	var lowerStage func(index int, input *ast.Node) *ast.Node
+	lowerStage = func(index int, input *ast.Node) *ast.Node {
+		stage := node.Elements.Nodes[index*2+1]
+		var result *ast.Node
+		if tx.resolver.IsKvsPipelineBareStage(stage) {
+			callee := tx.Visitor().VisitNode(stage)
+			result = factory.NewCallExpression(callee, nil, nil, factory.NewNodeList([]*ast.Node{input}), ast.NodeFlagsNone)
+		} else {
+			tx.placeholderNames = append(tx.placeholderNames, input)
+			result = tx.Visitor().VisitNode(stage)
+			tx.placeholderNames = tx.placeholderNames[:len(tx.placeholderNames)-1]
+		}
+		if index == len(node.Elements.Nodes)/2-1 {
+			return result
+		}
+
+		operator := node.Elements.Nodes[(index+1)*2]
+		switch operator.Kind {
+		case ast.KindBarPercentGreaterThanToken:
+			return factory.NewCommaExpression(result, lowerStage(index+1, input))
+		case ast.KindBarQuestionGreaterThanToken:
+			assigned := factory.NewAssignmentExpression(current, result)
+			present := factory.NewBinaryExpression(nil, assigned, nil, factory.NewToken(ast.KindExclamationEqualsToken), factory.NewKeywordExpression(ast.KindNullKeyword))
+			return factory.NewConditionalExpression(present, factory.NewToken(ast.KindQuestionToken), lowerStage(index+1, current), factory.NewToken(ast.KindColonToken), factory.NewKeywordExpression(ast.KindNullKeyword))
+		default:
+			return factory.NewCommaExpression(factory.NewAssignmentExpression(current, result), lowerStage(index+1, current))
+		}
+	}
+
+	if len(node.Elements.Nodes) == 0 {
+		return initial
+	}
+	firstOperator := node.Elements.Nodes[0]
+	switch firstOperator.Kind {
+	case ast.KindBarQuestionGreaterThanToken:
+		present := factory.NewBinaryExpression(nil, initial, nil, factory.NewToken(ast.KindExclamationEqualsToken), factory.NewKeywordExpression(ast.KindNullKeyword))
+		return factory.NewConditionalExpression(present, factory.NewToken(ast.KindQuestionToken), lowerStage(0, current), factory.NewToken(ast.KindColonToken), factory.NewKeywordExpression(ast.KindNullKeyword))
+	default:
+		return factory.NewCommaExpression(initial, lowerStage(0, current))
+	}
+}
+
 func (tx *transformer) transformLazyCollectExpression(node *ast.KvsLazyCollectExpression) *ast.Node {
 	factory := tx.Factory()
 	implicitSubject := node.Flags&ast.NodeFlagsKvsImplicitSubject != 0
@@ -739,7 +789,7 @@ func (tx *transformer) transformPlaceholderLambda(node *ast.KvsPlaceholderLambda
 	originalParameter := arrow.Parameters.Nodes[0].AsParameterDeclaration()
 	parameter := factory.UpdateParameterDeclaration(originalParameter, originalParameter.Modifiers(), originalParameter.DotDotDotToken, name, originalParameter.QuestionToken, originalParameter.Type, originalParameter.Initializer)
 	parameters := factory.NewNodeList([]*ast.Node{parameter})
-	tx.placeholderNames = append(tx.placeholderNames, name)
+	tx.placeholderNames = append(tx.placeholderNames, name.AsNode())
 	body := tx.Visitor().VisitNode(arrow.Body)
 	tx.placeholderNames = tx.placeholderNames[:len(tx.placeholderNames)-1]
 

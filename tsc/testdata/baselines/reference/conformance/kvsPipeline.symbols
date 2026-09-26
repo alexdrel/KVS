@@ -1,0 +1,238 @@
+//// [tests/cases/conformance/kvs/kvsPipeline.ts] ////
+
+=== kvsPipeline.ts ===
+function double(value: number): number {
+>double : Symbol(double, Decl(kvsPipeline.ts, 0, 0))
+>value : Symbol(value, Decl(kvsPipeline.ts, 0, 16))
+
+    return value * 2;
+>value : Symbol(value, Decl(kvsPipeline.ts, 0, 16))
+}
+
+function add(left: number, right: number): number {
+>add : Symbol(add, Decl(kvsPipeline.ts, 2, 1))
+>left : Symbol(left, Decl(kvsPipeline.ts, 4, 13))
+>right : Symbol(right, Decl(kvsPipeline.ts, 4, 26))
+
+    return left + right;
+>left : Symbol(left, Decl(kvsPipeline.ts, 4, 13))
+>right : Symbol(right, Decl(kvsPipeline.ts, 4, 26))
+}
+
+function identity<T>(value: T): T {
+>identity : Symbol(identity, Decl(kvsPipeline.ts, 6, 1))
+>T : Symbol(T, Decl(kvsPipeline.ts, 8, 18))
+>value : Symbol(value, Decl(kvsPipeline.ts, 8, 21))
+>T : Symbol(T, Decl(kvsPipeline.ts, 8, 18))
+>T : Symbol(T, Decl(kvsPipeline.ts, 8, 18))
+
+    return value;
+>value : Symbol(value, Decl(kvsPipeline.ts, 8, 21))
+}
+
+function maybe(value: number): number? {
+>maybe : Symbol(maybe, Decl(kvsPipeline.ts, 10, 1))
+>value : Symbol(value, Decl(kvsPipeline.ts, 12, 15))
+
+    return value > 0 ? value : null;
+>value : Symbol(value, Decl(kvsPipeline.ts, 12, 15))
+>value : Symbol(value, Decl(kvsPipeline.ts, 12, 15))
+}
+
+const ordinary = 2 |>
+>ordinary : Symbol(ordinary, Decl(kvsPipeline.ts, 16, 5))
+
+    double |>
+>double : Symbol(double, Decl(kvsPipeline.ts, 0, 0))
+
+    add(%, 3) |>
+>add : Symbol(add, Decl(kvsPipeline.ts, 2, 1))
+>% : Symbol(%, Decl(kvsPipeline.ts, 18, 8))
+
+    identity;
+>identity : Symbol(identity, Decl(kvsPipeline.ts, 6, 1))
+
+const positioned = "  text  " |>
+>positioned : Symbol(positioned, Decl(kvsPipeline.ts, 21, 5))
+
+    %.trim() |>
+>%.trim : Symbol(String.trim, Decl(lib.es5.d.ts, --, --))
+>% : Symbol(%, Decl(kvsPipeline.ts, 21, 32))
+>trim : Symbol(String.trim, Decl(lib.es5.d.ts, --, --))
+
+    new String(%);
+>String : Symbol(String, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --), Decl(lib.es2015.core.d.ts, --, --), Decl(lib.es2015.iterable.d.ts, --, --) ... and 4 more)
+>% : Symbol(%, Decl(kvsPipeline.ts, 23, 15))
+
+const repeated = 3 |>
+>repeated : Symbol(repeated, Decl(kvsPipeline.ts, 25, 5))
+
+    add(%, %);
+>add : Symbol(add, Decl(kvsPipeline.ts, 2, 1))
+>% : Symbol(%, Decl(kvsPipeline.ts, 26, 8))
+>% : Symbol(%, Decl(kvsPipeline.ts, 26, 10))
+
+const conditional = 2 |>
+>conditional : Symbol(conditional, Decl(kvsPipeline.ts, 28, 5))
+
+    true ? double(%) : add(%, 1);
+>double : Symbol(double, Decl(kvsPipeline.ts, 0, 0))
+>% : Symbol(%, Decl(kvsPipeline.ts, 29, 18))
+>add : Symbol(add, Decl(kvsPipeline.ts, 2, 1))
+>% : Symbol(%, Decl(kvsPipeline.ts, 29, 27))
+
+const processor = {
+>processor : Symbol(processor, Decl(kvsPipeline.ts, 31, 5))
+
+    offset: 4,
+>offset : Symbol(offset, Decl(kvsPipeline.ts, 31, 19))
+
+    normalize(value: number): number {
+>normalize : Symbol(normalize, Decl(kvsPipeline.ts, 32, 14))
+>value : Symbol(value, Decl(kvsPipeline.ts, 33, 14))
+
+        return value + this.offset;
+>value : Symbol(value, Decl(kvsPipeline.ts, 33, 14))
+>this.offset : Symbol(offset, Decl(kvsPipeline.ts, 31, 19))
+>this : Symbol(processor, Decl(kvsPipeline.ts, 31, 17))
+>offset : Symbol(offset, Decl(kvsPipeline.ts, 31, 19))
+
+    },
+};
+
+const member = 2 |>
+>member : Symbol(member, Decl(kvsPipeline.ts, 38, 5))
+
+    processor.normalize;
+>processor.normalize : Symbol(normalize, Decl(kvsPipeline.ts, 32, 14))
+>processor : Symbol(processor, Decl(kvsPipeline.ts, 31, 5))
+>normalize : Symbol(normalize, Decl(kvsPipeline.ts, 32, 14))
+
+const observed: number[] = [];
+>observed : Symbol(observed, Decl(kvsPipeline.ts, 41, 5))
+
+const tapped = 3 |>
+>tapped : Symbol(tapped, Decl(kvsPipeline.ts, 42, 5))
+
+    observed.push |%>
+>observed.push : Symbol(Array.push, Decl(lib.es5.d.ts, --, --))
+>observed : Symbol(observed, Decl(kvsPipeline.ts, 41, 5))
+>push : Symbol(Array.push, Decl(lib.es5.d.ts, --, --))
+
+    double;
+>double : Symbol(double, Decl(kvsPipeline.ts, 0, 0))
+
+let captured = 0;
+>captured : Symbol(captured, Decl(kvsPipeline.ts, 46, 3))
+
+const assigned = 3 |>
+>assigned : Symbol(assigned, Decl(kvsPipeline.ts, 47, 5))
+
+    captured = % + 1 |>
+>captured : Symbol(captured, Decl(kvsPipeline.ts, 46, 3))
+>% : Symbol(%, Decl(kvsPipeline.ts, 48, 14))
+
+    double;
+>double : Symbol(double, Decl(kvsPipeline.ts, 0, 0))
+
+const compoundAssigned = 2 |>
+>compoundAssigned : Symbol(compoundAssigned, Decl(kvsPipeline.ts, 51, 5))
+
+    captured += % |>
+>captured : Symbol(captured, Decl(kvsPipeline.ts, 46, 3))
+>% : Symbol(%, Decl(kvsPipeline.ts, 52, 15))
+
+    double;
+>double : Symbol(double, Decl(kvsPipeline.ts, 0, 0))
+
+const continued = 2 |?>
+>continued : Symbol(continued, Decl(kvsPipeline.ts, 55, 5))
+
+    maybe |?>
+>maybe : Symbol(maybe, Decl(kvsPipeline.ts, 10, 1))
+
+    captured = % |>
+>captured : Symbol(captured, Decl(kvsPipeline.ts, 46, 3))
+>% : Symbol(%, Decl(kvsPipeline.ts, 57, 14))
+
+    double;
+>double : Symbol(double, Decl(kvsPipeline.ts, 0, 0))
+
+const stopped = 0 |>
+>stopped : Symbol(stopped, Decl(kvsPipeline.ts, 60, 5))
+
+    maybe |?>
+>maybe : Symbol(maybe, Decl(kvsPipeline.ts, 10, 1))
+
+    (captured += 100, %) |>
+>captured : Symbol(captured, Decl(kvsPipeline.ts, 46, 3))
+>% : Symbol(%, Decl(kvsPipeline.ts, 62, 21))
+
+    double;
+>double : Symbol(double, Decl(kvsPipeline.ts, 0, 0))
+
+const acceptsNullable = null as number? |>
+>acceptsNullable : Symbol(acceptsNullable, Decl(kvsPipeline.ts, 65, 5))
+
+    (value: number?) => value;
+>value : Symbol(value, Decl(kvsPipeline.ts, 66, 5))
+>value : Symbol(value, Decl(kvsPipeline.ts, 66, 5))
+
+const callbackBoundary = [1, 2] |>
+>callbackBoundary : Symbol(callbackBoundary, Decl(kvsPipeline.ts, 68, 5))
+
+    add(%.length, %.map(% + 1)[0]);
+>add : Symbol(add, Decl(kvsPipeline.ts, 2, 1))
+>%.length : Symbol(Array.length, Decl(lib.es5.d.ts, --, --))
+>% : Symbol(%, Decl(kvsPipeline.ts, 69, 8))
+>length : Symbol(Array.length, Decl(lib.es5.d.ts, --, --))
+>%.map : Symbol(Array.map, Decl(lib.es5.d.ts, --, --))
+>% : Symbol(%, Decl(kvsPipeline.ts, 69, 17))
+>map : Symbol(Array.map, Decl(lib.es5.d.ts, --, --))
+>% : Symbol(%, Decl(kvsPipeline.ts, 69, 24))
+
+const nestedPipeline = 2 |>
+>nestedPipeline : Symbol(nestedPipeline, Decl(kvsPipeline.ts, 71, 5))
+
+    add(%, 3 |> double |> add(%, 1));
+>add : Symbol(add, Decl(kvsPipeline.ts, 2, 1))
+>% : Symbol(%, Decl(kvsPipeline.ts, 72, 8))
+>double : Symbol(double, Decl(kvsPipeline.ts, 0, 0))
+>add : Symbol(add, Decl(kvsPipeline.ts, 2, 1))
+>% : Symbol(%, Decl(kvsPipeline.ts, 72, 30))
+
+const explicitGeneric = [1, 2] |>
+>explicitGeneric : Symbol(explicitGeneric, Decl(kvsPipeline.ts, 74, 5))
+
+    identity(%);
+>identity : Symbol(identity, Decl(kvsPipeline.ts, 6, 1))
+>% : Symbol(%, Decl(kvsPipeline.ts, 75, 13))
+
+const produced = collect ([1, 2, 3]) {
+>produced : Symbol(produced, Decl(kvsPipeline.ts, 77, 5))
+
+    yield _;
+>_ : Symbol(_, Decl(kvsPipeline.ts, 78, 9))
+
+} |>
+    new Set(%);
+>Set : Symbol(Set, Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.iterable.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --))
+>% : Symbol(%, Decl(kvsPipeline.ts, 80, 12))
+
+const nonCallable = 2 |>
+>nonCallable : Symbol(nonCallable, Decl(kvsPipeline.ts, 82, 5))
+
+    3;
+
+const invalidPreserve = 2 |%>
+>invalidPreserve : Symbol(invalidPreserve, Decl(kvsPipeline.ts, 85, 5))
+
+    double;
+>double : Symbol(double, Decl(kvsPipeline.ts, 0, 0))
+
+const danglingPreserve = 2 |>
+>danglingPreserve : Symbol(danglingPreserve, Decl(kvsPipeline.ts, 88, 5))
+
+    double |%>;
+>double : Symbol(double, Decl(kvsPipeline.ts, 0, 0))
+

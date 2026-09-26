@@ -211,6 +211,7 @@ import type {
     KvsNullableAssertionExpression,
     KvsNullableType,
     KvsNullingExpression,
+    KvsPipelineExpression,
     KvsPlaceholderLambdaExpression,
     KvsRangeExpression,
     KvsSelectExpression,
@@ -800,6 +801,15 @@ export declare namespace isKvsRangeExpression {
     function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsRangeExpression>;
 }
 isKvsRangeExpression.Handle = isKvsRangeExpression as any;
+
+export function isKvsPipelineExpression(node: Node): node is KvsPipelineExpression {
+    return node.kind === SyntaxKind.KvsPipelineExpression;
+}
+
+export declare namespace isKvsPipelineExpression {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsPipelineExpression>;
+}
+isKvsPipelineExpression.Handle = isKvsPipelineExpression as any;
 
 export function isKvsCollectExpression(node: Node): node is KvsCollectExpression {
     return node.kind === SyntaxKind.KvsCollectExpression;

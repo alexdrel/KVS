@@ -62,6 +62,9 @@
             "GreaterThanGreaterThanGreaterThanToken",
             "AmpersandToken",
             "BarToken",
+            "BarGreaterThanToken",
+            "BarQuestionGreaterThanToken",
+            "BarPercentGreaterThanToken",
             "CaretToken",
             "ExclamationToken",
             "TildeToken",
@@ -311,6 +314,7 @@
             "KvsCompactObjectExpression",
             "KvsTypedObjectExpression",
             "KvsRangeExpression",
+            "KvsPipelineExpression",
             "KvsCollectExpression",
             "KvsLazyCollectExpression",
             "KvsSelectExpression",
@@ -2187,6 +2191,25 @@
                     {
                         "name": "Upper",
                         "type": "Expression"
+                    }
+                ],
+                "arena": true
+            },
+            "KvsPipelineExpression": {
+                "generateSubtreeFacts": true,
+                "extends": [
+                    "ExpressionBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "Head",
+                        "type": "Expression"
+                    },
+                    {
+                        "name": "Elements",
+                        "type": "Node",
+                        "list": "NodeList"
                     }
                 ],
                 "arena": true

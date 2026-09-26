@@ -381,11 +381,13 @@ const (
 type NodeLinks struct {
 	flags                                NodeCheckFlags // Set of flags specific to Node
 	kvsPlaceholderType                   *Type
+	kvsPipelinePlaceholderType           *Type
 	kvsTypedObjectType                   *Type
 	kvsTypedObjectDefaults               []kvsTypedObjectDefault
 	kvsTypedSpreadProperties             []string
 	kvsDefaultConstructorSymbol          *ast.Symbol
 	kvsExtantCall                        *kvsExtantCallInfo
+	kvsPipeline                          *kvsPipelineInfo
 	declarationRequiresScopeChange       core.Tristate // Set by `useOuterVariableScopeInParameter` in checker when downlevel emit would change the name resolution scope inside of a parameter.
 	hasReportedStatementInAmbientContext bool          // Cache boolean if we report statements in ambient context
 }
@@ -397,6 +399,12 @@ type kvsExtantCallInfo struct {
 	undefinedArguments        []int
 	argumentWidths            []int
 	unsupportedSpreadReported bool
+}
+
+type kvsPipelineInfo struct {
+	bareStages      map[*ast.Node]bool
+	stageInputTypes map[*ast.Node]*Type
+	resultType      *Type
 }
 
 type kvsTypedObjectDefault struct {

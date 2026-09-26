@@ -1,0 +1,353 @@
+//// [tests/cases/conformance/kvs/kvsPipeline.ts] ////
+
+=== kvsPipeline.ts ===
+function double(value: number): number {
+>double : (value: number) => number
+>value : number
+
+    return value * 2;
+>value * 2 : number
+>value : number
+>2 : 2
+}
+
+function add(left: number, right: number): number {
+>add : (left: number, right: number) => number
+>left : number
+>right : number
+
+    return left + right;
+>left + right : number
+>left : number
+>right : number
+}
+
+function identity<T>(value: T): T {
+>identity : <T>(value: T) => T
+>value : T
+
+    return value;
+>value : T
+}
+
+function maybe(value: number): number? {
+>maybe : (value: number) => number?
+>value : number
+
+    return value > 0 ? value : null;
+>value > 0 ? value : null : number | null
+>value > 0 : boolean
+>value : number
+>0 : 0
+>value : number
+}
+
+const ordinary = 2 |>
+>ordinary : number
+>2 |>    double |>    add(%, 3) |>    identity : number
+>2 : 2
+
+    double |>
+>double : (value: number) => number
+
+    add(%, 3) |>
+>add(%, 3) : (__kvsPlaceholder: any) => number
+>add(%, 3) : number
+>add : (left: number, right: number) => number
+>% : (__kvsPlaceholder: any) => number
+>% : number
+>3 : 3
+
+    identity;
+>identity : <T>(value: T) => T
+
+const positioned = "  text  " |>
+>positioned : String
+>"  text  " |>    %.trim() |>    new String(%) : String
+>"  text  " : "  text  "
+
+    %.trim() |>
+>%.trim() : (__kvsPlaceholder: any) => string
+>%.trim() : string
+>%.trim : () => string
+>% : "  text  "
+>trim : () => string
+
+    new String(%);
+>new String(%) : (__kvsPlaceholder: any) => String
+>new String(%) : String
+>String : StringConstructor
+>% : (__kvsPlaceholder: any) => string
+>% : string
+
+const repeated = 3 |>
+>repeated : number
+>3 |>    add(%, %) : number
+>3 : 3
+
+    add(%, %);
+>add(%, %) : (__kvsPlaceholder: any) => number
+>add(%, %) : number
+>add : (left: number, right: number) => number
+>% : (__kvsPlaceholder: any) => number
+>% : 3
+>% : (__kvsPlaceholder: any) => number
+>% : 3
+
+const conditional = 2 |>
+>conditional : number
+>2 |>    true ? double(%) : add(%, 1) : number
+>2 : 2
+
+    true ? double(%) : add(%, 1);
+>true ? double(%) : add(%, 1) : (__kvsPlaceholder: any) => number
+>true ? double(%) : add(%, 1) : number
+>true : true
+>double(%) : number
+>double : (value: number) => number
+>% : (__kvsPlaceholder: any) => number
+>% : 2
+>add(%, 1) : number
+>add : (left: number, right: number) => number
+>% : (__kvsPlaceholder: any) => number
+>% : 2
+>1 : 1
+
+const processor = {
+>processor : { offset: number; normalize(value: number): number; }
+>{    offset: 4,    normalize(value: number): number {        return value + this.offset;    },} : { offset: number; normalize(value: number): number; }
+
+    offset: 4,
+>offset : number
+>4 : 4
+
+    normalize(value: number): number {
+>normalize : (value: number) => number
+>value : number
+
+        return value + this.offset;
+>value + this.offset : number
+>value : number
+>this.offset : number
+>this : { offset: number; normalize(value: number): number; }
+>offset : number
+
+    },
+};
+
+const member = 2 |>
+>member : number
+>2 |>    processor.normalize : number
+>2 : 2
+
+    processor.normalize;
+>processor.normalize : (value: number) => number
+>processor : { offset: number; normalize(value: number): number; }
+>normalize : (value: number) => number
+
+const observed: number[] = [];
+>observed : number[]
+>[] : never[]
+
+const tapped = 3 |>
+>tapped : number
+>3 |>    observed.push |%>    double : number
+>3 : 3
+
+    observed.push |%>
+>observed.push : (...items: number[]) => number
+>observed : number[]
+>push : (...items: number[]) => number
+
+    double;
+>double : (value: number) => number
+
+let captured = 0;
+>captured : number
+>0 : 0
+
+const assigned = 3 |>
+>assigned : number
+>3 |>    captured = % + 1 |>    double : number
+>3 : 3
+
+    captured = % + 1 |>
+>captured = % + 1 : (__kvsPlaceholder: any) => number
+>captured = % + 1 : number
+>captured : number
+>% + 1 : number
+>% : 3
+>1 : 1
+
+    double;
+>double : (value: number) => number
+
+const compoundAssigned = 2 |>
+>compoundAssigned : number
+>2 |>    captured += % |>    double : number
+>2 : 2
+
+    captured += % |>
+>captured += % : (__kvsPlaceholder: any) => number
+>captured += % : number
+>captured : number
+>% : 2
+
+    double;
+>double : (value: number) => number
+
+const continued = 2 |?>
+>continued : number | null
+>2 |?>    maybe |?>    captured = % |>    double : number | null
+>2 : 2
+
+    maybe |?>
+>maybe : (value: number) => number?
+
+    captured = % |>
+>captured = % : (__kvsPlaceholder: any) => number
+>captured = % : number
+>captured : number
+>% : number
+
+    double;
+>double : (value: number) => number
+
+const stopped = 0 |>
+>stopped : number | null
+>0 |>    maybe |?>    (captured += 100, %) |>    double : number | null
+>0 : 0
+
+    maybe |?>
+>maybe : (value: number) => number?
+
+    (captured += 100, %) |>
+>(captured += 100, %) : (__kvsPlaceholder: any) => number
+>(captured += 100, %) : number
+>captured += 100, % : number
+>captured += 100 : number
+>captured : number
+>100 : 100
+>% : number
+
+    double;
+>double : (value: number) => number
+
+const acceptsNullable = null as number? |>
+>acceptsNullable : number | null | undefined
+>null as number? |>    (value: number?) => value : number | null | undefined
+>null as number? : number | null | undefined
+
+    (value: number?) => value;
+>(value: number?) => value : (value: number?) => number | null | undefined
+>value : number | null | undefined
+>value : number | null | undefined
+
+const callbackBoundary = [1, 2] |>
+>callbackBoundary : number
+>[1, 2] |>    add(%.length, %.map(% + 1)[0]) : number
+>[1, 2] : number[]
+>1 : 1
+>2 : 2
+
+    add(%.length, %.map(% + 1)[0]);
+>add(%.length, %.map(% + 1)[0]) : (__kvsPlaceholder: any) => number
+>add(%.length, %.map(% + 1)[0]) : number
+>add : (left: number, right: number) => number
+>%.length : (__kvsPlaceholder: any) => number
+>%.length : number
+>% : number[]
+>length : number
+>%.map(% + 1)[0] : (__kvsPlaceholder: any) => number
+>%.map(% + 1)[0] : number
+>%.map(% + 1) : number[]
+>%.map : <U>(callbackfn: (value: number, index: number, array: number[]) => U, thisArg?: any) => U[]
+>% : number[]
+>map : <U>(callbackfn: (value: number, index: number, array: number[]) => U, thisArg?: any) => U[]
+>% + 1 : (__kvsPlaceholder: number) => number
+>% + 1 : number
+>% : number
+>1 : 1
+>0 : 0
+
+const nestedPipeline = 2 |>
+>nestedPipeline : number
+>2 |>    add(%, 3 |> double |> add(%, 1)) : number
+>2 : 2
+
+    add(%, 3 |> double |> add(%, 1));
+>add(%, 3 |> double |> add(%, 1)) : (__kvsPlaceholder: any) => number
+>add(%, 3 |> double |> add(%, 1)) : number
+>add : (left: number, right: number) => number
+>% : (__kvsPlaceholder: any) => number
+>% : 2
+>3 |> double |> add(%, 1) : (__kvsPlaceholder: any) => number
+>3 |> double |> add(%, 1) : number
+>3 : 3
+>double : (value: number) => number
+>add(%, 1) : (__kvsPlaceholder: any) => number
+>add(%, 1) : number
+>add : (left: number, right: number) => number
+>% : (__kvsPlaceholder: any) => number
+>% : number
+>1 : 1
+
+const explicitGeneric = [1, 2] |>
+>explicitGeneric : number[]
+>[1, 2] |>    identity(%) : number[]
+>[1, 2] : number[]
+>1 : 1
+>2 : 2
+
+    identity(%);
+>identity(%) : (__kvsPlaceholder: any) => number[]
+>identity(%) : number[]
+>identity : <T>(value: T) => T
+>% : (__kvsPlaceholder: any) => number[]
+>% : number[]
+
+const produced = collect ([1, 2, 3]) {
+>produced : Set<number>
+>collect ([1, 2, 3]) {    yield _;} |>    new Set(%) : Set<number>
+>collect ([1, 2, 3]) {    yield _;} : number[]
+>[1, 2, 3] : number[]
+>1 : 1
+>2 : 2
+>3 : 3
+
+    yield _;
+>_ : number
+
+} |>
+    new Set(%);
+>new Set(%) : (__kvsPlaceholder: any) => Set<number>
+>new Set(%) : Set<number>
+>Set : SetConstructor
+>% : (__kvsPlaceholder: any) => number[]
+>% : number[]
+
+const nonCallable = 2 |>
+>nonCallable : any
+>2 |>    3 : any
+>2 : 2
+
+    3;
+>3 : 3
+
+const invalidPreserve = 2 |%>
+>invalidPreserve : number
+>2 |%>    double : number
+>2 : 2
+
+    double;
+>double : (value: number) => number
+
+const danglingPreserve = 2 |>
+>danglingPreserve : any
+>2 |>    double |%> : any
+>2 : 2
+
+    double |%>;
+>double : (value: number) => number
+> : any
+

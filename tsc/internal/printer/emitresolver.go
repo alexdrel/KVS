@@ -91,6 +91,7 @@ type EmitResolver interface {
 	CreateKvsDefaultConstructor(emitContext *EmitContext, node *ast.Node, symbol *ast.Symbol) *ast.Node
 	IsKvsLiftedBinaryExpression(node *ast.Node) bool
 	IsKvsPlaceholderBoundary(node *ast.Node) bool
+	IsKvsPipelineBareStage(node *ast.Node) bool
 	IsKvsNullableAccess(node *ast.Node) bool
 	GetKvsExtantCallInfo(node *ast.Node) *KvsExtantCallInfo
 	IsKvsLiftedBinaryLeftNullable(node *ast.Node) bool

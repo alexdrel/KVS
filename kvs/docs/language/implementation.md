@@ -464,36 +464,29 @@ is a direct expression inside `try`, with no runtime helper, IIFE, or closure.
 JavaScript's observable distinctions between `null`, `undefined`, and omission remain intact, but
 all three participate as absence where applicable.
 
-### Call evaluation and dispatch
+### Pipeline evaluation
 
-For a computed operation, KVS evaluates the receiver, then the operation expression, then additional
-arguments from left to right. It invokes the selected callable with the receiver followed by those
-arguments.
+KVS evaluates the initial pipeline expression and every reached stage once in source order. Every
+pipeline `%` in one stage reads the same captured current value. A nested pipeline captures its own
+current value; an accepted placeholder-lambda argument introduces its own nearer `%` parameter.
 
-The promoted receiver is an ordinary first argument; it is not installed as the callable's `this`.
-If the operation expression is itself a member reference, its normal JavaScript receiver behavior is
-retained.
+A bare callable stage is checked as an ordinary one-argument call. A bare member reference is
+invoked as a member call and therefore retains its JavaScript receiver. Explicit stage expressions
+otherwise use normal JavaScript evaluation order and call behavior.
 
-Named fallback applies only from method-shaped immediate call syntax to a receiver-first free
-function. It does not synthesize properties, change reflection, create runtime members, alter
-function values, or reinterpret function-shaped calls. Real members retain ordinary JavaScript
-`this` dispatch.
+After a stage, `|>` replaces the current value with that stage's result. `|%>` evaluates the stage
+but retains the value that entered it, so lowering preserves that input across the stage. Assignment
+stages need no special write semantics: ordinary assignment produces the value that continues.
 
-Method extraction also remains ordinary JavaScript:
+`|?>` tests the outgoing value on its left for `null` or `undefined`. On absence it skips every
+remaining stage and makes the whole pipeline produce `null`; on presence the checker narrows the
+value supplied to the next stage. Ordinary `|>` performs no such test or narrowing. Lowering may
+share branches and temporaries, but it must preserve once-only evaluation and must not evaluate a
+skipped stage or assignment.
 
-```kvs
-const push = array.push;
-
-push(array, item);       // does not supply `this`; generally fails
-push.call(array, item);  // explicit JavaScript receiver
-```
-
-Accessibility, overload, and nullable-call rules remain the normal KVS and TypeScript rules. A
-failed member call does not trigger fallback merely because the free function would type-check;
-fallback occurs only when the member name is absent.
-
-A newly available real member supersedes method-to-function fallback when the code is recompiled.
-Lexical function calls are unaffected because they never use fallback dispatch.
+Pipelines do not synthesize members, change reflection, alter function values, or add fallback
+dispatch. Accessibility, overload, nullable-call, and JavaScript `this` rules remain ordinary KVS
+and TypeScript rules.
 
 ### Optional-call evaluation
 

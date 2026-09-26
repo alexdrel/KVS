@@ -18,6 +18,6 @@ console.log(`${available} seats available`); // 9 seats available
 
 const availableByRoom = collect* (const [room, seats] in capacity) {
     yield [room, seats - booked.get(room)!];
-};  // .toMap();
+} |> new Map(%);
 
-console.log(new Map(availableByRoom)); // Map(3) { 'studio' => 0, 'gallery' => 7, 'garden' => 2 }
+console.log(availableByRoom); // Map(3) { 'studio' => 0, 'gallery' => 7, 'garden' => 2 }

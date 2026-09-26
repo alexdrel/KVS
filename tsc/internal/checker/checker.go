@@ -807,6 +807,7 @@ type Checker struct {
 	freeFlowState                               *FlowState
 	flowLoopCache                               map[FlowLoopKey]*Type
 	flowLoopStack                               []FlowLoopInfo
+	kvsPipelineContext                          *kvsPipelineContext
 	sharedFlows                                 []SharedFlow
 	antecedentTypes                             []*Type
 	flowAnalysisDisabled                        bool
@@ -8143,6 +8144,8 @@ func (c *Checker) checkExpressionWorker(node *ast.Node, checkMode CheckMode) *Ty
 		return c.checkKvsComparisonChainExpression(node.AsKvsComparisonChainExpression(), checkMode)
 	case ast.KindKvsRangeExpression:
 		return c.checkKvsRangeExpression(node.AsKvsRangeExpression(), checkMode)
+	case ast.KindKvsPipelineExpression:
+		return c.checkKvsPipelineExpression(node.AsKvsPipelineExpression(), checkMode)
 	case ast.KindKvsCollectExpression:
 		return c.checkKvsCollectExpression(node)
 	case ast.KindKvsLazyCollectExpression:
@@ -10458,12 +10461,20 @@ func (c *Checker) inferTypeArguments(node *ast.Node, signature *Signature, args 
 		if arg.Kind != ast.KindOmittedExpression {
 			paramType := c.getTypeAtPosition(signature, i)
 			if c.couldContainTypeVariables(paramType) {
+				var originalSignatures []*Signature
 				if arg.Kind == ast.KindKvsPlaceholderLambdaExpression {
-					paramType = c.instantiateType(paramType, context.nonFixingMapper)
+					originalSignatures = c.getSignaturesOfType(c.getTypeAtPosition(signature, i), SignatureKindCall)
+					if len(originalSignatures) != 0 {
+						paramType = c.instantiateType(paramType, context.nonFixingMapper)
+					}
 				}
-				argType := c.checkExpressionWithContextualType(arg, paramType, context, checkMode)
+				var argType *Type
+				if arg.Kind == ast.KindKvsPlaceholderLambdaExpression && c.kvsPipelineContext != nil && len(originalSignatures) == 0 {
+					argType = c.checkExpressionEx(arg.AsKvsPlaceholderLambdaExpression().Arrow.AsArrowFunction().Body, checkMode)
+				} else {
+					argType = c.checkExpressionWithContextualType(arg, paramType, context, checkMode)
+				}
 				if arg.Kind == ast.KindKvsPlaceholderLambdaExpression {
-					originalSignatures := c.getSignaturesOfType(c.getTypeAtPosition(signature, i), SignatureKindCall)
 					if len(originalSignatures) == 1 {
 						arrow := arg.AsKvsPlaceholderLambdaExpression().Arrow
 						arrowSignature := c.getSignatureFromDeclaration(arrow)
@@ -12068,10 +12079,17 @@ func (c *Checker) checkSyntheticExpression(node *ast.Node) *Type {
 	return t
 }
 
+type kvsPipelineContext struct {
+	inputType *Type
+	used      bool
+	links     NodeLinks
+}
+
 func (c *Checker) checkIdentifier(node *ast.Node, checkMode CheckMode) *Type {
 	if node.AsIdentifier().Text == "__kvsPlaceholder" {
 		insidePlaceholder := false
 		insideNestedPlaceholder := false
+		insideAcceptedPlaceholder := false
 		for parent := node.Parent; parent != nil; parent = parent.Parent {
 			if parent.Kind == ast.KindKvsPlaceholderLambdaExpression {
 				insidePlaceholder = true
@@ -12081,10 +12099,34 @@ func (c *Checker) checkIdentifier(node *ast.Node, checkMode CheckMode) *Type {
 						return links.kvsPlaceholderType
 					}
 					insidePlaceholder = false
+					insideAcceptedPlaceholder = true
 					break
 				}
 				insideNestedPlaceholder = true
 			}
+		}
+		if !insideAcceptedPlaceholder && c.kvsPipelineContext != nil {
+			c.kvsPipelineContext.used = true
+			c.nodeLinks.Get(node).kvsPipelinePlaceholderType = c.kvsPipelineContext.inputType
+			return c.kvsPipelineContext.inputType
+		}
+		if !insideAcceptedPlaceholder {
+			if pipelineType := c.nodeLinks.Get(node).kvsPipelinePlaceholderType; pipelineType != nil {
+				return pipelineType
+			}
+		}
+		child := node
+		for parent := node.Parent; !insideAcceptedPlaceholder && parent != nil; parent = parent.Parent {
+			if parent.Kind == ast.KindKvsPipelineExpression {
+				info := c.nodeLinks.Get(parent).kvsPipeline
+				if info != nil {
+					if pipelineType := info.stageInputTypes[child]; pipelineType != nil {
+						c.nodeLinks.Get(node).kvsPipelinePlaceholderType = pipelineType
+						return pipelineType
+					}
+				}
+			}
+			child = parent
 		}
 		if insidePlaceholder {
 			return c.anyType
@@ -12280,6 +12322,7 @@ func (c *Checker) checkKvsPlaceholderLambdaExpression(node *ast.KvsPlaceholderLa
 }
 
 func (c *Checker) GetKvsPlaceholderTypeAtLocation(node *ast.Node) *Type {
+	child := node
 	for parent := node.Parent; parent != nil; parent = parent.Parent {
 		if parent.Kind == ast.KindKvsPlaceholderLambdaExpression {
 			links := c.nodeLinks.Get(parent)
@@ -12287,6 +12330,16 @@ func (c *Checker) GetKvsPlaceholderTypeAtLocation(node *ast.Node) *Type {
 				return links.kvsPlaceholderType
 			}
 		}
+		if parent.Kind == ast.KindKvsPipelineExpression {
+			if c.nodeLinks.Get(parent).kvsPipeline == nil {
+				c.checkExpression(parent)
+			}
+			info := c.nodeLinks.Get(parent).kvsPipeline
+			if info != nil {
+				return info.stageInputTypes[child]
+			}
+		}
+		child = parent
 	}
 	return nil
 }
@@ -12299,6 +12352,9 @@ func (c *Checker) findKvsPlaceholderBoundary(node *ast.Node) *NodeLinks {
 				return links
 			}
 		}
+	}
+	if c.kvsPipelineContext != nil {
+		return &c.kvsPipelineContext.links
 	}
 	return nil
 }
@@ -19392,6 +19448,84 @@ func (c *Checker) checkKvsRangeExpression(node *ast.KvsRangeExpression, checkMod
 	c.checkTypeAssignableTo(lowerType, c.numberType, node.Lower, nil)
 	c.checkTypeAssignableTo(upperType, c.numberType, node.Upper, nil)
 	return c.createIterableType(c.numberType)
+}
+
+func (c *Checker) checkKvsPipelineExpression(node *ast.KvsPipelineExpression, checkMode CheckMode) *Type {
+	links := c.nodeLinks.Get(node.AsNode())
+	if links.kvsPipeline != nil && links.kvsPipeline.resultType != nil {
+		// Every child was checked while computing this result. Rechecking a stage here
+		// would lose its pipeline context and diagnose its synthetic `%` parameter.
+		return links.kvsPipeline.resultType //nolint:customlint
+	}
+	info := &kvsPipelineInfo{
+		bareStages:      make(map[*ast.Node]bool),
+		stageInputTypes: make(map[*ast.Node]*Type),
+	}
+	links.kvsPipeline = info
+
+	currentType := c.checkExpressionEx(node.Head, checkMode)
+	var stageInputType *Type
+	shortCircuits := false
+	for index := 0; index < len(node.Elements.Nodes); index += 2 {
+		operator := node.Elements.Nodes[index]
+		switch operator.Kind {
+		case ast.KindBarQuestionGreaterThanToken:
+			if isKvsNullableType(currentType) {
+				shortCircuits = true
+			}
+			currentType = c.GetNonNullableType(currentType)
+		case ast.KindBarPercentGreaterThanToken:
+			if stageInputType == nil {
+				c.error(operator, diagnostics.KVS_requires_a_preceding_pipeline_stage)
+			} else {
+				currentType = stageInputType
+			}
+		}
+
+		stage := node.Elements.Nodes[index+1]
+		stageInputType = currentType
+		info.stageInputTypes[stage] = currentType
+		currentType = c.checkKvsPipelineStage(stage, currentType, info, checkMode)
+	}
+	if shortCircuits {
+		info.resultType = c.getUnionType([]*Type{currentType, c.nullType})
+		return info.resultType
+	}
+	info.resultType = currentType
+	return info.resultType
+}
+
+func (c *Checker) checkKvsPipelineStage(stage *ast.Node, inputType *Type, info *kvsPipelineInfo, checkMode CheckMode) *Type {
+	context := &kvsPipelineContext{inputType: inputType}
+	savedContext := c.kvsPipelineContext
+	c.kvsPipelineContext = context
+	stageType := c.checkExpressionEx(stage, checkMode)
+	c.kvsPipelineContext = savedContext
+	if context.used {
+		return stageType
+	}
+
+	info.bareStages[stage] = true
+	if IsTypeAny(stageType) {
+		return c.anyType
+	}
+	apparentType := c.getApparentType(stageType)
+	if c.isErrorType(apparentType) {
+		return c.errorType
+	}
+	signatures := c.getSignaturesOfType(apparentType, SignatureKindCall)
+	if len(signatures) == 0 {
+		c.error(stage, diagnostics.This_expression_is_not_callable)
+		return c.errorType
+	}
+	argument := c.factory.NewSyntheticExpression(inputType, false, nil)
+	argument.Loc = stage.Loc
+	call := c.factory.NewCallExpression(stage, nil, nil, c.factory.NewNodeList([]*ast.Node{argument}), ast.NodeFlagsNone)
+	call.Loc = stage.Loc
+	call.Parent = stage.Parent
+	argument.Parent = call
+	signature := c.resolveCall(call, signatures, nil, checkMode, SignatureFlagsNone, nil)
+	return c.getReturnTypeOfSignature(signature)
 }
 
 func (c *Checker) checkKvsSelectExpression(node *ast.Node) *Type {
@@ -32966,6 +33100,10 @@ func (c *Checker) isContextSensitive(node *ast.Node) bool {
 	case ast.KindFunctionExpression, ast.KindArrowFunction, ast.KindMethodDeclaration, ast.KindFunctionDeclaration:
 		return c.isContextSensitiveFunctionLikeDeclaration(node)
 	case ast.KindKvsPlaceholderLambdaExpression:
+		if c.kvsPipelineContext != nil {
+			contextualType := c.getApparentTypeOfContextualType(node.AsKvsPlaceholderLambdaExpression().Arrow, ContextFlagsSignature)
+			return contextualType != nil && len(c.getSignaturesOfType(contextualType, SignatureKindCall)) != 0
+		}
 		return true
 	case ast.KindObjectLiteralExpression, ast.KindKvsCompactObjectExpression, ast.KindKvsTypedObjectExpression:
 		return core.Some(node.Properties(), c.isContextSensitive)

@@ -166,8 +166,35 @@ func (r *EmitResolver) IsKvsLiftedBinaryExpression(node *ast.Node) bool {
 func (r *EmitResolver) IsKvsPlaceholderBoundary(node *ast.Node) bool {
 	r.checkerMu.Lock()
 	defer r.checkerMu.Unlock()
-	r.checker.checkExpression(node)
+	pipeline := node.Parent
+	for pipeline != nil && pipeline.Kind != ast.KindKvsPipelineExpression {
+		pipeline = pipeline.Parent
+	}
+	if pipeline != nil {
+		if r.checker.nodeLinks.Get(pipeline).kvsPipeline == nil {
+			r.checker.checkExpression(pipeline)
+		}
+	} else {
+		r.checker.checkExpression(node)
+	}
 	return r.checker.nodeLinks.Get(node).flags&NodeCheckFlagsKvsPlaceholderBoundary != 0
+}
+
+func (r *EmitResolver) IsKvsPipelineBareStage(node *ast.Node) bool {
+	r.checkerMu.Lock()
+	defer r.checkerMu.Unlock()
+	pipeline := node.Parent
+	for pipeline != nil && pipeline.Kind != ast.KindKvsPipelineExpression {
+		pipeline = pipeline.Parent
+	}
+	if pipeline == nil {
+		return false
+	}
+	if r.checker.nodeLinks.Get(pipeline).kvsPipeline == nil {
+		r.checker.checkExpression(pipeline)
+	}
+	info := r.checker.nodeLinks.Get(pipeline).kvsPipeline
+	return info != nil && info.bareStages[node]
 }
 
 func (r *EmitResolver) IsKvsNullableAccess(node *ast.Node) bool {

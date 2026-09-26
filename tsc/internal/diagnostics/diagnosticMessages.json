@@ -8995,5 +8995,9 @@
     "A keyed producer header must use an array binding pattern.": {
         "category": "Error",
         "code": 100092
+    },
+    "KVS '|%>' requires a preceding pipeline stage.": {
+        "category": "Error",
+        "code": 100096
     }
 }

@@ -4482,6 +4482,8 @@ var A_concise_KVS_switch_arm_must_contain_exactly_one_expression_Use_a_block_and
 
 var A_KVS_switch_binding_must_be_a_single_const_declaration_with_an_initializer = &Message{code: 100095, category: CategoryError, key: "A_KVS_switch_binding_must_be_a_single_const_declaration_with_an_initializer_100095", text: "A KVS switch binding must be a single const declaration with an initializer."}
 
+var KVS_requires_a_preceding_pipeline_stage = &Message{code: 100096, category: CategoryError, key: "KVS_requires_a_preceding_pipeline_stage_100096", text: "KVS '|%>' requires a preceding pipeline stage."}
+
 var allMessages = [...]**Message{
 	&Unterminated_string_literal,
 	&Identifier_expected,
@@ -6723,4 +6725,5 @@ var allMessages = [...]**Message{
 	&KVS_switch_must_be_at_the_head_of_a_supported_value_expression,
 	&A_concise_KVS_switch_arm_must_contain_exactly_one_expression_Use_a_block_and_yield_for_a_procedural_arm,
 	&A_KVS_switch_binding_must_be_a_single_const_declaration_with_an_initializer,
+	&KVS_requires_a_preceding_pipeline_stage,
 }

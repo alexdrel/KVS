@@ -139,6 +139,7 @@ type Printer struct {
 	detachedCommentsInfo              core.Stack[detachedCommentsInfo]
 	commentsDisabled                  bool
 	inExtends                         bool // whether we are emitting the `extends` clause of a ConditionalTypeNode or InferTypeNode
+	kvsPlaceholderDepth               int
 	nameGenerator                     NameGenerator
 	makeFileLevelOptimisticUniqueName func(string) string
 	commentStateArena                 core.Arena[commentState]
@@ -1154,6 +1155,12 @@ func (p *Printer) getUniqueHelperName(name string) *ast.IdentifierNode {
 }
 
 func (p *Printer) emitIdentifierReference(node *ast.Identifier) {
+	if node.Text == "__kvsPlaceholder" && p.kvsPlaceholderDepth > 0 {
+		state := p.enterNode(node.AsNode())
+		p.writePunctuation("%")
+		p.exitNode(node.AsNode(), state)
+		return
+	}
 	if (p.externalHelpersModuleName != nil || p.uniqueHelperNames != nil) &&
 		p.emitContext.EmitFlags(node.AsNode())&EFHelperName != 0 {
 		if p.externalHelpersModuleName != nil {
@@ -3413,7 +3420,9 @@ func (p *Printer) emitExpression(node *ast.Expression, precedence ast.OperatorPr
 	case ast.KindKvsSieveExpression:
 		p.emitKvsSieveExpression(node.AsKvsSieveExpression())
 	case ast.KindKvsPlaceholderLambdaExpression:
+		p.kvsPlaceholderDepth++
 		p.emitExpression(node.AsKvsPlaceholderLambdaExpression().Arrow.AsArrowFunction().Body, ast.OperatorPrecedenceLowest)
+		p.kvsPlaceholderDepth--
 	case ast.KindKvsIterationCoordinateExpression:
 		p.writePunctuation("#")
 	case ast.KindKvsSieveBindingInitializer:
@@ -3442,6 +3451,8 @@ func (p *Printer) emitExpression(node *ast.Expression, precedence ast.OperatorPr
 		p.emitKvsTypedObjectExpression(node.AsKvsTypedObjectExpression())
 	case ast.KindKvsRangeExpression:
 		p.emitKvsRangeExpression(node.AsKvsRangeExpression())
+	case ast.KindKvsPipelineExpression:
+		p.emitKvsPipelineExpression(node.AsKvsPipelineExpression())
 	case ast.KindKvsCollectExpression:
 		p.emitKvsCollectExpression(node.AsKvsCollectExpression())
 	case ast.KindKvsLazyCollectExpression:
@@ -3861,6 +3872,18 @@ func (p *Printer) emitKvsRangeExpression(node *ast.KvsRangeExpression) {
 	p.emitExpression(node.Lower, ast.OperatorPrecedenceRange)
 	p.emitTokenNode(node.OperatorToken)
 	p.emitExpression(node.Upper, ast.OperatorPrecedenceRange)
+	p.exitNode(node.AsNode(), state)
+}
+
+func (p *Printer) emitKvsPipelineExpression(node *ast.KvsPipelineExpression) {
+	state := p.enterNode(node.AsNode())
+	p.emitExpression(node.Head, ast.OperatorPrecedenceAssignment)
+	for index := 0; index < len(node.Elements.Nodes); index += 2 {
+		p.writeSpace()
+		p.emitTokenNode(node.Elements.Nodes[index])
+		p.writeSpace()
+		p.emitExpression(node.Elements.Nodes[index+1], ast.OperatorPrecedenceAssignment)
+	}
 	p.exitNode(node.AsNode(), state)
 }
 

@@ -116,6 +116,9 @@ func (d *astDecoder) createChildrenNode(kind ast.Kind, data uint32, childIndices
 		ast.KindGreaterThanGreaterThanGreaterThanToken,
 		ast.KindAmpersandToken,
 		ast.KindBarToken,
+		ast.KindBarGreaterThanToken,
+		ast.KindBarQuestionGreaterThanToken,
+		ast.KindBarPercentGreaterThanToken,
 		ast.KindCaretToken,
 		ast.KindExclamationToken,
 		ast.KindTildeToken,
@@ -430,6 +433,11 @@ func (d *astDecoder) createChildrenNode(kind ast.Kind, data uint32, childIndices
 		operatorToken := d.nodeAt(it.nextIf(mask, 1))
 		upper := d.nodeAt(it.nextIf(mask, 2))
 		return d.factory.NewKvsRangeExpression(lower, operatorToken, upper), nil
+	case ast.KindKvsPipelineExpression:
+		it := newChildIter(childIndices)
+		head := d.nodeAt(it.nextIf(mask, 0))
+		elements := d.nodeListAt(it.nextIf(mask, 1))
+		return d.factory.NewKvsPipelineExpression(head, elements), nil
 	case ast.KindKvsCollectExpression:
 		keyed := commonData&1 != 0
 		it := newChildIter(childIndices)

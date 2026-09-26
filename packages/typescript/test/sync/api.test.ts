@@ -6848,6 +6848,31 @@ describe("AST roundtrips", { concurrency }, () => {
         assert.equal(api.printer.printFile(sourceFile), sourceFile.text);
     });
 
+    test("KVS pipeline roundtrip", () => {
+        using api = spawnAPI({
+            "/tsconfig.json": "{}",
+            "/src/index.ts": `const result = input |?> normalize |> audit |%> %.value;\n`,
+        });
+
+        const snapshot = api.createSnapshot({ openProject: "/tsconfig.json" });
+        const project = snapshot.getConfiguredProject("/tsconfig.json")!;
+        const sourceFile = project.program.getSourceFile("/src/index.ts");
+        assert(sourceFile);
+        const stmt = sourceFile.statements[0] as import("@typescript/typescript/unstable/ast").VariableStatement;
+        const pipeline = stmt.declarationList.declarations[0].initializer as import("@typescript/typescript/unstable/ast").KvsPipelineExpression;
+        assert.equal(pipeline.kind, SyntaxKind.KvsPipelineExpression);
+        assert.equal(pipeline.head.kind, SyntaxKind.Identifier);
+        assert.deepEqual(pipeline.elements.map(node => node.kind), [
+            SyntaxKind.BarQuestionGreaterThanToken,
+            SyntaxKind.Identifier,
+            SyntaxKind.BarGreaterThanToken,
+            SyntaxKind.Identifier,
+            SyntaxKind.BarPercentGreaterThanToken,
+            SyntaxKind.KvsPlaceholderLambdaExpression,
+        ]);
+        assert.equal(api.printer.printFile(sourceFile), sourceFile.text);
+    });
+
     test("VariableDeclarationList const flag clone", () => {
         using api = spawnAPI({
             "/tsconfig.json": "{}",

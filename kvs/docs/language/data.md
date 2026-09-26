@@ -437,4 +437,4 @@ target ...= source  typed spread into an existing POD
 ---
 
 [← Structured production and decisions](flow.md) · [Contents](README.md#reading-guide) ·
-[Next: Calls, composition, and callbacks →](calls.md)
+[Next: Pipelines and placeholder lambdas →](pipelines.md)

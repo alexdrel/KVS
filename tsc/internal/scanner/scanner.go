@@ -166,6 +166,9 @@ var textToToken = func() map[string]ast.Kind {
 		">>>":  ast.KindGreaterThanGreaterThanGreaterThanToken,
 		"&":    ast.KindAmpersandToken,
 		"|":    ast.KindBarToken,
+		"|>":   ast.KindBarGreaterThanToken,
+		"|?>":  ast.KindBarQuestionGreaterThanToken,
+		"|%>":  ast.KindBarPercentGreaterThanToken,
 		"^":    ast.KindCaretToken,
 		"!":    ast.KindExclamationToken,
 		"~":    ast.KindTildeToken,
@@ -881,7 +884,16 @@ func (s *Scanner) Scan() ast.Kind {
 					return s.token
 				}
 			}
-			if s.charAt(1) == '|' {
+			if s.charAt(1) == '>' {
+				s.pos += 2
+				s.token = ast.KindBarGreaterThanToken
+			} else if s.charAt(1) == '?' && s.charAt(2) == '>' {
+				s.pos += 3
+				s.token = ast.KindBarQuestionGreaterThanToken
+			} else if s.charAt(1) == '%' && s.charAt(2) == '>' {
+				s.pos += 3
+				s.token = ast.KindBarPercentGreaterThanToken
+			} else if s.charAt(1) == '|' {
 				if s.charAt(2) == '=' {
 					s.pos += 3
 					s.token = ast.KindBarBarEqualsToken

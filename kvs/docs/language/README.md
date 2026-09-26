@@ -52,8 +52,8 @@ explicit and local.
 
 KVS compound operators and keyword forms are indivisible spellings, not two operations fused by
 context. Their characters must be adjacent: whitespace or comments may not appear inside `return?`,
-`yield?`, `as?`, `as!`, `?=`, `?:`, `collect*`, `?(`, `?[`, or `?{`. The same rule applies to every
-compound form introduced by KVS.
+`yield?`, `as?`, `as!`, `?=`, `?:`, `collect*`, `?(`, `?[`, `?{`, `|>`, `|?>`, or `|%>`. The same
+rule applies to every compound form introduced by KVS.
 
 ## Functional ideas in procedural code
 
@@ -199,17 +199,18 @@ exception with the underlying cause preserved. Each decision lives beside the op
 
 ## Compose in execution order
 
-Fluent calls let methods and receiver-first functions participate in the same transformation:
+Pipelines compose ordinary functions explicitly, keep argument placement visible, and can stop when
+an intermediate value is absent:
 
 ```kvs
-const encoded = document
-    .normalize()
-    .(% + "\n")
-    .compress("LZ", compressionLevel)
-    .toBase64();
+const encoded = maybeDocument |?>
+    normalize |>
+    % + "\n" |>
+    compress(%, "LZ", compressionLevel) |>
+    toBase64;
 ```
 
-Use a chain for successive transformations and a producing loop for branching work. Both keep the
+Use a pipeline for successive transformations and a producing loop for branching work. Both keep the
 steps in the order they happen.
 
 ## Typed context
@@ -245,14 +246,14 @@ and comparisons that express ranges and finite alternatives directly.
 Read the core chapters in order, or start with [whole programs](examples.md) to see the ideas
 together.
 
-1. [Nullability, Values, and Defaults](values.md) — nullable types, what happens when data is
-   missing, and how static assertions and defaults work.
+1. [Nullability, Values, and Defaults](values.md) — nullable types, optional invocation, and
+   explicit policies for missing data.
 2. [Structured Production and Decisions](flow.md) — final state, every result, first result, and
    selected results using familiar control flow.
 3. [Constructing and Shaping Data](data.md) — presence-aware literals, POD construction, writable
    paths, and typed spread.
-4. [Calls, Composition, and Callbacks](calls.md) — optional invocation, fluent functions, computed
-   operations, and concise callbacks.
+4. [Pipelines and Placeholder Lambdas](pipelines.md) — staged composition and concise callbacks
+   around `%`.
 5. [Failure Policy](errors.md) — expose failure, demote it to absence, or raise an exception at a
    boundary.
 

@@ -4356,6 +4356,10 @@ func (p *Parser) parseAssignmentExpressionOrHigher() *ast.Expression {
 }
 
 func (p *Parser) parseAssignmentExpressionOrHigherWorker(allowReturnTypeInArrowFunction bool) *ast.Expression {
+	return p.parseAssignmentExpressionOrHigherWorkerMode(allowReturnTypeInArrowFunction, true)
+}
+
+func (p *Parser) parseAssignmentExpressionOrHigherWorkerMode(allowReturnTypeInArrowFunction bool, allowPipeline bool) *ast.Expression {
 	//  AssignmentExpression[in,yield]:
 	//      1) ConditionalExpression[?in,?yield]
 	//      2) LeftHandSideExpression = AssignmentExpression[?in,?yield]
@@ -4429,26 +4433,26 @@ func (p *Parser) parseAssignmentExpressionOrHigherWorker(allowReturnTypeInArrowF
 	if ast.IsLeftHandSideExpression(expr) && p.isKvsExtantAssignment() {
 		questionToken := p.parseTokenNode()
 		equalsToken := p.parseTokenNode()
-		right := p.parseAssignmentExpressionOrHigherWorker(allowReturnTypeInArrowFunction)
+		right := p.parseAssignmentExpressionOrHigherWorkerMode(allowReturnTypeInArrowFunction, allowPipeline)
 		return p.finishNode(p.factory.NewKvsExtantAssignmentExpression(expr, questionToken, equalsToken, right), pos)
 	}
 	if ast.IsLeftHandSideExpression(expr) && p.isKvsSieveAssignment() {
 		tildeToken := p.parseTokenNode()
 		equalsToken := p.parseTokenNode()
-		right := p.parseAssignmentExpressionOrHigherWorker(allowReturnTypeInArrowFunction)
+		right := p.parseAssignmentExpressionOrHigherWorkerMode(allowReturnTypeInArrowFunction, allowPipeline)
 		return p.finishNode(p.factory.NewKvsSieveAssignmentExpression(expr, tildeToken, equalsToken, right), pos)
 	}
 	if ast.IsLeftHandSideExpression(expr) && p.isKvsTypedSpreadAssignment() {
 		dotDotDotToken := p.parseTokenNode()
 		equalsToken := p.parseTokenNode()
-		right := p.parseAssignmentExpressionOrHigherWorker(allowReturnTypeInArrowFunction)
+		right := p.parseAssignmentExpressionOrHigherWorkerMode(allowReturnTypeInArrowFunction, allowPipeline)
 		return p.finishNode(p.factory.NewKvsTypedSpreadAssignmentExpression(expr, dotDotDotToken, equalsToken, right), pos)
 	}
 	if expr.Kind == ast.KindIdentifier && p.isKvsCatchSplit(expr.End()) {
 		tildeToken := p.parseTokenNode()
 		errorTarget := p.parseIdentifier()
 		equalsToken := p.parseExpectedToken(ast.KindEqualsToken)
-		right := p.parseAssignmentExpressionOrHigherWorker(allowReturnTypeInArrowFunction)
+		right := p.parseAssignmentExpressionOrHigherWorkerMode(allowReturnTypeInArrowFunction, allowPipeline)
 		return p.finishNode(p.factory.NewKvsCatchSplitAssignmentExpression(expr, tildeToken, errorTarget, equalsToken, right), pos)
 	}
 	// Now see if we might be in cases '2' or '3'.
@@ -4458,10 +4462,28 @@ func (p *Parser) parseAssignmentExpressionOrHigherWorker(allowReturnTypeInArrowF
 	// Note: we call reScanGreaterToken so that we get an appropriately merged token
 	// for cases like `> > =` becoming `>>=`
 	if ast.IsLeftHandSideExpression(expr) && ast.IsAssignmentOperator(p.reScanGreaterThanToken()) {
-		return p.makeBinaryExpression(expr, p.parseTokenNode(), p.parseAssignmentExpressionOrHigherWorker(allowReturnTypeInArrowFunction), pos)
+		return p.makeBinaryExpression(expr, p.parseTokenNode(), p.parseAssignmentExpressionOrHigherWorkerMode(allowReturnTypeInArrowFunction, allowPipeline), pos)
 	}
 	// It wasn't an assignment or a lambda.  This is a conditional expression:
-	return p.parseConditionalExpressionRest(expr, pos, allowReturnTypeInArrowFunction)
+	expr = p.parseConditionalExpressionRest(expr, pos, allowReturnTypeInArrowFunction, allowPipeline)
+	if allowPipeline && p.isKvsPipelineOperator() {
+		return p.parseKvsPipelineExpressionRest(expr, pos, allowReturnTypeInArrowFunction)
+	}
+	return expr
+}
+
+func (p *Parser) isKvsPipelineOperator() bool {
+	return p.token == ast.KindBarGreaterThanToken || p.token == ast.KindBarQuestionGreaterThanToken || p.token == ast.KindBarPercentGreaterThanToken
+}
+
+func (p *Parser) parseKvsPipelineExpressionRest(first *ast.Expression, pos int, allowReturnTypeInArrowFunction bool) *ast.Expression {
+	var elements []*ast.Node
+	for p.isKvsPipelineOperator() {
+		operator := p.parseTokenNode()
+		expression := p.wrapKvsPlaceholderExpression(p.parseAssignmentExpressionOrHigherWorkerMode(allowReturnTypeInArrowFunction, false))
+		elements = append(elements, operator, expression)
+	}
+	return p.finishNode(p.factory.NewKvsPipelineExpression(first, p.newNodeList(core.NewTextRange(first.End(), p.nodePos()), elements)), pos)
 }
 
 func (p *Parser) isKvsFailurePromotion() bool {
@@ -4920,12 +4942,12 @@ func (p *Parser) parseSimpleArrowFunctionExpression(pos int, identifier *ast.Nod
 	return result
 }
 
-func (p *Parser) parseConditionalExpressionRest(leftOperand *ast.Expression, pos int, allowReturnTypeInArrowFunction bool) *ast.Expression {
+func (p *Parser) parseConditionalExpressionRest(leftOperand *ast.Expression, pos int, allowReturnTypeInArrowFunction bool, allowPipeline bool) *ast.Expression {
 	// Note: we are passed in an expression which was produced from parseBinaryExpressionOrHigher.
 	if p.isKvsNullingOperator(leftOperand) {
 		questionToken := p.parseTokenNode()
 		colonToken := p.parseTokenNode()
-		whenTrue := p.parseAssignmentExpressionOrHigherWorker(allowReturnTypeInArrowFunction)
+		whenTrue := p.parseAssignmentExpressionOrHigherWorkerMode(allowReturnTypeInArrowFunction, allowPipeline)
 		return p.finishNode(p.factory.NewKvsNullingExpression(leftOperand, questionToken, colonToken, whenTrue), pos)
 	}
 	questionToken := p.parseOptionalToken(ast.KindQuestionToken)
@@ -4936,12 +4958,12 @@ func (p *Parser) parseConditionalExpressionRest(leftOperand *ast.Expression, pos
 	// we do not that for the 'whenFalse' part.
 	saveContextFlags := p.contextFlags
 	p.setContextFlags(ast.NodeFlagsDisallowInContext, false)
-	trueExpression := p.parseAssignmentExpressionOrHigherWorker(false /*allowReturnTypeInArrowFunction*/)
+	trueExpression := p.parseAssignmentExpressionOrHigherWorkerMode(false /*allowReturnTypeInArrowFunction*/, allowPipeline)
 	p.contextFlags = saveContextFlags
 	colonToken := p.parseExpectedToken(ast.KindColonToken)
 	var falseExpression *ast.Expression
 	if ast.NodeIsPresent(colonToken) {
-		falseExpression = p.parseAssignmentExpressionOrHigherWorker(allowReturnTypeInArrowFunction)
+		falseExpression = p.parseAssignmentExpressionOrHigherWorkerMode(allowReturnTypeInArrowFunction, allowPipeline)
 	} else {
 		falseExpression = p.createMissingIdentifier()
 	}
@@ -6059,6 +6081,10 @@ func (p *Parser) parseArgumentList() *ast.NodeList {
 
 func (p *Parser) parseArgumentExpression() *ast.Expression {
 	expression := p.doInContext(ast.NodeFlagsDisallowInContext|ast.NodeFlagsDecoratorContext, false, (*Parser).parseArgumentOrArrayLiteralElement)
+	return p.wrapKvsPlaceholderExpression(expression)
+}
+
+func (p *Parser) wrapKvsPlaceholderExpression(expression *ast.Expression) *ast.Expression {
 	placeholder := findKvsPlaceholder(expression)
 	if placeholder == nil {
 		return expression

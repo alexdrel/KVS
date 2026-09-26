@@ -129,6 +129,7 @@ import type {
     KvsNullableAssertionExpression,
     KvsNullableType,
     KvsNullingExpression,
+    KvsPipelineExpression,
     KvsPlaceholderLambdaExpression,
     KvsRangeExpression,
     KvsSelectExpression,
@@ -337,6 +338,7 @@ import {
     updateKvsNullableAssertionExpression,
     updateKvsNullableType,
     updateKvsNullingExpression,
+    updateKvsPipelineExpression,
     updateKvsPlaceholderLambdaExpression,
     updateKvsRangeExpression,
     updateKvsSelectExpression,
@@ -805,6 +807,11 @@ const visitEachChildTable: Record<number, VisitEachChildFunction> = {
         const _operatorToken = visitNode(node.operatorToken, visitor);
         const _upper = visitNode(node.upper, visitor, isExpression);
         return updateKvsRangeExpression(node, _lower, _operatorToken, _upper);
+    },
+    [SyntaxKind.KvsPipelineExpression]: (node: KvsPipelineExpression, visitor: Visitor): KvsPipelineExpression => {
+        const _head = visitNode(node.head, visitor, isExpression);
+        const _elements = visitNodes(node.elements, visitor);
+        return updateKvsPipelineExpression(node, _head, _elements);
     },
     [SyntaxKind.KvsCollectExpression]: (node: KvsCollectExpression, visitor: Visitor): KvsCollectExpression => {
         const _initializer = visitNode(node.initializer, visitor, isForInitializer);

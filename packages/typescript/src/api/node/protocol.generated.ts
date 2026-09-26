@@ -49,6 +49,7 @@ export const childProperties: Readonly<Partial<Record<SyntaxKind, readonly (stri
     [SyntaxKind.KvsCompactObjectExpression]: ["questionToken", "properties"],
     [SyntaxKind.KvsTypedObjectExpression]: ["type", "properties"],
     [SyntaxKind.KvsRangeExpression]: ["lower", "operatorToken", "upper"],
+    [SyntaxKind.KvsPipelineExpression]: ["head", "elements"],
     [SyntaxKind.KvsCollectExpression]: ["initializer", "expression", "statement"],
     [SyntaxKind.KvsLazyCollectExpression]: ["initializer", "expression", "statement"],
     [SyntaxKind.KvsSelectExpression]: ["initializer", "expression", "statement"],

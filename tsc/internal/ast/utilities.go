@@ -554,6 +554,7 @@ func isExpressionKind(kind Kind) bool {
 		KindKvsConditionalElement,
 		KindKvsCompactObjectExpression, KindKvsTypedObjectExpression,
 		KindKvsRangeExpression,
+		KindKvsPipelineExpression,
 		KindKvsIterationCoordinateExpression,
 		KindKvsCollectExpression,
 		KindKvsLazyCollectExpression,
@@ -2133,7 +2134,7 @@ func IsExpressionNode(node *Node) bool {
 		KindCallExpression, KindNewExpression, KindTaggedTemplateExpression, KindAsExpression, KindTypeAssertionExpression,
 		KindSatisfiesExpression, KindNonNullExpression, KindParenthesizedExpression, KindFunctionExpression,
 		KindClassExpression, KindArrowFunction, KindVoidExpression, KindDeleteExpression, KindTypeOfExpression,
-		KindPrefixUnaryExpression, KindPostfixUnaryExpression, KindBinaryExpression, KindConditionalExpression, KindKvsDefaultExpression, KindKvsSieveExpression, KindKvsSieveBindingInitializer, KindKvsSieveAssignmentExpression, KindKvsTypedSpreadAssignmentExpression, KindKvsFailureDemotionExpression, KindKvsFailurePromotionExpression, KindKvsCatchSplitExpression, KindKvsCatchSplitAssignmentExpression, KindKvsNullingExpression, KindKvsConditionalElement, KindKvsRangeExpression,
+		KindPrefixUnaryExpression, KindPostfixUnaryExpression, KindBinaryExpression, KindConditionalExpression, KindKvsDefaultExpression, KindKvsSieveExpression, KindKvsSieveBindingInitializer, KindKvsSieveAssignmentExpression, KindKvsTypedSpreadAssignmentExpression, KindKvsFailureDemotionExpression, KindKvsFailurePromotionExpression, KindKvsCatchSplitExpression, KindKvsCatchSplitAssignmentExpression, KindKvsNullingExpression, KindKvsConditionalElement, KindKvsRangeExpression, KindKvsPipelineExpression,
 		KindSpreadElement, KindTemplateExpression, KindOmittedExpression, KindJsxElement, KindJsxSelfClosingElement, KindKvsIterationCoordinateExpression,
 		KindJsxFragment, KindYieldExpression, KindKvsNullableAssertionExpression, KindKvsExtantAssertionExpression, KindKvsExtantAssignmentExpression, KindKvsCollectExpression, KindKvsLazyCollectExpression, KindKvsSelectExpression, KindKvsSwitchExpression, KindKvsForExpression, KindAwaitExpression:
 		return true
@@ -2202,6 +2203,10 @@ func IsKvsStatementHeadPosition(node *Node) bool {
 			KindPropertyAccessExpression, KindElementAccessExpression, KindCallExpression, KindNewExpression,
 			KindKvsDefaultExpression:
 			if parent.Expression() != current {
+				return false
+			}
+		case KindKvsPipelineExpression:
+			if parent.AsKvsPipelineExpression().Head != current {
 				return false
 			}
 		case KindConditionalExpression:

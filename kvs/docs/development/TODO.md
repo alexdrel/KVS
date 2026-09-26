@@ -3,7 +3,7 @@
 This is a working implementation aid, not a language specification or feature order. The language
 documents remain authoritative for accepted semantics.
 
-Progress: **297 of 382 items complete (77.7%)**; **85 remain open**.
+Progress: **332 of 394 items complete (84.3%)**; **62 remain open**.
 
 - `[x]` means implemented with focused compiler evidence.
 - `[ ]` means unimplemented, incomplete, or not yet deliberately validated.
@@ -413,6 +413,19 @@ example `.js` files are intentionally ignored.
 - [ ] Preserve defined evaluation-order semantics (prototype is RHS-first)
 - [x] No extant compound-assignment family
 
+### Optional/extant invocation
+
+- [x] `f?(...)`
+- [x] Nullable callable suppresses call
+- [x] Absent required argument suppresses call
+- [x] Nullable parameter accepts absence normally
+- [x] Absence representation follows the parameter contract
+- [x] Arguments evaluate in source order until blocking absence
+- [x] Stop evaluating later arguments after blocking absence
+- [x] Statically extant receiver/method lookup may be delayed until invocation
+- [x] Materialization staging
+- [x] Materialization commit semantics
+
 ### Conditional placement
 
 - [x] Array `?: expr`
@@ -502,37 +515,29 @@ example `.js` files are intentionally ignored.
 - [x] Non-writable method-callee bases default transiently
 - [x] Terminal value defaults do not write back
 
-## 5. Calls, composition, and callbacks
+## 5. Pipelines and placeholder callbacks
 
-### Optional/extant invocation
+### Pipelines
 
-- [x] `f?(...)`
-- [x] Nullable callable suppresses call
-- [x] Absent required argument suppresses call
-- [x] Nullable parameter accepts absence normally
-- [x] Absence representation follows the parameter contract
-- [x] Arguments evaluate in source order until blocking absence
-- [x] Stop evaluating later arguments after blocking absence
-- [x] Statically extant receiver/method lookup may be delayed until invocation
-- [x] Materialization staging
-- [x] Materialization commit semantics
-
-### Fluent receiver-first calls
-
-- [ ] Ordinary member lookup first
-- [ ] Lexical free-function fallback
-- [ ] Receiver becomes first argument
-- [ ] Real non-callable member prevents fallback
-- [ ] Real incompatible member prevents fallback
-- [ ] One-way fallback only
-- [ ] Lexical visibility/scoping
-
-### Computed operations
-
-- [ ] `value.(operation)`
-- [ ] `value.(operation, args...)`
-- [ ] Dynamic callable expression
-- [ ] Receiver injected as first argument
+- [x] `value |> stage`
+- [x] Bare callable stage receives the current value
+- [x] Bare method reference preserves its receiver
+- [x] `%` places the current value explicitly within a stage
+- [x] Multiple pipeline `%` occurrences share one current value
+- [x] Nested pipelines establish the nearer pipeline `%`
+- [x] Callback placeholder boundaries shadow pipeline `%`
+- [x] `|>` forwards the preceding stage result
+- [x] `|?>` continues only when the preceding value is present
+- [x] Extant continuation narrows the following stage input
+- [x] Extant continuation skips the remaining pipeline with `null`
+- [x] `|%>` discards the preceding stage result and keeps its input
+- [x] Assignment expressions capture and forward intermediate values
+- [x] Extant continuation skips guarded assignments
+- [x] Pipeline input and stages evaluate once in source order
+- [x] Pipelines are ordinary expressions
+- [x] Pipeline tail after a KVS producer
+- [x] Reject non-callable bare stages
+- [x] Reject leading or dangling `|%>`
 
 ### Placeholder lambda `%`
 
@@ -542,7 +547,6 @@ example `.js` files are intentionally ignored.
 - [x] Multiple `%` share one parameter
 - [x] Nested placeholder boundaries
 - [x] Overload resolution follows ordinary arrow rules
-- [ ] Use as a computed/fluent operation
 - [x] Ordinary closure semantics
 - [x] Context-aware callback interaction
 

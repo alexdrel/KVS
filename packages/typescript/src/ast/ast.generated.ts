@@ -49,6 +49,9 @@ export type PunctuationSyntaxKind =
     | SyntaxKind.GreaterThanGreaterThanGreaterThanToken
     | SyntaxKind.AmpersandToken
     | SyntaxKind.BarToken
+    | SyntaxKind.BarGreaterThanToken
+    | SyntaxKind.BarQuestionGreaterThanToken
+    | SyntaxKind.BarPercentGreaterThanToken
     | SyntaxKind.CaretToken
     | SyntaxKind.ExclamationToken
     | SyntaxKind.TildeToken
@@ -220,6 +223,9 @@ export type TokenSyntaxKind =
     | SyntaxKind.GreaterThanGreaterThanGreaterThanToken
     | SyntaxKind.AmpersandToken
     | SyntaxKind.BarToken
+    | SyntaxKind.BarGreaterThanToken
+    | SyntaxKind.BarQuestionGreaterThanToken
+    | SyntaxKind.BarPercentGreaterThanToken
     | SyntaxKind.CaretToken
     | SyntaxKind.ExclamationToken
     | SyntaxKind.TildeToken
@@ -738,6 +744,11 @@ export interface KvsRangeExpression extends ExpressionBase {
     readonly lower: Expression;
     readonly operatorToken: Node;
     readonly upper: Expression;
+}
+export interface KvsPipelineExpression extends ExpressionBase {
+    readonly kind: SyntaxKind.KvsPipelineExpression;
+    readonly head: Expression;
+    readonly elements: NodeArray<Node>;
 }
 export interface KvsCollectExpression extends ExpressionBase {
     readonly kind: SyntaxKind.KvsCollectExpression;

@@ -81,7 +81,7 @@ Missing business data flows through the calculation, while the endpoint decides 
 is required. Auditing is a local detour around the same computation.
 
 See [values and defaults](values.md), [accumulator loops](flow.md#returning-final-loop-state),
-[optional calls](calls.md#optional-invocation), and [failure policy](errors.md).
+[optional calls](values.md#optional-invocation), and [failure policy](errors.md).
 
 ### Equivalent TypeScript shape
 
@@ -252,19 +252,19 @@ function exportFirst(documents: Document[], level: number): string? {
         if (_.body) yield _;
     };
 
-    return selected.body
-        .normalize()
-        .(% + "\n")
-        .compress("LZ", level)
-        .toBase64();
+    return selected |?>
+        %.body |>
+        normalize |>
+        % + "\n" |>
+        compress(%, "LZ", level) |>
+        toBase64;
 }
 ```
 
 Selection remains an ordinary loop with an explicit first result. If it produces nothing, absence
-flows through the transformation; otherwise the chain reads in execution order, using receiver-first
-functions and one small placeholder operation.
+stops the pipeline; otherwise its stages read in execution order with explicit argument placement.
 
 See [first production](flow.md#select), [nullable dataflow](values.md#nullable-dataflow), and
-[fluent calls and placeholders](calls.md#fluent-calls).
+[pipelines and placeholders](pipelines.md#pipelines).
 
 [Back to the reading guide](README.md#reading-guide)
