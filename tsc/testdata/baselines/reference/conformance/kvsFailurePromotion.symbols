@@ -124,3 +124,59 @@ declare function consume(value: { name: string }): void;
 >value : Symbol(value, Decl(kvsFailurePromotion.ts, 37, 25))
 >name : Symbol(name, Decl(kvsFailurePromotion.ts, 37, 33))
 
+function requireSelectedUser(users: ({ name: string } | null)[]) {
+>requireSelectedUser : Symbol(requireSelectedUser, Decl(kvsFailurePromotion.ts, 37, 56))
+>users : Symbol(users, Decl(kvsFailurePromotion.ts, 39, 29))
+>name : Symbol(name, Decl(kvsFailurePromotion.ts, 39, 38))
+
+    return select (const user of users) {
+>user : Symbol(user, Decl(kvsFailurePromotion.ts, 40, 24))
+>users : Symbol(users, Decl(kvsFailurePromotion.ts, 39, 29))
+
+        yield? user;
+>user : Symbol(user, Decl(kvsFailurePromotion.ts, 40, 24))
+
+    } ~~ new UserNotFound("empty");
+>UserNotFound : Symbol(UserNotFound, Decl(kvsFailurePromotion.ts, 0, 0))
+}
+
+function collectUsersOrCause(users: ({ name: string } | null)[] | null) {
+>collectUsersOrCause : Symbol(collectUsersOrCause, Decl(kvsFailurePromotion.ts, 43, 1))
+>users : Symbol(users, Decl(kvsFailurePromotion.ts, 45, 29))
+>name : Symbol(name, Decl(kvsFailurePromotion.ts, 45, 38))
+
+    return collect (const user of users) {
+>user : Symbol(user, Decl(kvsFailurePromotion.ts, 46, 25))
+>users : Symbol(users, Decl(kvsFailurePromotion.ts, 45, 29))
+
+        if (user?.name === "broken") throw new SyntaxError("broken");
+>user?.name : Symbol(name, Decl(kvsFailurePromotion.ts, 45, 38))
+>user : Symbol(user, Decl(kvsFailurePromotion.ts, 46, 25))
+>name : Symbol(name, Decl(kvsFailurePromotion.ts, 45, 38))
+>SyntaxError : Symbol(SyntaxError, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --))
+
+        yield? user;
+>user : Symbol(user, Decl(kvsFailurePromotion.ts, 46, 25))
+
+    } ~~ new UserNotFound("unavailable");
+>UserNotFound : Symbol(UserNotFound, Decl(kvsFailurePromotion.ts, 0, 0))
+}
+
+function requireSelectedUserName(users: ({ name: string } | null)[]) {
+>requireSelectedUserName : Symbol(requireSelectedUserName, Decl(kvsFailurePromotion.ts, 50, 1))
+>users : Symbol(users, Decl(kvsFailurePromotion.ts, 52, 33))
+>name : Symbol(name, Decl(kvsFailurePromotion.ts, 52, 42))
+
+    return (select (const user of users) {
+>(select (const user of users) {        yield? user;    } ~~ new UserNotFound("empty")).name : Symbol(name, Decl(kvsFailurePromotion.ts, 52, 42))
+>user : Symbol(user, Decl(kvsFailurePromotion.ts, 53, 25))
+>users : Symbol(users, Decl(kvsFailurePromotion.ts, 52, 33))
+
+        yield? user;
+>user : Symbol(user, Decl(kvsFailurePromotion.ts, 53, 25))
+
+    } ~~ new UserNotFound("empty")).name;
+>UserNotFound : Symbol(UserNotFound, Decl(kvsFailurePromotion.ts, 0, 0))
+>name : Symbol(name, Decl(kvsFailurePromotion.ts, 52, 42))
+}
+

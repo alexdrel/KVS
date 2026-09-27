@@ -30,6 +30,25 @@ function returnedConstructor() {
 }
 const constructorValue = returnedConstructor() ~ SyntaxError;
 
+function demoteCollectFailure(values: number[]) {
+    return collect (const value of values) {
+        if (value < 0) throw new MathError("negative");
+        yield value;
+    } ~ MathError;
+}
+
+function demoteSelectedSentinel(values: number[]) {
+    return select (const value of values) {
+        yield value;
+    } ~ -1;
+}
+
+function demoteCollectFailureWithTail(values: number[]) {
+    return (collect (const value of values) {
+        yield value;
+    } ~ MathError)?.length;
+}
+
 
 //// [kvsFailureDemotion.js]
 "use strict";
@@ -88,3 +107,46 @@ const constructorValue = (() => {
         throw _a;
     }
 })();
+function demoteCollectFailure(values) {
+    return (() => {
+        try {
+            var _a = [];
+            for (const value of values) {
+                if (value < 0)
+                    throw new MathError("negative");
+                _a.push(value);
+            }
+            return _a;
+        }
+        catch (_b) {
+            if (_b instanceof MathError)
+                return null;
+            throw _b;
+        }
+    })();
+}
+function demoteSelectedSentinel(values) {
+    var _a;
+    var _b = null;
+    for (const value of values) {
+        _b = value;
+        break;
+    }
+    return Object.is(_a = _b, -1) ? null : _a;
+}
+function demoteCollectFailureWithTail(values) {
+    return ((() => {
+        try {
+            var _a = [];
+            for (const value of values) {
+                _a.push(value);
+            }
+            return _a;
+        }
+        catch (_b) {
+            if (_b instanceof MathError)
+                return null;
+            throw _b;
+        }
+    })())?.length;
+}

@@ -2209,6 +2209,14 @@ func IsKvsStatementHeadPosition(node *Node) bool {
 			if parent.AsKvsPipelineExpression().Head != current {
 				return false
 			}
+		case KindKvsFailureDemotionExpression:
+			if parent.AsKvsFailureDemotionExpression().Expression != current {
+				return false
+			}
+		case KindKvsFailurePromotionExpression:
+			if parent.AsKvsFailurePromotionExpression().Expression != current {
+				return false
+			}
 		case KindConditionalExpression:
 			if parent.AsConditionalExpression().Condition != current {
 				return false

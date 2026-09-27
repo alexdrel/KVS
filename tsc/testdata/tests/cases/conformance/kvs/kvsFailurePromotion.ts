@@ -39,3 +39,22 @@ const branch = true ? findUser("seven") ~~ missingUser("seven") : user;
 const list = [findUser("eight") ~~ missingUser("eight")];
 
 declare function consume(value: { name: string }): void;
+
+function requireSelectedUser(users: ({ name: string } | null)[]) {
+    return select (const user of users) {
+        yield? user;
+    } ~~ new UserNotFound("empty");
+}
+
+function collectUsersOrCause(users: ({ name: string } | null)[] | null) {
+    return collect (const user of users) {
+        if (user?.name === "broken") throw new SyntaxError("broken");
+        yield? user;
+    } ~~ new UserNotFound("unavailable");
+}
+
+function requireSelectedUserName(users: ({ name: string } | null)[]) {
+    return (select (const user of users) {
+        yield? user;
+    } ~~ new UserNotFound("empty")).name;
+}

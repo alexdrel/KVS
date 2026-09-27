@@ -3,7 +3,7 @@
 This is a working implementation aid, not a language specification or feature order. The language
 documents remain authoritative for accepted semantics.
 
-Progress: **332 of 394 items complete (84.3%)**; **62 remain open**.
+Progress: **336 of 396 items complete (84.8%)**; **60 remain open**.
 
 - `[x]` means implemented with focused compiler evidence.
 - `[ ]` means unimplemented, incomplete, or not yet deliberately validated.
@@ -45,6 +45,7 @@ Implemented vertical slices:
 - Failure promotion: `expression ~~ error`, including non-nullable results and caught-cause
   preservation.
 - Placeholder lambdas in contextual callback arguments: `%`.
+- Pipelines with ordinary, extant, and input-retaining continuation: `|>`, `|?>`, and `|%>`.
 - Typed construction for concrete defaultable interfaces and object type aliases, including
   inherited fields and closed generic instantiations.
 - Typed spread during construction, with target-selected fields, presence-aware copying, and
@@ -104,6 +105,7 @@ Focused conformance inputs:
 - `tsc/testdata/tests/cases/conformance/kvs/kvsFailurePromotion.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsPlaceholderLambda.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsPlaceholderLambdaClosure.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsPipeline.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsRange.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsKeyedIteration.ts`
 
@@ -114,6 +116,7 @@ Focused language-service inputs:
 - `tsc/internal/fourslash/tests/kvsIfBindingLanguageService_test.go`
 - `tsc/internal/fourslash/tests/kvsImplicitSubjectLanguageService_test.go`
 - `tsc/internal/fourslash/tests/kvsPlaceholderLambdaLanguageService_test.go`
+- `tsc/internal/fourslash/tests/kvsPipelineLanguageService_test.go`
 - `tsc/internal/fourslash/tests/kvsTypedSpreadLanguageService_test.go`
 
 Run all implemented KVS slices together:
@@ -355,8 +358,8 @@ example `.js` files are intentionally ignored.
 - [x] Member access after producer
 - [x] Calls after producer
 - [x] Terminal `!` after producer
-- [ ] `~` after producer
-- [ ] `~~` after producer
+- [x] `~` after producer
+- [x] `~~` after producer
 - [x] `??` after producer
 - [x] Binary operation after producer
 - [x] Reject producer when earlier sibling/subexpression must evaluate first
@@ -574,6 +577,7 @@ example `.js` files are intentionally ignored.
 - [x] Error subclasses match through `instanceof`
 - [x] Left-associative policy chaining
 - [x] Awaited operation remains protected
+- [x] Eager producer execution remains inside the protected region
 
 ### Infix require/promote `~~`
 
@@ -585,6 +589,7 @@ example `.js` files are intentionally ignored.
 - [x] Returned absence and thrown `null`/`undefined` deliberately converge
 - [x] Replacement must produce an `Error`
 - [x] Head-position lowering without an IIFE or happy-path closure
+- [x] Eager producer execution remains inside the protected region
 
 ## 7. Lightweight type-system additions
 

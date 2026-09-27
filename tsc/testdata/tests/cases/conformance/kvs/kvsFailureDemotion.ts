@@ -29,3 +29,22 @@ function returnedConstructor() {
     return SyntaxError;
 }
 const constructorValue = returnedConstructor() ~ SyntaxError;
+
+function demoteCollectFailure(values: number[]) {
+    return collect (const value of values) {
+        if (value < 0) throw new MathError("negative");
+        yield value;
+    } ~ MathError;
+}
+
+function demoteSelectedSentinel(values: number[]) {
+    return select (const value of values) {
+        yield value;
+    } ~ -1;
+}
+
+function demoteCollectFailureWithTail(values: number[]) {
+    return (collect (const value of values) {
+        yield value;
+    } ~ MathError)?.length;
+}

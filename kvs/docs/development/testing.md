@@ -504,10 +504,11 @@ go -C ./tsc test -run='TestLocal/kvsCatchAndSplit' ./internal/testrunner
 
 `kvsFailureDemotion.ts` checks returned sentinels, `NaN`, object identity sentinels, error
 constructors, left-associative chaining, returned constructor values, awaited operations, and
-terminal `!` applied to demoted numeric sentinels. Its type baseline records nullable results before
-`!` and plain `number` afterward. Its JavaScript baseline verifies `Object.is` value matching,
-selective `instanceof` catches with unchanged rethrow, nested policy composition, and an async catch
-boundary around awaited work.
+terminal `!` applied to demoted numeric sentinels. Producer-tail cases cover sentinel matching,
+following operations, and exceptions raised during eager collection. Its type baseline records
+nullable results before `!` and plain `number` afterward. Its JavaScript baseline verifies
+`Object.is` value matching, selective `instanceof` catches with unchanged rethrow, nested policy
+composition, and protected eager-producer execution inside the catch boundary.
 
 Run it with:
 
@@ -588,10 +589,12 @@ go -C ./tsc test -run='TestLocal/kvsSieve' ./internal/testrunner
 
 `kvsFailurePromotion.ts` verifies present-value pass-through and narrowing, lazy `Error` replacement
 for returned absence, caught-cause attachment that preserves an existing cause, awaited operations,
-and the supported declaration, assignment, return, property, and member-continuation heads. It also
-diagnoses non-`Error` replacements and placement in call arguments, conditional branches, and array
-elements. Its JavaScript baseline fences the direct `try` lowering and absence of a helper or
-closure.
+and the supported declaration, assignment, return, property, and member-continuation heads. Select
+and collect tails verify that eager producer execution stays inside the direct `try`, including body
+exceptions becoming the promoted error's cause, and that following member access resumes from the
+producer result. It also diagnoses non-`Error` replacements and placement in call arguments,
+conditional branches, and array elements. Its JavaScript baseline fences the direct `try` lowering
+and absence of a helper or closure.
 
 Run it with:
 

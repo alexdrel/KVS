@@ -112,3 +112,66 @@ const constructorValue = returnedConstructor() ~ SyntaxError;
 >returnedConstructor : () => SyntaxErrorConstructor
 >SyntaxError : SyntaxErrorConstructor
 
+function demoteCollectFailure(values: number[]) {
+>demoteCollectFailure : (values: number[]) => number[] | null
+>values : number[]
+
+    return collect (const value of values) {
+>collect (const value of values) {        if (value < 0) throw new MathError("negative");        yield value;    } ~ MathError : number[] | null
+>collect (const value of values) {        if (value < 0) throw new MathError("negative");        yield value;    } : number[]
+>value : number
+>values : number[]
+
+        if (value < 0) throw new MathError("negative");
+>value < 0 : boolean
+>value : number
+>0 : 0
+>new MathError("negative") : MathError
+>MathError : typeof MathError
+>"negative" : "negative"
+
+        yield value;
+>value : number
+
+    } ~ MathError;
+>MathError : typeof MathError
+}
+
+function demoteSelectedSentinel(values: number[]) {
+>demoteSelectedSentinel : (values: number[]) => number | null
+>values : number[]
+
+    return select (const value of values) {
+>select (const value of values) {        yield value;    } ~ -1 : number | null
+>select (const value of values) {        yield value;    } : number | null
+>value : number
+>values : number[]
+
+        yield value;
+>value : number
+
+    } ~ -1;
+>-1 : -1
+>1 : 1
+}
+
+function demoteCollectFailureWithTail(values: number[]) {
+>demoteCollectFailureWithTail : (values: number[]) => number | undefined
+>values : number[]
+
+    return (collect (const value of values) {
+>(collect (const value of values) {        yield value;    } ~ MathError)?.length : number | undefined
+>(collect (const value of values) {        yield value;    } ~ MathError) : number[] | null
+>collect (const value of values) {        yield value;    } ~ MathError : number[] | null
+>collect (const value of values) {        yield value;    } : number[]
+>value : number
+>values : number[]
+
+        yield value;
+>value : number
+
+    } ~ MathError)?.length;
+>MathError : typeof MathError
+>length : number | undefined
+}
+

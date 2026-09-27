@@ -40,6 +40,25 @@ const list = [findUser("eight") ~~ missingUser("eight")];
 
 declare function consume(value: { name: string }): void;
 
+function requireSelectedUser(users: ({ name: string } | null)[]) {
+    return select (const user of users) {
+        yield? user;
+    } ~~ new UserNotFound("empty");
+}
+
+function collectUsersOrCause(users: ({ name: string } | null)[] | null) {
+    return collect (const user of users) {
+        if (user?.name === "broken") throw new SyntaxError("broken");
+        yield? user;
+    } ~~ new UserNotFound("unavailable");
+}
+
+function requireSelectedUserName(users: ({ name: string } | null)[]) {
+    return (select (const user of users) {
+        yield? user;
+    } ~~ new UserNotFound("empty")).name;
+}
+
 
 //// [kvsFailurePromotion.js]
 "use strict";
@@ -185,3 +204,79 @@ const wrongReplacement = _0;
 consume(findUser("six"));
 const branch = true ? findUser("seven") : user;
 const list = [findUser("eight")];
+function requireSelectedUser(users) {
+    var _a = null, _b = null;
+    try {
+        var _c = null;
+        var _d;
+        for (const user of users) {
+            if ((_d = user) != null) {
+                _c = _d;
+                break;
+            }
+        }
+        _a = _c;
+    }
+    catch (_e) {
+        _b = _e;
+    }
+    if (_a == null) {
+        var _f = new UserNotFound("empty");
+        if (_b != null && !("cause" in _f))
+            Object.defineProperty(_f, "cause", { value: _b, writable: true, configurable: true });
+        throw _f;
+    }
+    return _a;
+}
+function collectUsersOrCause(users) {
+    var _a = null, _b = null;
+    try {
+        var _c = users;
+        var _d = null;
+        var _e;
+        if (_c != null) {
+            _d = [];
+            for (const user of _c) {
+                if (user?.name === "broken")
+                    throw new SyntaxError("broken");
+                if ((_e = user) != null)
+                    _d.push(_e);
+            }
+        }
+        _a = _d;
+    }
+    catch (_f) {
+        _b = _f;
+    }
+    if (_a == null) {
+        var _g = new UserNotFound("unavailable");
+        if (_b != null && !("cause" in _g))
+            Object.defineProperty(_g, "cause", { value: _b, writable: true, configurable: true });
+        throw _g;
+    }
+    return _a;
+}
+function requireSelectedUserName(users) {
+    var _a = null, _b = null;
+    try {
+        var _c = null;
+        var _d;
+        for (const user of users) {
+            if ((_d = user) != null) {
+                _c = _d;
+                break;
+            }
+        }
+        _a = _c;
+    }
+    catch (_e) {
+        _b = _e;
+    }
+    if (_a == null) {
+        var _f = new UserNotFound("empty");
+        if (_b != null && !("cause" in _f))
+            Object.defineProperty(_f, "cause", { value: _b, writable: true, configurable: true });
+        throw _f;
+    }
+    return (_a).name;
+}

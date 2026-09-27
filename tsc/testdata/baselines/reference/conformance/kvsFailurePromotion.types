@@ -189,3 +189,76 @@ declare function consume(value: { name: string }): void;
 >value : { name: string; }
 >name : string
 
+function requireSelectedUser(users: ({ name: string } | null)[]) {
+>requireSelectedUser : (users: ({ name: string; } | null)[]) => { name: string; }
+>users : ({ name: string; } | null)[]
+>name : string
+
+    return select (const user of users) {
+>select (const user of users) {        yield? user;    } ~~ new UserNotFound("empty") : { name: string; }
+>select (const user of users) {        yield? user;    } : { name: string; } | null
+>user : { name: string; } | null
+>users : ({ name: string; } | null)[]
+
+        yield? user;
+>user : { name: string; } | null
+
+    } ~~ new UserNotFound("empty");
+>new UserNotFound("empty") : UserNotFound
+>UserNotFound : typeof UserNotFound
+>"empty" : "empty"
+}
+
+function collectUsersOrCause(users: ({ name: string } | null)[] | null) {
+>collectUsersOrCause : (users: ({ name: string; } | null)[] | null) => { name: string; }[]
+>users : ({ name: string; } | null)[] | null
+>name : string
+
+    return collect (const user of users) {
+>collect (const user of users) {        if (user?.name === "broken") throw new SyntaxError("broken");        yield? user;    } ~~ new UserNotFound("unavailable") : { name: string; }[]
+>collect (const user of users) {        if (user?.name === "broken") throw new SyntaxError("broken");        yield? user;    } : { name: string; }[] | null
+>user : { name: string; } | null
+>users : ({ name: string; } | null)[] | null
+
+        if (user?.name === "broken") throw new SyntaxError("broken");
+>user?.name === "broken" : boolean
+>user?.name : string | undefined
+>user : { name: string; } | null
+>name : string | undefined
+>"broken" : "broken"
+>new SyntaxError("broken") : SyntaxError
+>SyntaxError : SyntaxErrorConstructor
+>"broken" : "broken"
+
+        yield? user;
+>user : { name: string; } | null
+
+    } ~~ new UserNotFound("unavailable");
+>new UserNotFound("unavailable") : UserNotFound
+>UserNotFound : typeof UserNotFound
+>"unavailable" : "unavailable"
+}
+
+function requireSelectedUserName(users: ({ name: string } | null)[]) {
+>requireSelectedUserName : (users: ({ name: string; } | null)[]) => string
+>users : ({ name: string; } | null)[]
+>name : string
+
+    return (select (const user of users) {
+>(select (const user of users) {        yield? user;    } ~~ new UserNotFound("empty")).name : string
+>(select (const user of users) {        yield? user;    } ~~ new UserNotFound("empty")) : { name: string; }
+>select (const user of users) {        yield? user;    } ~~ new UserNotFound("empty") : { name: string; }
+>select (const user of users) {        yield? user;    } : { name: string; } | null
+>user : { name: string; } | null
+>users : ({ name: string; } | null)[]
+
+        yield? user;
+>user : { name: string; } | null
+
+    } ~~ new UserNotFound("empty")).name;
+>new UserNotFound("empty") : UserNotFound
+>UserNotFound : typeof UserNotFound
+>"empty" : "empty"
+>name : string
+}
+

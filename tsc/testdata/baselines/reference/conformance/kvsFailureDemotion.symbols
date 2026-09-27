@@ -83,3 +83,53 @@ const constructorValue = returnedConstructor() ~ SyntaxError;
 >returnedConstructor : Symbol(returnedConstructor, Decl(kvsFailureDemotion.ts, 22, 1))
 >SyntaxError : Symbol(SyntaxError, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --))
 
+function demoteCollectFailure(values: number[]) {
+>demoteCollectFailure : Symbol(demoteCollectFailure, Decl(kvsFailureDemotion.ts, 27, 61))
+>values : Symbol(values, Decl(kvsFailureDemotion.ts, 29, 30))
+
+    return collect (const value of values) {
+>value : Symbol(value, Decl(kvsFailureDemotion.ts, 30, 25))
+>values : Symbol(values, Decl(kvsFailureDemotion.ts, 29, 30))
+
+        if (value < 0) throw new MathError("negative");
+>value : Symbol(value, Decl(kvsFailureDemotion.ts, 30, 25))
+>MathError : Symbol(MathError, Decl(kvsFailureDemotion.ts, 0, 0))
+
+        yield value;
+>value : Symbol(value, Decl(kvsFailureDemotion.ts, 30, 25))
+
+    } ~ MathError;
+>MathError : Symbol(MathError, Decl(kvsFailureDemotion.ts, 0, 0))
+}
+
+function demoteSelectedSentinel(values: number[]) {
+>demoteSelectedSentinel : Symbol(demoteSelectedSentinel, Decl(kvsFailureDemotion.ts, 34, 1))
+>values : Symbol(values, Decl(kvsFailureDemotion.ts, 36, 32))
+
+    return select (const value of values) {
+>value : Symbol(value, Decl(kvsFailureDemotion.ts, 37, 24))
+>values : Symbol(values, Decl(kvsFailureDemotion.ts, 36, 32))
+
+        yield value;
+>value : Symbol(value, Decl(kvsFailureDemotion.ts, 37, 24))
+
+    } ~ -1;
+}
+
+function demoteCollectFailureWithTail(values: number[]) {
+>demoteCollectFailureWithTail : Symbol(demoteCollectFailureWithTail, Decl(kvsFailureDemotion.ts, 40, 1))
+>values : Symbol(values, Decl(kvsFailureDemotion.ts, 42, 38))
+
+    return (collect (const value of values) {
+>(collect (const value of values) {        yield value;    } ~ MathError)?.length : Symbol(Array.length, Decl(lib.es5.d.ts, --, --))
+>value : Symbol(value, Decl(kvsFailureDemotion.ts, 43, 26))
+>values : Symbol(values, Decl(kvsFailureDemotion.ts, 42, 38))
+
+        yield value;
+>value : Symbol(value, Decl(kvsFailureDemotion.ts, 43, 26))
+
+    } ~ MathError)?.length;
+>MathError : Symbol(MathError, Decl(kvsFailureDemotion.ts, 0, 0))
+>length : Symbol(Array.length, Decl(lib.es5.d.ts, --, --))
+}
+

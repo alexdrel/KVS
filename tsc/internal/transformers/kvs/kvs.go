@@ -949,9 +949,13 @@ func (tx *transformer) transformFailureDemotion(node *ast.KvsFailureDemotionExpr
 	}
 
 	caught := factory.NewTempVariable()
-	tryBlock := factory.NewBlock(factory.NewNodeList([]*ast.Node{
-		factory.NewReturnStatement(tx.Visitor().VisitNode(node.Expression)),
-	}), true)
+	protected := tx.lowerHeadEffects(node.Expression, func(result *ast.Expression) *ast.Node {
+		return factory.NewReturnStatement(result)
+	})
+	if protected == nil {
+		protected = factory.NewReturnStatement(tx.Visitor().VisitNode(node.Expression))
+	}
+	tryBlock := factory.NewBlock(factory.NewNodeList(kvsStatementNodes(protected)), true)
 	matches := factory.NewBinaryExpression(nil, caught, nil, factory.NewToken(ast.KindInstanceOfKeyword), tx.Visitor().VisitNode(node.Pattern))
 	catchBlock := factory.NewBlock(factory.NewNodeList([]*ast.Node{
 		factory.NewIfStatement(matches, factory.NewReturnStatement(factory.NewKeywordExpression(ast.KindNullKeyword)), nil),
@@ -973,6 +977,13 @@ func (tx *transformer) transformFailureDemotion(node *ast.KvsFailureDemotionExpr
 	)
 	call := factory.NewCallExpression(factory.NewParenthesizedExpression(arrow), nil, nil, factory.NewNodeList(nil), ast.NodeFlagsNone)
 	return factory.NewAwaitExpression(call)
+}
+
+func kvsStatementNodes(node *ast.Node) []*ast.Node {
+	if node.Kind == ast.KindSyntaxList {
+		return node.AsSyntaxList().Children
+	}
+	return []*ast.Node{node}
 }
 
 func (tx *transformer) transformCatchSplit(expression *ast.Expression) *ast.Node {
@@ -1600,6 +1611,12 @@ func (tx *transformer) lowerHeadEffects(root *ast.Expression, continuation func(
 		if node.Kind == ast.KindKvsLazyCollectExpression {
 			return false
 		}
+		// Error demotion supplies its own protected lowering scope. Effects in its
+		// input must stay inside that try block so failures from eager producers
+		// are demoted with ordinary expression failures.
+		if node.Kind == ast.KindKvsFailureDemotionExpression && tx.resolver.IsKvsFailureDemotionErrorPattern(node.AsKvsFailureDemotionExpression().Pattern) {
+			return false
+		}
 		if isKvsProducer(node) || node.Kind == ast.KindKvsFailurePromotionExpression {
 			if ast.IsKvsStatementHeadPosition(node) {
 				effects = append(effects, node)
@@ -1647,9 +1664,13 @@ func (tx *transformer) lowerFailurePromotion(effect *ast.Node, continuation func
 		factory.NewVariableDeclaration(value, nil, nil, null),
 		factory.NewVariableDeclaration(cause, nil, nil, factory.NewKeywordExpression(ast.KindNullKeyword)),
 	}), ast.NodeFlagsNone))
-	tryBlock := factory.NewBlock(factory.NewNodeList([]*ast.Node{
-		factory.NewExpressionStatement(factory.NewAssignmentExpression(value, tx.Visitor().VisitNode(node.Expression))),
-	}), true)
+	protected := tx.lowerHeadEffects(node.Expression, func(result *ast.Expression) *ast.Node {
+		return factory.NewExpressionStatement(factory.NewAssignmentExpression(value, result))
+	})
+	if protected == nil {
+		protected = factory.NewExpressionStatement(factory.NewAssignmentExpression(value, tx.Visitor().VisitNode(node.Expression)))
+	}
+	tryBlock := factory.NewBlock(factory.NewNodeList(kvsStatementNodes(protected)), true)
 	catchBlock := factory.NewBlock(factory.NewNodeList([]*ast.Node{
 		factory.NewExpressionStatement(factory.NewAssignmentExpression(cause, caught)),
 	}), true)

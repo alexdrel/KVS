@@ -148,7 +148,7 @@ const byId = collect* (items) {
 The producer's own [head-path placement rule](flow.md#producing-loops-in-expression-position)
 remains unchanged. A pipeline introduces no new exception or block boundary.
 
-## Placeholder operations
+## Placeholder lambdas
 
 Small callbacks often just select a property or apply a short expression to their argument. `%`
 names that argument:

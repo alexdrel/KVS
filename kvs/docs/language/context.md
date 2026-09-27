@@ -26,8 +26,10 @@ context CurrentUser: User?;
 context CurrentUser: User? = null;
 ```
 
-A non-nullable key must either declare a default or have a type with a default value. Frame
-materialization uses that value whenever no override is present.
+A non-nullable key must either declare a default or have a type with a default value. All context
+frames are lazy: creating or deriving a frame does not enumerate context keys or evaluate their
+defaults. When lookup reaches the root without finding a supplied value, the key's explicit or
+type-derived default is materialized on demand and then reused for that context.
 
 The declaration, rather than its textual name, establishes identity. Imported keys retain that
 identity even when renamed. Packages can introduce keys independently; there is no central
@@ -43,8 +45,7 @@ context function log(message: string) {
 
 ## Context functions
 
-`context` before a function declaration says that the function receives the current complete context
-frame:
+`context` before a function declaration says that the function receives the current context frame:
 
 ```kvs
 context function processOrder(order: Order) {
@@ -79,8 +80,10 @@ type Handler = context () => void;
 type Loader = context async (id: string) => Promise<Order>;
 ```
 
-The color records participation in context propagation, not general impurity. A plain function may
-still perform I/O, mutate state, or throw.
+A context callable is not implicitly converted to an ordinary callable by capturing the current
+frame. The distinction remains visible in assignability and overload resolution. The color records
+participation in context propagation, not general impurity. A plain function may still perform I/O,
+mutate state, or throw.
 
 ## Scoped overrides
 
@@ -102,8 +105,10 @@ Every statically known property must resolve to a visible context key, and its v
 assignable to that key's declared type. Unknown properties are errors. An optional property
 overrides its key only when present; an explicit null overrides a nullable key with null.
 
-Property expressions are evaluated from left to right before the body begins. Nested context
-statements compose: an inner frame shadows only the supplied keys and inherits everything else.
+Property expressions are evaluated from left to right before the body begins. A derived frame stores
+only the supplied overrides; all other keys are resolved through its parent. Nested context statements
+therefore compose naturally: an inner frame shadows only the supplied keys and inherits everything
+else. Frames remain lazy regardless of depth.
 
 `context (...)` requires an existing frame. `context! (...)` ensures that one exists before applying
 the overrides:
@@ -119,9 +124,10 @@ function applicationEntry(request: Request) {
 }
 ```
 
-Inside a plain function, `context!` materializes a frame from all declared defaults. Inside a
-context function, the current frame already exists, so `context!` preserves it and behaves like
-`context`. It never replaces or detaches an existing frame.
+Inside a plain function, `context!` establishes a root frame when none exists and applies the supplied
+overrides to it. Inside a context function, the current frame already exists, so `context!` preserves
+it and behaves like `context`. It never replaces or detaches an existing frame, and it never eagerly
+materializes unrelated context keys or defaults.
 
 A plain function naturally forms a strong context boundary because no frame is passed to it. It may
 establish a fresh one with `context!`:
@@ -138,11 +144,28 @@ context function handleRequest(job: Job) {
 }
 ```
 
-## Closures and lazy execution
+## Closures, callbacks, and lazy execution
 
-A closure created in a context region can capture the frame as ordinary lexical data. Async
-functions retain it as an ordinary parameter, and lazy collectors or generators retain it with their
-other captured state:
+A closure created in a context region can capture the frame as ordinary lexical data. This is also
+how a context function is deliberately adapted to an ordinary callback. Placeholder-lambda syntax
+makes the capture explicit:
+
+```kvs
+context function label(item: Item) {
+    return format(item, Locale);
+}
+
+context function render(items: Item[]) {
+    return items.map(label(%));
+}
+```
+
+`label(%)` creates an ordinary callback closure. The closure captures the current frame and invokes
+`label` with that frame when the callback later runs. Passing `label` directly does not perform this
+conversion: if `map` expects an ordinary callback, `items.map(label)` is a type error.
+
+Async functions retain a captured frame as ordinary lexical state, and lazy collectors or generators
+retain it with their other captured state:
 
 ```kvs
 context function localized(items: Item[]) {
@@ -155,17 +178,24 @@ context function localized(items: Item[]) {
 Every later iteration observes the frame captured when `localized` created the iterator. No
 host-level async-context propagation is required.
 
-The initial proposal keeps `context` explicit on named functions and callable types. Inferring it
-for local closures whose bodies are available may remove minor ceremony later without changing the
-frame model.
+The initial proposal keeps `context` explicit on named functions and callable types. Ordinary local
+closures remain ordinary closures; when they call context functions, they capture the surrounding
+frame just like `label(%)` above.
 
 ## JavaScript boundaries
 
-A context function has a different generated calling convention from a plain JavaScript function.
-When it crosses into untyped JavaScript as a callback, the compiler creates an ordinary closure that
-captures the current frame and supplies it to the context function. Exports called directly by
-JavaScript require a wrapper that deliberately supplies a frame, usually one established from
-defaults.
+A context function has a different generated calling convention from a plain JavaScript function and
+does not silently become a plain callback at a JavaScript boundary. Code passes an ordinary closure
+explicitly. Where the API has a callback type, placeholder syntax is enough:
+
+```kvs
+externalApi.register(handler(%));
+```
+
+For a truly untyped callback position, an ordinary arrow provides the same explicit boundary. In both
+cases the closure captures the current frame and supplies it when `handler` is later invoked. Exports
+called directly by JavaScript likewise need a deliberate plain wrapper that chooses or establishes a
+frame; the boundary does not implicitly capture whichever context happened to exist during export.
 
 Workers, processes, and message boundaries do not inherit a frame. Applications pass the required
 data and establish a new context explicitly on the other side.

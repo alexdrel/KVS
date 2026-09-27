@@ -345,6 +345,11 @@ return select (records) {
 } ~~ OwnerNotFound();
 ```
 
+For eager producers, failure demotion or promotion protects the whole production step: failures
+raised while evaluating the source or running the body are handled by the following `~` or `~~`. For
+`collect*`, only iterator creation happens at that point; failures raised later while consuming the
+lazy iterator are not retroactively handled by the tail.
+
 Named object fields establish their own value positions:
 
 ```kvs
