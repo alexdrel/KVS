@@ -11,9 +11,14 @@ func TestKvsContextLanguageService(t *testing.T) {
 	t.Parallel()
 	defer testutil.RecoverAndFail(t, "Panic on fourslash test")
 	const content = `context /*declaration*/RequestId: string = "none";
+context /*nullableDeclaration*/CurrentUser: string?;
 
 context function read() {
     return /*read*/RequestId;
+}
+
+context function readCurrentUser() {
+    return /*nullableRead*/CurrentUser;
 }
 
 type /*callable*/Handler = context (value: string) => string;
@@ -36,6 +41,8 @@ function entry(id: string) {
 	f, done := fourslash.NewFourslash(t, nil /*capabilities*/, content)
 	defer done()
 	f.VerifyQuickInfoAt(t, "read", "context RequestId: string", "")
+	f.VerifyQuickInfoAt(t, "nullableDeclaration", "context CurrentUser: string?", "")
+	f.VerifyQuickInfoAt(t, "nullableRead", "context CurrentUser: string?", "")
 	f.VerifyQuickInfoAt(t, "callable", "type Handler = context (value: string) => string", "")
 	f.VerifyBaselineGoToDefinition(t, true, "read", "binding")
 	f.VerifyBaselineGoToDefinition(t, true, "method", "methodCall")

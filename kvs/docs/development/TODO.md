@@ -3,7 +3,7 @@
 This is a working implementation aid, not a language specification or feature order. The language
 documents remain authoritative for accepted semantics.
 
-Progress: **370 of 396 items complete (93.4%)**; **26 remain open**.
+Progress: **372 of 397 items complete (93.7%)**; **25 remain open**.
 
 - `[x]` means implemented with focused compiler evidence.
 - `[ ]` means unimplemented, incomplete, or not yet deliberately validated.
@@ -62,6 +62,9 @@ Implemented vertical slices:
   explicit JavaScript adapters, and retained async or lazy state.
 - Native language-service support for implemented KVS syntax, including typed hover, document
   highlights, and safe source navigation through synthetic compiler nodes.
+- KVS-aware formatting for implemented syntax, guarded by an all-in-one golden and idempotence
+  checks across runnable examples.
+- Standalone VS Code syntax-highlighting supplementation for KVS punctuation and producer forms.
 
 Known semantic debts:
 
@@ -135,7 +138,7 @@ example `.js` files are intentionally ignored.
 - [x] Establish KVS AST node/kind strategy
 - [x] Add KVS parser paths for implemented slices
 - [x] Add KVS source printer support for implemented slices
-- [ ] Add KVS formatter support
+- [x] Add KVS formatter support
 - [x] Add KVS -> ordinary TS/JS lowering phase
 - [x] Establish initial KVS diagnostics convention
 - [ ] Preserve source maps through KVS lowering
@@ -144,6 +147,7 @@ example `.js` files are intentionally ignored.
 - [x] Add runtime/evaluation-order test mechanism
 - [x] Add language-service/Fourslash coverage
 - [x] Wire VS Code Native Preview to the local KVS compiler
+- [x] Supplement VS Code's TypeScript syntax highlighting for KVS punctuation
 - [x] Hover types for implicit `_`, keyed `#`, and placeholder `%`
 - [x] Preserve explicit KVS nullable type spelling in symbol hover
 - [x] Document highlights for synthetic KVS binding forms

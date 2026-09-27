@@ -1,0 +1,81 @@
+{
+    "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+    "scopeName": "kvs.injection",
+    "injectionSelector": "L:source.ts -comment -string, L:source.tsx -comment -string",
+    "patterns": [
+        {
+            "match": "\\b(collect|select)(\\*)?",
+            "captures": {
+                "1": {
+                    "name": "keyword.control.kvs.producer.ts"
+                },
+                "2": {
+                    "name": "keyword.operator.kvs.lazy.ts"
+                }
+            }
+        },
+        {
+            "match": "\\b(if|switch)(\\s*\\(\\s*)(const|let)\\b",
+            "captures": {
+                "1": {
+                    "name": "keyword.control.kvs.binding.ts"
+                },
+                "3": {
+                    "name": "storage.type.kvs.binding.ts"
+                }
+            }
+        },
+        {
+            "name": "keyword.control.kvs.producer-body.ts",
+            "match": "\\b(?:case|continue|default|for|if|switch|yield)\\b"
+        },
+        {
+            "name": "storage.type.kvs.iteration-binding.ts",
+            "match": "\\b(?:const|let)\\b(?=\\s+[_$[:alpha:]][_$[:alnum:]]*\\s+of\\b)"
+        },
+        {
+            "name": "constant.numeric.kvs.ts",
+            "match": "(?<![_$[:alnum:]])(?:0[xX][0-9a-fA-F]+|0[bB][01]+|0[oO][0-7]+|[0-9]+(?:\\.[0-9]+)?)(?![_$[:alnum:]])"
+        },
+        {
+            "name": "keyword.operator.kvs.pipeline.ts",
+            "match": "\\|(?:[?%])?>"
+        },
+        {
+            "name": "keyword.operator.kvs.assertion.ts",
+            "match": "\\bas[?!]"
+        },
+        {
+            "name": "keyword.control.flow.kvs.extant.ts",
+            "match": "\\b(?:return|yield)\\?"
+        },
+        {
+            "name": "keyword.operator.kvs.extant-assignment.ts",
+            "match": "\\?(?==)"
+        },
+        {
+            "name": "keyword.operator.kvs.optional-invocation.ts",
+            "match": "\\?(?=\\()"
+        },
+        {
+            "name": "meta.type.kvs.nullable.ts",
+            "match": "\\b(string|number|bigint|boolean|symbol|any|void|never|unknown)(\\?)(?=\\s*(?:[\\[\\]),;=|&>]|$))",
+            "captures": {
+                "1": {
+                    "name": "support.type.primitive.ts"
+                },
+                "2": {
+                    "name": "keyword.operator.kvs.nullable.ts"
+                }
+            }
+        },
+        {
+            "name": "keyword.operator.kvs.nulling.ts",
+            "match": "(?<=\\s)\\?\\:"
+        },
+        {
+            "name": "keyword.operator.kvs.compact-literal.ts",
+            "match": "\\?(?=[\\[\\{])"
+        }
+    ]
+}

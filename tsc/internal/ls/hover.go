@@ -979,7 +979,7 @@ func getQuickInfoAndDeclarationAtLocation(c *checker.Checker, symbol *ast.Symbol
 }
 
 func getExplicitKvsTypeAnnotation(declaration *ast.Node) *ast.Node {
-	if declaration == nil || !(ast.IsParameterDeclaration(declaration) || ast.IsVariableDeclaration(declaration) || ast.IsPropertySignatureDeclaration(declaration) || ast.IsPropertyDeclaration(declaration)) {
+	if declaration == nil || !(ast.IsParameterDeclaration(declaration) || ast.IsVariableDeclaration(declaration) || ast.IsPropertySignatureDeclaration(declaration) || ast.IsPropertyDeclaration(declaration) || ast.IsKvsContextDeclaration(declaration)) {
 		return nil
 	}
 	typeNode := declaration.Type()

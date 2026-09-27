@@ -1,0 +1,33 @@
+{
+    "name": "kvs-syntax-preview",
+    "displayName": "KVS Syntax Preview",
+    "description": "Syntax-highlighting additions for the KVS TypeScript dialect.",
+    "publisher": "kvs-local",
+    "version": "0.0.8",
+    "private": true,
+    "license": "Apache-2.0",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/alexdrel/KVS.git",
+        "directory": "kvs/vscode"
+    },
+    "engines": {
+        "vscode": "^1.100.0"
+    },
+    "files": [
+        "README.md",
+        "syntaxes/kvs.injection.tmLanguage.json"
+    ],
+    "contributes": {
+        "grammars": [
+            {
+                "scopeName": "kvs.injection",
+                "path": "./syntaxes/kvs.injection.tmLanguage.json",
+                "injectTo": [
+                    "source.ts",
+                    "source.tsx"
+                ]
+            }
+        ]
+    }
+}

@@ -5184,7 +5184,8 @@ func (p *Parser) parseBinaryExpressionRest(precedence ast.OperatorPrecedence, le
 			} else if (operator == ast.KindEqualsEqualsToken || operator == ast.KindExclamationEqualsToken) && p.token == ast.KindDotDotDotToken {
 				spreadToken := p.parseTokenNode()
 				alternative := p.parseBinaryExpressionOrHigher(newPrecedence)
-				leftOperand = p.finishNode(p.factory.NewKvsComparisonAlternativesExpression(leftOperand, operatorToken, spreadToken, p.factory.NewNodeList([]*ast.Node{alternative})), pos)
+				alternatives := p.newNodeList(alternative.Loc, []*ast.Node{alternative})
+				leftOperand = p.finishNode(p.factory.NewKvsComparisonAlternativesExpression(leftOperand, operatorToken, spreadToken, alternatives), pos)
 			} else {
 				rightOperand := p.parseBinaryExpressionOrHigher(newPrecedence)
 				if operator == ast.KindEqualsEqualsToken || operator == ast.KindExclamationEqualsToken {
@@ -5194,7 +5195,8 @@ func (p *Parser) parseBinaryExpressionRest(precedence ast.OperatorPrecedence, le
 						alternatives = append(alternatives, p.parseBinaryExpressionOrHigher(ast.OperatorPrecedenceBitwiseOR))
 					}
 					if len(alternatives) > 1 {
-						leftOperand = p.finishNode(p.factory.NewKvsComparisonAlternativesExpression(leftOperand, operatorToken, nil, p.factory.NewNodeList(alternatives)), pos)
+						alternativeList := p.newNodeList(core.NewTextRange(rightOperand.Pos(), p.nodePos()), alternatives)
+						leftOperand = p.finishNode(p.factory.NewKvsComparisonAlternativesExpression(leftOperand, operatorToken, nil, alternativeList), pos)
 					} else if p.canExtendKvsComparisonChain(leftOperand, operatorToken, rightOperand) {
 						leftOperand = p.extendKvsComparisonChain(leftOperand, operatorToken, rightOperand, pos)
 					} else {
@@ -5216,16 +5218,16 @@ func (p *Parser) extendKvsComparisonChain(leftOperand *ast.Node, operatorToken *
 	if ast.IsBinaryExpression(leftOperand) {
 		binary := leftOperand.AsBinaryExpression()
 		return p.finishNode(p.factory.NewKvsComparisonChainExpression(
-			p.factory.NewNodeList([]*ast.Node{binary.Left, binary.Right, rightOperand}),
-			p.factory.NewNodeList([]*ast.Node{binary.OperatorToken, operatorToken}),
+			p.newNodeList(core.NewTextRange(binary.Left.Pos(), rightOperand.End()), []*ast.Node{binary.Left, binary.Right, rightOperand}),
+			p.newNodeList(core.NewTextRange(binary.OperatorToken.Pos(), operatorToken.End()), []*ast.Node{binary.OperatorToken, operatorToken}),
 		), pos)
 	}
 	chain := leftOperand.AsKvsComparisonChainExpression()
 	operands := append([]*ast.Node{}, chain.Operands.Nodes...)
 	operators := append([]*ast.Node{}, chain.Operators.Nodes...)
 	return p.finishNode(p.factory.NewKvsComparisonChainExpression(
-		p.factory.NewNodeList(append(operands, rightOperand)),
-		p.factory.NewNodeList(append(operators, operatorToken)),
+		p.newNodeList(core.NewTextRange(chain.Operands.Pos(), rightOperand.End()), append(operands, rightOperand)),
+		p.newNodeList(core.NewTextRange(chain.Operators.Pos(), operatorToken.End()), append(operators, operatorToken)),
 	), pos)
 }
 

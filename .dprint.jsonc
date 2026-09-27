@@ -54,6 +54,8 @@
         "!kvs/**/*.md",
         "**/*-lock.json",
         "**/testdata",
+        // Keep the deliberately malformed formatter input intact. Test fixtures are excluded above.
+        "tsc/testdata/fixtures/kvs/format-all-in-one.input.ts",
         "kvs/examples/**/*.ts",
         "packages/vscode-typescript/l10n/**",
         "tsc/internal/bundled/libs/**",

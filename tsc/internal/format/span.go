@@ -534,7 +534,64 @@ func (w *formatSpanWorker) executeProcessNodeVisitor(node *ast.Node, indenter *d
 	w.visitingIndenter = indenter
 	w.visitingNodeStartLine = nodeStartLine
 	w.visitingUndecoratedNodeStartLine = undecoratedNodeStartLine
-	node.VisitEachChild(w.visitor)
+	switch node.Kind {
+	case ast.KindKvsPlaceholderLambdaExpression:
+		// The placeholder lambda's arrow is synthetic and shares its source range
+		// with the expression it wraps. Formatting it as source would visit the
+		// synthetic parameter and arrow token at the `%` token's position.
+		w.visitor.VisitNode(node.AsKvsPlaceholderLambdaExpression().Arrow.AsArrowFunction().Body)
+	case ast.KindKvsComparisonChainExpression:
+		// The chain stores operands and operators in parallel lists rather than
+		// source order. Visiting the operands consumes the interleaved operator
+		// tokens; visiting the operator list afterwards would process them twice.
+		for _, operand := range node.AsKvsComparisonChainExpression().Operands.Nodes {
+			w.visitor.VisitNode(operand)
+		}
+	case ast.KindKvsCollectExpression:
+		collect := node.AsKvsCollectExpression()
+		if node.Flags&ast.NodeFlagsKvsImplicitSubject == 0 {
+			node.VisitEachChild(w.visitor)
+		} else {
+			w.visitor.VisitNode(collect.Expression)
+			w.visitor.VisitNode(collect.Statement)
+		}
+	case ast.KindKvsLazyCollectExpression:
+		collect := node.AsKvsLazyCollectExpression()
+		if node.Flags&ast.NodeFlagsKvsImplicitSubject == 0 {
+			node.VisitEachChild(w.visitor)
+		} else {
+			w.visitor.VisitNode(collect.Expression)
+			w.visitor.VisitNode(collect.Statement)
+		}
+	case ast.KindKvsSelectExpression:
+		selectExpression := node.AsKvsSelectExpression()
+		if node.Flags&ast.NodeFlagsKvsImplicitSubject == 0 {
+			node.VisitEachChild(w.visitor)
+		} else {
+			w.visitor.VisitNode(selectExpression.Expression)
+			w.visitor.VisitNode(selectExpression.Statement)
+		}
+	case ast.KindKvsForExpression:
+		forExpression := node.AsKvsForExpression()
+		if node.Flags&ast.NodeFlagsKvsImplicitSubject == 0 {
+			node.VisitEachChild(w.visitor)
+		} else {
+			w.visitor.VisitNode(forExpression.Expression)
+			w.visitor.VisitNode(forExpression.Result)
+			w.visitor.VisitNode(forExpression.Statement)
+		}
+	case ast.KindForInStatement, ast.KindForOfStatement:
+		forStatement := node.AsForInOrOfStatement()
+		if node.Flags&ast.NodeFlagsKvsImplicitSubject == 0 {
+			node.VisitEachChild(w.visitor)
+		} else {
+			w.visitor.VisitNode(forStatement.AwaitModifier)
+			w.visitor.VisitNode(forStatement.Expression)
+			w.visitor.VisitNode(forStatement.Statement)
+		}
+	default:
+		node.VisitEachChild(w.visitor)
+	}
 	w.visitingNode = oldNode
 	w.visitingIndenter = oldIndenter
 	w.visitingNodeStartLine = oldStart

@@ -147,6 +147,12 @@ func isBinaryOpContext(context *FormattingContext) bool {
 	switch context.contextNode.Kind {
 	case ast.KindBinaryExpression:
 		return context.contextNode.AsBinaryExpression().OperatorToken.Kind != ast.KindCommaToken
+	case ast.KindKvsPipelineExpression,
+		ast.KindKvsFailureDemotionExpression,
+		ast.KindKvsFailurePromotionExpression,
+		ast.KindKvsComparisonAlternativesExpression,
+		ast.KindKvsComparisonChainExpression:
+		return true
 	case ast.KindConditionalExpression,
 		ast.KindConditionalType,
 		ast.KindAsExpression,
@@ -220,6 +226,53 @@ func isNonOptionalPropertyContext(context *FormattingContext) bool {
 func isConditionalOperatorContext(context *FormattingContext) bool {
 	return context.contextNode.Kind == ast.KindConditionalExpression ||
 		context.contextNode.Kind == ast.KindConditionalType
+}
+
+func isKvsQuestionPrefixContext(context *FormattingContext) bool {
+	switch context.contextNode.Kind {
+	case ast.KindKvsContextBinding,
+		ast.KindKvsExtantAssignmentExpression,
+		ast.KindKvsNullingExpression:
+		return true
+	default:
+		return false
+	}
+}
+
+func isKvsOptionalDeclarationContext(context *FormattingContext) bool {
+	return context.contextNode.Kind == ast.KindVariableDeclaration &&
+		context.currentTokenSpan.Kind != ast.KindEqualsToken
+}
+
+func isKvsQuestionSuffixContext(context *FormattingContext) bool {
+	return context.contextNode.Kind == ast.KindKvsExtantReturnStatement ||
+		context.contextNode.Kind == ast.KindKvsExtantYieldStatement
+}
+
+func isKvsFailureOperatorContext(context *FormattingContext) bool {
+	return context.contextNode.Kind == ast.KindKvsFailureDemotionExpression ||
+		context.contextNode.Kind == ast.KindKvsFailurePromotionExpression
+}
+
+func isBeforeKvsCompactLiteral(context *FormattingContext) bool {
+	return context.nextTokenParent.Kind == ast.KindKvsCompactArrayExpression ||
+		context.nextTokenParent.Kind == ast.KindKvsCompactObjectExpression
+}
+
+func isKvsExtantAssignmentContext(context *FormattingContext) bool {
+	return context.contextNode.Kind == ast.KindKvsContextBinding ||
+		context.contextNode.Kind == ast.KindKvsExtantAssignmentExpression
+}
+
+func isKvsSieveBindingContext(context *FormattingContext) bool {
+	return context.contextNode.Kind == ast.KindKvsSieveBindingInitializer ||
+		context.contextNode.Kind == ast.KindKvsSieveAssignmentExpression ||
+		context.currentTokenParent.Kind == ast.KindKvsSieveBindingInitializer ||
+		context.nextTokenParent.Kind == ast.KindKvsSieveBindingInitializer
+}
+
+func isKvsTypedSpreadAssignmentContext(context *FormattingContext) bool {
+	return context.contextNode.Kind == ast.KindKvsTypedSpreadAssignmentExpression
 }
 
 func isSameLineTokenOrBeforeBlockContext(context *FormattingContext) bool {
@@ -524,7 +577,9 @@ func isVoidOpContext(context *FormattingContext) bool {
 }
 
 func isYieldOrYieldStarWithOperand(context *FormattingContext) bool {
-	return context.contextNode.Kind == ast.KindYieldExpression && context.contextNode.Expression() != nil
+	return (context.contextNode.Kind == ast.KindYieldExpression ||
+		context.contextNode.Kind == ast.KindKvsYieldStatement) &&
+		context.contextNode.Expression() != nil
 }
 
 func isNonNullAssertionContext(context *FormattingContext) bool {

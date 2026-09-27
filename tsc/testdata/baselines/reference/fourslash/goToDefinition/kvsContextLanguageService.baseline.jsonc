@@ -1,25 +1,26 @@
 // === goToDefinition ===
 // === /kvsContextLanguageService.ts ===
 // <|context [|RequestId|]: string = "none";|>
+// context CurrentUser: string?;
 // 
 // context function read() {
 //     return /*GOTO DEF*/RequestId;
 // }
 // 
-// type Handler = context (value: string) => string;
-// --- (line: 8) skipped ---
+// context function readCurrentUser() {
+// --- (line: 9) skipped ---
 
 
 
 // === goToDefinition ===
 // === /kvsContextLanguageService.ts ===
 // <|context [|RequestId|]: string = "none";|>
+// context CurrentUser: string?;
 // 
 // context function read() {
-//     return RequestId;
 // --- (line: 5) skipped ---
 
-// --- (line: 16) skipped ---
+// --- (line: 21) skipped ---
 // }
 // 
 // function entry(id: string) {
@@ -32,7 +33,7 @@
 
 // === goToDefinition ===
 // === /kvsContextLanguageService.ts ===
-// --- (line: 6) skipped ---
+// --- (line: 11) skipped ---
 // type Handler = context (value: string) => string;
 // 
 // class Service {
@@ -42,13 +43,13 @@
 // }
 // 
 // context function use(service: Service) {
-// --- (line: 16) skipped ---
+// --- (line: 21) skipped ---
 
 
 
 // === goToDefinition ===
 // === /kvsContextLanguageService.ts ===
-// --- (line: 6) skipped ---
+// --- (line: 11) skipped ---
 // type Handler = context (value: string) => string;
 // 
 // class Service {
@@ -62,4 +63,4 @@
 // }
 // 
 // function entry(id: string) {
-// --- (line: 20) skipped ---
+// --- (line: 25) skipped ---

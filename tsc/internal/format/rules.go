@@ -98,6 +98,24 @@ func getAllRules() []ruleSpec {
 
 	// These rules are higher in priority than user-configurable
 	highPriorityCommonRules := []ruleSpec{
+		// KVS operators use ordinary infix spacing even when their punctuation is
+		// also meaningful as a TypeScript prefix or suffix token.
+		rule("SpaceBeforeKvsQuestionOperator", anyToken, ast.KindQuestionToken, []contextPredicate{isNonJsxSameLineTokenContext, isKvsQuestionPrefixContext}, ruleActionInsertSpace),
+		rule("SpaceAfterKvsQuestionOperator", ast.KindQuestionToken, anyToken, []contextPredicate{isNonJsxSameLineTokenContext, isKvsQuestionSuffixContext}, ruleActionInsertSpace),
+		rule("NoSpaceBeforeKvsOptionalDeclarationSuffix", anyToken, ast.KindQuestionToken, []contextPredicate{isNonJsxSameLineTokenContext, isKvsOptionalDeclarationContext}, ruleActionDeleteSpace),
+		rule("SpaceAfterKvsOptionalDeclarationSuffix", ast.KindQuestionToken, ast.KindEqualsToken, []contextPredicate{isNonJsxSameLineTokenContext, isKvsOptionalDeclarationContext}, ruleActionInsertSpace),
+		rule("SpaceBeforeKvsFailureOperator", anyToken, ast.KindTildeToken, []contextPredicate{isNonJsxSameLineTokenContext, isKvsFailureOperatorContext}, ruleActionInsertSpace),
+		rule("SpaceAfterKvsFailureOperator", ast.KindTildeToken, anyToken, []contextPredicate{isNonJsxSameLineTokenContext, isKvsFailureOperatorContext}, ruleActionInsertSpace),
+		rule("NoSpaceInsideKvsFailurePromotion", ast.KindTildeToken, ast.KindTildeToken, []contextPredicate{isNonJsxSameLineTokenContext, isKvsFailureOperatorContext}, ruleActionDeleteSpace),
+		rule("SpaceBeforeKvsCompactLiteral", anyToken, ast.KindQuestionToken, []contextPredicate{isNonJsxSameLineTokenContext, isBeforeKvsCompactLiteral}, ruleActionInsertSpace),
+		rule("NoSpaceInsideKvsExtantAssignment", ast.KindQuestionToken, ast.KindEqualsToken, []contextPredicate{isNonJsxSameLineTokenContext, isKvsExtantAssignmentContext}, ruleActionDeleteSpace),
+		rule("SpaceAfterKvsExtantAssignment", ast.KindEqualsToken, anyToken, []contextPredicate{isNonJsxSameLineTokenContext, isKvsExtantAssignmentContext}, ruleActionInsertSpace),
+		rule("SpaceBeforeKvsSieveBinding", anyToken, ast.KindTildeToken, []contextPredicate{isNonJsxSameLineTokenContext, isKvsSieveBindingContext}, ruleActionInsertSpace),
+		rule("NoSpaceInsideKvsSieveBinding", ast.KindTildeToken, ast.KindEqualsToken, []contextPredicate{isNonJsxSameLineTokenContext, isKvsSieveBindingContext}, ruleActionDeleteSpace),
+		rule("SpaceAfterKvsSieveBinding", ast.KindEqualsToken, anyToken, []contextPredicate{isNonJsxSameLineTokenContext, isKvsSieveBindingContext}, ruleActionInsertSpace),
+		rule("SpaceBeforeKvsTypedSpreadAssignment", anyToken, ast.KindDotDotDotToken, []contextPredicate{isNonJsxSameLineTokenContext, isKvsTypedSpreadAssignmentContext}, ruleActionInsertSpace),
+		rule("SpaceAfterKvsTypedSpreadAssignment", ast.KindEqualsToken, anyToken, []contextPredicate{isNonJsxSameLineTokenContext, isKvsTypedSpreadAssignmentContext}, ruleActionInsertSpace),
+
 		// Leave comments alone
 		rule("IgnoreBeforeComment", anyToken, comments, anyContext, ruleActionStopProcessingSpaceActions),
 		rule("IgnoreAfterLineComment", ast.KindSingleLineCommentTrivia, anyToken, anyContext, ruleActionStopProcessingSpaceActions),
