@@ -123,10 +123,11 @@ func TestFormatKvsExamples(t *testing.T) {
 			textBytes, err := os.ReadFile(filePath)
 			assert.NilError(t, err)
 			text := string(textBytes)
+			fileName := tspath.NormalizePath(filePath)
 			parse := func(text string) *ast.SourceFile {
 				return parser.ParseSourceFile(ast.SourceFileParseOptions{
-					FileName: filePath,
-					Path:     tspath.Path(filePath),
+					FileName: fileName,
+					Path:     tspath.Path(fileName),
 				}, text, core.ScriptKindTS)
 			}
 
