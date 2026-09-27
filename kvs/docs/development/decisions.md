@@ -2,6 +2,37 @@
 
 This file records accepted project-level decisions. It does not prescribe a feature order.
 
+## Model typed context as identity keys and sparse prototype frames
+
+Status: accepted.
+
+A context-key declaration is a read-only shadowed global. Its runtime identity is a frozen tuple
+`[Symbol("KeyName"), defaultValue]`: the symbol description aids debugging but does not establish
+identity, so imports and aliases preserve the actual key object. An explicit initializer is
+evaluated once in ordinary module order and is the shared global default. Nullable keys may omit the
+initializer and default to `null`; non-nullable keys require one.
+
+Context frames contain only explicit overrides. A root is `Object.create(null)` and a derived frame
+uses `Object.create(currentFrame)`; reads consult the key's symbol slot through the prototype chain
+and fall back to the tuple's default. Frames do not enumerate keys, copy defaults, retain a root
+pointer, or create a fresh default per root.
+
+Context functions and methods use a hidden frame parameter and forward it to context calls. Context
+callable types retain that calling convention and are not assignable to or from plain callable
+types. Plain functions are propagation boundaries, while ordinary closures created inside a context
+region may capture the frame as lexical state. A context statement creates a sparse root when no
+frame is available and otherwise derives from the current frame. A bindingless statement
+deliberately enters context at a plain boundary and is redundant, with a warning, when a frame is
+already available. JavaScript callback and export boundaries use explicit ordinary wrappers; no
+implicit conversion captures or creates a frame.
+
+The key tuple is compiler-owned rather than a source value. Its emitted local binding is hygienic,
+so ordinary same-named values cannot hide its runtime identity. Context binding names use filtered
+key lookup while their initializers retain ordinary lexical lookup. Bindings execute sequentially;
+`?=` skips its write for an absent value, and repeated keys follow ordinary last-write behavior. An
+exported key exposes the generated identity under its authored module name without making the tuple
+available through KVS value expressions.
+
 ## Use explicit pipelines for staged composition
 
 Status: accepted and implemented.

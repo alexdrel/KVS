@@ -724,6 +724,8 @@ func getQuickInfoAndDeclarationAtLocation(c *checker.Checker, symbol *ast.Symbol
 							dpw.WritePunctuation("(")
 							dpw.Write("parameter")
 							dpw.WritePunctuation(") ")
+						case ast.IsKvsContextDeclaration(decl):
+							dpw.WriteKeyword("context ")
 						case ast.IsVarLet(decl):
 							dpw.WriteKeyword("let ")
 						case ast.IsVarConst(decl):

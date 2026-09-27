@@ -3,7 +3,7 @@
 This is a working implementation aid, not a language specification or feature order. The language
 documents remain authoritative for accepted semantics.
 
-Progress: **336 of 396 items complete (84.8%)**; **60 remain open**.
+Progress: **370 of 396 items complete (93.4%)**; **26 remain open**.
 
 - `[x]` means implemented with focused compiler evidence.
 - `[ ]` means unimplemented, incomplete, or not yet deliberately validated.
@@ -58,6 +58,8 @@ Implemented vertical slices:
   including unions across multiple yield sites.
 - Keyed iteration across implicit loops and destructuring `in`, with static array, Map, record, and
   general-iterable categories.
+- Typed context keys, sparse scoped frames, context functions and methods, context callable types,
+  explicit JavaScript adapters, and retained async or lazy state.
 - Native language-service support for implemented KVS syntax, including typed hover, document
   highlights, and safe source navigation through synthetic compiler nodes.
 
@@ -330,7 +332,7 @@ example `.js` files are intentionally ignored.
 - [x] `yield`
 - [x] `yield?`
 - [x] Captured lexical state
-- [ ] Captured context state
+- [x] Captured context state
 - [x] Iterator closing
 - [x] JavaScript `.next(value)` resumption semantics
 - [x] Prohibit outer `return`
@@ -623,48 +625,48 @@ example `.js` files are intentionally ignored.
 
 ### Keys
 
-- [ ] `context Key: T`
-- [ ] Explicit default
-- [ ] Type-derived default
-- [ ] Nullable implicit absence default
-- [ ] Declaration identity rather than textual name
-- [ ] Imports preserve key identity
-- [ ] Read-only bindings
+- [x] `context Key: T`
+- [x] Explicit default
+- [x] Non-nullable key requires an explicit initializer
+- [x] Nullable implicit absence default
+- [x] Declaration identity rather than textual name
+- [x] Imports preserve key identity
+- [x] Read-only bindings
+- [x] Shared global default with sparse frame overrides
 
 ### Context functions
 
-- [ ] `context function`
-- [ ] `context async function`
-- [ ] Context methods
-- [ ] Context callable types
-- [ ] Context -> context call forwards frame
-- [ ] Context -> plain call
-- [ ] Plain -> context call prohibited without frame
-- [ ] Context color does not imply general purity/effects
+- [x] `context function`
+- [x] `context async function`
+- [x] Context methods
+- [x] Context callable types
+- [x] Context -> context call forwards frame
+- [x] Context -> plain call
+- [x] Plain -> context call prohibited without frame
+- [x] Context color does not imply general purity/effects
 
 ### Scoped frames
 
-- [ ] `context ({ ... })`
-- [ ] Override visible keys
-- [ ] Optional property overrides only when extant
-- [ ] Explicit `null` override
-- [ ] Nested inheritance
-- [ ] Left-to-right override evaluation
-- [ ] Require existing frame
+- [x] `context (Key = value, ...) statement`
+- [x] Binding names use filtered context-key lookup
+- [x] `?=` binding writes only when extant
+- [x] Explicit `null` override
+- [x] Nested inheritance
+- [x] Sequential left-to-right binding evaluation and visibility
+- [x] Repeated keys follow last-write behavior
 
 ### Root frame
 
-- [ ] `context! ({ ... })`
-- [ ] Materialize defaults in plain function
-- [ ] Preserve existing frame in context function
-- [ ] Plain function forms context propagation boundary
+- [x] Bindingless `context statement`
+- [x] Establish a sparse root frame in a plain function
+- [x] Derive from an available frame
+- [x] Warn for redundant bindingless context when a frame is available
+- [x] Plain function forms context propagation boundary
 
 ### Closures and JavaScript boundaries
 
-- [ ] Closure captures frame
-- [ ] Async function retains frame
-- [ ] Lazy iterator retains frame
-- [ ] JavaScript callback wrapper
-- [ ] JavaScript export wrapper
-- [ ] Workers do not inherit frame
-- [ ] Processes do not inherit frame
+- [x] Closure captures frame
+- [x] Async function retains frame
+- [x] Lazy iterator retains frame
+- [x] Explicit JavaScript callback adapter
+- [x] Explicit JavaScript export adapter

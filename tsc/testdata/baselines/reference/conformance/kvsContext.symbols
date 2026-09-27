@@ -1,0 +1,210 @@
+//// [tests/cases/conformance/kvs/kvsContext.ts] ////
+
+=== kvsContext.ts ===
+export context RequestId: string = "NO_REQUEST";
+>RequestId : Symbol(RequestId, Decl(kvsContext.ts, 0, 0))
+
+export context CurrentUser: { name: string }?;
+>CurrentUser : Symbol(CurrentUser, Decl(kvsContext.ts, 0, 48))
+>name : Symbol(name, Decl(kvsContext.ts, 1, 29))
+
+const _ctx_RequestId = "authored collision";
+>_ctx_RequestId : Symbol(_ctx_RequestId, Decl(kvsContext.ts, 3, 5))
+
+export context function log(message: string) {
+>log : Symbol(log, Decl(kvsContext.ts, 3, 44))
+>message : Symbol(message, Decl(kvsContext.ts, 5, 28))
+
+    console.log(`[${RequestId}] ${message}`);
+>console.log : Symbol(Console.log, Decl(lib.dom.d.ts, --, --))
+>console : Symbol(console, Decl(lib.dom.d.ts, --, --))
+>log : Symbol(Console.log, Decl(lib.dom.d.ts, --, --))
+>RequestId : Symbol(RequestId, Decl(kvsContext.ts, 0, 0))
+>message : Symbol(message, Decl(kvsContext.ts, 5, 28))
+}
+
+context async function logUser() {
+>logUser : Symbol(logUser, Decl(kvsContext.ts, 7, 1))
+
+    log(CurrentUser?.name ?? "anonymous");
+>log : Symbol(log, Decl(kvsContext.ts, 3, 44))
+>CurrentUser?.name : Symbol(name, Decl(kvsContext.ts, 1, 29))
+>CurrentUser : Symbol(CurrentUser, Decl(kvsContext.ts, 0, 48))
+>name : Symbol(name, Decl(kvsContext.ts, 1, 29))
+}
+
+context function delayedLog(messages: string[]) {
+>delayedLog : Symbol(delayedLog, Decl(kvsContext.ts, 11, 1))
+>messages : Symbol(messages, Decl(kvsContext.ts, 13, 28))
+
+    return collect* (messages) {
+>messages : Symbol(messages, Decl(kvsContext.ts, 13, 28))
+
+        yield `[${RequestId}] ${_}`;
+>RequestId : Symbol(RequestId, Decl(kvsContext.ts, 0, 0))
+>_ : Symbol(_, Decl(kvsContext.ts, 15, 32))
+
+    };
+}
+
+type ContextLogger = context (message: string) => void;
+>ContextLogger : Symbol(ContextLogger, Decl(kvsContext.ts, 17, 1))
+>message : Symbol(message, Decl(kvsContext.ts, 19, 30))
+
+class Logger {
+>Logger : Symbol(Logger, Decl(kvsContext.ts, 19, 55))
+
+    context write(message: string) {
+>write : Symbol(Logger.write, Decl(kvsContext.ts, 21, 14))
+>message : Symbol(message, Decl(kvsContext.ts, 22, 18))
+
+        log(message);
+>log : Symbol(log, Decl(kvsContext.ts, 3, 44))
+>message : Symbol(message, Decl(kvsContext.ts, 22, 18))
+
+        return RequestId;
+>RequestId : Symbol(RequestId, Decl(kvsContext.ts, 0, 0))
+    }
+}
+
+context function useCallableAndMethod(logger: Logger, messages: string[]) {
+>useCallableAndMethod : Symbol(useCallableAndMethod, Decl(kvsContext.ts, 26, 1))
+>logger : Symbol(logger, Decl(kvsContext.ts, 28, 38))
+>Logger : Symbol(Logger, Decl(kvsContext.ts, 19, 55))
+>messages : Symbol(messages, Decl(kvsContext.ts, 28, 53))
+
+    const write: ContextLogger = log;
+>write : Symbol(write, Decl(kvsContext.ts, 29, 9))
+>ContextLogger : Symbol(ContextLogger, Decl(kvsContext.ts, 17, 1))
+>log : Symbol(log, Decl(kvsContext.ts, 3, 44))
+
+    write("callable");
+>write : Symbol(write, Decl(kvsContext.ts, 29, 9))
+
+    const methodResult: string = logger.write("method");
+>methodResult : Symbol(methodResult, Decl(kvsContext.ts, 31, 9))
+>logger.write : Symbol(Logger.write, Decl(kvsContext.ts, 21, 14))
+>logger : Symbol(logger, Decl(kvsContext.ts, 28, 38))
+>write : Symbol(Logger.write, Decl(kvsContext.ts, 21, 14))
+
+    return { messages, methodResult };
+>messages : Symbol(messages, Decl(kvsContext.ts, 32, 12))
+>methodResult : Symbol(methodResult, Decl(kvsContext.ts, 32, 22))
+}
+
+function handleRequest(id: string, user: { name: string } | null) {
+>handleRequest : Symbol(handleRequest, Decl(kvsContext.ts, 33, 1))
+>id : Symbol(id, Decl(kvsContext.ts, 35, 23))
+>user : Symbol(user, Decl(kvsContext.ts, 35, 34))
+>name : Symbol(name, Decl(kvsContext.ts, 35, 42))
+
+    context (
+        RequestId = id,
+>RequestId : Symbol(RequestId, Decl(kvsContext.ts, 0, 0))
+
+        CurrentUser = user,
+>CurrentUser : Symbol(CurrentUser, Decl(kvsContext.ts, 0, 48))
+
+    ) {
+        log("start");
+>log : Symbol(log, Decl(kvsContext.ts, 3, 44))
+
+        void logUser();
+>logUser : Symbol(logUser, Decl(kvsContext.ts, 7, 1))
+
+        context (RequestId = `${id}:nested`) {
+>RequestId : Symbol(RequestId, Decl(kvsContext.ts, 0, 0))
+>id : Symbol(id, Decl(kvsContext.ts, 35, 23))
+
+            log("nested");
+>log : Symbol(log, Decl(kvsContext.ts, 3, 44))
+
+            const delayed = delayedLog(["later"]);
+>delayed : Symbol(delayed, Decl(kvsContext.ts, 45, 17))
+>delayedLog : Symbol(delayedLog, Decl(kvsContext.ts, 11, 1))
+
+            const expected: Generator<string, void, unknown> = delayed;
+>expected : Symbol(expected, Decl(kvsContext.ts, 46, 17))
+>Generator : Symbol(Generator, Decl(lib.es2015.generator.d.ts, --, --))
+>delayed : Symbol(delayed, Decl(kvsContext.ts, 45, 17))
+        }
+    }
+}
+
+export function runWithRequest(id: string): string {
+>runWithRequest : Symbol(runWithRequest, Decl(kvsContext.ts, 49, 1))
+>id : Symbol(id, Decl(kvsContext.ts, 51, 31))
+
+    context (RequestId = id) {
+>RequestId : Symbol(RequestId, Decl(kvsContext.ts, 0, 0))
+
+        log("export wrapper");
+>log : Symbol(log, Decl(kvsContext.ts, 3, 44))
+
+        return RequestId;
+>RequestId : Symbol(RequestId, Decl(kvsContext.ts, 0, 0))
+    }
+}
+
+function handleBindings(RequestId: string, CurrentUser: { name: string } | null, candidate: { name: string } | null) {
+>handleBindings : Symbol(handleBindings, Decl(kvsContext.ts, 56, 1))
+>RequestId : Symbol(RequestId, Decl(kvsContext.ts, 58, 24))
+>CurrentUser : Symbol(CurrentUser, Decl(kvsContext.ts, 58, 42))
+>name : Symbol(name, Decl(kvsContext.ts, 58, 57))
+>candidate : Symbol(candidate, Decl(kvsContext.ts, 58, 80))
+>name : Symbol(name, Decl(kvsContext.ts, 58, 93))
+
+    context (RequestId = RequestId, CurrentUser ?= candidate) {
+>RequestId : Symbol(RequestId, Decl(kvsContext.ts, 0, 0))
+>CurrentUser : Symbol(CurrentUser, Decl(kvsContext.ts, 0, 48))
+
+        log("bindings");
+>log : Symbol(log, Decl(kvsContext.ts, 3, 44))
+
+        context (CurrentUser ?= CurrentUser, RequestId = `${RequestId}:next`) {
+>CurrentUser : Symbol(CurrentUser, Decl(kvsContext.ts, 0, 48))
+>RequestId : Symbol(RequestId, Decl(kvsContext.ts, 0, 0))
+>RequestId : Symbol(RequestId, Decl(kvsContext.ts, 58, 24))
+
+            log("sequential bindings");
+>log : Symbol(log, Decl(kvsContext.ts, 3, 44))
+        }
+    }
+}
+
+function defaultsOnly() {
+>defaultsOnly : Symbol(defaultsOnly, Decl(kvsContext.ts, 66, 1))
+
+    context log("defaults");
+>log : Symbol(log, Decl(kvsContext.ts, 3, 44))
+}
+
+function inferredFromContextStatement() {
+>inferredFromContextStatement : Symbol(inferredFromContextStatement, Decl(kvsContext.ts, 70, 1))
+
+    context (RequestId = "inferred") {
+>RequestId : Symbol(RequestId, Decl(kvsContext.ts, 0, 0))
+
+        return RequestId;
+>RequestId : Symbol(RequestId, Decl(kvsContext.ts, 0, 0))
+    }
+}
+
+const inferredRequestId: string = inferredFromContextStatement();
+>inferredRequestId : Symbol(inferredRequestId, Decl(kvsContext.ts, 78, 5))
+>inferredFromContextStatement : Symbol(inferredFromContextStatement, Decl(kvsContext.ts, 70, 1))
+
+context function sequential(id: string) {
+>sequential : Symbol(sequential, Decl(kvsContext.ts, 78, 65))
+>id : Symbol(id, Decl(kvsContext.ts, 80, 28))
+
+    context (RequestId = id, RequestId = `${RequestId}:next`) {
+>RequestId : Symbol(RequestId, Decl(kvsContext.ts, 0, 0))
+>RequestId : Symbol(RequestId, Decl(kvsContext.ts, 0, 0))
+>RequestId : Symbol(RequestId, Decl(kvsContext.ts, 0, 0))
+
+        log("sequential");
+>log : Symbol(log, Decl(kvsContext.ts, 3, 44))
+    }
+}
+

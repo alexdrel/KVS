@@ -180,6 +180,43 @@ func (r *EmitResolver) IsKvsPlaceholderBoundary(node *ast.Node) bool {
 	return r.checker.nodeLinks.Get(node).flags&NodeCheckFlagsKvsPlaceholderBoundary != 0
 }
 
+func (r *EmitResolver) IsKvsContextKeyReference(node *ast.Node) bool {
+	r.checkerMu.Lock()
+	defer r.checkerMu.Unlock()
+	if !ast.IsIdentifier(node) || !ast.IsInExpressionContext(node) {
+		return false
+	}
+	if ast.IsDeclarationNameOrImportPropertyName(node) {
+		return false
+	}
+	return r.checker.kvsContextKeyDeclaration(r.checker.getResolvedSymbol(node)) != nil
+}
+
+func (r *EmitResolver) GetLocalKvsContextKeyDeclaration(node *ast.Node) *ast.Node {
+	r.checkerMu.Lock()
+	defer r.checkerMu.Unlock()
+	symbol := r.checker.resolveKvsContextKey(node)
+	if symbol == nil || symbol.Flags&ast.SymbolFlagsAlias != 0 {
+		return nil
+	}
+	return r.checker.kvsContextKeyDeclaration(symbol)
+}
+
+func (r *EmitResolver) IsKvsContextCall(node *ast.Node) bool {
+	r.checkerMu.Lock()
+	defer r.checkerMu.Unlock()
+	if !ast.IsCallExpression(node) {
+		return false
+	}
+	if r.checker.nodeLinks.Get(node).flags&NodeCheckFlagsKvsContextCall != 0 {
+		return true
+	}
+	// Imported and otherwise lazily checked direct calls may not have been marked during semantic
+	// checking. Resolving a direct identifier remains stable during transformation; property calls
+	// rely on the recorded flag because an earlier transformed member can reparent their name node.
+	return ast.IsIdentifier(node.Expression()) && r.checker.getResolvedSignature(node, nil, CheckModeNormal).flags&SignatureFlagsKvsContext != 0
+}
+
 func (r *EmitResolver) IsKvsPipelineBareStage(node *ast.Node) bool {
 	r.checkerMu.Lock()
 	defer r.checkerMu.Unlock()

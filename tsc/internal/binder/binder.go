@@ -654,6 +654,8 @@ func (b *Binder) bind(node *ast.Node) bool {
 		b.bindParameter(node)
 	case ast.KindVariableDeclaration:
 		b.bindVariableDeclarationOrBindingElement(node)
+	case ast.KindKvsContextDeclaration:
+		b.bindBlockScopedDeclaration(node, ast.SymbolFlagsBlockScopedVariable, ast.SymbolFlagsBlockScopedVariableExcludes)
 	case ast.KindBindingElement:
 		node.AsBindingElement().FlowNode = b.currentFlow
 		b.bindVariableDeclarationOrBindingElement(node)

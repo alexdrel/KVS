@@ -1492,6 +1492,9 @@ func (c *Checker) compareSignaturesRelated(source *Signature, target *Signature,
 	if source == target {
 		return TernaryTrue
 	}
+	if source.flags&SignatureFlagsKvsContext != target.flags&SignatureFlagsKvsContext {
+		return TernaryFalse
+	}
 	if !(checkMode&SignatureCheckModeStrictTopSignature != 0 && c.isTopSignature(source)) && c.isTopSignature(target) {
 		return TernaryTrue
 	}

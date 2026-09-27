@@ -1,0 +1,39 @@
+//// [tests/cases/conformance/kvs/kvsContextImports.ts] ////
+
+=== keys.ts ===
+export context RequestId: string = "none";
+>RequestId : string
+
+export context function readRequestId() {
+>readRequestId : context () => string
+
+    return RequestId;
+>RequestId : string
+}
+
+=== main.ts ===
+import { RequestId as ImportedRequestId, readRequestId } from "./keys";
+>RequestId : string
+>ImportedRequestId : string
+>readRequestId : context () => string
+
+function run(id: string) {
+>run : (id: string) => boolean
+>id : string
+
+    context (ImportedRequestId = id) {
+>ImportedRequestId : error
+>id : error
+
+        const current: string = ImportedRequestId;
+>current : string
+>ImportedRequestId : string
+
+        return current === readRequestId();
+>current === readRequestId() : boolean
+>current : string
+>readRequestId() : string
+>readRequestId : context () => string
+    }
+}
+

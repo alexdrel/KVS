@@ -1,0 +1,65 @@
+// === goToDefinition ===
+// === /kvsContextLanguageService.ts ===
+// <|context [|RequestId|]: string = "none";|>
+// 
+// context function read() {
+//     return /*GOTO DEF*/RequestId;
+// }
+// 
+// type Handler = context (value: string) => string;
+// --- (line: 8) skipped ---
+
+
+
+// === goToDefinition ===
+// === /kvsContextLanguageService.ts ===
+// <|context [|RequestId|]: string = "none";|>
+// 
+// context function read() {
+//     return RequestId;
+// --- (line: 5) skipped ---
+
+// --- (line: 16) skipped ---
+// }
+// 
+// function entry(id: string) {
+//     context (/*GOTO DEF*/RequestId = id) {
+//         read();
+//     }
+// }
+
+
+
+// === goToDefinition ===
+// === /kvsContextLanguageService.ts ===
+// --- (line: 6) skipped ---
+// type Handler = context (value: string) => string;
+// 
+// class Service {
+//     <|context /*GOTO DEF*/[|run|](value: string) {
+//         return RequestId + value;
+//     }|>
+// }
+// 
+// context function use(service: Service) {
+// --- (line: 16) skipped ---
+
+
+
+// === goToDefinition ===
+// === /kvsContextLanguageService.ts ===
+// --- (line: 6) skipped ---
+// type Handler = context (value: string) => string;
+// 
+// class Service {
+//     <|context [|run|](value: string) {
+//         return RequestId + value;
+//     }|>
+// }
+// 
+// context function use(service: Service) {
+//     return service./*GOTO DEF*/run("x");
+// }
+// 
+// function entry(id: string) {
+// --- (line: 20) skipped ---

@@ -737,6 +737,7 @@ func getExistingNodeTreeVisitor(b *NodeBuilderImpl, bound *recoveryBoundary) *as
 					node.AsFunctionTypeNode().TypeParameters,
 					node.AsFunctionTypeNode().Parameters,
 					newType,
+					node.Modifiers(),
 				)
 			case ast.KindConstructorType:
 				return factory.UpdateConstructorTypeNode(

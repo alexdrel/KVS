@@ -669,3 +669,30 @@ Run them with:
 ```sh
 go -C ./tsc test -run='TestLocal/kvsSwitch' ./internal/testrunner
 ```
+
+## Typed-context slice
+
+`kvsContext.ts` checks explicit and implicit defaults, synchronous and asynchronous context
+functions, hidden frame forwarding, root and derived blocks, typed overrides, nested shadowing, and
+ordinary return-type inference through context statements. It also covers context methods and
+callable types, their distinct assignability and calling convention, explicit export wrapping,
+filtered key lookup, sequential `=` and `?=` bindings, bindingless root entry, and hygienic runtime
+key names. The runnable context example creates a lazy collector in a nested binding, returns it
+past both context blocks, and consumes it afterward to verify that the inherited frame is retained.
+`kvsContextImports.ts` verifies that imported aliases retain key identity and that both key reads
+and context calls survive CommonJS substitution. `kvsContextErrors.ts` covers missing non-nullable
+defaults, reads and calls without a frame, unknown or ill-typed bindings, read-only keys, redundant
+bindingless context, invalid context modifiers, plain/context callable mismatches, and method calls
+without a frame.
+
+`TestKvsContextLanguageService` checks key and callable-type hover plus navigation from reads,
+binding names, and context method calls. The runnable `context.ts` example shows a request frame,
+context-to-context forwarding, and a nested audit binding with tracked output.
+
+Run the focused cases with:
+
+```sh
+go -C ./tsc test -run='TestLocal/kvsContext' ./internal/testrunner
+go -C ./tsc test -run='TestKvsContextLanguageService' ./internal/fourslash/tests
+npx hereby test:smoke
+```

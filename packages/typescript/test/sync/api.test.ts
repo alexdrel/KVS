@@ -6873,6 +6873,32 @@ describe("AST roundtrips", { concurrency }, () => {
         assert.equal(api.printer.printFile(sourceFile), sourceFile.text);
     });
 
+    test("KVS context roundtrip", () => {
+        using api = spawnAPI({
+            "/tsconfig.json": "{}",
+            "/src/index.ts": `context RequestId: string = "default";\ncontext (RequestId = "R1", RequestId ?= candidate) {\n    run();\n}\ncontext (\n    RequestId = "R2",\n) {\n    run();\n}\n`,
+        });
+
+        const snapshot = api.createSnapshot({ openProject: "/tsconfig.json" });
+        const project = snapshot.getConfiguredProject("/tsconfig.json")!;
+        const sourceFile = project.program.getSourceFile("/src/index.ts");
+        assert(sourceFile);
+        const declaration = sourceFile.statements[0] as import("@typescript/typescript/unstable/ast").KvsContextDeclaration;
+        assert.equal(declaration.kind, SyntaxKind.KvsContextDeclaration);
+        assert.equal(declaration.name.kind, SyntaxKind.Identifier);
+        assert.equal(declaration.initializer?.kind, SyntaxKind.StringLiteral);
+        const statement = sourceFile.statements[1] as import("@typescript/typescript/unstable/ast").KvsContextStatement;
+        assert.equal(statement.kind, SyntaxKind.KvsContextStatement);
+        assert.equal(statement.bindings.length, 2);
+        assert.equal(statement.bindings[0].questionToken, undefined);
+        assert.equal(statement.bindings[1].questionToken?.kind, SyntaxKind.QuestionToken);
+        assert.equal(statement.statement.kind, SyntaxKind.Block);
+        const multilineStatement = sourceFile.statements[2] as import("@typescript/typescript/unstable/ast").KvsContextStatement;
+        assert.equal(multilineStatement.kind, SyntaxKind.KvsContextStatement);
+        assert.equal(multilineStatement.bindings.length, 1);
+        assert.equal(api.printer.printFile(sourceFile), sourceFile.text);
+    });
+
     test("VariableDeclarationList const flag clone", () => {
         using api = spawnAPI({
             "/tsconfig.json": "{}",

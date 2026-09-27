@@ -6,11 +6,12 @@ export enum SignatureFlags {
     HasLiteralTypes = 1 << 1,
     Construct = 1 << 2,
     Abstract = 1 << 3,
+    KvsContext = 1 << 9,
     IsInnerCallChain = 1 << 4,
     IsOuterCallChain = 1 << 5,
     IsUntypedSignatureInJSFile = 1 << 6,
     IsNonInferrable = 1 << 7,
     IsSignatureCandidateForOverloadFailure = 1 << 8,
-    PropagatingFlags = HasRestParameter | HasLiteralTypes | Construct | Abstract | IsUntypedSignatureInJSFile | IsSignatureCandidateForOverloadFailure,
+    PropagatingFlags = HasRestParameter | HasLiteralTypes | Construct | Abstract | KvsContext | IsUntypedSignatureInJSFile | IsSignatureCandidateForOverloadFailure,
     CallChainFlags = IsInnerCallChain | IsOuterCallChain,
 }

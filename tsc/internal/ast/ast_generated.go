@@ -48,6 +48,9 @@ type NodeFactory struct {
 	kvsCollectExpressionArena                core.Arena[KvsCollectExpression]
 	kvsComparisonAlternativesExpressionArena core.Arena[KvsComparisonAlternativesExpression]
 	kvsComparisonChainExpressionArena        core.Arena[KvsComparisonChainExpression]
+	kvsContextBindingArena                   core.Arena[KvsContextBinding]
+	kvsContextDeclarationArena               core.Arena[KvsContextDeclaration]
+	kvsContextStatementArena                 core.Arena[KvsContextStatement]
 	kvsDefaultExpressionArena                core.Arena[KvsDefaultExpression]
 	kvsExtantAssertionExpressionArena        core.Arena[KvsExtantAssertionExpression]
 	kvsExtantAssignmentExpressionArena       core.Arena[KvsExtantAssignmentExpression]
@@ -307,6 +310,9 @@ type (
 	KvsYieldStatementNode                   = Node
 	KvsExtantYieldStatementNode             = Node
 	KvsIfBindingStatementNode               = Node
+	KvsContextDeclarationNode               = Node
+	KvsContextStatementNode                 = Node
+	KvsContextBindingNode                   = Node
 	KvsIfBindingClauseNode                  = Node
 	KvsNullableAssertionExpressionNode      = Node
 	KvsExtantAssertionExpressionNode        = Node
@@ -530,6 +536,7 @@ type (
 	AccessorKeyword                         = Node
 	AsyncKeyword                            = Node
 	ConstKeyword                            = Node
+	ContextKeyword                          = Node
 	DeclareKeyword                          = Node
 	DefaultKeyword                          = Node
 	ExportKeyword                           = Node
@@ -677,7 +684,7 @@ func (node *Token) Clone(f NodeFactoryCoercible) *Node {
 
 func IsToken(node *Node) bool {
 	switch node.Kind {
-	case KindUnknown, KindEndOfFile, KindSingleLineCommentTrivia, KindMultiLineCommentTrivia, KindNewLineTrivia, KindWhitespaceTrivia, KindConflictMarkerTrivia, KindNonTextFileMarkerTrivia, KindNumericLiteral, KindBigIntLiteral, KindStringLiteral, KindJsxText, KindJsxTextAllWhiteSpaces, KindRegularExpressionLiteral, KindNoSubstitutionTemplateLiteral, KindTemplateHead, KindTemplateMiddle, KindTemplateTail, KindOpenBraceToken, KindCloseBraceToken, KindOpenParenToken, KindCloseParenToken, KindOpenBracketToken, KindCloseBracketToken, KindDotToken, KindDotDotToken, KindDotDotEqualsToken, KindDotDotDotToken, KindSemicolonToken, KindCommaToken, KindQuestionDotToken, KindLessThanToken, KindLessThanSlashToken, KindGreaterThanToken, KindLessThanEqualsToken, KindGreaterThanEqualsToken, KindEqualsEqualsToken, KindExclamationEqualsToken, KindEqualsEqualsEqualsToken, KindExclamationEqualsEqualsToken, KindEqualsGreaterThanToken, KindPlusToken, KindMinusToken, KindAsteriskToken, KindAsteriskAsteriskToken, KindSlashToken, KindPercentToken, KindPlusPlusToken, KindMinusMinusToken, KindLessThanLessThanToken, KindGreaterThanGreaterThanToken, KindGreaterThanGreaterThanGreaterThanToken, KindAmpersandToken, KindBarToken, KindBarGreaterThanToken, KindBarQuestionGreaterThanToken, KindBarPercentGreaterThanToken, KindCaretToken, KindExclamationToken, KindTildeToken, KindAmpersandAmpersandToken, KindBarBarToken, KindQuestionToken, KindColonToken, KindAtToken, KindQuestionQuestionToken, KindBacktickToken, KindHashToken, KindEqualsToken, KindPlusEqualsToken, KindMinusEqualsToken, KindAsteriskEqualsToken, KindAsteriskAsteriskEqualsToken, KindSlashEqualsToken, KindPercentEqualsToken, KindLessThanLessThanEqualsToken, KindGreaterThanGreaterThanEqualsToken, KindGreaterThanGreaterThanGreaterThanEqualsToken, KindAmpersandEqualsToken, KindBarEqualsToken, KindBarBarEqualsToken, KindAmpersandAmpersandEqualsToken, KindQuestionQuestionEqualsToken, KindCaretEqualsToken, KindIdentifier, KindPrivateIdentifier, KindJSDocCommentTextToken, KindBreakKeyword, KindCaseKeyword, KindCatchKeyword, KindClassKeyword, KindConstKeyword, KindContinueKeyword, KindDebuggerKeyword, KindDefaultKeyword, KindDeleteKeyword, KindDoKeyword, KindElseKeyword, KindEnumKeyword, KindExportKeyword, KindExtendsKeyword, KindFalseKeyword, KindFinallyKeyword, KindForKeyword, KindFunctionKeyword, KindIfKeyword, KindImportKeyword, KindInKeyword, KindInstanceOfKeyword, KindNewKeyword, KindNullKeyword, KindReturnKeyword, KindSuperKeyword, KindSwitchKeyword, KindThisKeyword, KindThrowKeyword, KindTrueKeyword, KindTryKeyword, KindTypeOfKeyword, KindVarKeyword, KindVoidKeyword, KindWhileKeyword, KindWithKeyword, KindImplementsKeyword, KindInterfaceKeyword, KindLetKeyword, KindPackageKeyword, KindPrivateKeyword, KindProtectedKeyword, KindPublicKeyword, KindStaticKeyword, KindYieldKeyword, KindAbstractKeyword, KindAccessorKeyword, KindAsKeyword, KindAssertsKeyword, KindAssertKeyword, KindAnyKeyword, KindAsyncKeyword, KindAwaitKeyword, KindBooleanKeyword, KindConstructorKeyword, KindDeclareKeyword, KindGetKeyword, KindImmediateKeyword, KindInferKeyword, KindIntrinsicKeyword, KindIsKeyword, KindKeyOfKeyword, KindModuleKeyword, KindNamespaceKeyword, KindNeverKeyword, KindOutKeyword, KindReadonlyKeyword, KindRequireKeyword, KindNumberKeyword, KindObjectKeyword, KindSatisfiesKeyword, KindSetKeyword, KindStringKeyword, KindSymbolKeyword, KindTypeKeyword, KindUndefinedKeyword, KindUniqueKeyword, KindUnknownKeyword, KindUsingKeyword, KindFromKeyword, KindGlobalKeyword, KindBigIntKeyword, KindOverrideKeyword, KindOfKeyword, KindDeferKeyword:
+	case KindUnknown, KindEndOfFile, KindSingleLineCommentTrivia, KindMultiLineCommentTrivia, KindNewLineTrivia, KindWhitespaceTrivia, KindConflictMarkerTrivia, KindNonTextFileMarkerTrivia, KindNumericLiteral, KindBigIntLiteral, KindStringLiteral, KindJsxText, KindJsxTextAllWhiteSpaces, KindRegularExpressionLiteral, KindNoSubstitutionTemplateLiteral, KindTemplateHead, KindTemplateMiddle, KindTemplateTail, KindOpenBraceToken, KindCloseBraceToken, KindOpenParenToken, KindCloseParenToken, KindOpenBracketToken, KindCloseBracketToken, KindDotToken, KindDotDotToken, KindDotDotEqualsToken, KindDotDotDotToken, KindSemicolonToken, KindCommaToken, KindQuestionDotToken, KindLessThanToken, KindLessThanSlashToken, KindGreaterThanToken, KindLessThanEqualsToken, KindGreaterThanEqualsToken, KindEqualsEqualsToken, KindExclamationEqualsToken, KindEqualsEqualsEqualsToken, KindExclamationEqualsEqualsToken, KindEqualsGreaterThanToken, KindPlusToken, KindMinusToken, KindAsteriskToken, KindAsteriskAsteriskToken, KindSlashToken, KindPercentToken, KindPlusPlusToken, KindMinusMinusToken, KindLessThanLessThanToken, KindGreaterThanGreaterThanToken, KindGreaterThanGreaterThanGreaterThanToken, KindAmpersandToken, KindBarToken, KindBarGreaterThanToken, KindBarQuestionGreaterThanToken, KindBarPercentGreaterThanToken, KindCaretToken, KindExclamationToken, KindTildeToken, KindAmpersandAmpersandToken, KindBarBarToken, KindQuestionToken, KindColonToken, KindAtToken, KindQuestionQuestionToken, KindBacktickToken, KindHashToken, KindEqualsToken, KindPlusEqualsToken, KindMinusEqualsToken, KindAsteriskEqualsToken, KindAsteriskAsteriskEqualsToken, KindSlashEqualsToken, KindPercentEqualsToken, KindLessThanLessThanEqualsToken, KindGreaterThanGreaterThanEqualsToken, KindGreaterThanGreaterThanGreaterThanEqualsToken, KindAmpersandEqualsToken, KindBarEqualsToken, KindBarBarEqualsToken, KindAmpersandAmpersandEqualsToken, KindQuestionQuestionEqualsToken, KindCaretEqualsToken, KindIdentifier, KindPrivateIdentifier, KindJSDocCommentTextToken, KindBreakKeyword, KindCaseKeyword, KindCatchKeyword, KindClassKeyword, KindConstKeyword, KindContinueKeyword, KindDebuggerKeyword, KindDefaultKeyword, KindDeleteKeyword, KindDoKeyword, KindElseKeyword, KindEnumKeyword, KindExportKeyword, KindExtendsKeyword, KindFalseKeyword, KindFinallyKeyword, KindForKeyword, KindFunctionKeyword, KindIfKeyword, KindImportKeyword, KindInKeyword, KindInstanceOfKeyword, KindNewKeyword, KindNullKeyword, KindReturnKeyword, KindSuperKeyword, KindSwitchKeyword, KindThisKeyword, KindThrowKeyword, KindTrueKeyword, KindTryKeyword, KindTypeOfKeyword, KindVarKeyword, KindVoidKeyword, KindWhileKeyword, KindWithKeyword, KindImplementsKeyword, KindInterfaceKeyword, KindLetKeyword, KindPackageKeyword, KindPrivateKeyword, KindProtectedKeyword, KindPublicKeyword, KindStaticKeyword, KindYieldKeyword, KindAbstractKeyword, KindAccessorKeyword, KindAsKeyword, KindAssertsKeyword, KindAssertKeyword, KindAnyKeyword, KindAsyncKeyword, KindAwaitKeyword, KindBooleanKeyword, KindConstructorKeyword, KindDeclareKeyword, KindGetKeyword, KindImmediateKeyword, KindInferKeyword, KindIntrinsicKeyword, KindIsKeyword, KindKeyOfKeyword, KindModuleKeyword, KindNamespaceKeyword, KindNeverKeyword, KindOutKeyword, KindReadonlyKeyword, KindRequireKeyword, KindNumberKeyword, KindObjectKeyword, KindSatisfiesKeyword, KindSetKeyword, KindStringKeyword, KindSymbolKeyword, KindTypeKeyword, KindUndefinedKeyword, KindUniqueKeyword, KindUnknownKeyword, KindUsingKeyword, KindFromKeyword, KindGlobalKeyword, KindBigIntKeyword, KindOverrideKeyword, KindOfKeyword, KindContextKeyword, KindDeferKeyword:
 		return true
 	}
 	return false
@@ -1759,6 +1766,172 @@ func (node *KvsIfBindingStatement) computeSubtreeFacts() SubtreeFacts {
 
 func IsKvsIfBindingStatement(node *Node) bool {
 	return node.Kind == KindKvsIfBindingStatement
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// KvsContextDeclaration
+// ──────────────────────────────────────────────────────────────────────
+
+type KvsContextDeclaration struct {
+	StatementBase
+	DeclarationBase
+	ExportableBase
+	ModifiersBase
+	CompositeBase
+	name        *IdentifierNode
+	Type        *TypeNode
+	Initializer *Expression // Optional
+}
+
+func (f *NodeFactory) NewKvsContextDeclaration(modifiers *ModifierList, name *IdentifierNode, typeNode *TypeNode, initializer *Expression) *Node {
+	data := f.kvsContextDeclarationArena.New()
+	data.modifiers = modifiers
+	data.name = name
+	data.Type = typeNode
+	data.Initializer = initializer
+	return f.newNode(KindKvsContextDeclaration, data)
+}
+
+func (f *NodeFactory) UpdateKvsContextDeclaration(node *KvsContextDeclaration, modifiers *ModifierList, name *IdentifierNode, typeNode *TypeNode, initializer *Expression) *Node {
+	if modifiers != node.modifiers || name != node.name || typeNode != node.Type || initializer != node.Initializer {
+		return updateNode(f.NewKvsContextDeclaration(modifiers, name, typeNode, initializer), node.AsNode(), f.hooks)
+	}
+	return node.AsNode()
+}
+
+func (node *KvsContextDeclaration) ForEachChild(v Visitor) bool {
+	return visitModifiers(v, node.modifiers) ||
+		visit(v, node.name) ||
+		visit(v, node.Type) ||
+		visit(v, node.Initializer)
+}
+
+func (node *KvsContextDeclaration) VisitEachChild(v *NodeVisitor) *Node {
+	return v.Factory.UpdateKvsContextDeclaration(node, v.visitModifiers(node.modifiers), v.visitNode(node.name), v.visitNode(node.Type), v.visitNode(node.Initializer))
+}
+
+func (node *KvsContextDeclaration) Clone(f NodeFactoryCoercible) *Node {
+	return cloneNode(f.AsNodeFactory().NewKvsContextDeclaration(node.Modifiers(), node.name, node.Type, node.Initializer), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func (node *KvsContextDeclaration) computeSubtreeFacts() SubtreeFacts {
+	return propagateModifierListSubtreeFacts(node.modifiers) |
+		propagateSubtreeFacts(node.name) |
+		propagateSubtreeFacts(node.Type) |
+		propagateSubtreeFacts(node.Initializer)
+}
+
+func (node *KvsContextDeclaration) Name() *DeclarationName {
+	return node.name
+}
+
+func IsKvsContextDeclaration(node *Node) bool {
+	return node.Kind == KindKvsContextDeclaration
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// KvsContextStatement
+// ──────────────────────────────────────────────────────────────────────
+
+type KvsContextStatement struct {
+	StatementBase
+	CompositeBase
+	Bindings  *NodeList
+	Statement *Statement
+}
+
+func (f *NodeFactory) NewKvsContextStatement(bindings *NodeList, statement *Statement) *Node {
+	data := f.kvsContextStatementArena.New()
+	data.Bindings = bindings
+	data.Statement = statement
+	return f.newNode(KindKvsContextStatement, data)
+}
+
+func (f *NodeFactory) UpdateKvsContextStatement(node *KvsContextStatement, bindings *NodeList, statement *Statement) *Node {
+	if bindings != node.Bindings || statement != node.Statement {
+		return updateNode(f.NewKvsContextStatement(bindings, statement), node.AsNode(), f.hooks)
+	}
+	return node.AsNode()
+}
+
+func (node *KvsContextStatement) ForEachChild(v Visitor) bool {
+	return visitNodeList(v, node.Bindings) || visit(v, node.Statement)
+}
+
+func (node *KvsContextStatement) VisitEachChild(v *NodeVisitor) *Node {
+	return v.Factory.UpdateKvsContextStatement(node, v.visitNodes(node.Bindings), v.visitEmbeddedStatement(node.Statement))
+}
+
+func (node *KvsContextStatement) Clone(f NodeFactoryCoercible) *Node {
+	return cloneNode(f.AsNodeFactory().NewKvsContextStatement(node.Bindings, node.Statement), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func (node *KvsContextStatement) computeSubtreeFacts() SubtreeFacts {
+	return propagateNodeListSubtreeFacts(node.Bindings, propagateSubtreeFacts) |
+		propagateSubtreeFacts(node.Statement)
+}
+
+func IsKvsContextStatement(node *Node) bool {
+	return node.Kind == KindKvsContextStatement
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// KvsContextBinding
+// ──────────────────────────────────────────────────────────────────────
+
+type KvsContextBinding struct {
+	NodeBase
+	CompositeBase
+	name          *IdentifierNode
+	QuestionToken *QuestionToken // Optional
+	EqualsToken   *EqualsToken
+	Initializer   *Expression
+}
+
+func (f *NodeFactory) NewKvsContextBinding(name *IdentifierNode, questionToken *QuestionToken, equalsToken *EqualsToken, initializer *Expression) *Node {
+	data := f.kvsContextBindingArena.New()
+	data.name = name
+	data.QuestionToken = questionToken
+	data.EqualsToken = equalsToken
+	data.Initializer = initializer
+	return f.newNode(KindKvsContextBinding, data)
+}
+
+func (f *NodeFactory) UpdateKvsContextBinding(node *KvsContextBinding, name *IdentifierNode, questionToken *QuestionToken, equalsToken *EqualsToken, initializer *Expression) *Node {
+	if name != node.name || questionToken != node.QuestionToken || equalsToken != node.EqualsToken || initializer != node.Initializer {
+		return updateNode(f.NewKvsContextBinding(name, questionToken, equalsToken, initializer), node.AsNode(), f.hooks)
+	}
+	return node.AsNode()
+}
+
+func (node *KvsContextBinding) ForEachChild(v Visitor) bool {
+	return visit(v, node.name) ||
+		visit(v, node.QuestionToken) ||
+		visit(v, node.EqualsToken) ||
+		visit(v, node.Initializer)
+}
+
+func (node *KvsContextBinding) VisitEachChild(v *NodeVisitor) *Node {
+	return v.Factory.UpdateKvsContextBinding(node, v.visitNode(node.name), v.visitNode(node.QuestionToken), v.visitNode(node.EqualsToken), v.visitNode(node.Initializer))
+}
+
+func (node *KvsContextBinding) Clone(f NodeFactoryCoercible) *Node {
+	return cloneNode(f.AsNodeFactory().NewKvsContextBinding(node.name, node.QuestionToken, node.EqualsToken, node.Initializer), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func (node *KvsContextBinding) computeSubtreeFacts() SubtreeFacts {
+	return propagateSubtreeFacts(node.name) |
+		propagateSubtreeFacts(node.QuestionToken) |
+		propagateSubtreeFacts(node.EqualsToken) |
+		propagateSubtreeFacts(node.Initializer)
+}
+
+func (node *KvsContextBinding) Name() *DeclarationName {
+	return node.name
+}
+
+func IsKvsContextBinding(node *Node) bool {
+	return node.Kind == KindKvsContextBinding
 }
 
 // ──────────────────────────────────────────────────────────────────────
@@ -7770,31 +7943,35 @@ type FunctionTypeNode struct {
 	FunctionOrConstructorTypeNodeBase
 }
 
-func (f *NodeFactory) NewFunctionTypeNode(typeParameters *TypeParameterList, parameters *ParameterList, typeNode *TypeNode) *Node {
+func (f *NodeFactory) NewFunctionTypeNode(typeParameters *TypeParameterList, parameters *ParameterList, typeNode *TypeNode, modifiers *ModifierList) *Node {
 	data := f.functionTypeNodeArena.New()
 	data.TypeParameters = typeParameters
 	data.Parameters = parameters
 	data.Type = typeNode
+	data.modifiers = modifiers
 	return f.newNode(KindFunctionType, data)
 }
 
-func (f *NodeFactory) UpdateFunctionTypeNode(node *FunctionTypeNode, typeParameters *TypeParameterList, parameters *ParameterList, typeNode *TypeNode) *Node {
-	if typeParameters != node.TypeParameters || parameters != node.Parameters || typeNode != node.Type {
-		return updateNode(f.NewFunctionTypeNode(typeParameters, parameters, typeNode), node.AsNode(), f.hooks)
+func (f *NodeFactory) UpdateFunctionTypeNode(node *FunctionTypeNode, typeParameters *TypeParameterList, parameters *ParameterList, typeNode *TypeNode, modifiers *ModifierList) *Node {
+	if typeParameters != node.TypeParameters || parameters != node.Parameters || typeNode != node.Type || modifiers != node.modifiers {
+		return updateNode(f.NewFunctionTypeNode(typeParameters, parameters, typeNode, modifiers), node.AsNode(), f.hooks)
 	}
 	return node.AsNode()
 }
 
 func (node *FunctionTypeNode) ForEachChild(v Visitor) bool {
-	return visitNodeList(v, node.TypeParameters) || visitNodeList(v, node.Parameters) || visit(v, node.Type)
+	return visitNodeList(v, node.TypeParameters) ||
+		visitNodeList(v, node.Parameters) ||
+		visit(v, node.Type) ||
+		visitModifiers(v, node.modifiers)
 }
 
 func (node *FunctionTypeNode) VisitEachChild(v *NodeVisitor) *Node {
-	return v.Factory.UpdateFunctionTypeNode(node, v.visitNodes(node.TypeParameters), v.visitNodes(node.Parameters), v.visitNode(node.Type))
+	return v.Factory.UpdateFunctionTypeNode(node, v.visitNodes(node.TypeParameters), v.visitNodes(node.Parameters), v.visitNode(node.Type), v.visitModifiers(node.modifiers))
 }
 
 func (node *FunctionTypeNode) Clone(f NodeFactoryCoercible) *Node {
-	return cloneNode(f.AsNodeFactory().NewFunctionTypeNode(node.TypeParameters, node.Parameters, node.Type), node.AsNode(), f.AsNodeFactory().hooks)
+	return cloneNode(f.AsNodeFactory().NewFunctionTypeNode(node.TypeParameters, node.Parameters, node.Type, node.Modifiers()), node.AsNode(), f.AsNodeFactory().hooks)
 }
 
 func IsFunctionTypeNode(node *Node) bool {
@@ -10480,6 +10657,12 @@ func (n *Node) ForEachChild(v Visitor) bool {
 		return n.data.(*KvsExtantYieldStatement).ForEachChild(v)
 	case KindKvsIfBindingStatement:
 		return n.data.(*KvsIfBindingStatement).ForEachChild(v)
+	case KindKvsContextDeclaration:
+		return n.data.(*KvsContextDeclaration).ForEachChild(v)
+	case KindKvsContextStatement:
+		return n.data.(*KvsContextStatement).ForEachChild(v)
+	case KindKvsContextBinding:
+		return n.data.(*KvsContextBinding).ForEachChild(v)
 	case KindKvsIfBindingClause:
 		return n.data.(*KvsIfBindingClause).ForEachChild(v)
 	case KindKvsNullableAssertionExpression:
@@ -10953,6 +11136,18 @@ func (n *Node) AsKvsExtantYieldStatement() *KvsExtantYieldStatement {
 
 func (n *Node) AsKvsIfBindingStatement() *KvsIfBindingStatement {
 	return n.data.(*KvsIfBindingStatement)
+}
+
+func (n *Node) AsKvsContextDeclaration() *KvsContextDeclaration {
+	return n.data.(*KvsContextDeclaration)
+}
+
+func (n *Node) AsKvsContextStatement() *KvsContextStatement {
+	return n.data.(*KvsContextStatement)
+}
+
+func (n *Node) AsKvsContextBinding() *KvsContextBinding {
+	return n.data.(*KvsContextBinding)
 }
 
 func (n *Node) AsKvsIfBindingClause() *KvsIfBindingClause {
@@ -11789,7 +11984,7 @@ func IsKeywordKind(kind Kind) bool {
 
 func IsModifierKind(kind Kind) bool {
 	switch kind {
-	case KindAbstractKeyword, KindAccessorKeyword, KindAsyncKeyword, KindConstKeyword, KindDeclareKeyword, KindDefaultKeyword, KindExportKeyword, KindInKeyword, KindPrivateKeyword, KindProtectedKeyword, KindPublicKeyword, KindReadonlyKeyword, KindOutKeyword, KindOverrideKeyword, KindStaticKeyword:
+	case KindAbstractKeyword, KindAccessorKeyword, KindAsyncKeyword, KindConstKeyword, KindContextKeyword, KindDeclareKeyword, KindDefaultKeyword, KindExportKeyword, KindInKeyword, KindPrivateKeyword, KindProtectedKeyword, KindPublicKeyword, KindReadonlyKeyword, KindOutKeyword, KindOverrideKeyword, KindStaticKeyword:
 		return true
 	}
 	return false

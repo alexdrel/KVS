@@ -1949,6 +1949,7 @@ func (p *Printer) emitReturnType(node *ast.TypeNode) {
 
 func (p *Printer) emitFunctionType(node *ast.FunctionTypeNode) {
 	state := p.enterNode(node.AsNode())
+	p.emitModifierList(node.AsNode(), node.Modifiers(), false /*allowDecorators*/)
 	indented := p.shouldEmitIndented(node.AsNode())
 	p.increaseIndentIf(indented)
 	p.pushNameGenerationScope(node.AsNode())
@@ -3670,6 +3671,41 @@ func (p *Printer) emitKvsIfBindingStatement(node *ast.KvsIfBindingStatement) {
 	p.exitNode(node.AsNode(), state)
 }
 
+func (p *Printer) emitKvsContextDeclaration(node *ast.KvsContextDeclaration) {
+	state := p.enterNode(node.AsNode())
+	p.emitModifierList(node.AsNode(), node.Modifiers(), false /*allowDecorators*/)
+	p.emitIdentifierName(node.Name().AsIdentifier())
+	p.emitTypeAnnotation(node.Type)
+	p.emitInitializer(node.Initializer, greatestEnd(node.Name().End(), node.Type), node.AsNode())
+	p.writeTrailingSemicolon()
+	p.exitNode(node.AsNode(), state)
+}
+
+func (p *Printer) emitKvsContextStatement(node *ast.KvsContextStatement) {
+	state := p.enterNode(node.AsNode())
+	p.writeKeyword("context")
+	if len(node.Bindings.Nodes) != 0 {
+		p.writeSpace()
+		listParent := *node.AsNode()
+		listParent.Loc = core.NewTextRange(listParent.Pos(), node.Statement.Pos())
+		p.emitList((*Printer).emitKvsContextBindingNode, &listParent, node.Bindings, LFPreserveLines|LFCommaDelimited|LFSpaceBetweenSiblings|LFIndented|LFParenthesis|LFAllowTrailingComma)
+	}
+	p.emitEmbeddedStatement(node.AsNode(), node.Statement)
+	p.exitNode(node.AsNode(), state)
+}
+
+func (p *Printer) emitKvsContextBindingNode(node *ast.Node) {
+	binding := node.AsKvsContextBinding()
+	p.emitIdentifierName(binding.Name().AsIdentifier())
+	p.writeSpace()
+	if binding.QuestionToken != nil {
+		p.writePunctuation("?")
+	}
+	p.writePunctuation("=")
+	p.writeSpace()
+	p.emitExpression(binding.Initializer, ast.OperatorPrecedenceDisallowComma)
+}
+
 func (p *Printer) emitWhileClause(node *ast.Node, expression *ast.Expression, startPos int) {
 	pos := p.emitToken(ast.KindWhileKeyword, startPos, WriteKindKeyword, node)
 	p.writeSpace()
@@ -4685,6 +4721,10 @@ func (p *Printer) emitStatement(node *ast.Statement) {
 		p.emitIfStatement(node.AsIfStatement())
 	case ast.KindKvsIfBindingStatement:
 		p.emitKvsIfBindingStatement(node.AsKvsIfBindingStatement())
+	case ast.KindKvsContextDeclaration:
+		p.emitKvsContextDeclaration(node.AsKvsContextDeclaration())
+	case ast.KindKvsContextStatement:
+		p.emitKvsContextStatement(node.AsKvsContextStatement())
 	case ast.KindDoStatement:
 		p.emitDoStatement(node.AsDoStatement())
 	case ast.KindWhileStatement:

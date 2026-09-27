@@ -28,6 +28,7 @@ type transformer struct {
 	headReplacements map[*ast.Node]*ast.Node
 	placeholderNames []*ast.Node
 	coordinateNames  []*ast.IdentifierNode
+	contextFrame     *ast.IdentifierNode
 }
 
 func NewTransformer(opts *transformers.TransformOptions) *transformers.Transformer {
@@ -43,11 +44,184 @@ func (tx *transformer) declareTemp(temp *ast.IdentifierNode) {
 	}
 }
 
+func (tx *transformer) contextRuntimeCall(object string, method string, arguments ...*ast.Node) *ast.Node {
+	factory := tx.Factory()
+	callee := factory.NewPropertyAccessExpression(factory.NewIdentifier(object), nil, factory.NewIdentifier(method), ast.NodeFlagsNone)
+	return factory.NewCallExpression(callee, nil, nil, factory.NewNodeList(arguments), ast.NodeFlagsNone)
+}
+
+func (tx *transformer) contextKeySlot(key *ast.Node) *ast.Node {
+	return tx.Factory().NewElementAccessExpression(key, nil, tx.Factory().NewNumericLiteral("0", ast.TokenFlagsNone), ast.NodeFlagsNone)
+}
+
+func (tx *transformer) contextKeyRuntimeName(name *ast.Node) *ast.IdentifierNode {
+	return tx.Factory().NewGeneratedNameForNodeEx(name, printer.AutoGenerateOptions{Prefix: "_ctx_"})
+}
+
+func (tx *transformer) contextKeyReference(node *ast.Node) *ast.Node {
+	if declaration := tx.resolver.GetLocalKvsContextKeyDeclaration(node); declaration != nil {
+		return tx.contextKeyRuntimeName(declaration.Name())
+	}
+	reference := tx.Factory().NewIdentifier(node.Text())
+	tx.EmitContext().SetOriginal(reference, node)
+	return reference
+}
+
+func (tx *transformer) transformContextKeyRead(node *ast.Node) *ast.Node {
+	factory := tx.Factory()
+	key := tx.contextKeyReference(node)
+	slot := tx.contextKeySlot(key)
+	hasOverride := factory.NewBinaryExpression(nil, slot, nil, factory.NewToken(ast.KindInKeyword), tx.contextFrame)
+	override := factory.NewElementAccessExpression(tx.contextFrame, nil, tx.contextKeySlot(tx.contextKeyReference(node)), ast.NodeFlagsNone)
+	defaultValue := factory.NewElementAccessExpression(tx.contextKeyReference(node), nil, factory.NewNumericLiteral("1", ast.TokenFlagsNone), ast.NodeFlagsNone)
+	return factory.NewConditionalExpression(hasOverride, factory.NewToken(ast.KindQuestionToken), override, factory.NewToken(ast.KindColonToken), defaultValue)
+}
+
+func (tx *transformer) transformContextCall(node *ast.CallExpression) *ast.Node {
+	arguments := make([]*ast.Node, 0, len(node.Arguments.Nodes)+1)
+	arguments = append(arguments, tx.contextFrame)
+	arguments = append(arguments, tx.Visitor().VisitNodes(node.Arguments).Nodes...)
+	return tx.Factory().UpdateCallExpression(node, tx.Visitor().VisitNode(node.Expression), node.QuestionDotToken, tx.Visitor().VisitNodes(node.TypeArguments), tx.Factory().NewNodeList(arguments), node.Flags)
+}
+
+func (tx *transformer) contextRuntimeModifiers(modifiers *ast.ModifierList) *ast.ModifierList {
+	if modifiers == nil {
+		return nil
+	}
+	result := make([]*ast.Node, 0, len(modifiers.Nodes))
+	for _, modifier := range modifiers.Nodes {
+		if modifier.Kind != ast.KindContextKeyword {
+			result = append(result, modifier)
+		}
+	}
+	if len(result) == 0 {
+		return nil
+	}
+	return tx.Factory().NewModifierList(result)
+}
+
+func (tx *transformer) transformFunctionDeclaration(node *ast.FunctionDeclaration) *ast.Node {
+	contextFunction := node.ModifierFlags()&ast.ModifierFlagsContext != 0
+	previousFrame := tx.contextFrame
+	parameters := tx.EmitContext().VisitParameters(node.Parameters, tx.Visitor())
+	if contextFunction {
+		tx.contextFrame = tx.Factory().NewUniqueName("context")
+		parameter := tx.Factory().NewParameterDeclaration(nil, nil, tx.contextFrame, nil, nil, nil)
+		parameters = tx.Factory().NewNodeList(append([]*ast.Node{parameter}, parameters.Nodes...))
+	}
+	body := tx.EmitContext().VisitFunctionBody(node.Body, tx.Visitor())
+	tx.contextFrame = previousFrame
+	return tx.Factory().UpdateFunctionDeclaration(node, tx.contextRuntimeModifiers(node.Modifiers()), node.AsteriskToken, tx.Visitor().VisitNode(node.Name()), tx.Visitor().VisitNodes(node.TypeParameters), parameters, tx.Visitor().VisitNode(node.Type), tx.Visitor().VisitNode(node.FullSignature), body)
+}
+
+func (tx *transformer) transformMethodDeclaration(node *ast.MethodDeclaration) *ast.Node {
+	contextMethod := node.ModifierFlags()&ast.ModifierFlagsContext != 0
+	previousFrame := tx.contextFrame
+	if !contextMethod {
+		tx.contextFrame = nil
+		result := tx.Visitor().VisitEachChild(node.AsNode())
+		tx.contextFrame = previousFrame
+		return result
+	}
+	parameters := tx.EmitContext().VisitParameters(node.Parameters, tx.Visitor())
+	tx.contextFrame = tx.Factory().NewUniqueName("context")
+	parameter := tx.Factory().NewParameterDeclaration(nil, nil, tx.contextFrame, nil, nil, nil)
+	parameters = tx.Factory().NewNodeList(append([]*ast.Node{parameter}, parameters.Nodes...))
+	body := tx.EmitContext().VisitFunctionBody(node.Body, tx.Visitor())
+	tx.contextFrame = previousFrame
+	return tx.Factory().UpdateMethodDeclaration(node, tx.contextRuntimeModifiers(node.Modifiers()), node.AsteriskToken, tx.Visitor().VisitNode(node.Name()), node.PostfixToken, tx.Visitor().VisitNodes(node.TypeParameters), parameters, tx.Visitor().VisitNode(node.Type), tx.Visitor().VisitNode(node.FullSignature), body)
+}
+
+func (tx *transformer) transformContextDeclaration(node *ast.KvsContextDeclaration) *ast.Node {
+	factory := tx.Factory()
+	defaultValue := tx.Visitor().VisitNode(node.Initializer)
+	if defaultValue == nil {
+		defaultValue = factory.NewKeywordExpression(ast.KindNullKeyword)
+	}
+	symbol := factory.NewCallExpression(factory.NewIdentifier("Symbol"), nil, nil, factory.NewNodeList([]*ast.Node{factory.NewStringLiteral(node.Name().Text(), ast.TokenFlagsNone)}), ast.NodeFlagsNone)
+	tuple := factory.NewArrayLiteralExpression(factory.NewNodeList([]*ast.Node{symbol, defaultValue}), false)
+	frozen := tx.contextRuntimeCall("Object", "freeze", tuple)
+	runtimeName := tx.contextKeyRuntimeName(node.Name())
+	declaration := factory.NewVariableDeclaration(runtimeName, nil, nil, frozen)
+	list := factory.NewVariableDeclarationList(factory.NewNodeList([]*ast.Node{declaration}), ast.NodeFlagsConst)
+	modifiers := tx.contextRuntimeModifiers(node.Modifiers())
+	if modifiers != nil {
+		filtered := make([]*ast.Node, 0, len(modifiers.Nodes))
+		for _, modifier := range modifiers.Nodes {
+			if modifier.Kind != ast.KindExportKeyword {
+				filtered = append(filtered, modifier)
+			}
+		}
+		if len(filtered) == 0 {
+			modifiers = nil
+		} else {
+			modifiers = factory.NewModifierList(filtered)
+		}
+	}
+	statement := factory.NewVariableStatement(modifiers, list)
+	if node.ModifierFlags()&ast.ModifierFlagsExport == 0 {
+		return statement
+	}
+	exportName := factory.NewIdentifier(node.Name().Text())
+	exportValue := tx.contextKeyRuntimeName(node.Name())
+	exportAlias := factory.NewVariableDeclaration(exportName, nil, nil, exportValue)
+	exportList := factory.NewVariableDeclarationList(factory.NewNodeList([]*ast.Node{exportAlias}), ast.NodeFlagsConst)
+	exportModifiers := factory.NewModifierList([]*ast.Node{factory.NewModifier(ast.KindExportKeyword)})
+	return factory.NewSyntaxList([]*ast.Node{statement, factory.NewVariableStatement(exportModifiers, exportList)})
+}
+
+func (tx *transformer) transformContextStatement(node *ast.KvsContextStatement) *ast.Node {
+	factory := tx.Factory()
+	if len(node.Bindings.Nodes) == 0 && tx.contextFrame != nil {
+		return tx.Visitor().VisitNode(node.Statement)
+	}
+	var parent *ast.Node
+	if tx.contextFrame == nil {
+		parent = factory.NewKeywordExpression(ast.KindNullKeyword)
+	} else {
+		parent = tx.contextFrame.AsNode()
+	}
+	frame := factory.NewUniqueName("context")
+	create := tx.contextRuntimeCall("Object", "create", parent)
+	declaration := factory.NewVariableDeclaration(frame, nil, nil, create)
+	statements := []*ast.Node{factory.NewVariableStatement(nil, factory.NewVariableDeclarationList(factory.NewNodeList([]*ast.Node{declaration}), ast.NodeFlagsConst))}
+	previousFrame := tx.contextFrame
+	tx.contextFrame = frame
+	for _, bindingNode := range node.Bindings.Nodes {
+		binding := bindingNode.AsKvsContextBinding()
+		value := tx.Visitor().VisitNode(binding.Initializer)
+		if binding.QuestionToken != nil {
+			temp := factory.NewUniqueName("binding")
+			tempDeclaration := factory.NewVariableDeclaration(temp, nil, nil, value)
+			statements = append(statements, factory.NewVariableStatement(nil, factory.NewVariableDeclarationList(factory.NewNodeList([]*ast.Node{tempDeclaration}), ast.NodeFlagsConst)))
+			value = temp
+		}
+		target := factory.NewElementAccessExpression(frame, nil, tx.contextKeySlot(tx.contextKeyReference(binding.Name())), ast.NodeFlagsNone)
+		assignStatement := factory.NewExpressionStatement(factory.NewAssignmentExpression(target, value))
+		if binding.QuestionToken != nil {
+			present := factory.NewBinaryExpression(nil, value, nil, factory.NewToken(ast.KindExclamationEqualsToken), factory.NewKeywordExpression(ast.KindNullKeyword))
+			statements = append(statements, factory.NewIfStatement(present, assignStatement, nil))
+		} else {
+			statements = append(statements, assignStatement)
+		}
+	}
+	body := tx.Visitor().VisitNode(node.Statement)
+	tx.contextFrame = previousFrame
+	if ast.IsBlock(body) {
+		statements = append(statements, body.AsBlock().Statements.Nodes...)
+	} else {
+		statements = append(statements, body)
+	}
+	return factory.NewBlock(factory.NewNodeList(statements), true)
+}
+
 func (tx *transformer) visit(node *ast.Node) *ast.Node {
 	if replacement := tx.headReplacements[node]; replacement != nil {
 		return replacement
 	}
 	switch node.Kind {
+	case ast.KindContextKeyword:
+		return nil
 	case ast.KindKvsIterationCoordinateExpression:
 		if len(tx.coordinateNames) != 0 {
 			return tx.coordinateNames[len(tx.coordinateNames)-1]
@@ -60,8 +234,19 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 			}
 			return tx.Factory().NewIdentifier("undefined")
 		}
+		if tx.contextFrame != nil && tx.resolver.IsKvsContextKeyReference(node) {
+			return tx.transformContextKeyRead(node)
+		}
 	case ast.KindSourceFile:
 		return tx.Visitor().VisitEachChild(node)
+	case ast.KindFunctionDeclaration:
+		return tx.transformFunctionDeclaration(node.AsFunctionDeclaration())
+	case ast.KindMethodDeclaration:
+		return tx.transformMethodDeclaration(node.AsMethodDeclaration())
+	case ast.KindKvsContextDeclaration:
+		return tx.transformContextDeclaration(node.AsKvsContextDeclaration())
+	case ast.KindKvsContextStatement:
+		return tx.transformContextStatement(node.AsKvsContextStatement())
 	case ast.KindForOfStatement:
 		return tx.transformForOfStatement(node.AsForInOrOfStatement())
 	case ast.KindForInStatement:
@@ -209,6 +394,13 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 			return tx.transformNullableAccess(node)
 		}
 	case ast.KindCallExpression:
+		resolvedNode := node
+		if original := tx.EmitContext().ParseNode(node); original != nil {
+			resolvedNode = original
+		}
+		if tx.contextFrame != nil && tx.resolver.IsKvsContextCall(resolvedNode) {
+			return tx.transformContextCall(node.AsCallExpression())
+		}
 		if ast.IsKvsExtantCall(node) {
 			return tx.transformExtantCall(node.AsCallExpression())
 		}

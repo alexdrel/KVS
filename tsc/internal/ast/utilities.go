@@ -759,6 +759,7 @@ func IsJsxAttributeLike(node *Node) bool {
 func isDeclarationStatementKind(kind Kind) bool {
 	switch kind {
 	case KindFunctionDeclaration,
+		KindKvsContextDeclaration,
 		KindMissingDeclaration,
 		KindClassDeclaration,
 		KindInterfaceDeclaration,
@@ -798,6 +799,7 @@ func isStatementKindButNotDeclarationKind(kind Kind) bool {
 		KindForStatement,
 		KindIfStatement,
 		KindKvsIfBindingStatement,
+		KindKvsContextStatement,
 		KindLabeledStatement,
 		KindReturnStatement,
 		KindKvsExtantReturnStatement,
@@ -848,7 +850,7 @@ func IsFunctionBlock(node *Node) bool {
 }
 
 func IsBlockOrCatchScoped(declaration *Node) bool {
-	return GetCombinedNodeFlags(declaration)&NodeFlagsBlockScoped != 0 || IsCatchClauseVariableDeclarationOrBindingElement(declaration)
+	return declaration.Kind == KindKvsContextDeclaration || GetCombinedNodeFlags(declaration)&NodeFlagsBlockScoped != 0 || IsCatchClauseVariableDeclarationOrBindingElement(declaration)
 }
 
 func IsCatchClauseVariableDeclarationOrBindingElement(declaration *Node) bool {
@@ -1140,6 +1142,8 @@ func ModifierToFlag(token Kind) ModifierFlags {
 		return ModifierFlagsAmbient
 	case KindConstKeyword:
 		return ModifierFlagsConst
+	case KindContextKeyword:
+		return ModifierFlagsContext
 	case KindDefaultKeyword:
 		return ModifierFlagsDefault
 	case KindAsyncKeyword:
@@ -1293,7 +1297,7 @@ func ForEachReturnStatement(body *Node, visitor func(stmt *Node) bool) bool {
 		switch node.Kind {
 		case KindReturnStatement, KindKvsExtantReturnStatement:
 			return visitor(node)
-		case KindCaseBlock, KindBlock, KindIfStatement, KindDoStatement, KindWhileStatement, KindForStatement, KindForInStatement,
+		case KindCaseBlock, KindBlock, KindIfStatement, KindKvsContextStatement, KindDoStatement, KindWhileStatement, KindForStatement, KindForInStatement,
 			KindForOfStatement, KindWithStatement, KindSwitchStatement, KindCaseClause, KindDefaultClause, KindLabeledStatement,
 			KindTryStatement, KindCatchClause:
 			return node.ForEachChild(traverse)
@@ -2477,7 +2481,7 @@ const (
 
 func GetMeaningFromDeclaration(node *Node) SemanticMeaning {
 	switch node.Kind {
-	case KindVariableDeclaration:
+	case KindVariableDeclaration, KindKvsContextDeclaration:
 		return SemanticMeaningValue
 	case KindParameter,
 		KindBindingElement,
@@ -3530,6 +3534,9 @@ func CreateModifiersFromModifierFlags(flags ModifierFlags, createModifier func(k
 	if flags&ModifierFlagsConst != 0 {
 		result = append(result, createModifier(KindConstKeyword))
 	}
+	if flags&ModifierFlagsContext != 0 {
+		result = append(result, createModifier(KindContextKeyword))
+	}
 	if flags&ModifierFlagsPublic != 0 {
 		result = append(result, createModifier(KindPublicKeyword))
 	}
@@ -3823,6 +3830,7 @@ func IsLateVisibilityPaintedStatement(node *Node) bool {
 		KindVariableStatement,
 		KindClassDeclaration,
 		KindFunctionDeclaration,
+		KindKvsContextDeclaration,
 		KindModuleDeclaration,
 		KindTypeAliasDeclaration,
 		KindJSTypeAliasDeclaration,

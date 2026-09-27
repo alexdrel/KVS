@@ -1,0 +1,99 @@
+//// [tests/cases/conformance/kvs/kvsContextErrors.ts] ////
+
+=== kvsContextErrors.ts ===
+context Required: string;
+>Required : Symbol(Required, Decl(lib.es5.d.ts, --, --), Decl(kvsContextErrors.ts, 0, 0))
+
+context Optional: string?;
+>Optional : Symbol(Optional, Decl(kvsContextErrors.ts, 0, 25))
+
+context Count: number = 0;
+>Count : Symbol(Count, Decl(kvsContextErrors.ts, 1, 26))
+
+context function useContext() {
+>useContext : Symbol(useContext, Decl(kvsContextErrors.ts, 2, 26))
+
+    return Required;
+>Required : Symbol(Required, Decl(lib.es5.d.ts, --, --), Decl(kvsContextErrors.ts, 0, 0))
+}
+
+Required;
+>Required : Symbol(Required, Decl(lib.es5.d.ts, --, --), Decl(kvsContextErrors.ts, 0, 0))
+
+useContext();
+>useContext : Symbol(useContext, Decl(kvsContextErrors.ts, 2, 26))
+
+function plain() {
+>plain : Symbol(plain, Decl(kvsContextErrors.ts, 9, 13))
+
+    context (
+        Missing = 1,
+        Count = "wrong",
+>Count : Symbol(Count, Decl(kvsContextErrors.ts, 1, 26))
+
+        Optional ?= null,
+>Optional : Symbol(Optional, Decl(kvsContextErrors.ts, 0, 25))
+
+    ) {
+        Count = 1;
+>Count : Symbol(Count, Decl(kvsContextErrors.ts, 1, 26))
+    }
+}
+
+context function redundant() {
+>redundant : Symbol(redundant, Decl(kvsContextErrors.ts, 19, 1))
+
+    context useContext();
+>useContext : Symbol(useContext, Decl(kvsContextErrors.ts, 2, 26))
+}
+
+type ContextCallable = context (value: string) => string;
+>ContextCallable : Symbol(ContextCallable, Decl(kvsContextErrors.ts, 23, 1))
+>value : Symbol(value, Decl(kvsContextErrors.ts, 25, 32))
+
+type PlainCallable = (value: string) => string;
+>PlainCallable : Symbol(PlainCallable, Decl(kvsContextErrors.ts, 25, 57))
+>value : Symbol(value, Decl(kvsContextErrors.ts, 26, 22))
+
+declare const contextCallable: ContextCallable;
+>contextCallable : Symbol(contextCallable, Decl(kvsContextErrors.ts, 28, 13))
+>ContextCallable : Symbol(ContextCallable, Decl(kvsContextErrors.ts, 23, 1))
+
+declare const plainCallable: PlainCallable;
+>plainCallable : Symbol(plainCallable, Decl(kvsContextErrors.ts, 29, 13))
+>PlainCallable : Symbol(PlainCallable, Decl(kvsContextErrors.ts, 25, 57))
+
+const losesContext: PlainCallable = contextCallable;
+>losesContext : Symbol(losesContext, Decl(kvsContextErrors.ts, 31, 5))
+>PlainCallable : Symbol(PlainCallable, Decl(kvsContextErrors.ts, 25, 57))
+>contextCallable : Symbol(contextCallable, Decl(kvsContextErrors.ts, 28, 13))
+
+const inventsContext: ContextCallable = plainCallable;
+>inventsContext : Symbol(inventsContext, Decl(kvsContextErrors.ts, 32, 5))
+>ContextCallable : Symbol(ContextCallable, Decl(kvsContextErrors.ts, 23, 1))
+>plainCallable : Symbol(plainCallable, Decl(kvsContextErrors.ts, 29, 13))
+
+interface ContextService {
+>ContextService : Symbol(ContextService, Decl(kvsContextErrors.ts, 32, 54))
+
+    context run(value: string): string;
+>run : Symbol(ContextService.run, Decl(kvsContextErrors.ts, 34, 26))
+>value : Symbol(value, Decl(kvsContextErrors.ts, 35, 16))
+}
+
+declare const contextService: ContextService;
+>contextService : Symbol(contextService, Decl(kvsContextErrors.ts, 38, 13))
+>ContextService : Symbol(ContextService, Decl(kvsContextErrors.ts, 32, 54))
+
+contextService.run("outside");
+>contextService.run : Symbol(ContextService.run, Decl(kvsContextErrors.ts, 34, 26))
+>contextService : Symbol(contextService, Decl(kvsContextErrors.ts, 38, 13))
+>run : Symbol(ContextService.run, Decl(kvsContextErrors.ts, 34, 26))
+
+class Invalid {
+>Invalid : Symbol(Invalid, Decl(kvsContextErrors.ts, 39, 30))
+
+    context value = 1;
+>value : Symbol(Invalid.value, Decl(kvsContextErrors.ts, 41, 15))
+}
+

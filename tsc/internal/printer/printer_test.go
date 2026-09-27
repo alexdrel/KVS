@@ -2091,6 +2091,7 @@ func TestParenthesizeUnionType1(t *testing.T) {
 									[]*ast.Node{},
 								),
 								factory.NewTypeReferenceNode(factory.NewIdentifier("b"), nil /*typeArguments*/),
+								nil, /*modifiers*/
 							),
 						},
 					),
@@ -2306,6 +2307,7 @@ func TestParenthesizeConditionalType1(t *testing.T) {
 							[]*ast.Node{},
 						),
 						factory.NewTypeReferenceNode(factory.NewIdentifier("a"), nil /*typeArguments*/),
+						nil, /*modifiers*/
 					),
 					factory.NewTypeReferenceNode(factory.NewIdentifier("b"), nil /*typeArguments*/),
 					factory.NewTypeReferenceNode(factory.NewIdentifier("c"), nil /*typeArguments*/),
@@ -2376,6 +2378,7 @@ func TestParenthesizeConditionalType3(t *testing.T) {
 								nil, /*defaultType*/
 							),
 						),
+						nil, /*modifiers*/
 					),
 					factory.NewTypeReferenceNode(factory.NewIdentifier("d"), nil /*typeArguments*/),
 					factory.NewTypeReferenceNode(factory.NewIdentifier("e"), nil /*typeArguments*/),
@@ -2421,6 +2424,7 @@ func TestParenthesizeConditionalType4(t *testing.T) {
 							},
 						),
 					),
+					nil, /*modifiers*/
 				),
 				factory.NewTypeReferenceNode(factory.NewIdentifier("e"), nil /*typeArguments*/),
 				factory.NewTypeReferenceNode(factory.NewIdentifier("f"), nil /*typeArguments*/),

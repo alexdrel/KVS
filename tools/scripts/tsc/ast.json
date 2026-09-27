@@ -200,6 +200,7 @@
             "BigIntKeyword",
             "OverrideKeyword",
             "OfKeyword",
+            "ContextKeyword",
             {
                 "name": "DeferKeyword",
                 "comment": "LastKeyword and LastToken and LastContextualKeyword"
@@ -360,7 +361,10 @@
             "KvsYieldStatement",
             "KvsExtantYieldStatement",
             "KvsIfBindingStatement",
+            "KvsContextDeclaration",
+            "KvsContextStatement",
             "KvsIfBindingClause",
+            "KvsContextBinding",
             "VariableDeclaration",
             "VariableDeclarationList",
             "FunctionDeclaration",
@@ -583,7 +587,7 @@
             },
             {
                 "name": "LastStatement",
-                "value": "KvsIfBindingStatement"
+                "value": "KvsContextStatement"
             },
             {
                 "name": "FirstNode",
@@ -662,6 +666,7 @@
                 "AccessorKeyword",
                 "AsyncKeyword",
                 "ConstKeyword",
+                "ContextKeyword",
                 "DeclareKeyword",
                 "DefaultKeyword",
                 "ExportKeyword",
@@ -1249,6 +1254,7 @@
                     "AccessorKeyword": "AccessorKeyword",
                     "AsyncKeyword": "AsyncKeyword",
                     "ConstKeyword": "ConstKeyword",
+                    "ContextKeyword": "ContextKeyword",
                     "DeclareKeyword": "DeclareKeyword",
                     "DefaultKeyword": "DefaultKeyword",
                     "ExportKeyword": "ExportKeyword",
@@ -1700,6 +1706,85 @@
                         "name": "ElseStatement",
                         "type": "Statement",
                         "optional": true
+                    }
+                ],
+                "arena": true
+            },
+            "KvsContextDeclaration": {
+                "generateSubtreeFacts": true,
+                "extends": [
+                    "StatementBase",
+                    "DeclarationBase",
+                    "ExportableBase",
+                    "ModifiersBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "modifiers",
+                        "inherited": true
+                    },
+                    {
+                        "name": "name",
+                        "type": "Identifier",
+                        "private": true
+                    },
+                    {
+                        "name": "Type",
+                        "type": "TypeNode"
+                    },
+                    {
+                        "name": "Initializer",
+                        "type": "Expression",
+                        "optional": true
+                    }
+                ],
+                "arena": true
+            },
+            "KvsContextStatement": {
+                "generateSubtreeFacts": true,
+                "extends": [
+                    "StatementBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "Bindings",
+                        "type": "KvsContextBinding",
+                        "list": "NodeList"
+                    },
+                    {
+                        "name": "Statement",
+                        "type": "Statement",
+                        "visit": "embeddedStatement"
+                    }
+                ],
+                "arena": true
+            },
+            "KvsContextBinding": {
+                "generateSubtreeFacts": true,
+                "extends": [
+                    "NodeBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "name",
+                        "type": "Identifier",
+                        "private": true
+                    },
+                    {
+                        "name": "QuestionToken",
+                        "type": "QuestionToken",
+                        "optional": true
+                    },
+                    {
+                        "name": "EqualsToken",
+                        "type": "EqualsToken"
+                    },
+                    {
+                        "name": "Initializer",
+                        "type": "Expression"
                     }
                 ],
                 "arena": true
@@ -4704,6 +4789,10 @@
                     },
                     {
                         "name": "Type",
+                        "inherited": true
+                    },
+                    {
+                        "name": "modifiers",
                         "inherited": true
                     }
                 ],

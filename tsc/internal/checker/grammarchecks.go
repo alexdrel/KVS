@@ -284,7 +284,10 @@ func (c *Checker) checkGrammarModifiers(node *ast.Node /*Union[HasModifiers, Has
 				firstDecorator = modifier
 			}
 		} else {
-			if modifier.Kind != ast.KindReadonlyKeyword {
+			if modifier.Kind == ast.KindContextKeyword && node.Kind != ast.KindFunctionDeclaration && node.Kind != ast.KindMethodDeclaration && node.Kind != ast.KindMethodSignature && node.Kind != ast.KindFunctionType && node.Kind != ast.KindKvsContextDeclaration {
+				return c.grammarErrorOnNode(modifier, diagnostics.Modifiers_cannot_appear_here)
+			}
+			if modifier.Kind != ast.KindReadonlyKeyword && modifier.Kind != ast.KindContextKeyword {
 				if node.Kind == ast.KindPropertySignature || node.Kind == ast.KindMethodSignature {
 					return c.grammarErrorOnNode(modifier, diagnostics.X_0_modifier_cannot_appear_on_a_type_member, scanner.TokenToString(modifier.Kind))
 				}
@@ -602,6 +605,7 @@ func (c *Checker) findFirstIllegalModifier(node *ast.Node) *ast.Node {
 		ast.KindExportAssignment,
 		ast.KindFunctionExpression,
 		ast.KindArrowFunction,
+		ast.KindFunctionType,
 		ast.KindParameter,
 		ast.KindTypeParameter,
 		ast.KindJSTypeAliasDeclaration:

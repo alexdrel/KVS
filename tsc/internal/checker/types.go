@@ -374,6 +374,7 @@ const (
 	NodeCheckFlagsKvsPlaceholderBoundary                   NodeCheckFlags = 1 << 28
 	NodeCheckFlagsKvsNullableAccess                        NodeCheckFlags = 1 << 29
 	NodeCheckFlagsKvsDefaultWritesBack                     NodeCheckFlags = 1 << 30
+	NodeCheckFlagsKvsContextCall                           NodeCheckFlags = 1 << 31
 )
 
 // Common links
@@ -1331,6 +1332,7 @@ const (
 	SignatureFlagsHasLiteralTypes  SignatureFlags = 1 << 1 // Indicates signature is specialized
 	SignatureFlagsConstruct        SignatureFlags = 1 << 2 // Indicates signature is a construct signature
 	SignatureFlagsAbstract         SignatureFlags = 1 << 3 // Indicates signature comes from an abstract class, abstract construct signature, or abstract constructor type
+	SignatureFlagsKvsContext       SignatureFlags = 1 << 9
 	// Non-propagating flags
 	SignatureFlagsIsInnerCallChain                       SignatureFlags = 1 << 4 // Indicates signature comes from a CallChain nested in an outer OptionalChain
 	SignatureFlagsIsOuterCallChain                       SignatureFlags = 1 << 5 // Indicates signature comes from a CallChain that is the outermost chain of an optional expression
@@ -1340,7 +1342,7 @@ const (
 	// We do not propagate `IsInnerCallChain` or `IsOuterCallChain` to instantiated signatures, as that would result in us
 	// attempting to add `| undefined` on each recursive call to `getReturnTypeOfSignature` when
 	// instantiating the return type.
-	SignatureFlagsPropagatingFlags = SignatureFlagsHasRestParameter | SignatureFlagsHasLiteralTypes | SignatureFlagsConstruct | SignatureFlagsAbstract | SignatureFlagsIsUntypedSignatureInJSFile | SignatureFlagsIsSignatureCandidateForOverloadFailure
+	SignatureFlagsPropagatingFlags = SignatureFlagsHasRestParameter | SignatureFlagsHasLiteralTypes | SignatureFlagsConstruct | SignatureFlagsAbstract | SignatureFlagsKvsContext | SignatureFlagsIsUntypedSignatureInJSFile | SignatureFlagsIsSignatureCandidateForOverloadFailure
 	SignatureFlagsCallChainFlags   = SignatureFlagsIsInnerCallChain | SignatureFlagsIsOuterCallChain
 )
 

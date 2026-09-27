@@ -101,6 +101,15 @@ func getChildrenPropertyMask(node *ast.Node) uint8 {
 	case ast.KindKvsIfBindingStatement:
 		n := node.AsKvsIfBindingStatement()
 		return (boolToByte(n.Clause != nil) << 0) | (boolToByte(n.ElseStatement != nil) << 1)
+	case ast.KindKvsContextDeclaration:
+		n := node.AsKvsContextDeclaration()
+		return (boolToByte(hasModifiers(n.Modifiers())) << 0) | (boolToByte(n.Name() != nil) << 1) | (boolToByte(n.Type != nil) << 2) | (boolToByte(n.Initializer != nil) << 3)
+	case ast.KindKvsContextStatement:
+		n := node.AsKvsContextStatement()
+		return (boolToByte(n.Bindings != nil) << 0) | (boolToByte(n.Statement != nil) << 1)
+	case ast.KindKvsContextBinding:
+		n := node.AsKvsContextBinding()
+		return (boolToByte(n.Name() != nil) << 0) | (boolToByte(n.QuestionToken != nil) << 1) | (boolToByte(n.EqualsToken != nil) << 2) | (boolToByte(n.Initializer != nil) << 3)
 	case ast.KindKvsIfBindingClause:
 		n := node.AsKvsIfBindingClause()
 		return (boolToByte(n.DeclarationList != nil) << 0) | (boolToByte(n.Statement != nil) << 1)
@@ -463,7 +472,7 @@ func getChildrenPropertyMask(node *ast.Node) uint8 {
 		return (boolToByte(n.Type != nil) << 0)
 	case ast.KindFunctionType:
 		n := node.AsFunctionTypeNode()
-		return (boolToByte(n.TypeParameters != nil) << 0) | (boolToByte(n.Parameters != nil) << 1) | (boolToByte(n.Type != nil) << 2)
+		return (boolToByte(n.TypeParameters != nil) << 0) | (boolToByte(n.Parameters != nil) << 1) | (boolToByte(n.Type != nil) << 2) | (boolToByte(hasModifiers(n.Modifiers())) << 3)
 	case ast.KindConstructorType:
 		n := node.AsConstructorTypeNode()
 		return (boolToByte(hasModifiers(n.Modifiers())) << 0) | (boolToByte(n.TypeParameters != nil) << 1) | (boolToByte(n.Parameters != nil) << 2) | (boolToByte(n.Type != nil) << 3)

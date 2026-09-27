@@ -61,6 +61,7 @@ import type {
     ConstructorDeclaration,
     ConstructorTypeNode,
     ConstructSignatureDeclaration,
+    ContextKeyword,
     ContinueStatement,
     DebuggerStatement,
     DeclarationName,
@@ -195,6 +196,9 @@ import type {
     KvsComparisonAlternativesExpression,
     KvsComparisonChainExpression,
     KvsConditionalElement,
+    KvsContextBinding,
+    KvsContextDeclaration,
+    KvsContextStatement,
     KvsDefaultExpression,
     KvsExtantAssertionExpression,
     KvsExtantAssignmentExpression,
@@ -594,6 +598,33 @@ export declare namespace isKvsIfBindingStatement {
     function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsIfBindingStatement>;
 }
 isKvsIfBindingStatement.Handle = isKvsIfBindingStatement as any;
+
+export function isKvsContextDeclaration(node: Node): node is KvsContextDeclaration {
+    return node.kind === SyntaxKind.KvsContextDeclaration;
+}
+
+export declare namespace isKvsContextDeclaration {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsContextDeclaration>;
+}
+isKvsContextDeclaration.Handle = isKvsContextDeclaration as any;
+
+export function isKvsContextStatement(node: Node): node is KvsContextStatement {
+    return node.kind === SyntaxKind.KvsContextStatement;
+}
+
+export declare namespace isKvsContextStatement {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsContextStatement>;
+}
+isKvsContextStatement.Handle = isKvsContextStatement as any;
+
+export function isKvsContextBinding(node: Node): node is KvsContextBinding {
+    return node.kind === SyntaxKind.KvsContextBinding;
+}
+
+export declare namespace isKvsContextBinding {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsContextBinding>;
+}
+isKvsContextBinding.Handle = isKvsContextBinding as any;
 
 export function isKvsIfBindingClause(node: Node): node is KvsIfBindingClause {
     return node.kind === SyntaxKind.KvsIfBindingClause;
@@ -2615,7 +2646,7 @@ isBindingName.Handle = isBindingName as any;
 
 export function isModifierLike(node: Node): node is ModifierLike {
     const kind = node.kind;
-    return kind === SyntaxKind.AbstractKeyword || kind === SyntaxKind.AccessorKeyword || kind === SyntaxKind.AsyncKeyword || kind === SyntaxKind.ConstKeyword || kind === SyntaxKind.DeclareKeyword || kind === SyntaxKind.DefaultKeyword || kind === SyntaxKind.ExportKeyword || kind === SyntaxKind.InKeyword || kind === SyntaxKind.PrivateKeyword || kind === SyntaxKind.ProtectedKeyword || kind === SyntaxKind.PublicKeyword || kind === SyntaxKind.ReadonlyKeyword || kind === SyntaxKind.OutKeyword || kind === SyntaxKind.OverrideKeyword || kind === SyntaxKind.StaticKeyword || kind === SyntaxKind.Decorator;
+    return kind === SyntaxKind.AbstractKeyword || kind === SyntaxKind.AccessorKeyword || kind === SyntaxKind.AsyncKeyword || kind === SyntaxKind.ConstKeyword || kind === SyntaxKind.ContextKeyword || kind === SyntaxKind.DeclareKeyword || kind === SyntaxKind.DefaultKeyword || kind === SyntaxKind.ExportKeyword || kind === SyntaxKind.InKeyword || kind === SyntaxKind.PrivateKeyword || kind === SyntaxKind.ProtectedKeyword || kind === SyntaxKind.PublicKeyword || kind === SyntaxKind.ReadonlyKeyword || kind === SyntaxKind.OutKeyword || kind === SyntaxKind.OverrideKeyword || kind === SyntaxKind.StaticKeyword || kind === SyntaxKind.Decorator;
 }
 
 export declare namespace isModifierLike {
@@ -3089,6 +3120,7 @@ export function isModifierKind(kind: SyntaxKind): kind is ModifierSyntaxKind {
         || kind === SyntaxKind.AccessorKeyword
         || kind === SyntaxKind.AsyncKeyword
         || kind === SyntaxKind.ConstKeyword
+        || kind === SyntaxKind.ContextKeyword
         || kind === SyntaxKind.DeclareKeyword
         || kind === SyntaxKind.DefaultKeyword
         || kind === SyntaxKind.ExportKeyword
@@ -3527,6 +3559,16 @@ export declare namespace isConstKeyword {
 }
 
 isConstKeyword.Handle = isConstKeyword as any;
+
+export function isContextKeyword(node: Node): node is ContextKeyword {
+    return node.kind === SyntaxKind.ContextKeyword;
+}
+
+export declare namespace isContextKeyword {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, ContextKeyword>;
+}
+
+isContextKeyword.Handle = isContextKeyword as any;
 
 export function isDeclareKeyword(node: Node): node is DeclareKeyword {
     return node.kind === SyntaxKind.DeclareKeyword;

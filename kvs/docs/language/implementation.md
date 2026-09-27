@@ -592,9 +592,7 @@ applies these same assignments.
 
 These are implementation debts, not source-language semantics.
 
-## Prospective implementation sketches
-
-The following lowering is not implemented by the current compiler.
+## Context implementation
 
 ### Context frame lowering
 
@@ -625,6 +623,46 @@ async function checkout($context: KvsContext, id: string) {
 A context statement creates an immutable derived frame and uses that frame for calls in its body.
 The frame needs only unique key tokens, lookup, and extension. It is one compiler-owned structure,
 not an authored application type and not one argument per key.
+
+Context methods use the same leading frame parameter after the JavaScript receiver has been
+resolved. Context callable types carry this calling convention in their signature, so indirect calls
+forward the frame as well. Plain and context callable types are deliberately incompatible; explicit
+ordinary closures adapt callbacks, and plain exported wrappers choose or establish their own frame.
+
+One direct representation emits each key as a frozen tuple containing a unique symbol and its
+ordinary global default value:
+
+```typescript
+const _ctx_RequestId = Object.freeze([Symbol("RequestId"), "NO_REQUEST"] as const);
+```
+
+The actual local name is compiler-generated with a short context prefix (for example
+`_ctx_RequestId`) so an ordinary authored `RequestId` binding can shadow the context key without
+hiding its runtime identity. An exported key aliases that generated binding under the authored
+module-export name.
+
+The symbol description is diagnostic only; every `Symbol(...)` call creates a distinct identity.
+Exporting and importing the tuple therefore preserves declaration identity even through an import
+alias. The initializer is evaluated once in ordinary module order, like a `const` initializer.
+
+A root frame is a null-prototype object. A derived frame uses its current frame as its prototype and
+stores own symbol properties only for explicit bindings. Reading a key uses inherited symbol lookup
+and otherwise falls back to the tuple's default value:
+
+```typescript
+function getContextValue<T>(frame: object, key: readonly [symbol, T]): T {
+    return key[0] in frame ? (frame as Record<symbol, T>)[key[0]] : key[1];
+}
+```
+
+This representation has no key registry, root search, default copying, or per-root materialization.
+The prototype chain represents scoped shadowing only; defaults remain ordinary shared globals.
+
+Binding names use filtered context-key lookup, while their initializers use ordinary lexical lookup.
+The compiler creates the frame before evaluating the list, then evaluates and writes each binding in
+source order. A later initializer can therefore read an earlier binding. `?=` captures its
+initializer once and skips the write when that value is null or undefined; repeated keys simply
+write the same symbol slot again.
 
 An implementation may use a mutable stack to optimize synchronous context calls, or combine a stack
 with explicit frames. Such choices must preserve the parameter-passing semantics and are not

@@ -215,6 +215,7 @@ func (d *astDecoder) createChildrenNode(kind ast.Kind, data uint32, childIndices
 		ast.KindGlobalKeyword,
 		ast.KindOverrideKeyword,
 		ast.KindOfKeyword,
+		ast.KindContextKeyword,
 		ast.KindDeferKeyword:
 		return d.factory.NewToken(kind), nil
 	case ast.KindQualifiedName:
@@ -307,6 +308,25 @@ func (d *astDecoder) createChildrenNode(kind ast.Kind, data uint32, childIndices
 		clause := d.nodeAt(it.nextIf(mask, 0))
 		elseStatement := d.nodeAt(it.nextIf(mask, 1))
 		return d.factory.NewKvsIfBindingStatement(clause, elseStatement), nil
+	case ast.KindKvsContextDeclaration:
+		it := newChildIter(childIndices)
+		modifiers := d.modifierListAt(it.nextIf(mask, 0))
+		name := d.nodeAt(it.nextIf(mask, 1))
+		typeNode := d.nodeAt(it.nextIf(mask, 2))
+		initializer := d.nodeAt(it.nextIf(mask, 3))
+		return d.factory.NewKvsContextDeclaration(modifiers, name, typeNode, initializer), nil
+	case ast.KindKvsContextStatement:
+		it := newChildIter(childIndices)
+		bindings := d.nodeListAt(it.nextIf(mask, 0))
+		statement := d.nodeAt(it.nextIf(mask, 1))
+		return d.factory.NewKvsContextStatement(bindings, statement), nil
+	case ast.KindKvsContextBinding:
+		it := newChildIter(childIndices)
+		name := d.nodeAt(it.nextIf(mask, 0))
+		questionToken := d.nodeAt(it.nextIf(mask, 1))
+		equalsToken := d.nodeAt(it.nextIf(mask, 2))
+		initializer := d.nodeAt(it.nextIf(mask, 3))
+		return d.factory.NewKvsContextBinding(name, questionToken, equalsToken, initializer), nil
 	case ast.KindKvsIfBindingClause:
 		it := newChildIter(childIndices)
 		declarationList := d.nodeAt(it.nextIf(mask, 0))
@@ -1029,7 +1049,8 @@ func (d *astDecoder) createChildrenNode(kind ast.Kind, data uint32, childIndices
 		typeParameters := d.nodeListAt(it.nextIf(mask, 0))
 		parameters := d.nodeListAt(it.nextIf(mask, 1))
 		typeNode := d.nodeAt(it.nextIf(mask, 2))
-		return d.factory.NewFunctionTypeNode(typeParameters, parameters, typeNode), nil
+		modifiers := d.modifierListAt(it.nextIf(mask, 3))
+		return d.factory.NewFunctionTypeNode(typeParameters, parameters, typeNode, modifiers), nil
 	case ast.KindConstructorType:
 		it := newChildIter(childIndices)
 		modifiers := d.modifierListAt(it.nextIf(mask, 0))

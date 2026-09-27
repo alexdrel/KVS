@@ -232,6 +232,7 @@ func (tx *DeclarationTransformer) visit(node *ast.Node) *ast.Node {
 		return tx.visitSourceFile(node.AsSourceFile())
 	// statements we keep but do something to
 	case ast.KindFunctionDeclaration,
+		ast.KindKvsContextDeclaration,
 		ast.KindModuleDeclaration,
 		ast.KindImportEqualsDeclaration,
 		ast.KindInterfaceDeclaration,
@@ -792,6 +793,7 @@ func (tx *DeclarationTransformer) transformFunctionTypeNode(input *ast.FunctionT
 		tx.Visitor().VisitNodes(input.TypeParameters),
 		tx.updateParamList(input.AsNode(), input.Parameters),
 		tx.Visitor().Visit(input.Type),
+		tx.ensureModifiers(input.AsNode()),
 	)
 }
 
@@ -1769,6 +1771,8 @@ func (tx *DeclarationTransformer) transformTopLevelDeclaration(input *ast.Node) 
 		result = tx.transformInterfaceDeclaration(input.AsInterfaceDeclaration())
 	case ast.KindFunctionDeclaration:
 		result = tx.transformFunctionDeclaration(input.AsFunctionDeclaration())
+	case ast.KindKvsContextDeclaration:
+		result = tx.transformKvsContextDeclaration(input.AsKvsContextDeclaration())
 	case ast.KindModuleDeclaration:
 		result = tx.transformModuleDeclaration(input.AsModuleDeclaration())
 	case ast.KindClassDeclaration:
@@ -1824,6 +1828,16 @@ func (tx *DeclarationTransformer) transformFunctionDeclaration(input *ast.Functi
 		tx.updateParamList(input.AsNode(), input.Parameters),
 		tx.ensureType(input.AsNode(), false),
 		nil, /*fullSignature*/
+		nil,
+	)
+}
+
+func (tx *DeclarationTransformer) transformKvsContextDeclaration(input *ast.KvsContextDeclaration) *ast.Node {
+	return tx.Factory().UpdateKvsContextDeclaration(
+		input,
+		tx.ensureModifiers(input.AsNode()),
+		input.Name(),
+		tx.ensureType(input.AsNode(), false),
 		nil,
 	)
 }

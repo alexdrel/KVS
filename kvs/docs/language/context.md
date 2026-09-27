@@ -10,7 +10,7 @@ particular operation and the context functions it calls.
 
 ## Keys
 
-A declaration creates a unique key with a type-provided or explicitly supplied default value:
+A declaration creates a unique key with a global default value:
 
 ```kvs
 context RequestId: string = "NO_REQUEST";
@@ -18,24 +18,25 @@ export context CurrentUser: User?;
 context Now: () => Date = () => new Date();
 ```
 
-A nullable context key may omit `= null`; absence is its type-provided default. Writing the
-initializer explicitly is equivalent and remains valid when it improves clarity:
+A nullable context key may omit `= null`. Writing the initializer explicitly is equivalent and
+remains valid when it improves clarity:
 
 ```kvs
 context CurrentUser: User?;
 context CurrentUser: User? = null;
 ```
 
-A non-nullable key must either declare a default or have a type with a default value. All context
-frames are lazy: creating or deriving a frame does not enumerate context keys or evaluate their
-defaults. When lookup reaches the root without finding a supplied value, the key's explicit or
-type-derived default is materialized on demand and then reused for that context.
+A non-nullable key must declare an initializer, following the same rule as `const`. The initializer
+is evaluated once in ordinary module evaluation order. Its value is the shared global default,
+including when that value is mutable. A frame contains only its explicit overrides: creating or
+deriving one never enumerates visible context keys or copies their defaults.
 
 The declaration, rather than its textual name, establishes identity. Imported keys retain that
 identity even when renamed. Packages can introduce keys independently; there is no central
 `RequestContext` interface to extend or combine.
 
-Context bindings are read-only. Code reads the value of a key directly:
+Context bindings are read-only shadowed globals. Code reads the global default unless the current
+frame supplies an override, using the key directly:
 
 ```kvs
 context function log(message: string) {
@@ -85,56 +86,46 @@ frame. The distinction remains visible in assignability and overload resolution.
 participation in context propagation, not general impurity. A plain function may still perform I/O,
 mutate state, or throw.
 
-## Scoped overrides
+## Scoped bindings
 
-`context (record)` derives a frame from the current one and executes a statement or block with the
-supplied overrides:
+A context statement establishes a root frame when none is available, or derives a frame from the
+current one. Its optional binding list uses `=` for an override and `?=` for an override applied
+only when its value is extant:
 
 ```kvs
-context function handleRequest(request: Request) {
-    context ({
-        RequestId: request.id,
-        CurrentUser: request.user,
-    }) {
+function handleRequest(request: Request) {
+    context (
+        RequestId = request.id,
+        CurrentUser ?= request.user,
+    ) {
         processOrder(request.order);
     }
 }
 ```
 
-Every statically known property must resolve to a visible context key, and its value must be
-assignable to that key's declared type. Unknown properties are errors. An optional property
-overrides its key only when present; an explicit null overrides a nullable key with null.
+The left side is resolved among visible context keys; the right side uses ordinary expression
+lookup. Values are evaluated once from left to right, and each successful binding is installed
+before the next value is evaluated. Repeating a key therefore performs another write; for `?=`, an
+absent value leaves the previous binding unchanged. Explicit `null` with `=` remains an override for
+a nullable key.
 
-Property expressions are evaluated from left to right before the body begins. A derived frame stores
-only the supplied overrides; all other keys are resolved through its parent. Nested context
-statements therefore compose naturally: an inner frame shadows only the supplied keys and inherits
-everything else. Frames remain lazy regardless of depth.
-
-`context (...)` requires an existing frame. `context! (...)` ensures that one exists before applying
-the overrides:
+A derived frame stores only its bindings; all other keys are resolved through its parent. Nested
+context statements therefore compose naturally. A plain function may deliberately start with
+defaults and no bindings:
 
 ```kvs
 function applicationEntry(request: Request) {
-    context! ({
-        RequestId: request.id,
-        CurrentUser: request.user,
-    }) {
-        processOrder(request.order);
-    }
+    context processOrder(request.order);
 }
 ```
 
-Inside a plain function, `context!` establishes a root frame when none exists and applies the
-supplied overrides to it. Inside a context function, the current frame already exists, so `context!`
-preserves it and behaves like `context`. It never replaces or detaches an existing frame, and it
-never eagerly materializes unrelated context keys or defaults.
-
-A plain function naturally forms a strong context boundary because no frame is passed to it. It may
-establish a fresh one with `context!`:
+A bindingless context statement is redundant when a frame is already available and produces a
+warning. A plain function remains a strong propagation boundary because no caller frame is passed to
+it:
 
 ```kvs
 function runBackgroundJob(job: Job) {
-    context! ({ JobId: job.id }) {
+    context (JobId = job.id) {
         processJob(job);
     }
 }

@@ -4484,6 +4484,18 @@ var A_KVS_switch_binding_must_be_a_single_const_declaration_with_an_initializer 
 
 var KVS_requires_a_preceding_pipeline_stage = &Message{code: 100096, category: CategoryError, key: "KVS_requires_a_preceding_pipeline_stage_100096", text: "KVS '|%>' requires a preceding pipeline stage."}
 
+var A_KVS_context_key_requires_a_type_annotation = &Message{code: 100097, category: CategoryError, key: "A_KVS_context_key_requires_a_type_annotation_100097", text: "A KVS context key requires a type annotation."}
+
+var A_non_nullable_KVS_context_key_requires_an_initializer = &Message{code: 100098, category: CategoryError, key: "A_non_nullable_KVS_context_key_requires_an_initializer_100098", text: "A non-nullable KVS context key requires an initializer."}
+
+var A_KVS_context_binding_name_must_refer_to_a_context_key = &Message{code: 100099, category: CategoryError, key: "A_KVS_context_binding_name_must_refer_to_a_context_key_100099", text: "A KVS context binding name must refer to a context key."}
+
+var A_KVS_context_value_is_only_available_in_a_context_function_or_context_block = &Message{code: 100100, category: CategoryError, key: "A_KVS_context_value_is_only_available_in_a_context_function_or_context_block_100100", text: "A KVS context value is only available in a context function or context block."}
+
+var A_KVS_context_function_can_only_be_called_from_a_context_function_or_context_block = &Message{code: 100101, category: CategoryError, key: "A_KVS_context_function_can_only_be_called_from_a_context_function_or_context_block_100101", text: "A KVS context function can only be called from a context function or context block."}
+
+var A_bindingless_context_statement_is_redundant_when_a_context_frame_is_already_available = &Message{code: 100102, category: CategoryWarning, key: "A_bindingless_context_statement_is_redundant_when_a_context_frame_is_already_available_100102", text: "A bindingless context statement is redundant when a context frame is already available."}
+
 var allMessages = [...]**Message{
 	&Unterminated_string_literal,
 	&Identifier_expected,
@@ -6726,4 +6738,10 @@ var allMessages = [...]**Message{
 	&A_concise_KVS_switch_arm_must_contain_exactly_one_expression_Use_a_block_and_yield_for_a_procedural_arm,
 	&A_KVS_switch_binding_must_be_a_single_const_declaration_with_an_initializer,
 	&KVS_requires_a_preceding_pipeline_stage,
+	&A_KVS_context_key_requires_a_type_annotation,
+	&A_non_nullable_KVS_context_key_requires_an_initializer,
+	&A_KVS_context_binding_name_must_refer_to_a_context_key,
+	&A_KVS_context_value_is_only_available_in_a_context_function_or_context_block,
+	&A_KVS_context_function_can_only_be_called_from_a_context_function_or_context_block,
+	&A_bindingless_context_statement_is_redundant_when_a_context_frame_is_already_available,
 }

@@ -693,6 +693,8 @@ func (n *Node) Type() *Node {
 	switch n.Kind {
 	case KindVariableDeclaration:
 		return n.AsVariableDeclaration().Type
+	case KindKvsContextDeclaration:
+		return n.AsKvsContextDeclaration().Type
 	case KindParameter:
 		return n.AsParameterDeclaration().Type
 	case KindPropertySignature:
@@ -758,6 +760,8 @@ func (m *MutableNode) SetType(t *Node) {
 	switch m.Kind {
 	case KindVariableDeclaration:
 		n.AsVariableDeclaration().Type = t
+	case KindKvsContextDeclaration:
+		n.AsKvsContextDeclaration().Type = t
 	case KindParameter:
 		n.AsParameterDeclaration().Type = t
 	case KindPropertySignature:
@@ -823,6 +827,8 @@ func (n *Node) Initializer() *Node {
 	switch n.Kind {
 	case KindVariableDeclaration:
 		return n.AsVariableDeclaration().Initializer
+	case KindKvsContextDeclaration:
+		return n.AsKvsContextDeclaration().Initializer
 	case KindParameter:
 		return n.AsParameterDeclaration().Initializer
 	case KindBindingElement:
@@ -858,6 +864,8 @@ func (m *MutableNode) SetInitializer(initializer *Node) {
 	switch n.Kind {
 	case KindVariableDeclaration:
 		n.AsVariableDeclaration().Initializer = initializer
+	case KindKvsContextDeclaration:
+		n.AsKvsContextDeclaration().Initializer = initializer
 	case KindParameter:
 		n.AsParameterDeclaration().Initializer = initializer
 	case KindBindingElement:

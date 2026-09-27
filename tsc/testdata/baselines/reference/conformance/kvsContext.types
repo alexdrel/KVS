@@ -1,0 +1,251 @@
+//// [tests/cases/conformance/kvs/kvsContext.ts] ////
+
+=== kvsContext.ts ===
+export context RequestId: string = "NO_REQUEST";
+>RequestId : string
+
+export context CurrentUser: { name: string }?;
+>CurrentUser : { name: string; } | null | undefined
+>name : string
+
+const _ctx_RequestId = "authored collision";
+>_ctx_RequestId : "authored collision"
+>"authored collision" : "authored collision"
+
+export context function log(message: string) {
+>log : context (message: string) => void
+>message : string
+
+    console.log(`[${RequestId}] ${message}`);
+>console.log(`[${RequestId}] ${message}`) : void
+>console.log : (...data: any[]) => void
+>console : Console
+>log : (...data: any[]) => void
+>`[${RequestId}] ${message}` : string
+>RequestId : string
+>message : string
+}
+
+context async function logUser() {
+>logUser : context () => Promise<void>
+
+    log(CurrentUser?.name ?? "anonymous");
+>log(CurrentUser?.name ?? "anonymous") : void
+>log : context (message: string) => void
+>CurrentUser?.name ?? "anonymous" : string
+>CurrentUser?.name : string | undefined
+>CurrentUser : { name: string; } | null | undefined
+>name : string | undefined
+>"anonymous" : "anonymous"
+}
+
+context function delayedLog(messages: string[]) {
+>delayedLog : context (messages: string[]) => Generator<string, void, unknown>
+>messages : string[]
+
+    return collect* (messages) {
+>collect* (messages) {        yield `[${RequestId}] ${_}`;    } : Generator<string, void, unknown>
+>messages : string[]
+
+        yield `[${RequestId}] ${_}`;
+>`[${RequestId}] ${_}` : string
+>RequestId : string
+>_ : string
+
+    };
+}
+
+type ContextLogger = context (message: string) => void;
+>ContextLogger : ContextLogger
+>message : string
+
+class Logger {
+>Logger : Logger
+
+    context write(message: string) {
+>write : context (message: string) => string
+>message : string
+
+        log(message);
+>log(message) : void
+>log : context (message: string) => void
+>message : string
+
+        return RequestId;
+>RequestId : string
+    }
+}
+
+context function useCallableAndMethod(logger: Logger, messages: string[]) {
+>useCallableAndMethod : context (logger: Logger, messages: string[]) => { messages: string[]; methodResult: string; }
+>logger : Logger
+>messages : string[]
+
+    const write: ContextLogger = log;
+>write : ContextLogger
+>log : context (message: string) => void
+
+    write("callable");
+>write("callable") : void
+>write : ContextLogger
+>"callable" : "callable"
+
+    const methodResult: string = logger.write("method");
+>methodResult : string
+>logger.write("method") : string
+>logger.write : context (message: string) => string
+>logger : Logger
+>write : context (message: string) => string
+>"method" : "method"
+
+    return { messages, methodResult };
+>{ messages, methodResult } : { messages: string[]; methodResult: string; }
+>messages : string[]
+>methodResult : string
+}
+
+function handleRequest(id: string, user: { name: string } | null) {
+>handleRequest : (id: string, user: { name: string; } | null) => void
+>id : string
+>user : { name: string; } | null
+>name : string
+
+    context (
+        RequestId = id,
+>RequestId : error
+>id : error
+
+        CurrentUser = user,
+>CurrentUser : error
+>user : error
+
+    ) {
+        log("start");
+>log("start") : void
+>log : context (message: string) => void
+>"start" : "start"
+
+        void logUser();
+>void logUser() : undefined
+>logUser() : Promise<void>
+>logUser : context () => Promise<void>
+
+        context (RequestId = `${id}:nested`) {
+>RequestId : error
+>`${id}:nested` : string
+>id : string
+
+            log("nested");
+>log("nested") : void
+>log : context (message: string) => void
+>"nested" : "nested"
+
+            const delayed = delayedLog(["later"]);
+>delayed : Generator<string, void, unknown>
+>delayedLog(["later"]) : Generator<string, void, unknown>
+>delayedLog : context (messages: string[]) => Generator<string, void, unknown>
+>["later"] : string[]
+>"later" : "later"
+
+            const expected: Generator<string, void, unknown> = delayed;
+>expected : Generator<string, void, unknown>
+>delayed : Generator<string, void, unknown>
+        }
+    }
+}
+
+export function runWithRequest(id: string): string {
+>runWithRequest : (id: string) => string
+>id : string
+
+    context (RequestId = id) {
+>RequestId : error
+>id : error
+
+        log("export wrapper");
+>log("export wrapper") : void
+>log : context (message: string) => void
+>"export wrapper" : "export wrapper"
+
+        return RequestId;
+>RequestId : string
+    }
+}
+
+function handleBindings(RequestId: string, CurrentUser: { name: string } | null, candidate: { name: string } | null) {
+>handleBindings : (RequestId: string, CurrentUser: { name: string; } | null, candidate: { name: string; } | null) => void
+>RequestId : string
+>CurrentUser : { name: string; } | null
+>name : string
+>candidate : { name: string; } | null
+>name : string
+
+    context (RequestId = RequestId, CurrentUser ?= candidate) {
+>RequestId : error
+>RequestId : error
+>CurrentUser : error
+>candidate : error
+
+        log("bindings");
+>log("bindings") : void
+>log : context (message: string) => void
+>"bindings" : "bindings"
+
+        context (CurrentUser ?= CurrentUser, RequestId = `${RequestId}:next`) {
+>CurrentUser : error
+>CurrentUser : error
+>RequestId : error
+>`${RequestId}:next` : string
+>RequestId : string
+
+            log("sequential bindings");
+>log("sequential bindings") : void
+>log : context (message: string) => void
+>"sequential bindings" : "sequential bindings"
+        }
+    }
+}
+
+function defaultsOnly() {
+>defaultsOnly : () => void
+
+    context log("defaults");
+>log("defaults") : void
+>log : context (message: string) => void
+>"defaults" : "defaults"
+}
+
+function inferredFromContextStatement() {
+>inferredFromContextStatement : () => string
+
+    context (RequestId = "inferred") {
+>RequestId : error
+
+        return RequestId;
+>RequestId : string
+    }
+}
+
+const inferredRequestId: string = inferredFromContextStatement();
+>inferredRequestId : string
+>inferredFromContextStatement() : string
+>inferredFromContextStatement : () => string
+
+context function sequential(id: string) {
+>sequential : context (id: string) => void
+>id : string
+
+    context (RequestId = id, RequestId = `${RequestId}:next`) {
+>RequestId : error
+>id : error
+>RequestId : error
+>`${RequestId}:next` : string
+>RequestId : string
+
+        log("sequential");
+>log("sequential") : void
+>log : context (message: string) => void
+>"sequential" : "sequential"
+    }
+}
+

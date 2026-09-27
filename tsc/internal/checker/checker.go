@@ -1989,6 +1989,9 @@ func (c *Checker) isBlockScopedNameDeclaredBeforeUse(declaration *ast.Node, usag
 		case declaration.Kind == ast.KindVariableDeclaration:
 			// still might be illegal if usage is in the initializer of the variable declaration (eg var a = a)
 			return !isImmediatelyUsedInInitializerOfBlockScopedVariable(declaration, usage, declContainer)
+		case declaration.Kind == ast.KindKvsContextDeclaration:
+			initializer := declaration.AsKvsContextDeclaration().Initializer
+			return initializer == nil || ast.FindAncestor(usage, func(node *ast.Node) bool { return node == initializer }) == nil
 		case ast.IsClassLike(declaration):
 			// still might be illegal if the usage is within a computed property name in the class (eg class A { static p = "a"; [A.p]() {} })
 			// or when used within a decorator in the class (e.g. `@dec(A.x) class A { static x = "x" }`),
@@ -2376,6 +2379,10 @@ func (c *Checker) checkSourceElementWorker(node *ast.Node) {
 		c.checkIfStatement(node)
 	case ast.KindKvsIfBindingStatement:
 		c.checkKvsIfBindingStatement(node)
+	case ast.KindKvsContextDeclaration:
+		c.checkKvsContextDeclaration(node)
+	case ast.KindKvsContextStatement:
+		c.checkKvsContextStatement(node)
 	case ast.KindDoStatement:
 		c.checkDoStatement(node)
 	case ast.KindWhileStatement:
@@ -6059,6 +6066,99 @@ func (c *Checker) checkVariableDeclaration(node *ast.Node) {
 	c.checkVariableLikeDeclaration(node)
 }
 
+func (c *Checker) checkKvsContextDeclaration(node *ast.Node) {
+	declaration := node.AsKvsContextDeclaration()
+	c.checkGrammarModifiers(node)
+	if declaration.Type == nil {
+		c.error(node, diagnostics.A_KVS_context_key_requires_a_type_annotation)
+		if declaration.Initializer != nil {
+			c.checkExpression(declaration.Initializer)
+		}
+	} else {
+		c.checkSourceElement(declaration.Type)
+		declaredType := c.getTypeFromTypeNode(declaration.Type)
+		if declaration.Initializer == nil {
+			if node.Flags&ast.NodeFlagsAmbient == 0 && !c.maybeTypeOfKind(declaredType, TypeFlagsNullable) {
+				c.error(node, diagnostics.A_non_nullable_KVS_context_key_requires_an_initializer)
+			}
+		} else {
+			initializerType := c.checkExpressionCached(declaration.Initializer)
+			c.checkTypeAssignableToAndOptionallyElaborate(initializerType, declaredType, node, declaration.Initializer, nil, nil)
+		}
+	}
+}
+
+func (c *Checker) kvsContextKeyDeclaration(symbol *ast.Symbol) *ast.Node {
+	if symbol == nil || symbol == c.unknownSymbol {
+		return nil
+	}
+	if symbol.Flags&ast.SymbolFlagsAlias != 0 {
+		symbol = c.resolveAlias(symbol)
+	}
+	if symbol != nil && symbol.ValueDeclaration != nil && symbol.ValueDeclaration.Kind == ast.KindKvsContextDeclaration {
+		return symbol.ValueDeclaration
+	}
+	if symbol != nil {
+		for _, declaration := range symbol.Declarations {
+			if declaration.Kind == ast.KindKvsContextDeclaration {
+				return declaration
+			}
+		}
+	}
+	return nil
+}
+
+func (c *Checker) resolveKvsContextKey(location *ast.Node) *ast.Symbol {
+	resolver := c.createNameResolver()
+	resolver.Lookup = func(symbols ast.SymbolTable, name string, meaning ast.SymbolFlags) *ast.Symbol {
+		symbol := c.getSymbol(symbols, name, meaning)
+		if c.kvsContextKeyDeclaration(symbol) != nil {
+			return symbol
+		}
+		return nil
+	}
+	return resolver.Resolve(location, location.Text(), ast.SymbolFlagsValue|ast.SymbolFlagsAlias, nil, true /*isUse*/, false /*excludeGlobals*/)
+}
+
+func (c *Checker) hasKvsContextFrame(node *ast.Node) bool {
+	for current := node.Parent; current != nil; current = current.Parent {
+		if current.Kind == ast.KindKvsContextStatement {
+			return true
+		}
+		if ast.IsFunctionLike(current) {
+			if ast.GetCombinedModifierFlags(current)&ast.ModifierFlagsContext != 0 {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func (c *Checker) checkKvsContextStatement(node *ast.Node) {
+	statement := node.AsKvsContextStatement()
+	if len(statement.Bindings.Nodes) == 0 && c.hasKvsContextFrame(node) {
+		c.error(node, diagnostics.A_bindingless_context_statement_is_redundant_when_a_context_frame_is_already_available)
+	}
+	for _, bindingNode := range statement.Bindings.Nodes {
+		binding := bindingNode.AsKvsContextBinding()
+		name := binding.Name()
+		symbol := c.resolveKvsContextKey(name)
+		declaration := c.kvsContextKeyDeclaration(symbol)
+		if declaration == nil {
+			c.error(name, diagnostics.A_KVS_context_binding_name_must_refer_to_a_context_key)
+			c.checkExpression(binding.Initializer)
+			continue
+		}
+		valueType := c.checkExpression(binding.Initializer)
+		if binding.QuestionToken != nil {
+			valueType = c.GetNonNullableType(valueType)
+		}
+		keyType := c.getTypeFromTypeNode(declaration.AsKvsContextDeclaration().Type)
+		c.checkTypeAssignableToAndOptionallyElaborate(valueType, keyType, bindingNode, binding.Initializer, nil, nil)
+	}
+	c.checkSourceElement(statement.Statement)
+}
+
 // Check variable, parameter, or property declaration
 func (c *Checker) checkVariableLikeDeclaration(node *ast.Node) {
 	c.checkDecorators(node)
@@ -9194,6 +9294,12 @@ func (c *Checker) checkCallExpression(node *ast.Node, checkMode CheckMode) *Type
 		return c.silentNeverType
 	}
 	c.checkDeprecatedSignature(signature, node)
+	if signature.flags&SignatureFlagsKvsContext != 0 {
+		c.nodeLinks.Get(node).flags |= NodeCheckFlagsKvsContextCall
+		if !c.hasKvsContextFrame(node) {
+			c.error(node, diagnostics.A_KVS_context_function_can_only_be_called_from_a_context_function_or_context_block)
+		}
+	}
 	if node.Expression().Kind == ast.KindSuperKeyword {
 		return c.voidType
 	}
@@ -12151,6 +12257,16 @@ func (c *Checker) checkIdentifier(node *ast.Node, checkMode CheckMode) *Type {
 	}
 	localOrExportSymbol := c.getExportSymbolOfValueSymbolIfExported(symbol)
 	targetSymbol := c.resolveAliasWithDeprecationCheck(localOrExportSymbol, node)
+	if contextDeclaration := c.kvsContextKeyDeclaration(targetSymbol); contextDeclaration != nil && node.Parent.Kind != ast.KindKvsContextDeclaration {
+		if !c.hasKvsContextFrame(node) {
+			c.error(node, diagnostics.A_KVS_context_value_is_only_available_in_a_context_function_or_context_block)
+		}
+		if getAssignmentTargetKind(node) != AssignmentKindNone {
+			c.error(node, diagnostics.Cannot_assign_to_0_because_it_is_a_constant, node.Text())
+			return c.errorType
+		}
+		return c.getTypeOfSymbol(targetSymbol)
+	}
 	if len(targetSymbol.Declarations) != 0 && c.isDeprecatedSymbol(targetSymbol) && c.isUncalledFunctionReference(node, targetSymbol) {
 		c.addDeprecatedSuggestion(node, targetSymbol.Declarations, node.Text())
 	}
@@ -18098,6 +18214,8 @@ func (c *Checker) getTypeOfVariableOrParameterOrPropertyWorker(symbol *ast.Symbo
 	case ast.KindParameter, ast.KindPropertyDeclaration, ast.KindPropertySignature, ast.KindVariableDeclaration,
 		ast.KindBindingElement:
 		result = c.getWidenedTypeForVariableLikeDeclaration(declaration, !c.isParameterOfContextSensitiveSignature(symbol)) // only report diagnostics for context-insensitive parameters - context-sensitive ones may have their type fixed to something else
+	case ast.KindKvsContextDeclaration:
+		result = c.getTypeFromTypeNode(declaration.AsKvsContextDeclaration().Type)
 	case ast.KindPropertyAssignment:
 		result = c.checkPropertyAssignment(declaration, CheckModeNormal)
 	case ast.KindShorthandPropertyAssignment:
@@ -22001,6 +22119,9 @@ func (c *Checker) getSignatureFromDeclaration(declaration *ast.Node) *Signature 
 	}
 	if ast.IsConstructorTypeNode(declaration) && ast.HasSyntacticModifier(declaration, ast.ModifierFlagsAbstract) || ast.IsConstructorDeclaration(declaration) && ast.HasSyntacticModifier(declaration.Parent, ast.ModifierFlagsAbstract) {
 		flags |= SignatureFlagsAbstract
+	}
+	if ast.GetCombinedModifierFlags(declaration)&ast.ModifierFlagsContext != 0 {
+		flags |= SignatureFlagsKvsContext
 	}
 	links.resolvedSignature = c.newSignature(flags, declaration, typeParameters, thisParameter, parameters, nil /*resolvedReturnType*/, nil /*resolvedTypePredicate*/, minArgumentCount)
 	return links.resolvedSignature
@@ -32718,7 +32839,7 @@ func (c *Checker) newSetterFunctionType(t *Type) *Type {
 
 // Creates a synthetic `Signature` corresponding to a call signature.
 func (c *Checker) newCallSignature(typeParameters []*Type, thisParameter *ast.Symbol, parameters []*ast.Symbol, returnType *Type) *Signature {
-	decl := c.factory.NewFunctionTypeNode(nil, nil, c.factory.NewKeywordTypeNode(ast.KindAnyKeyword))
+	decl := c.factory.NewFunctionTypeNode(nil, nil, c.factory.NewKeywordTypeNode(ast.KindAnyKeyword), nil)
 	return c.newSignature(SignatureFlagsNone, decl, typeParameters, thisParameter, parameters, returnType, nil, len(parameters))
 }
 
@@ -33813,6 +33934,9 @@ func (c *Checker) getSymbolAtLocation(node *ast.Node, ignoreErrors bool) *ast.Sy
 	}
 	parent := node.Parent
 	grandParent := parent.Parent
+	if ast.IsIdentifier(node) && parent.Kind == ast.KindKvsContextBinding && parent.Name() == node {
+		return c.resolveKvsContextKey(node)
+	}
 
 	if node.Flags&ast.NodeFlagsInWithStatement != 0 {
 		// We cannot answer semantic questions within a with block, do not proceed any further

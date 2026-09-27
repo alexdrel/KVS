@@ -8999,5 +8999,29 @@
     "KVS '|%>' requires a preceding pipeline stage.": {
         "category": "Error",
         "code": 100096
+    },
+    "A KVS context key requires a type annotation.": {
+        "category": "Error",
+        "code": 100097
+    },
+    "A non-nullable KVS context key requires an initializer.": {
+        "category": "Error",
+        "code": 100098
+    },
+    "A KVS context binding name must refer to a context key.": {
+        "category": "Error",
+        "code": 100099
+    },
+    "A KVS context value is only available in a context function or context block.": {
+        "category": "Error",
+        "code": 100100
+    },
+    "A KVS context function can only be called from a context function or context block.": {
+        "category": "Error",
+        "code": 100101
+    },
+    "A bindingless context statement is redundant when a context frame is already available.": {
+        "category": "Warning",
+        "code": 100102
     }
 }

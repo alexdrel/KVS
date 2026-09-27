@@ -190,7 +190,7 @@ func (b *NodeBuilderImpl) pseudoTypeToNode(t *pseudochecker.PseudoType) *ast.Nod
 		}
 		params := b.pseudoParametersToNodeList(d.Parameters)
 		returnType := b.pseudoTypeToNode(d.ReturnType)
-		return b.f.NewFunctionTypeNode(typeParams, params, returnType)
+		return b.f.NewFunctionTypeNode(typeParams, params, returnType, nil)
 	case pseudochecker.PseudoTypeKindTuple:
 		var res []*ast.Node
 		elements := t.AsPseudoTypeTuple().Elements
@@ -256,6 +256,7 @@ func (b *NodeBuilderImpl) pseudoTypeToNode(t *pseudochecker.PseudoType) *ast.Nod
 							typeParams,
 							b.pseudoParametersToNodeList(d.Parameters),
 							b.pseudoTypeToNode(d.ReturnType),
+							nil,
 						),
 						nil,
 					)

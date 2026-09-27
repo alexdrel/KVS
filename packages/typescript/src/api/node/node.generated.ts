@@ -672,6 +672,9 @@ export class RemoteNode extends RemoteNodeBase implements Node {
     get awaitModifier(): RemoteNode | undefined {
         return this.getNamedChild("awaitModifier") as RemoteNode;
     }
+    get bindings(): RemoteNodeList | undefined {
+        return this.getNamedChild("bindings") as RemoteNodeList;
+    }
     get block(): RemoteNode | undefined {
         return this.getNamedChild("block") as RemoteNode;
     }

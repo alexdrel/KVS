@@ -158,6 +158,9 @@ import type {
     KvsComparisonAlternativesExpression,
     KvsComparisonChainExpression,
     KvsConditionalElement,
+    KvsContextBinding,
+    KvsContextDeclaration,
+    KvsContextStatement,
     KvsDefaultExpression,
     KvsExtantAssertionExpression,
     KvsExtantAssignmentExpression,
@@ -351,6 +354,9 @@ export class NodeObject {
     }
     get awaitModifier(): any {
         return this._data?.awaitModifier;
+    }
+    get bindings(): any {
+        return this._data?.bindings;
     }
     get block(): any {
         return this._data?.block;
@@ -926,6 +932,12 @@ function cloneNodeData(node: Node): any {
             return { expression: n.expression };
         case SyntaxKind.KvsIfBindingStatement:
             return { clause: n.clause, elseStatement: n.elseStatement };
+        case SyntaxKind.KvsContextDeclaration:
+            return { modifiers: n.modifiers, name: n.name, type: n.type, initializer: n.initializer };
+        case SyntaxKind.KvsContextStatement:
+            return { bindings: n.bindings, statement: n.statement };
+        case SyntaxKind.KvsContextBinding:
+            return { name: n.name, questionToken: n.questionToken, equalsToken: n.equalsToken, initializer: n.initializer };
         case SyntaxKind.KvsIfBindingClause:
             return { declarationList: n.declarationList, statement: n.statement };
         case SyntaxKind.KvsNullableAssertionExpression:
@@ -1177,7 +1189,7 @@ function cloneNodeData(node: Node): any {
         case SyntaxKind.ParenthesizedType:
             return { type: n.type };
         case SyntaxKind.FunctionType:
-            return { typeParameters: n.typeParameters, parameters: n.parameters, type: n.type };
+            return { typeParameters: n.typeParameters, parameters: n.parameters, type: n.type, modifiers: n.modifiers };
         case SyntaxKind.ConstructorType:
             return { modifiers: n.modifiers, typeParameters: n.typeParameters, parameters: n.parameters, type: n.type };
         case SyntaxKind.TemplateHead:
@@ -1372,6 +1384,19 @@ const forEachChildTable: Record<number, ForEachChildFunction> = {
     [SyntaxKind.KvsIfBindingStatement]: (data, cbNode, cbNodes) =>
         visitNode(cbNode, data.clause) ||
         visitNode(cbNode, data.elseStatement),
+    [SyntaxKind.KvsContextDeclaration]: (data, cbNode, cbNodes) =>
+        visitNodes(cbNode, cbNodes, data.modifiers) ||
+        visitNode(cbNode, data.name) ||
+        visitNode(cbNode, data.type) ||
+        visitNode(cbNode, data.initializer),
+    [SyntaxKind.KvsContextStatement]: (data, cbNode, cbNodes) =>
+        visitNodes(cbNode, cbNodes, data.bindings) ||
+        visitNode(cbNode, data.statement),
+    [SyntaxKind.KvsContextBinding]: (data, cbNode, cbNodes) =>
+        visitNode(cbNode, data.name) ||
+        visitNode(cbNode, data.questionToken) ||
+        visitNode(cbNode, data.equalsToken) ||
+        visitNode(cbNode, data.initializer),
     [SyntaxKind.KvsIfBindingClause]: (data, cbNode, cbNodes) =>
         visitNode(cbNode, data.declarationList) ||
         visitNode(cbNode, data.statement),
@@ -1788,7 +1813,8 @@ const forEachChildTable: Record<number, ForEachChildFunction> = {
     [SyntaxKind.FunctionType]: (data, cbNode, cbNodes) =>
         visitNodes(cbNode, cbNodes, data.typeParameters) ||
         visitNodes(cbNode, cbNodes, data.parameters) ||
-        visitNode(cbNode, data.type),
+        visitNode(cbNode, data.type) ||
+        visitNodes(cbNode, cbNodes, data.modifiers),
     [SyntaxKind.ConstructorType]: (data, cbNode, cbNodes) =>
         visitNodes(cbNode, cbNodes, data.modifiers) ||
         visitNodes(cbNode, cbNodes, data.typeParameters) ||
@@ -2166,6 +2192,54 @@ const yieldEachChildTable: Record<number, YieldEachChildFunction> = {
         }
         if (data.elseStatement) {
             const res = yield data.elseStatement;
+            if (res) return res;
+        }
+    },
+    [SyntaxKind.KvsContextDeclaration]: function* (data) {
+        if (data.modifiers) {
+            for (const n of data.modifiers) {
+                const res = yield n;
+                if (res) return res;
+            }
+        }
+        if (data.name) {
+            const res = yield data.name;
+            if (res) return res;
+        }
+        if (data.type) {
+            const res = yield data.type;
+            if (res) return res;
+        }
+        if (data.initializer) {
+            const res = yield data.initializer;
+            if (res) return res;
+        }
+    },
+    [SyntaxKind.KvsContextStatement]: function* (data) {
+        for (const n of data.bindings) {
+            const res = yield n;
+            if (res) return res;
+        }
+        if (data.statement) {
+            const res = yield data.statement;
+            if (res) return res;
+        }
+    },
+    [SyntaxKind.KvsContextBinding]: function* (data) {
+        if (data.name) {
+            const res = yield data.name;
+            if (res) return res;
+        }
+        if (data.questionToken) {
+            const res = yield data.questionToken;
+            if (res) return res;
+        }
+        if (data.equalsToken) {
+            const res = yield data.equalsToken;
+            if (res) return res;
+        }
+        if (data.initializer) {
+            const res = yield data.initializer;
             if (res) return res;
         }
     },
@@ -3858,6 +3932,12 @@ const yieldEachChildTable: Record<number, YieldEachChildFunction> = {
             const res = yield data.type;
             if (res) return res;
         }
+        if (data.modifiers) {
+            for (const n of data.modifiers) {
+                const res = yield n;
+                if (res) return res;
+            }
+        }
     },
     [SyntaxKind.ConstructorType]: function* (data) {
         if (data.modifiers) {
@@ -4815,6 +4895,31 @@ export function createKvsIfBindingStatement(clause: KvsIfBindingClause, elseStat
         clause,
         elseStatement,
     }) as unknown as KvsIfBindingStatement;
+}
+
+export function createKvsContextDeclaration(modifiers: readonly ModifierLike[] | undefined, name: Identifier, type: TypeNode, initializer?: Expression): KvsContextDeclaration {
+    return new NodeObject(SyntaxKind.KvsContextDeclaration, {
+        modifiers: modifiers ? createNodeArray(modifiers) : undefined,
+        name,
+        type,
+        initializer,
+    }) as unknown as KvsContextDeclaration;
+}
+
+export function createKvsContextStatement(bindings: readonly KvsContextBinding[], statement: Statement): KvsContextStatement {
+    return new NodeObject(SyntaxKind.KvsContextStatement, {
+        bindings: createNodeArray(bindings),
+        statement,
+    }) as unknown as KvsContextStatement;
+}
+
+export function createKvsContextBinding(name: Identifier, questionToken: QuestionToken | undefined, equalsToken: EqualsToken, initializer: Expression): KvsContextBinding {
+    return new NodeObject(SyntaxKind.KvsContextBinding, {
+        name,
+        questionToken,
+        equalsToken,
+        initializer,
+    }) as unknown as KvsContextBinding;
 }
 
 export function createKvsIfBindingClause(declarationList: VariableDeclarationList, statement: Statement): KvsIfBindingClause {
@@ -5835,11 +5940,12 @@ export function createParenthesizedTypeNode(type: TypeNode): ParenthesizedTypeNo
     }) as unknown as ParenthesizedTypeNode;
 }
 
-export function createFunctionTypeNode(typeParameters: readonly TypeParameterDeclaration[] | undefined, parameters: readonly ParameterDeclaration[], type?: TypeNode): FunctionTypeNode {
+export function createFunctionTypeNode(typeParameters: readonly TypeParameterDeclaration[] | undefined, parameters: readonly ParameterDeclaration[], type?: TypeNode, modifiers?: readonly ModifierLike[]): FunctionTypeNode {
     return new NodeObject(SyntaxKind.FunctionType, {
         typeParameters: typeParameters ? createNodeArray(typeParameters) : undefined,
         parameters: createNodeArray(parameters),
         type,
+        modifiers: modifiers ? createNodeArray(modifiers) : undefined,
     }) as unknown as FunctionTypeNode;
 }
 
@@ -6467,6 +6573,18 @@ export function updateKvsIfBindingStatement(node: KvsIfBindingStatement, clause:
     return node.clause !== clause || node.elseStatement !== elseStatement ? createKvsIfBindingStatement(clause, elseStatement) : node;
 }
 
+export function updateKvsContextDeclaration(node: KvsContextDeclaration, modifiers: readonly ModifierLike[] | undefined, name: Identifier, type: TypeNode, initializer?: Expression): KvsContextDeclaration {
+    return node.modifiers !== modifiers || node.name !== name || node.type !== type || node.initializer !== initializer ? createKvsContextDeclaration(modifiers, name, type, initializer) : node;
+}
+
+export function updateKvsContextStatement(node: KvsContextStatement, bindings: readonly KvsContextBinding[], statement: Statement): KvsContextStatement {
+    return node.bindings !== bindings || node.statement !== statement ? createKvsContextStatement(bindings, statement) : node;
+}
+
+export function updateKvsContextBinding(node: KvsContextBinding, name: Identifier, questionToken: QuestionToken | undefined, equalsToken: EqualsToken, initializer: Expression): KvsContextBinding {
+    return node.name !== name || node.questionToken !== questionToken || node.equalsToken !== equalsToken || node.initializer !== initializer ? createKvsContextBinding(name, questionToken, equalsToken, initializer) : node;
+}
+
 export function updateKvsIfBindingClause(node: KvsIfBindingClause, declarationList: VariableDeclarationList, statement: Statement): KvsIfBindingClause {
     return node.declarationList !== declarationList || node.statement !== statement ? createKvsIfBindingClause(declarationList, statement) : node;
 }
@@ -6943,8 +7061,8 @@ export function updateParenthesizedTypeNode(node: ParenthesizedTypeNode, type: T
     return node.type !== type ? createParenthesizedTypeNode(type) : node;
 }
 
-export function updateFunctionTypeNode(node: FunctionTypeNode, typeParameters: readonly TypeParameterDeclaration[] | undefined, parameters: readonly ParameterDeclaration[], type?: TypeNode): FunctionTypeNode {
-    return node.typeParameters !== typeParameters || node.parameters !== parameters || node.type !== type ? createFunctionTypeNode(typeParameters, parameters, type) : node;
+export function updateFunctionTypeNode(node: FunctionTypeNode, typeParameters: readonly TypeParameterDeclaration[] | undefined, parameters: readonly ParameterDeclaration[], type?: TypeNode, modifiers?: readonly ModifierLike[]): FunctionTypeNode {
+    return node.typeParameters !== typeParameters || node.parameters !== parameters || node.type !== type || node.modifiers !== modifiers ? createFunctionTypeNode(typeParameters, parameters, type, modifiers) : node;
 }
 
 export function updateConstructorTypeNode(node: ConstructorTypeNode, modifiers: readonly ModifierLike[] | undefined, typeParameters: readonly TypeParameterDeclaration[] | undefined, parameters: readonly ParameterDeclaration[], type?: TypeNode): ConstructorTypeNode {

@@ -219,10 +219,10 @@ context async function loadGreeting(userId: string): string {
 }
 
 async function greetingEndpoint(request: GreetingRequest): string {
-    context! ({
-        RequestId: request.id,
-        Locale: request.locale ?? "en",
-    }) {
+    context (
+        RequestId = request.id,
+        Locale = request.locale ?? "en",
+    ) {
         return await loadGreeting(request.userId);
     }
 }

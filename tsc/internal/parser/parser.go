@@ -1095,6 +1095,13 @@ func (p *Parser) parseStatement() *ast.Statement {
 		}
 	case ast.KindFunctionKeyword:
 		return p.parseFunctionDeclaration(p.nodePos(), p.jsdocScannerInfo(), nil /*modifiers*/)
+	case ast.KindContextKeyword:
+		if p.lookAhead((*Parser).nextTokenStartsKvsContextDeclaration) {
+			return p.parseDeclaration()
+		}
+		if p.lookAhead((*Parser).nextTokenStartsKvsContextStatement) {
+			return p.parseKvsContextStatement()
+		}
 	case ast.KindClassKeyword:
 		return p.parseClassDeclaration(p.nodePos(), p.jsdocScannerInfo(), nil /*modifiers*/)
 	case ast.KindIfKeyword:
@@ -1132,6 +1139,61 @@ func (p *Parser) parseStatement() *ast.Statement {
 		}
 	}
 	return p.parseExpressionOrLabeledStatement()
+}
+
+func (p *Parser) nextTokenStartsKvsContextDeclaration() bool {
+	switch p.nextToken() {
+	case ast.KindFunctionKeyword:
+		return true
+	case ast.KindAsyncKeyword:
+		return p.nextToken() == ast.KindFunctionKeyword
+	case ast.KindIdentifier:
+		return p.nextToken() == ast.KindColonToken
+	}
+	return false
+}
+
+func (p *Parser) nextTokenStartsKvsContextStatement() bool {
+	switch p.nextToken() {
+	case ast.KindDotToken, ast.KindQuestionDotToken, ast.KindOpenBracketToken, ast.KindEqualsToken,
+		ast.KindCommaToken, ast.KindSemicolonToken, ast.KindEndOfFile:
+		return false
+	}
+	return true
+}
+
+func (p *Parser) parseKvsContextStatement() *ast.Statement {
+	pos := p.nodePos()
+	p.parseExpected(ast.KindContextKeyword)
+	bindings := p.factory.NewNodeList(nil)
+	if p.parseOptional(ast.KindOpenParenToken) {
+		bindingsPos := p.nodePos()
+		bindingNodes := make([]*ast.Node, 0)
+		if p.token == ast.KindCloseParenToken {
+			p.parseErrorAtCurrentToken(diagnostics.Identifier_expected)
+		}
+		for p.token != ast.KindCloseParenToken && p.token != ast.KindEndOfFile {
+			bindingPos := p.nodePos()
+			name := p.parseIdentifier()
+			var questionToken *ast.Node
+			var equalsToken *ast.Node
+			if p.isKvsExtantAssignment() {
+				questionToken = p.parseTokenNode()
+				equalsToken = p.parseTokenNode()
+			} else {
+				equalsToken = p.parseExpectedToken(ast.KindEqualsToken)
+			}
+			initializer := p.parseAssignmentExpressionOrHigher()
+			bindingNodes = append(bindingNodes, p.finishNode(p.factory.NewKvsContextBinding(name, questionToken, equalsToken, initializer), bindingPos))
+			if !p.parseOptional(ast.KindCommaToken) {
+				break
+			}
+		}
+		bindings = p.newNodeList(core.NewTextRange(bindingsPos, p.nodePos()), p.nodeSliceArena.Clone(bindingNodes))
+		p.parseExpected(ast.KindCloseParenToken)
+	}
+	statement := p.parseStatement()
+	return p.finishNode(p.factory.NewKvsContextStatement(bindings, statement), pos)
 }
 
 func (p *Parser) parseKvsYieldStatement() *ast.Statement {
@@ -1178,6 +1240,9 @@ func (p *Parser) parseDeclaration() *ast.Statement {
 }
 
 func (p *Parser) parseDeclarationWorker(pos int, jsdoc jsdocScannerInfo, modifiers *ast.ModifierList) *ast.Statement {
+	if modifiers != nil && modifiers.ModifierFlags&ast.ModifierFlagsContext != 0 && p.token == ast.KindIdentifier {
+		return p.parseKvsContextDeclaration(pos, jsdoc, modifiers)
+	}
 	switch p.token {
 	case ast.KindVarKeyword, ast.KindLetKeyword, ast.KindConstKeyword, ast.KindUsingKeyword:
 		return p.parseVariableStatement(pos, jsdoc, modifiers)
@@ -1217,6 +1282,16 @@ func (p *Parser) parseDeclarationWorker(pos int, jsdoc jsdocScannerInfo, modifie
 		return p.finishNode(p.factory.NewMissingDeclaration(modifiers), pos)
 	}
 	panic("Unhandled case in parseDeclarationWorker")
+}
+
+func (p *Parser) parseKvsContextDeclaration(pos int, jsdoc jsdocScannerInfo, modifiers *ast.ModifierList) *ast.Statement {
+	name := p.parseBindingIdentifier()
+	typeNode := p.parseTypeAnnotation()
+	initializer := p.parseInitializer()
+	p.parseSemicolon()
+	result := p.finishNode(p.factory.NewKvsContextDeclaration(modifiers, name, typeNode, initializer), pos)
+	p.withJSDoc(result, jsdoc)
+	return result
 }
 
 func isDeclareModifier(modifier *ast.Node) bool {
@@ -4018,8 +4093,17 @@ func (p *Parser) parseFunctionOrConstructorTypeToError(isInUnionType bool, parse
 func (p *Parser) isStartOfFunctionTypeOrConstructorType() bool {
 	return p.token == ast.KindLessThanToken ||
 		p.token == ast.KindOpenParenToken && !p.lookAhead((*Parser).nextIsParenthesizedKvsPostfixType) && p.lookAhead((*Parser).nextIsUnambiguouslyStartOfFunctionType) ||
+		p.token == ast.KindContextKeyword && p.lookAhead((*Parser).nextTokenStartsKvsContextFunctionType) ||
 		p.token == ast.KindNewKeyword ||
 		p.token == ast.KindAbstractKeyword && p.lookAhead((*Parser).nextTokenIsNewKeyword)
+}
+
+func (p *Parser) nextTokenStartsKvsContextFunctionType() bool {
+	switch p.nextToken() {
+	case ast.KindOpenParenToken, ast.KindLessThanToken:
+		return true
+	}
+	return false
 }
 
 func (p *Parser) nextIsParenthesizedKvsPostfixType() bool {
@@ -4053,9 +4137,16 @@ func (p *Parser) nextIsParenthesizedKvsPostfixType() bool {
 func (p *Parser) parseFunctionOrConstructorType() *ast.TypeNode {
 	pos := p.nodePos()
 	jsdoc := p.jsdocScannerInfo()
-	modifiers := p.parseModifiersForConstructorType()
+	var modifiers *ast.ModifierList
+	if p.token == ast.KindContextKeyword {
+		modifierPos := p.nodePos()
+		modifier := p.parseTokenNode()
+		modifiers = p.newModifierList(modifier.Loc, p.nodeSliceArena.NewSlice1(p.finishNode(modifier, modifierPos)))
+	} else {
+		modifiers = p.parseModifiersForConstructorType()
+	}
 	isConstructorType := p.parseOptional(ast.KindNewKeyword)
-	debug.Assert(modifiers == nil || isConstructorType, "Per isStartOfFunctionOrConstructorType, a function type cannot have modifiers.")
+	debug.Assert(modifiers == nil || isConstructorType || modifiers.ModifierFlags&ast.ModifierFlagsContext != 0, "Unexpected function type modifier.")
 	typeParameters := p.parseTypeParameters()
 	parameters := p.parseParameters(ParseFlagsType)
 	returnType := p.parseReturnType(ast.KindEqualsGreaterThanToken, false /*isType*/)
@@ -4063,7 +4154,7 @@ func (p *Parser) parseFunctionOrConstructorType() *ast.TypeNode {
 	if isConstructorType {
 		result = p.factory.NewConstructorTypeNode(modifiers, typeParameters, parameters, returnType)
 	} else {
-		result = p.factory.NewFunctionTypeNode(typeParameters, parameters, returnType)
+		result = p.factory.NewFunctionTypeNode(typeParameters, parameters, returnType, modifiers)
 	}
 	p.finishNode(result, pos)
 	p.withJSDoc(result, jsdoc)
@@ -7049,7 +7140,7 @@ func (p *Parser) isStartOfStatement() bool {
 	case ast.KindConstKeyword, ast.KindExportKeyword:
 		return p.isStartOfDeclaration()
 	case ast.KindAsyncKeyword, ast.KindDeclareKeyword, ast.KindInterfaceKeyword, ast.KindModuleKeyword, ast.KindNamespaceKeyword,
-		ast.KindTypeKeyword, ast.KindGlobalKeyword, ast.KindDeferKeyword:
+		ast.KindTypeKeyword, ast.KindGlobalKeyword, ast.KindContextKeyword, ast.KindDeferKeyword:
 		// When these don't start a declaration, they're an identifier in an expression statement
 		return true
 	case ast.KindAccessorKeyword, ast.KindPublicKeyword, ast.KindPrivateKeyword, ast.KindProtectedKeyword, ast.KindStaticKeyword,
@@ -7102,6 +7193,15 @@ func (p *Parser) scanStartOfDeclaration() bool {
 			return p.nextTokenIsIdentifierOnSameLine()
 		case ast.KindModuleKeyword, ast.KindNamespaceKeyword:
 			return p.nextTokenIsIdentifierOrStringLiteralOnSameLine()
+		case ast.KindContextKeyword:
+			p.nextToken()
+			if p.hasPrecedingLineBreak() {
+				return false
+			}
+			if p.token == ast.KindIdentifier {
+				return true
+			}
+			continue
 		case ast.KindAbstractKeyword, ast.KindAccessorKeyword, ast.KindAsyncKeyword, ast.KindDeclareKeyword, ast.KindPrivateKeyword,
 			ast.KindProtectedKeyword, ast.KindPublicKeyword, ast.KindReadonlyKeyword:
 			previousToken := p.token

@@ -1903,6 +1903,10 @@ func (b *NodeBuilderImpl) signatureToSignatureDeclarationHelper(signature *Signa
 	if options != nil {
 		modifiers = options.modifiers
 	}
+	if signature.flags&SignatureFlagsKvsContext != 0 {
+		flags := ast.ModifiersToFlags(modifiers)
+		modifiers = ast.CreateModifiersFromModifierFlags(flags|ast.ModifierFlagsContext, b.f.NewModifier)
+	}
 	if (kind == ast.KindConstructorType) && signature.flags&SignatureFlagsAbstract != 0 {
 		flags := ast.ModifiersToFlags(modifiers)
 		modifiers = ast.CreateModifiersFromModifierFlags(flags|ast.ModifierFlagsAbstract, b.f.NewModifier)
@@ -1954,7 +1958,7 @@ func (b *NodeBuilderImpl) signatureToSignatureDeclarationHelper(signature *Signa
 		if returnTypeNode == nil {
 			returnTypeNode = b.f.NewTypeReferenceNode(b.f.NewIdentifier(""), nil)
 		}
-		node = b.f.NewFunctionTypeNode(typeParamList, paramList, returnTypeNode)
+		node = b.f.NewFunctionTypeNode(typeParamList, paramList, returnTypeNode, modifierList)
 	case kind == ast.KindConstructorType:
 		if returnTypeNode == nil {
 			returnTypeNode = b.f.NewTypeReferenceNode(b.f.NewIdentifier(""), nil)

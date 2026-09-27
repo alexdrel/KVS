@@ -1,0 +1,101 @@
+//// [tests/cases/conformance/kvs/kvsContextErrors.ts] ////
+
+=== kvsContextErrors.ts ===
+context Required: string;
+>Required : string
+
+context Optional: string?;
+>Optional : string | null | undefined
+
+context Count: number = 0;
+>Count : number
+
+context function useContext() {
+>useContext : context () => string
+
+    return Required;
+>Required : string
+}
+
+Required;
+>Required : string
+
+useContext();
+>useContext() : string
+>useContext : context () => string
+
+function plain() {
+>plain : () => void
+
+    context (
+        Missing = 1,
+>Missing : any
+
+        Count = "wrong",
+>Count : any
+
+        Optional ?= null,
+>Optional : any
+
+    ) {
+        Count = 1;
+>Count = 1 : 1
+>Count : any
+>1 : 1
+    }
+}
+
+context function redundant() {
+>redundant : context () => void
+
+    context useContext();
+>useContext() : string
+>useContext : context () => string
+}
+
+type ContextCallable = context (value: string) => string;
+>ContextCallable : ContextCallable
+>value : string
+
+type PlainCallable = (value: string) => string;
+>PlainCallable : PlainCallable
+>value : string
+
+declare const contextCallable: ContextCallable;
+>contextCallable : ContextCallable
+
+declare const plainCallable: PlainCallable;
+>plainCallable : PlainCallable
+
+const losesContext: PlainCallable = contextCallable;
+>losesContext : PlainCallable
+>contextCallable : ContextCallable
+
+const inventsContext: ContextCallable = plainCallable;
+>inventsContext : ContextCallable
+>plainCallable : PlainCallable
+
+interface ContextService {
+    context run(value: string): string;
+>run : context (value: string) => string
+>value : string
+}
+
+declare const contextService: ContextService;
+>contextService : ContextService
+
+contextService.run("outside");
+>contextService.run("outside") : string
+>contextService.run : context (value: string) => string
+>contextService : ContextService
+>run : context (value: string) => string
+>"outside" : "outside"
+
+class Invalid {
+>Invalid : Invalid
+
+    context value = 1;
+>value : number
+>1 : 1
+}
+

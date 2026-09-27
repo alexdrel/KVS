@@ -103,6 +103,9 @@ type EmitResolver interface {
 	IsKvsNullableIterableSource(node *ast.Node) bool
 	IsKvsNullableIterableElement(node *ast.Node) bool
 	GetKvsKeyedIterationKind(node *ast.Node) KvsKeyedIterationKind
+	IsKvsContextKeyReference(node *ast.Node) bool
+	GetLocalKvsContextKeyDeclaration(node *ast.Node) *ast.Node
+	IsKvsContextCall(node *ast.Node) bool
 	IsReferencedAliasDeclaration(node *ast.Node) bool
 	IsValueAliasDeclaration(node *ast.Node) bool
 	IsTopLevelValueImportEqualsWithEntityName(node *ast.Node) bool

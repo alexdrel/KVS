@@ -57,6 +57,7 @@ var textToKeyword = map[string]ast.Kind{
 	"continue":    ast.KindContinueKeyword,
 	"const":       ast.KindConstKeyword,
 	"constructor": ast.KindConstructorKeyword,
+	"context":     ast.KindContextKeyword,
 	"debugger":    ast.KindDebuggerKeyword,
 	"declare":     ast.KindDeclareKeyword,
 	"default":     ast.KindDefaultKeyword,

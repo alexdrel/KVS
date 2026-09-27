@@ -114,6 +114,9 @@ import type {
     KvsComparisonAlternativesExpression,
     KvsComparisonChainExpression,
     KvsConditionalElement,
+    KvsContextBinding,
+    KvsContextDeclaration,
+    KvsContextStatement,
     KvsDefaultExpression,
     KvsExtantAssertionExpression,
     KvsExtantAssignmentExpression,
@@ -323,6 +326,9 @@ import {
     updateKvsComparisonAlternativesExpression,
     updateKvsComparisonChainExpression,
     updateKvsConditionalElement,
+    updateKvsContextBinding,
+    updateKvsContextDeclaration,
+    updateKvsContextStatement,
     updateKvsDefaultExpression,
     updateKvsExtantAssertionExpression,
     updateKvsExtantAssignmentExpression,
@@ -680,6 +686,25 @@ const visitEachChildTable: Record<number, VisitEachChildFunction> = {
         const _clause = visitNode(node.clause, visitor, isKvsIfBindingClause);
         const _elseStatement = visitNode(node.elseStatement, visitor, isStatement);
         return updateKvsIfBindingStatement(node, _clause, _elseStatement);
+    },
+    [SyntaxKind.KvsContextDeclaration]: (node: KvsContextDeclaration, visitor: Visitor): KvsContextDeclaration => {
+        const _modifiers = visitNodes(node.modifiers, visitor);
+        const _name = visitNode(node.name, visitor, isIdentifier);
+        const _type = visitNode(node.type, visitor, isTypeNode);
+        const _initializer = visitNode(node.initializer, visitor, isExpression);
+        return updateKvsContextDeclaration(node, _modifiers, _name, _type, _initializer);
+    },
+    [SyntaxKind.KvsContextStatement]: (node: KvsContextStatement, visitor: Visitor): KvsContextStatement => {
+        const _bindings = visitNodes(node.bindings, visitor);
+        const _statement = visitNode(node.statement, visitor, isStatement);
+        return updateKvsContextStatement(node, _bindings, _statement);
+    },
+    [SyntaxKind.KvsContextBinding]: (node: KvsContextBinding, visitor: Visitor): KvsContextBinding => {
+        const _name = visitNode(node.name, visitor, isIdentifier);
+        const _questionToken = visitNode(node.questionToken, visitor, isQuestionToken);
+        const _equalsToken = visitNode(node.equalsToken, visitor, isEqualsToken);
+        const _initializer = visitNode(node.initializer, visitor, isExpression);
+        return updateKvsContextBinding(node, _name, _questionToken, _equalsToken, _initializer);
     },
     [SyntaxKind.KvsIfBindingClause]: (node: KvsIfBindingClause, visitor: Visitor): KvsIfBindingClause => {
         const _declarationList = visitNode(node.declarationList, visitor, isVariableDeclarationList);
@@ -1365,7 +1390,8 @@ const visitEachChildTable: Record<number, VisitEachChildFunction> = {
         const _typeParameters = visitNodes(node.typeParameters, visitor);
         const _parameters = visitNodes(node.parameters, visitor);
         const _type = visitNode(node.type, visitor, isTypeNode);
-        return updateFunctionTypeNode(node, _typeParameters, _parameters, _type);
+        const _modifiers = visitNodes(node.modifiers, visitor);
+        return updateFunctionTypeNode(node, _typeParameters, _parameters, _type, _modifiers);
     },
     [SyntaxKind.ConstructorType]: (node: ConstructorTypeNode, visitor: Visitor): ConstructorTypeNode => {
         const _modifiers = visitNodes(node.modifiers, visitor);

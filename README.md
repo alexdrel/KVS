@@ -183,7 +183,7 @@ context function processOrder(order: Order) {
 }
 
 function handleRequest(request: Request) {
-    context! ({ RequestId: request.id }) {
+    context (RequestId = request.id) {
         processOrder(request.order);
     }
 }
