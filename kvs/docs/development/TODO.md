@@ -3,7 +3,7 @@
 This is a working implementation aid, not a language specification or feature order. The language
 documents remain authoritative for accepted semantics.
 
-Progress: **372 of 397 items complete (93.7%)**; **25 remain open**.
+Progress: **376 of 397 items complete (94.7%)**; **21 remain open**.
 
 - `[x]` means implemented with focused compiler evidence.
 - `[ ]` means unimplemented, incomplete, or not yet deliberately validated.
@@ -65,6 +65,8 @@ Implemented vertical slices:
 - KVS-aware formatting for implemented syntax, guarded by an all-in-one golden and idempotence
   checks across runnable examples.
 - Standalone VS Code syntax-highlighting supplementation for KVS punctuation and producer forms.
+- Record type shorthand: `{ *: Value }` as a source-preserving string index signature, including
+  readonly forms and keyed-record iteration.
 
 Known semantic debts:
 
@@ -113,6 +115,7 @@ Focused conformance inputs:
 - `tsc/testdata/tests/cases/conformance/kvs/kvsPipeline.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsRange.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsKeyedIteration.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsRecordTypeShorthand.ts`
 
 Focused language-service inputs:
 
@@ -123,6 +126,7 @@ Focused language-service inputs:
 - `tsc/internal/fourslash/tests/kvsPlaceholderLambdaLanguageService_test.go`
 - `tsc/internal/fourslash/tests/kvsPipelineLanguageService_test.go`
 - `tsc/internal/fourslash/tests/kvsTypedSpreadLanguageService_test.go`
+- `tsc/internal/fourslash/tests/kvsRecordTypeShorthandLanguageService_test.go`
 
 Run all implemented KVS slices together:
 
@@ -601,10 +605,10 @@ example `.js` files are intentionally ignored.
 
 ### Record type shorthand
 
-- [ ] `{ *: Value }` shorthand for a string index signature
-- [ ] Named fields follow existing index-signature assignability rules
-- [ ] Arbitrary key types remain the responsibility of `Map<K, V>`
-- [ ] Shorthand identifies the static record category for keyed iteration
+- [x] `{ *: Value }` shorthand for a string index signature
+- [x] Named fields follow existing index-signature assignability rules
+- [x] Arbitrary key types remain the responsibility of `Map<K, V>`
+- [x] Shorthand identifies the static record category for keyed iteration
 
 ### `distinct`
 

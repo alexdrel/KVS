@@ -1061,7 +1061,7 @@ function cloneNodeData(node: Node): any {
         case SyntaxKind.SetAccessor:
             return { modifiers: n.modifiers, name: n.name, typeParameters: n.typeParameters, parameters: n.parameters, type: n.type, body: n.body };
         case SyntaxKind.IndexSignature:
-            return { modifiers: n.modifiers, parameters: n.parameters, type: n.type };
+            return { modifiers: n.modifiers, asteriskToken: n.asteriskToken, parameters: n.parameters, type: n.type };
         case SyntaxKind.MethodSignature:
             return { modifiers: n.modifiers, name: n.name, postfixToken: n.postfixToken, typeParameters: n.typeParameters, parameters: n.parameters, type: n.type };
         case SyntaxKind.MethodDeclaration:
@@ -1630,6 +1630,7 @@ const forEachChildTable: Record<number, ForEachChildFunction> = {
         visitNode(cbNode, data.body),
     [SyntaxKind.IndexSignature]: (data, cbNode, cbNodes) =>
         visitNodes(cbNode, cbNodes, data.modifiers) ||
+        visitNode(cbNode, data.asteriskToken) ||
         visitNodes(cbNode, cbNodes, data.parameters) ||
         visitNode(cbNode, data.type),
     [SyntaxKind.MethodSignature]: (data, cbNode, cbNodes) =>
@@ -3167,6 +3168,10 @@ const yieldEachChildTable: Record<number, YieldEachChildFunction> = {
                 const res = yield n;
                 if (res) return res;
             }
+        }
+        if (data.asteriskToken) {
+            const res = yield data.asteriskToken;
+            if (res) return res;
         }
         for (const n of data.parameters) {
             const res = yield n;
@@ -5424,9 +5429,10 @@ export function createSetAccessorDeclaration(modifiers: readonly ModifierLike[] 
     }) as unknown as SetAccessorDeclaration;
 }
 
-export function createIndexSignatureDeclaration(modifiers: readonly ModifierLike[] | undefined, parameters: readonly ParameterDeclaration[], type: TypeNode): IndexSignatureDeclaration {
+export function createIndexSignatureDeclaration(modifiers: readonly ModifierLike[] | undefined, asteriskToken: AsteriskToken | undefined, parameters: readonly ParameterDeclaration[], type: TypeNode): IndexSignatureDeclaration {
     return new NodeObject(SyntaxKind.IndexSignature, {
         modifiers: modifiers ? createNodeArray(modifiers) : undefined,
+        asteriskToken,
         parameters: createNodeArray(parameters),
         type,
     }) as unknown as IndexSignatureDeclaration;
@@ -6825,8 +6831,8 @@ export function updateSetAccessorDeclaration(node: SetAccessorDeclaration, modif
     return node.modifiers !== modifiers || node.name !== name || node.typeParameters !== typeParameters || node.parameters !== parameters || node.type !== type || node.body !== body ? createSetAccessorDeclaration(modifiers, name, typeParameters, parameters, type, body) : node;
 }
 
-export function updateIndexSignatureDeclaration(node: IndexSignatureDeclaration, modifiers: readonly ModifierLike[] | undefined, parameters: readonly ParameterDeclaration[], type: TypeNode): IndexSignatureDeclaration {
-    return node.modifiers !== modifiers || node.parameters !== parameters || node.type !== type ? createIndexSignatureDeclaration(modifiers, parameters, type) : node;
+export function updateIndexSignatureDeclaration(node: IndexSignatureDeclaration, modifiers: readonly ModifierLike[] | undefined, asteriskToken: AsteriskToken | undefined, parameters: readonly ParameterDeclaration[], type: TypeNode): IndexSignatureDeclaration {
+    return node.modifiers !== modifiers || node.asteriskToken !== asteriskToken || node.parameters !== parameters || node.type !== type ? createIndexSignatureDeclaration(modifiers, asteriskToken, parameters, type) : node;
 }
 
 export function updateMethodSignatureDeclaration(node: MethodSignatureDeclaration, modifiers: readonly ModifierLike[] | undefined, name: PropertyName, postfixToken: QuestionToken | ExclamationToken | undefined, typeParameters: readonly TypeParameterDeclaration[] | undefined, parameters: readonly ParameterDeclaration[], type?: TypeNode): MethodSignatureDeclaration {

@@ -966,6 +966,7 @@ export interface SetAccessorDeclaration extends NodeBase, DeclarationBase, Named
 }
 export interface IndexSignatureDeclaration extends NodeBase, DeclarationBase, ModifiersBase, FunctionLikeBase, TypeElementBase, ClassElementBase {
     readonly kind: SyntaxKind.IndexSignature;
+    readonly asteriskToken?: AsteriskToken;
     readonly type: TypeNode;
 }
 export interface MethodSignatureDeclaration extends NodeBase, DeclarationBase, NamedMemberBase, FunctionLikeBase, TypeElementBase {

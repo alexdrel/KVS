@@ -1,0 +1,130 @@
+//// [tests/cases/conformance/kvs/kvsRecordTypeShorthand.ts] ////
+
+=== kvsRecordTypeShorthand.ts ===
+interface User {
+>User : Symbol(User, Decl(kvsRecordTypeShorthand.ts, 0, 0))
+
+    name: string;
+>name : Symbol(User.name, Decl(kvsRecordTypeShorthand.ts, 0, 16))
+}
+
+type Users = { *: User };
+>Users : Symbol(Users, Decl(kvsRecordTypeShorthand.ts, 2, 1))
+>User : Symbol(User, Decl(kvsRecordTypeShorthand.ts, 0, 0))
+
+interface VersionedUsers {
+>VersionedUsers : Symbol(VersionedUsers, Decl(kvsRecordTypeShorthand.ts, 4, 25))
+
+    *: User | number;
+>User : Symbol(User, Decl(kvsRecordTypeShorthand.ts, 0, 0))
+
+    version: number;
+>version : Symbol(VersionedUsers.version, Decl(kvsRecordTypeShorthand.ts, 7, 21))
+}
+
+interface ReadonlyUsers {
+>ReadonlyUsers : Symbol(ReadonlyUsers, Decl(kvsRecordTypeShorthand.ts, 9, 1))
+
+    readonly *: User;
+>User : Symbol(User, Decl(kvsRecordTypeShorthand.ts, 0, 0))
+}
+
+declare const users: Users;
+>users : Symbol(users, Decl(kvsRecordTypeShorthand.ts, 15, 13))
+>Users : Symbol(Users, Decl(kvsRecordTypeShorthand.ts, 2, 1))
+
+declare const versionedUsers: VersionedUsers;
+>versionedUsers : Symbol(versionedUsers, Decl(kvsRecordTypeShorthand.ts, 16, 13))
+>VersionedUsers : Symbol(VersionedUsers, Decl(kvsRecordTypeShorthand.ts, 4, 25))
+
+declare const readonlyUsers: ReadonlyUsers;
+>readonlyUsers : Symbol(readonlyUsers, Decl(kvsRecordTypeShorthand.ts, 17, 13))
+>ReadonlyUsers : Symbol(ReadonlyUsers, Decl(kvsRecordTypeShorthand.ts, 9, 1))
+
+const ada = users["ada"];
+>ada : Symbol(ada, Decl(kvsRecordTypeShorthand.ts, 19, 5))
+>users : Symbol(users, Decl(kvsRecordTypeShorthand.ts, 15, 13))
+
+users["grace"] = { name: "Grace" };
+>users : Symbol(users, Decl(kvsRecordTypeShorthand.ts, 15, 13))
+>name : Symbol(name, Decl(kvsRecordTypeShorthand.ts, 20, 18))
+
+const version = versionedUsers.version;
+>version : Symbol(version, Decl(kvsRecordTypeShorthand.ts, 21, 5))
+>versionedUsers.version : Symbol(VersionedUsers.version, Decl(kvsRecordTypeShorthand.ts, 7, 21))
+>versionedUsers : Symbol(versionedUsers, Decl(kvsRecordTypeShorthand.ts, 16, 13))
+>version : Symbol(VersionedUsers.version, Decl(kvsRecordTypeShorthand.ts, 7, 21))
+
+readonlyUsers["ada"] = { name: "Augusta" };
+>readonlyUsers : Symbol(readonlyUsers, Decl(kvsRecordTypeShorthand.ts, 17, 13))
+>name : Symbol(name, Decl(kvsRecordTypeShorthand.ts, 22, 24))
+
+for (users) {
+>users : Symbol(users, Decl(kvsRecordTypeShorthand.ts, 15, 13))
+
+    const id: string = #;
+>id : Symbol(id, Decl(kvsRecordTypeShorthand.ts, 25, 9))
+
+    const user: User = _;
+>user : Symbol(user, Decl(kvsRecordTypeShorthand.ts, 26, 9))
+>User : Symbol(User, Decl(kvsRecordTypeShorthand.ts, 0, 0))
+>_ : Symbol(_, Decl(kvsRecordTypeShorthand.ts, 26, 22))
+}
+
+for (const [id, user] in users) {
+>id : Symbol(id, Decl(kvsRecordTypeShorthand.ts, 29, 12))
+>user : Symbol(user, Decl(kvsRecordTypeShorthand.ts, 29, 15))
+>users : Symbol(users, Decl(kvsRecordTypeShorthand.ts, 15, 13))
+
+    const recordId: string = id;
+>recordId : Symbol(recordId, Decl(kvsRecordTypeShorthand.ts, 30, 9))
+>id : Symbol(id, Decl(kvsRecordTypeShorthand.ts, 29, 12))
+
+    const recordUser: User = user;
+>recordUser : Symbol(recordUser, Decl(kvsRecordTypeShorthand.ts, 31, 9))
+>User : Symbol(User, Decl(kvsRecordTypeShorthand.ts, 0, 0))
+>user : Symbol(user, Decl(kvsRecordTypeShorthand.ts, 29, 15))
+}
+
+interface InvalidNamedField {
+>InvalidNamedField : Symbol(InvalidNamedField, Decl(kvsRecordTypeShorthand.ts, 32, 1))
+
+    *: User;
+>User : Symbol(User, Decl(kvsRecordTypeShorthand.ts, 0, 0))
+
+    version: number;
+>version : Symbol(InvalidNamedField.version, Decl(kvsRecordTypeShorthand.ts, 35, 12))
+}
+
+interface DuplicateShorthand {
+>DuplicateShorthand : Symbol(DuplicateShorthand, Decl(kvsRecordTypeShorthand.ts, 37, 1))
+
+    *: User;
+>User : Symbol(User, Decl(kvsRecordTypeShorthand.ts, 0, 0))
+
+    *: User;
+>User : Symbol(User, Decl(kvsRecordTypeShorthand.ts, 0, 0))
+}
+
+interface DuplicateExpanded {
+>DuplicateExpanded : Symbol(DuplicateExpanded, Decl(kvsRecordTypeShorthand.ts, 42, 1))
+
+    *: User;
+>User : Symbol(User, Decl(kvsRecordTypeShorthand.ts, 0, 0))
+
+    [key: string]: User;
+>key : Symbol(key, Decl(kvsRecordTypeShorthand.ts, 46, 5))
+>User : Symbol(User, Decl(kvsRecordTypeShorthand.ts, 0, 0))
+}
+
+declare const badValue: { *: User };
+>badValue : Symbol(badValue, Decl(kvsRecordTypeShorthand.ts, 49, 13))
+>User : Symbol(User, Decl(kvsRecordTypeShorthand.ts, 0, 0))
+
+const rejected: Users = { ada: { name: "Ada" }, count: 1 };
+>rejected : Symbol(rejected, Decl(kvsRecordTypeShorthand.ts, 50, 5))
+>Users : Symbol(Users, Decl(kvsRecordTypeShorthand.ts, 2, 1))
+>ada : Symbol(ada, Decl(kvsRecordTypeShorthand.ts, 50, 25))
+>name : Symbol(name, Decl(kvsRecordTypeShorthand.ts, 50, 32))
+>count : Symbol(count, Decl(kvsRecordTypeShorthand.ts, 50, 47))
+

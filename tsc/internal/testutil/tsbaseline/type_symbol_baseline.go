@@ -305,6 +305,11 @@ func (walker *typeWriterWalker) visitNode(node *ast.Node, isSymbolWalk bool) []*
 	nodes := forEachASTNode(node)
 	var results []*typeWriterResult
 	for _, n := range nodes {
+		if n.Kind == ast.KindIdentifier && n.Flags&ast.NodeFlagsSynthesized != 0 && n.Parent != nil && n.Parent.Kind == ast.KindParameter && n.Parent.Parent != nil && n.Parent.Parent.Kind == ast.KindIndexSignature && n.Parent.Parent.AsIndexSignatureDeclaration().AsteriskToken != nil {
+			// The record shorthand's synthetic `key` parameter supplies ordinary
+			// string-index-signature semantics but has no authored source text.
+			continue
+		}
 		if n.Kind == ast.KindIdentifier && n.Flags&ast.NodeFlagsSynthesized != 0 && n.Text() == "__kvsPlaceholder" && n.Parent != nil && n.Parent.Kind == ast.KindParameter {
 			// The placeholder parameter is parser-created binding scaffolding. Its
 			// source range points at the first authored `%`, but it is not itself

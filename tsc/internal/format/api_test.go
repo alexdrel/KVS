@@ -79,6 +79,20 @@ func TestFormatKvsPlaceholderLambda(t *testing.T) {
 	assert.Equal(t, applyBulkEdits(text, edits), "const link = \"docs\"\n    |> aliases.get(%) |?>\n    encodeURI |%> console.log;\n")
 }
 
+func TestFormatKvsRecordTypeShorthand(t *testing.T) {
+	t.Parallel()
+
+	ctx := format.WithFormatCodeSettings(t.Context(), lsutil.GetDefaultFormatCodeSettings(), "\n")
+	text := "type Users={readonly   * :User;version : number};\n"
+	sourceFile := parser.ParseSourceFile(ast.SourceFileParseOptions{
+		FileName: "/record.ts",
+		Path:     "/record.ts",
+	}, text, core.ScriptKindTS)
+
+	edits := format.FormatDocument(ctx, sourceFile)
+	assert.Equal(t, applyBulkEdits(text, edits), "type Users = { readonly *: User; version: number };\n")
+}
+
 func TestFormatKvsAllInOne(t *testing.T) {
 	t.Parallel()
 

@@ -695,9 +695,10 @@ func (d *astDecoder) createChildrenNode(kind ast.Kind, data uint32, childIndices
 	case ast.KindIndexSignature:
 		it := newChildIter(childIndices)
 		modifiers := d.modifierListAt(it.nextIf(mask, 0))
-		parameters := d.nodeListAt(it.nextIf(mask, 1))
-		typeNode := d.nodeAt(it.nextIf(mask, 2))
-		return d.factory.NewIndexSignatureDeclaration(modifiers, parameters, typeNode), nil
+		asteriskToken := d.nodeAt(it.nextIf(mask, 1))
+		parameters := d.nodeListAt(it.nextIf(mask, 2))
+		typeNode := d.nodeAt(it.nextIf(mask, 3))
+		return d.factory.NewIndexSignatureDeclaration(modifiers, asteriskToken, parameters, typeNode), nil
 	case ast.KindMethodSignature:
 		it := newChildIter(childIndices)
 		modifiers := d.modifierListAt(it.nextIf(mask, 0))

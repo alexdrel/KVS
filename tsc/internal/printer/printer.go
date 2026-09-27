@@ -1798,7 +1798,11 @@ func (p *Printer) emitIndexSignature(node *ast.IndexSignatureDeclaration) {
 	indented := p.shouldEmitIndented(node.AsNode())
 	p.increaseIndentIf(indented)
 	p.pushNameGenerationScope(node.AsNode())
-	p.emitParametersForIndexSignature(node.AsNode(), node.Parameters)
+	if node.AsteriskToken != nil {
+		p.emitTokenNode(node.AsteriskToken)
+	} else {
+		p.emitParametersForIndexSignature(node.AsNode(), node.Parameters)
+	}
 	p.emitTypeAnnotation(node.Type)
 	p.writeTrailingSemicolon()
 	p.popNameGenerationScope(node.AsNode())

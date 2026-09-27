@@ -728,6 +728,7 @@ func getExistingNodeTreeVisitor(b *NodeBuilderImpl, bound *recoveryBoundary) *as
 				return factory.UpdateIndexSignatureDeclaration(
 					node.AsIndexSignatureDeclaration(),
 					node.Modifiers(),
+					node.AsIndexSignatureDeclaration().AsteriskToken,
 					node.AsIndexSignatureDeclaration().Parameters,
 					newType,
 				)

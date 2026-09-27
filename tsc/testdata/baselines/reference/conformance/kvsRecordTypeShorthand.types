@@ -1,0 +1,116 @@
+//// [tests/cases/conformance/kvs/kvsRecordTypeShorthand.ts] ////
+
+=== kvsRecordTypeShorthand.ts ===
+interface User {
+    name: string;
+>name : string
+}
+
+type Users = { *: User };
+>Users : Users
+
+interface VersionedUsers {
+    *: User | number;
+    version: number;
+>version : number
+}
+
+interface ReadonlyUsers {
+    readonly *: User;
+}
+
+declare const users: Users;
+>users : Users
+
+declare const versionedUsers: VersionedUsers;
+>versionedUsers : VersionedUsers
+
+declare const readonlyUsers: ReadonlyUsers;
+>readonlyUsers : ReadonlyUsers
+
+const ada = users["ada"];
+>ada : User
+>users["ada"] : User
+>users : Users
+>"ada" : "ada"
+
+users["grace"] = { name: "Grace" };
+>users["grace"] = { name: "Grace" } : { name: string; }
+>users["grace"] : User
+>users : Users
+>"grace" : "grace"
+>{ name: "Grace" } : { name: string; }
+>name : string
+>"Grace" : "Grace"
+
+const version = versionedUsers.version;
+>version : number
+>versionedUsers.version : number
+>versionedUsers : VersionedUsers
+>version : number
+
+readonlyUsers["ada"] = { name: "Augusta" };
+>readonlyUsers["ada"] = { name: "Augusta" } : { name: string; }
+>readonlyUsers["ada"] : User
+>readonlyUsers : ReadonlyUsers
+>"ada" : "ada"
+>{ name: "Augusta" } : { name: string; }
+>name : string
+>"Augusta" : "Augusta"
+
+for (users) {
+>users : Users
+
+    const id: string = #;
+>id : string
+># : string
+
+    const user: User = _;
+>user : User
+>_ : User
+}
+
+for (const [id, user] in users) {
+>id : string
+>user : User
+>users : Users
+
+    const recordId: string = id;
+>recordId : string
+>id : string
+
+    const recordUser: User = user;
+>recordUser : User
+>user : User
+}
+
+interface InvalidNamedField {
+    *: User;
+    version: number;
+>version : number
+}
+
+interface DuplicateShorthand {
+    *: User;
+    *: User;
+}
+
+interface DuplicateExpanded {
+    *: User;
+    [key: string]: User;
+>key : string
+}
+
+declare const badValue: { *: User };
+>badValue : { [key: string]: User; }
+
+const rejected: Users = { ada: { name: "Ada" }, count: 1 };
+>rejected : Users
+>{ ada: { name: "Ada" }, count: 1 } : { ada: { name: string; }; count: number; }
+>ada : { name: string; }
+>{ name: "Ada" } : { name: string; }
+>name : string
+>"Ada" : "Ada"
+>count : number
+>1 : 1
+

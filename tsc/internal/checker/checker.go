@@ -30106,6 +30106,9 @@ func isRestParameter(param *ast.Node) bool {
 
 func getNameFromIndexInfo(info *IndexInfo) string {
 	if info.declaration != nil {
+		if declaration := info.declaration.AsIndexSignatureDeclaration(); declaration.AsteriskToken != nil {
+			return "key"
+		}
 		return scanner.DeclarationNameToString(info.declaration.Parameters()[0].Name())
 	}
 	return "x"

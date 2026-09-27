@@ -1483,6 +1483,7 @@ func (r *EmitResolver) CreateLateBoundIndexSignatures(emitContext *printer.EmitC
 				node = emitContext.Factory.UpdateIndexSignatureDeclaration(
 					node.AsIndexSignatureDeclaration(),
 					mods,
+					node.AsIndexSignatureDeclaration().AsteriskToken,
 					node.ParameterList(),
 					node.Type(),
 				)

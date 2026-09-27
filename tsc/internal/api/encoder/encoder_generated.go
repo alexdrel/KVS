@@ -295,7 +295,7 @@ func getChildrenPropertyMask(node *ast.Node) uint8 {
 		return (boolToByte(hasModifiers(n.Modifiers())) << 0) | (boolToByte(n.Name() != nil) << 1) | (boolToByte(n.TypeParameters != nil) << 2) | (boolToByte(n.Parameters != nil) << 3) | (boolToByte(n.Type != nil) << 4) | (boolToByte(n.Body != nil) << 5)
 	case ast.KindIndexSignature:
 		n := node.AsIndexSignatureDeclaration()
-		return (boolToByte(hasModifiers(n.Modifiers())) << 0) | (boolToByte(n.Parameters != nil) << 1) | (boolToByte(n.Type != nil) << 2)
+		return (boolToByte(hasModifiers(n.Modifiers())) << 0) | (boolToByte(n.AsteriskToken != nil) << 1) | (boolToByte(n.Parameters != nil) << 2) | (boolToByte(n.Type != nil) << 3)
 	case ast.KindMethodSignature:
 		n := node.AsMethodSignatureDeclaration()
 		return (boolToByte(hasModifiers(n.Modifiers())) << 0) | (boolToByte(n.Name() != nil) << 1) | (boolToByte(n.PostfixToken != nil) << 2) | (boolToByte(n.TypeParameters != nil) << 3) | (boolToByte(n.Parameters != nil) << 4) | (boolToByte(n.Type != nil) << 5)

@@ -3330,6 +3330,11 @@
                         "inherited": true
                     },
                     {
+                        "name": "AsteriskToken",
+                        "type": "AsteriskToken",
+                        "optional": true
+                    },
+                    {
                         "name": "Parameters",
                         "inherited": true
                     },

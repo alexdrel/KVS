@@ -1,11 +1,39 @@
 # Lightweight Type-System Additions
 
 KVS adds inexpensive static information where it can remain compatible with ordinary JavaScript
-values. The main addition here is `distinct`: a primitive value can carry a domain without a runtime
-wrapper.
+values. Record shorthand concisely names string-keyed dictionaries, while `distinct` lets a
+primitive value carry a domain without a runtime wrapper.
 
 Nullable type operators, expression inference, and assertions are covered in
 [Nullability, Values, and Defaults](values.md).
+
+## Record type shorthand
+
+`*` is a concise spelling for a TypeScript string index signature:
+
+```kvs
+type Users = { *: User };
+```
+
+This is equivalent to `{ [key: string]: User }` and adds no new type-system semantics. It works in
+type literals and interfaces, and may be readonly:
+
+```kvs
+interface Users {
+    readonly *: User | number;
+    version: number;
+}
+```
+
+Named fields follow TypeScript's existing index-signature assignability rules. The shorthand covers
+arbitrary string keys only; use `Map<K, V>` for other key types.
+
+A shorthand type is consequently a static record source for keyed iteration:
+
+```kvs
+for (users) use(#, _); // string key, User value
+for (const [id, user] in users) use(id, user);
+```
 
 ## Distinct primitive domains
 

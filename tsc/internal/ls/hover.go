@@ -762,7 +762,7 @@ func getQuickInfoAndDeclarationAtLocation(c *checker.Checker, symbol *ast.Symbol
 				if declaration != nil {
 					declaration = ast.GetRootDeclaration(declaration)
 				}
-				explicitKvsType := getExplicitKvsTypeAnnotation(declaration)
+				explicitKvsType := getExplicitKvsTypeNode(declaration)
 				// If the type is a constrained type parameter, support expansion:
 				// Level 0: show just "T", signal canIncreaseVerbosity
 				// Level 1+: show "T extends Constraint" with the constraint expanded at level-1
@@ -959,14 +959,19 @@ func getQuickInfoAndDeclarationAtLocation(c *checker.Checker, symbol *ast.Symbol
 			writeSymbolClassified(symbol, container, ast.SymbolFlagsNone, symbolFormatFlags)
 			writeTypeParams(c.GetTypeAliasTypeParameters(symbol))
 			dpw.WriteOperator(" = ")
-			var typeAliasType *checker.Type
-			if node.Parent != nil && ast.IsConstTypeReference(node.Parent) {
-				typeAliasType = c.GetTypeAtLocation(node.Parent)
+			declaration := core.Find(symbol.Declarations, ast.IsTypeOrJSTypeAliasDeclaration)
+			if explicitKvsType := getExplicitKvsTypeNode(declaration); explicitKvsType != nil {
+				writeTypeNodeClassified(explicitKvsType)
 			} else {
-				typeAliasType = c.GetDeclaredTypeOfSymbol(symbol)
+				var typeAliasType *checker.Type
+				if node.Parent != nil && ast.IsConstTypeReference(node.Parent) {
+					typeAliasType = c.GetTypeAtLocation(node.Parent)
+				} else {
+					typeAliasType = c.GetDeclaredTypeOfSymbol(symbol)
+				}
+				writeTypeClassified(typeAliasType, container, typeFormatFlags|checker.TypeFormatFlagsInTypeAlias)
 			}
-			writeTypeClassified(typeAliasType, container, typeFormatFlags|checker.TypeFormatFlagsInTypeAlias)
-			setDeclaration(core.Find(symbol.Declarations, ast.IsTypeOrJSTypeAliasDeclaration))
+			setDeclaration(declaration)
 		}
 		if flags&ast.SymbolFlagsSignature != 0 {
 			writeNewLine()
@@ -978,8 +983,8 @@ func getQuickInfoAndDeclarationAtLocation(c *checker.Checker, symbol *ast.Symbol
 	return symbolDisplayInfo{displayParts: dpw, declaration: firstDeclaration}
 }
 
-func getExplicitKvsTypeAnnotation(declaration *ast.Node) *ast.Node {
-	if declaration == nil || !(ast.IsParameterDeclaration(declaration) || ast.IsVariableDeclaration(declaration) || ast.IsPropertySignatureDeclaration(declaration) || ast.IsPropertyDeclaration(declaration) || ast.IsKvsContextDeclaration(declaration)) {
+func getExplicitKvsTypeNode(declaration *ast.Node) *ast.Node {
+	if declaration == nil || !(ast.IsParameterDeclaration(declaration) || ast.IsVariableDeclaration(declaration) || ast.IsPropertySignatureDeclaration(declaration) || ast.IsPropertyDeclaration(declaration) || ast.IsKvsContextDeclaration(declaration) || ast.IsTypeAliasDeclaration(declaration)) {
 		return nil
 	}
 	typeNode := declaration.Type()
@@ -989,7 +994,7 @@ func getExplicitKvsTypeAnnotation(declaration *ast.Node) *ast.Node {
 	found := false
 	var visit func(*ast.Node) bool
 	visit = func(node *ast.Node) bool {
-		if node.Kind == ast.KindKvsNullableType || node.Kind == ast.KindKvsExtantType {
+		if node.Kind == ast.KindKvsNullableType || node.Kind == ast.KindKvsExtantType || ast.IsIndexSignatureDeclaration(node) && node.AsIndexSignatureDeclaration().AsteriskToken != nil {
 			found = true
 			return true
 		}

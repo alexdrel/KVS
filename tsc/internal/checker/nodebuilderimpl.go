@@ -1950,7 +1950,7 @@ func (b *NodeBuilderImpl) signatureToSignatureDeclarationHelper(signature *Signa
 	case kind == ast.KindSetAccessor:
 		node = b.f.NewSetAccessorDeclaration(modifierList, name, nil /*typeParamList*/, paramList, nil /*returnTypeNode*/, nil /*fullSignature*/, nil /*body*/)
 	case kind == ast.KindIndexSignature:
-		node = b.f.NewIndexSignatureDeclaration(modifierList, paramList, returnTypeNode)
+		node = b.f.NewIndexSignatureDeclaration(modifierList, nil, paramList, returnTypeNode)
 	// !!! JSDoc Support
 	// case kind == ast.KindJSDocFunctionType:
 	// 	node = b.f.NewJSDocFunctionType(parameters, returnTypeNode)
@@ -2232,7 +2232,7 @@ func (b *NodeBuilderImpl) indexInfoToIndexSignatureDeclarationHelper(indexInfo *
 		b.ctx.approximateLength += 9
 		modifiers = b.f.NewModifierList([]*ast.Node{b.f.NewModifier(ast.KindReadonlyKeyword)})
 	}
-	return b.f.NewIndexSignatureDeclaration(modifiers, b.f.NewNodeList([]*ast.Node{indexingParameter}), typeNode)
+	return b.f.NewIndexSignatureDeclaration(modifiers, nil, b.f.NewNodeList([]*ast.Node{indexingParameter}), typeNode)
 }
 
 func hasTypeAnnotation(declaration *ast.Declaration) bool {

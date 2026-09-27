@@ -1,0 +1,77 @@
+kvsRecordTypeShorthand.ts(23,1): error TS2542: Index signature in type 'ReadonlyUsers' only permits reading.
+kvsRecordTypeShorthand.ts(37,5): error TS2411: Property 'version' of type 'number' is not assignable to 'string' index type 'User'.
+kvsRecordTypeShorthand.ts(41,5): error TS2374: Duplicate index signature for type 'string'.
+kvsRecordTypeShorthand.ts(42,5): error TS2374: Duplicate index signature for type 'string'.
+kvsRecordTypeShorthand.ts(46,5): error TS2374: Duplicate index signature for type 'string'.
+kvsRecordTypeShorthand.ts(47,5): error TS2374: Duplicate index signature for type 'string'.
+kvsRecordTypeShorthand.ts(51,49): error TS2322: Type 'number' is not assignable to type 'User'.
+
+
+==== kvsRecordTypeShorthand.ts (7 errors) ====
+    interface User {
+        name: string;
+    }
+    
+    type Users = { *: User };
+    
+    interface VersionedUsers {
+        *: User | number;
+        version: number;
+    }
+    
+    interface ReadonlyUsers {
+        readonly *: User;
+    }
+    
+    declare const users: Users;
+    declare const versionedUsers: VersionedUsers;
+    declare const readonlyUsers: ReadonlyUsers;
+    
+    const ada = users["ada"];
+    users["grace"] = { name: "Grace" };
+    const version = versionedUsers.version;
+    readonlyUsers["ada"] = { name: "Augusta" };
+    ~~~~~~~~~~~~~~~~~~~~
+!!! error TS2542: Index signature in type 'ReadonlyUsers' only permits reading.
+    
+    for (users) {
+        const id: string = #;
+        const user: User = _;
+    }
+    
+    for (const [id, user] in users) {
+        const recordId: string = id;
+        const recordUser: User = user;
+    }
+    
+    interface InvalidNamedField {
+        *: User;
+        version: number;
+        ~~~~~~~
+!!! error TS2411: Property 'version' of type 'number' is not assignable to 'string' index type 'User'.
+    }
+    
+    interface DuplicateShorthand {
+        *: User;
+        ~~~~~~~~
+!!! error TS2374: Duplicate index signature for type 'string'.
+        *: User;
+        ~~~~~~~~
+!!! error TS2374: Duplicate index signature for type 'string'.
+    }
+    
+    interface DuplicateExpanded {
+        *: User;
+        ~~~~~~~~
+!!! error TS2374: Duplicate index signature for type 'string'.
+        [key: string]: User;
+        ~~~~~~~~~~~~~~~~~~~~
+!!! error TS2374: Duplicate index signature for type 'string'.
+    }
+    
+    declare const badValue: { *: User };
+    const rejected: Users = { ada: { name: "Ada" }, count: 1 };
+                                                    ~~~~~
+!!! error TS2322: Type 'number' is not assignable to type 'User'.
+!!! related TS6501 kvsRecordTypeShorthand.ts:5:16: The expected type comes from this index signature.
+    

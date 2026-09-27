@@ -955,6 +955,7 @@ func (tx *DeclarationTransformer) transformIndexSignatureDeclaration(input *ast.
 	return tx.Factory().UpdateIndexSignatureDeclaration(
 		input,
 		tx.ensureModifiers(input.AsNode()),
+		input.AsteriskToken,
 		tx.updateParamList(input.AsNode(), input.Parameters),
 		t,
 	)

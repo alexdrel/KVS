@@ -1063,9 +1063,10 @@ const visitEachChildTable: Record<number, VisitEachChildFunction> = {
     },
     [SyntaxKind.IndexSignature]: (node: IndexSignatureDeclaration, visitor: Visitor): IndexSignatureDeclaration => {
         const _modifiers = visitNodes(node.modifiers, visitor);
+        const _asteriskToken = visitNode(node.asteriskToken, visitor, isAsteriskToken);
         const _parameters = visitNodes(node.parameters, visitor);
         const _type = visitNode(node.type, visitor, isTypeNode);
-        return updateIndexSignatureDeclaration(node, _modifiers, _parameters, _type);
+        return updateIndexSignatureDeclaration(node, _modifiers, _asteriskToken, _parameters, _type);
     },
     [SyntaxKind.MethodSignature]: (node: MethodSignatureDeclaration, visitor: Visitor): MethodSignatureDeclaration => {
         const _modifiers = visitNodes(node.modifiers, visitor);

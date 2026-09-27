@@ -589,6 +589,15 @@ func (w *formatSpanWorker) executeProcessNodeVisitor(node *ast.Node, indenter *d
 			w.visitor.VisitNode(forStatement.Expression)
 			w.visitor.VisitNode(forStatement.Statement)
 		}
+	case ast.KindIndexSignature:
+		indexSignature := node.AsIndexSignatureDeclaration()
+		if indexSignature.AsteriskToken == nil {
+			node.VisitEachChild(w.visitor)
+		} else {
+			w.visitor.VisitModifiers(indexSignature.Modifiers())
+			w.visitor.VisitNode(indexSignature.AsteriskToken)
+			w.visitor.VisitNode(indexSignature.Type)
+		}
 	default:
 		node.VisitEachChild(w.visitor)
 	}

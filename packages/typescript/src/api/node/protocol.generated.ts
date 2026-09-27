@@ -95,7 +95,7 @@ export const childProperties: Readonly<Partial<Record<SyntaxKind, readonly (stri
     [SyntaxKind.Constructor]: ["modifiers", "typeParameters", "parameters", "type", "body"],
     [SyntaxKind.GetAccessor]: ["modifiers", "name", "typeParameters", "parameters", "type", "body"],
     [SyntaxKind.SetAccessor]: ["modifiers", "name", "typeParameters", "parameters", "type", "body"],
-    [SyntaxKind.IndexSignature]: ["modifiers", "parameters", "type"],
+    [SyntaxKind.IndexSignature]: ["modifiers", "asteriskToken", "parameters", "type"],
     [SyntaxKind.MethodSignature]: ["modifiers", "name", "postfixToken", "typeParameters", "parameters", "type"],
     [SyntaxKind.MethodDeclaration]: ["modifiers", "asteriskToken", "name", "postfixToken", "typeParameters", "parameters", "type", "body"],
     [SyntaxKind.PropertySignature]: ["modifiers", "name", "postfixToken", "type", "initializer"],

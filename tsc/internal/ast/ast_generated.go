@@ -5048,33 +5048,38 @@ type IndexSignatureDeclaration struct {
 	DeclarationBase
 	ModifiersBase
 	FunctionLikeBase
+	AsteriskToken *AsteriskToken // Optional
 }
 
-func (f *NodeFactory) NewIndexSignatureDeclaration(modifiers *ModifierList, parameters *ParameterList, typeNode *TypeNode) *Node {
+func (f *NodeFactory) NewIndexSignatureDeclaration(modifiers *ModifierList, asteriskToken *AsteriskToken, parameters *ParameterList, typeNode *TypeNode) *Node {
 	data := &IndexSignatureDeclaration{}
 	data.modifiers = modifiers
+	data.AsteriskToken = asteriskToken
 	data.Parameters = parameters
 	data.Type = typeNode
 	return f.newNode(KindIndexSignature, data)
 }
 
-func (f *NodeFactory) UpdateIndexSignatureDeclaration(node *IndexSignatureDeclaration, modifiers *ModifierList, parameters *ParameterList, typeNode *TypeNode) *Node {
-	if modifiers != node.modifiers || parameters != node.Parameters || typeNode != node.Type {
-		return updateNode(f.NewIndexSignatureDeclaration(modifiers, parameters, typeNode), node.AsNode(), f.hooks)
+func (f *NodeFactory) UpdateIndexSignatureDeclaration(node *IndexSignatureDeclaration, modifiers *ModifierList, asteriskToken *AsteriskToken, parameters *ParameterList, typeNode *TypeNode) *Node {
+	if modifiers != node.modifiers || asteriskToken != node.AsteriskToken || parameters != node.Parameters || typeNode != node.Type {
+		return updateNode(f.NewIndexSignatureDeclaration(modifiers, asteriskToken, parameters, typeNode), node.AsNode(), f.hooks)
 	}
 	return node.AsNode()
 }
 
 func (node *IndexSignatureDeclaration) ForEachChild(v Visitor) bool {
-	return visitModifiers(v, node.modifiers) || visitNodeList(v, node.Parameters) || visit(v, node.Type)
+	return visitModifiers(v, node.modifiers) ||
+		visit(v, node.AsteriskToken) ||
+		visitNodeList(v, node.Parameters) ||
+		visit(v, node.Type)
 }
 
 func (node *IndexSignatureDeclaration) VisitEachChild(v *NodeVisitor) *Node {
-	return v.Factory.UpdateIndexSignatureDeclaration(node, v.visitModifiers(node.modifiers), v.visitNodes(node.Parameters), v.visitNode(node.Type))
+	return v.Factory.UpdateIndexSignatureDeclaration(node, v.visitModifiers(node.modifiers), v.visitNode(node.AsteriskToken), v.visitNodes(node.Parameters), v.visitNode(node.Type))
 }
 
 func (node *IndexSignatureDeclaration) Clone(f NodeFactoryCoercible) *Node {
-	return cloneNode(f.AsNodeFactory().NewIndexSignatureDeclaration(node.Modifiers(), node.Parameters, node.Type), node.AsNode(), f.AsNodeFactory().hooks)
+	return cloneNode(f.AsNodeFactory().NewIndexSignatureDeclaration(node.Modifiers(), node.AsteriskToken, node.Parameters, node.Type), node.AsNode(), f.AsNodeFactory().hooks)
 }
 
 func IsIndexSignatureDeclaration(node *Node) bool {

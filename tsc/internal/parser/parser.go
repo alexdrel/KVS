@@ -3508,6 +3508,9 @@ func (p *Parser) parseTypeMember() *ast.Node {
 	if p.parseContextualModifier(ast.KindSetKeyword) {
 		return p.parseAccessorDeclaration(pos, jsdoc, modifiers, ast.KindSetAccessor, ParseFlagsType)
 	}
+	if p.token == ast.KindAsteriskToken {
+		return p.parseKvsRecordIndexSignatureDeclaration(pos, jsdoc, modifiers)
+	}
 	if p.isIndexSignature() {
 		return p.parseIndexSignatureDeclaration(pos, jsdoc, modifiers)
 	}
@@ -3887,7 +3890,32 @@ func (p *Parser) parseIndexSignatureDeclaration(pos int, jsdoc jsdocScannerInfo,
 	parameters := p.parseBracketedList(PCParameters, (*Parser).parseParameter, ast.KindOpenBracketToken, ast.KindCloseBracketToken)
 	typeNode := p.parseTypeAnnotation()
 	p.parseTypeMemberSemicolon()
-	result := p.finishNode(p.factory.NewIndexSignatureDeclaration(modifiers, parameters, typeNode), pos)
+	result := p.finishNode(p.factory.NewIndexSignatureDeclaration(modifiers, nil, parameters, typeNode), pos)
+	p.withJSDoc(result, jsdoc)
+	return result
+}
+
+func (p *Parser) parseKvsRecordIndexSignatureDeclaration(pos int, jsdoc jsdocScannerInfo, modifiers *ast.ModifierList) *ast.Node {
+	asteriskToken := p.parseTokenNode()
+	typeNode := p.parseTypeAnnotation()
+	p.parseTypeMemberSemicolon()
+	parameter := p.factory.NewParameterDeclaration(
+		nil,
+		nil,
+		p.factory.NewIdentifier("key"),
+		nil,
+		p.factory.NewKeywordTypeNode(ast.KindStringKeyword),
+		nil,
+	)
+	parameter.Loc = asteriskToken.Loc
+	parameter.Flags |= ast.NodeFlagsSynthesized
+	parameter.Name().Loc = asteriskToken.Loc
+	parameter.Name().Flags |= ast.NodeFlagsSynthesized
+	parameter.Type().Loc = asteriskToken.Loc
+	parameter.Type().Flags |= ast.NodeFlagsSynthesized
+	ast.SetParentInChildren(parameter)
+	parameters := p.factory.NewNodeList([]*ast.Node{parameter})
+	result := p.finishNode(p.factory.NewIndexSignatureDeclaration(modifiers, asteriskToken, parameters, typeNode), pos)
 	p.withJSDoc(result, jsdoc)
 	return result
 }
@@ -7025,6 +7053,9 @@ func (p *Parser) scanTypeMemberStart() bool {
 	for ast.IsModifierKind(p.token) {
 		idToken = true
 		p.nextToken()
+	}
+	if p.token == ast.KindAsteriskToken {
+		return true
 	}
 	// Index signatures and computed property names are type members
 	if p.token == ast.KindOpenBracketToken {

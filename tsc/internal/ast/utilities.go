@@ -3690,6 +3690,7 @@ func ReplaceModifiers(factory *NodeFactory, node *Node, modifierArray *ModifierL
 		return factory.UpdateIndexSignatureDeclaration(
 			node.AsIndexSignatureDeclaration(),
 			modifierArray,
+			node.AsIndexSignatureDeclaration().AsteriskToken,
 			node.ParameterList(),
 			node.Type(),
 		)

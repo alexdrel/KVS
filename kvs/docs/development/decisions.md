@@ -732,3 +732,18 @@ helper is emitted once per file and returns an object that creates a fresh itera
 captured bounds for every `Symbol.iterator` request. The helper uses the iterator protocol directly
 because raw emit-helper text is inserted after target downleveling; generator syntax in that text
 would otherwise leak into older targets.
+
+## Record type shorthand
+
+Status: implemented as syntax sugar over TypeScript string index signatures.
+
+`{ *: Value }` is represented by the ordinary index-signature AST node with a retained authored
+asterisk token and a synthetic `key: string` parameter. The retained token preserves KVS source in
+formatting, printing, declaration emit, cloning, and API transport; the synthetic parameter lets the
+binder and checker reuse TypeScript's existing indexed access, assignability, readonly, duplicate,
+and named-field compatibility rules without a parallel type category.
+
+The shorthand is accepted in type literals and interfaces, including `readonly *: Value`. It has no
+arbitrary-key variant; `Map<K, V>` remains the general keyed container. Because the resulting type
+has an ordinary string index signature, existing keyed-iteration classification automatically treats
+it as a record with `string` coordinates and `Value` elements.
