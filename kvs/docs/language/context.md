@@ -106,9 +106,9 @@ assignable to that key's declared type. Unknown properties are errors. An option
 overrides its key only when present; an explicit null overrides a nullable key with null.
 
 Property expressions are evaluated from left to right before the body begins. A derived frame stores
-only the supplied overrides; all other keys are resolved through its parent. Nested context statements
-therefore compose naturally: an inner frame shadows only the supplied keys and inherits everything
-else. Frames remain lazy regardless of depth.
+only the supplied overrides; all other keys are resolved through its parent. Nested context
+statements therefore compose naturally: an inner frame shadows only the supplied keys and inherits
+everything else. Frames remain lazy regardless of depth.
 
 `context (...)` requires an existing frame. `context! (...)` ensures that one exists before applying
 the overrides:
@@ -124,10 +124,10 @@ function applicationEntry(request: Request) {
 }
 ```
 
-Inside a plain function, `context!` establishes a root frame when none exists and applies the supplied
-overrides to it. Inside a context function, the current frame already exists, so `context!` preserves
-it and behaves like `context`. It never replaces or detaches an existing frame, and it never eagerly
-materializes unrelated context keys or defaults.
+Inside a plain function, `context!` establishes a root frame when none exists and applies the
+supplied overrides to it. Inside a context function, the current frame already exists, so `context!`
+preserves it and behaves like `context`. It never replaces or detaches an existing frame, and it
+never eagerly materializes unrelated context keys or defaults.
 
 A plain function naturally forms a strong context boundary because no frame is passed to it. It may
 establish a fresh one with `context!`:
@@ -192,10 +192,11 @@ explicitly. Where the API has a callback type, placeholder syntax is enough:
 externalApi.register(handler(%));
 ```
 
-For a truly untyped callback position, an ordinary arrow provides the same explicit boundary. In both
-cases the closure captures the current frame and supplies it when `handler` is later invoked. Exports
-called directly by JavaScript likewise need a deliberate plain wrapper that chooses or establishes a
-frame; the boundary does not implicitly capture whichever context happened to exist during export.
+For a truly untyped callback position, an ordinary arrow provides the same explicit boundary. In
+both cases the closure captures the current frame and supplies it when `handler` is later invoked.
+Exports called directly by JavaScript likewise need a deliberate plain wrapper that chooses or
+establishes a frame; the boundary does not implicitly capture whichever context happened to exist
+during export.
 
 Workers, processes, and message boundaries do not inherit a frame. Applications pass the required
 data and establish a new context explicitly on the other side.
