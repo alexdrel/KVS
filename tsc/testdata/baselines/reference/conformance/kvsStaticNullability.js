@@ -81,3 +81,35 @@ const rejectNullableConst = "ready";
 let rejectTypedNullable = "ready";
 const rejectSpacedNullableAssertion = "ready";
 const rejectSpacedExtantAssertion = item;
+
+
+//// [kvsStaticNullability.d.ts]
+declare const item: string | null | undefined;
+declare const nullableNumber: number | null | undefined;
+declare const widened: string | null | undefined;
+declare const asserted: string;
+declare const untouched: string | null | undefined;
+declare const nested: string[];
+declare const grouped: number;
+declare const impossible: never;
+declare const liftedAddition: number | null;
+declare const assertedAddition: number;
+declare const omittedTrailingTuple: [string, boolean?];
+declare const omittedParenthesizedTrailingTuple: [string, (boolean?)];
+declare const presentTrailingTuple: [string, boolean?];
+declare const nullTrailingTuple: [string, boolean?];
+declare const undefinedTrailingTuple: [string, boolean?];
+declare const nullableTuple: [string, boolean?];
+declare const nullableTupleElement: boolean?;
+declare const presentNonTrailingTuple: [boolean?, string];
+declare const rejectOmittedNonTrailingTuple: [boolean?, string];
+declare let request: string | null | undefined;
+declare let explicitNullable: string?;
+declare const initiallyAbsent: string | null | undefined;
+declare const required = "ready";
+declare let current: string;
+declare const rejectNullableRequired: string;
+declare const rejectNullableConst: string | null | undefined;
+declare let rejectTypedNullable: string;
+declare const rejectSpacedNullableAssertion: any | null;
+declare const rejectSpacedExtantAssertion: any;

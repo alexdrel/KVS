@@ -1,4 +1,5 @@
 // @strict: true
+// @declaration: true
 
 declare const item: string | null | undefined;
 declare const nullableNumber: number | null | undefined;

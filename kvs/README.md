@@ -3,6 +3,7 @@
 KVS is an experimental TypeScript dialect developed in this compiler fork.
 
 - [Language documentation](docs/language/README.md)
+- [TypeScript interoperability](docs/language/interop.md)
 - [Development documentation](docs/development/README.md)
 - [Examples](examples/README.md)
 - [VS Code syntax highlighting](vscode/README.md)

@@ -2071,6 +2071,22 @@ func (p *Printer) emitKvsExtantType(node *ast.KvsExtantType) {
 	p.exitNode(node.AsNode(), state)
 }
 
+func (p *Printer) emitKvsDistinctType(node *ast.KvsDistinctType) {
+	state := p.enterNode(node.AsNode())
+	p.writeKeyword("distinct")
+	p.writeSpace()
+	p.emitTypeNodeOutsideExtends(node.Type)
+	p.exitNode(node.AsNode(), state)
+}
+
+func (p *Printer) emitKvsBrandedType(node *ast.KvsBrandedType) {
+	state := p.enterNode(node.AsNode())
+	p.writeKeyword("branded")
+	p.writeSpace()
+	p.emitTypeNodeOutsideExtends(node.Type)
+	p.exitNode(node.AsNode(), state)
+}
+
 func (p *Printer) emitNamedTupleMember(node *ast.NamedTupleMember) {
 	state := p.enterNode(node.AsNode())
 	p.emitPunctuationNode(node.DotDotDotToken)
@@ -2372,6 +2388,10 @@ func (p *Printer) emitTypeNode(node *ast.TypeNode, precedence ast.TypePrecedence
 		p.emitKvsNullableType(node.AsKvsNullableType())
 	case ast.KindKvsExtantType:
 		p.emitKvsExtantType(node.AsKvsExtantType())
+	case ast.KindKvsDistinctType:
+		p.emitKvsDistinctType(node.AsKvsDistinctType())
+	case ast.KindKvsBrandedType:
+		p.emitKvsBrandedType(node.AsKvsBrandedType())
 	case ast.KindRestType:
 		p.emitRestType(node.AsRestTypeNode())
 	case ast.KindUnionType:

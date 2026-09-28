@@ -38,7 +38,7 @@
         "trailingCommas": "never"
     },
     "markdown": {
-        "associations": ["kvs/**/*.md"],
+        "associations": ["/README.md", "kvs/**/*.md"],
         "lineWidth": 100,
         "textWrap": "always",
         "codeBlock.skipFormat": true
@@ -51,6 +51,7 @@
         "**/.git",
         "**/node_modules",
         "**/*.md",
+        "!/README.md",
         "!kvs/**/*.md",
         "**/*-lock.json",
         "**/testdata",

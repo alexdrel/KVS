@@ -187,6 +187,7 @@ import type {
     KeywordExpressionSyntaxKind,
     KeywordTypeNode,
     KeywordTypeSyntaxKind,
+    KvsBrandedType,
     KvsCatchSplitAssignmentExpression,
     KvsCatchSplitBindingPattern,
     KvsCatchSplitExpression,
@@ -200,6 +201,7 @@ import type {
     KvsContextDeclaration,
     KvsContextStatement,
     KvsDefaultExpression,
+    KvsDistinctType,
     KvsExtantAssertionExpression,
     KvsExtantAssignmentExpression,
     KvsExtantReturnStatement,
@@ -1807,6 +1809,24 @@ export declare namespace isKvsExtantType {
     function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsExtantType>;
 }
 isKvsExtantType.Handle = isKvsExtantType as any;
+
+export function isKvsDistinctType(node: Node): node is KvsDistinctType {
+    return node.kind === SyntaxKind.KvsDistinctType;
+}
+
+export declare namespace isKvsDistinctType {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsDistinctType>;
+}
+isKvsDistinctType.Handle = isKvsDistinctType as any;
+
+export function isKvsBrandedType(node: Node): node is KvsBrandedType {
+    return node.kind === SyntaxKind.KvsBrandedType;
+}
+
+export declare namespace isKvsBrandedType {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsBrandedType>;
+}
+isKvsBrandedType.Handle = isKvsBrandedType as any;
 
 export function isRestTypeNode(node: Node): node is RestTypeNode {
     return node.kind === SyntaxKind.RestType;

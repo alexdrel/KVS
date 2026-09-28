@@ -2349,6 +2349,9 @@ func (c *Checker) checkSourceElementWorker(node *ast.Node) {
 		c.checkUnionOrIntersectionType(node)
 	case ast.KindParenthesizedType, ast.KindOptionalType, ast.KindKvsNullableType, ast.KindKvsExtantType, ast.KindRestType:
 		node.ForEachChild(c.checkSourceElement)
+	case ast.KindKvsDistinctType, ast.KindKvsBrandedType:
+		c.getTypeFromTypeNode(node)
+		node.ForEachChild(c.checkSourceElement)
 	case ast.KindThisType:
 		c.checkThisType(node)
 	case ast.KindTypeOperator:
@@ -7755,6 +7758,9 @@ func (c *Checker) getQuickTypeOfExpression(node *ast.Node) *Type {
 	// Optimize for the common case of a call to a function with a single non-generic call
 	// signature where we can just fetch the return type without checking the arguments.
 	case ast.IsCallExpression(expr) && !ast.IsKvsExtantCall(expr) && expr.Expression().Kind != ast.KindSuperKeyword && !ast.IsRequireCall(expr, true /*requireStringLiteralLikeArgument*/) && !c.isSymbolOrSymbolForCall(expr) && !ast.IsImportCall(expr):
+		if c.kvsCallHasDomainParticipant(expr) {
+			return nil
+		}
 		if isCallChain(expr) {
 			return c.getReturnTypeOfSingleNonGenericSignatureOfCallChain(expr)
 		}
@@ -7767,6 +7773,28 @@ func (c *Checker) getQuickTypeOfExpression(node *ast.Node) *Type {
 		return c.checkExpression(node)
 	}
 	return nil
+}
+
+func (c *Checker) kvsCallHasDomainParticipant(node *ast.Node) bool {
+	callee := node.Expression()
+	if ast.IsPropertyAccessExpression(callee) {
+		if isKvsDomainType(c.getKvsCallOperandType(callee.AsPropertyAccessExpression().Expression)) {
+			return true
+		}
+	} else if ast.IsElementAccessExpression(callee) {
+		if isKvsDomainType(c.getKvsCallOperandType(callee.AsElementAccessExpression().Expression)) {
+			return true
+		}
+	}
+	for _, argument := range node.Arguments() {
+		if ast.IsSpreadElement(argument) {
+			argument = argument.Expression()
+		}
+		if isKvsDomainType(c.getKvsCallOperandType(argument)) {
+			return true
+		}
+	}
+	return false
 }
 
 func (c *Checker) getReturnTypeOfSingleNonGenericSignature(funcType *Type, kind SignatureKind) *Type {
@@ -9317,6 +9345,8 @@ func (c *Checker) checkCallExpression(node *ast.Node, checkMode CheckMode) *Type
 		return c.resolveExternalModuleTypeByLiteral(node.Arguments()[0])
 	}
 	returnType := c.getReturnTypeOfSignature(signature)
+	returnType = c.applyKvsCallDomain(node, signature, returnType)
+	c.recordKvsDomainExpressionType(node, returnType)
 	if ast.IsKvsExtantCall(node) {
 		c.recordKvsExtantCallInfo(node, signature)
 		info := c.nodeLinks.Get(node).kvsExtantCall
@@ -9338,6 +9368,85 @@ func (c *Checker) checkCallExpression(node *ast.Node, checkMode CheckMode) *Type
 		}
 	}
 	return returnType
+}
+
+func (c *Checker) applyKvsCallDomain(node *ast.Node, signature *Signature, returnType *Type) *Type {
+	// Placeholder arguments are checked through their own contextual boundary. Probing them again
+	// here would escape that boundary and poison the established placeholder type.
+	if containsKvsPlaceholderReference(node) {
+		return returnType
+	}
+	if !c.kvsCallHasDomainParticipant(node) {
+		return returnType
+	}
+	var participants []*Type
+	callee := node.Expression()
+	if ast.IsPropertyAccessExpression(callee) {
+		receiverType := c.getKvsCallOperandType(callee.AsPropertyAccessExpression().Expression)
+		if info := getKvsDomainInfo(receiverType); info != nil && c.isTypeIdenticalTo(returnType, info.underlying) {
+			participants = append(participants, receiverType)
+		}
+	} else if ast.IsElementAccessExpression(callee) {
+		receiverType := c.getKvsCallOperandType(callee.AsElementAccessExpression().Expression)
+		if info := getKvsDomainInfo(receiverType); info != nil && c.isTypeIdenticalTo(returnType, info.underlying) {
+			participants = append(participants, receiverType)
+		}
+	}
+	arguments := node.Arguments()
+	for i, argument := range arguments {
+		if ast.IsSpreadElement(argument) {
+			break
+		}
+		argumentType := c.getKvsCallOperandType(argument)
+		info := getKvsDomainInfo(argumentType)
+		if info == nil {
+			continue
+		}
+		parameterType := c.getTypeAtPosition(signature, i)
+		if c.isTypeIdenticalTo(parameterType, info.underlying) && c.isTypeIdenticalTo(returnType, info.underlying) {
+			participants = append(participants, argumentType)
+		}
+	}
+	domain, conflict := c.getKvsOperationDomain(participants...)
+	if conflict {
+		c.error(node, diagnostics.KVS_operation_cannot_combine_competing_domains_over_the_same_underlying_type)
+		return returnType
+	}
+	return c.applyKvsDistinctResult(returnType, domain)
+}
+
+func (c *Checker) getKvsCallOperandType(node *ast.Node) *Type {
+	if containsKvsPlaceholderReference(node) {
+		if ast.IsIdentifier(node) && node.Text() == "__kvsPlaceholder" {
+			return c.checkIdentifier(node, CheckModeNormal)
+		}
+		return nil
+	}
+	if ast.IsParenthesizedExpression(node) {
+		return c.getKvsCallOperandType(node.Expression())
+	}
+	if ast.IsIdentifier(node) {
+		symbol := c.getResolvedSymbol(node)
+		if symbol != nil {
+			return c.getTypeOfSymbol(symbol)
+		}
+		return nil
+	}
+	return c.nodeLinks.Get(node).kvsDomainExpressionType
+}
+
+func containsKvsPlaceholderReference(node *ast.Node) bool {
+	if ast.IsIdentifier(node) && node.Text() == "__kvsPlaceholder" {
+		return true
+	}
+	return node.ForEachChild(containsKvsPlaceholderReference)
+}
+
+func (c *Checker) recordKvsDomainExpressionType(node *ast.Node, t *Type) *Type {
+	if node != nil && isKvsDomainType(t) {
+		c.nodeLinks.Get(node).kvsDomainExpressionType = t
+	}
+	return t
 }
 
 func (c *Checker) checkDeprecatedSignature(sig *Signature, node *ast.Node) {
@@ -12000,16 +12109,17 @@ func (c *Checker) checkPrefixUnaryExpression(node *ast.Node) *Type {
 	switch expr.Operator {
 	case ast.KindPlusToken, ast.KindMinusToken, ast.KindTildeToken:
 		c.checkNonNullType(operandType, expr.Operand)
-		if c.maybeTypeOfKindConsideringBaseConstraint(operandType, TypeFlagsESSymbolLike) {
+		checkedType := getKvsDomainUnderlyingOrSelf(operandType)
+		if c.maybeTypeOfKindConsideringBaseConstraint(checkedType, TypeFlagsESSymbolLike) {
 			c.error(expr.Operand, diagnostics.The_0_operator_cannot_be_applied_to_type_symbol, scanner.TokenToString(expr.Operator))
 		}
 		if expr.Operator == ast.KindPlusToken {
-			if c.maybeTypeOfKindConsideringBaseConstraint(operandType, TypeFlagsBigIntLike) {
-				c.error(expr.Operand, diagnostics.Operator_0_cannot_be_applied_to_type_1, scanner.TokenToString(expr.Operator), c.TypeToString(c.getBaseTypeOfLiteralType(operandType)))
+			if c.maybeTypeOfKindConsideringBaseConstraint(checkedType, TypeFlagsBigIntLike) {
+				c.error(expr.Operand, diagnostics.Operator_0_cannot_be_applied_to_type_1, scanner.TokenToString(expr.Operator), c.TypeToString(c.getBaseTypeOfLiteralType(checkedType)))
 			}
-			return c.numberType
+			return c.recordKvsDomainExpressionType(node, c.applyKvsDistinctResult(c.numberType, operandType))
 		}
-		return c.getUnaryResultType(operandType)
+		return c.recordKvsDomainExpressionType(node, c.applyKvsDistinctResult(c.getUnaryResultType(checkedType), operandType))
 	case ast.KindExclamationToken:
 		c.checkTruthinessOfType(operandType, expr.Operand)
 		facts := c.getTypeFacts(operandType, TypeFactsTruthy|TypeFactsFalsy)
@@ -12032,8 +12142,9 @@ func (c *Checker) checkPrefixUnaryExpression(node *ast.Node) *Type {
 			// run check only if former checks succeeded to avoid reporting cascading errors
 			c.checkReferenceExpression(expr.Operand, diagnostics.The_operand_of_an_increment_or_decrement_operator_must_be_a_variable_or_a_property_access, diagnostics.The_operand_of_an_increment_or_decrement_operator_may_not_be_an_optional_property_access)
 		}
-		result := c.getUnaryResultType(checkedType)
-		return core.IfElse(optional, c.getNullableType(result, TypeFlagsNull), result)
+		result := c.applyKvsDistinctResult(c.getUnaryResultType(getKvsDomainUnderlyingOrSelf(checkedType)), checkedType)
+		result = core.IfElse(optional, c.getNullableType(result, TypeFlagsNull), result)
+		return c.recordKvsDomainExpressionType(node, result)
 	}
 	return c.errorType
 }
@@ -12054,8 +12165,9 @@ func (c *Checker) checkPostfixUnaryExpression(node *ast.Node) *Type {
 		// run check only if former checks succeeded to avoid reporting cascading errors
 		c.checkReferenceExpression(expr.Operand, diagnostics.The_operand_of_an_increment_or_decrement_operator_must_be_a_variable_or_a_property_access, diagnostics.The_operand_of_an_increment_or_decrement_operator_may_not_be_an_optional_property_access)
 	}
-	result := c.getUnaryResultType(checkedType)
-	return core.IfElse(optional, c.getNullableType(result, TypeFlagsNull), result)
+	result := c.applyKvsDistinctResult(c.getUnaryResultType(getKvsDomainUnderlyingOrSelf(checkedType)), checkedType)
+	result = core.IfElse(optional, c.getNullableType(result, TypeFlagsNull), result)
+	return c.recordKvsDomainExpressionType(node, result)
 }
 
 func (c *Checker) getUnaryResultType(operandType *Type) *Type {
@@ -13642,7 +13754,9 @@ func (c *Checker) checkAssertionDeferred(node *ast.Node) {
 	targetType := c.getTypeFromTypeNode(typeNode)
 	if !c.isErrorType(targetType) {
 		widenedType := c.getWidenedType(exprType)
-		if !c.isTypeComparableTo(targetType, widenedType) {
+		comparisonSource := getKvsDomainUnderlyingOrSelf(widenedType)
+		comparisonTarget := getKvsDomainUnderlyingOrSelf(targetType)
+		if !c.isTypeComparableTo(comparisonTarget, comparisonSource) {
 			errNode := node
 			if typeNode.Flags&ast.NodeFlagsReparsed != 0 {
 				errNode = typeNode
@@ -13670,6 +13784,18 @@ func isKvsLiftedArithmeticOperator(operator ast.Kind) bool {
 	switch operator {
 	case ast.KindPlusToken, ast.KindMinusToken, ast.KindAsteriskToken, ast.KindAsteriskAsteriskToken,
 		ast.KindSlashToken, ast.KindPercentToken:
+		return true
+	}
+	return false
+}
+
+func isKvsDomainBinaryOperator(operator ast.Kind) bool {
+	switch operator {
+	case ast.KindPlusToken, ast.KindMinusToken, ast.KindAsteriskToken, ast.KindAsteriskAsteriskToken,
+		ast.KindSlashToken, ast.KindPercentToken, ast.KindLessThanLessThanToken, ast.KindGreaterThanGreaterThanToken,
+		ast.KindGreaterThanGreaterThanGreaterThanToken, ast.KindBarToken, ast.KindCaretToken, ast.KindAmpersandToken,
+		ast.KindLessThanToken, ast.KindGreaterThanToken, ast.KindLessThanEqualsToken, ast.KindGreaterThanEqualsToken,
+		ast.KindEqualsEqualsToken, ast.KindExclamationEqualsToken, ast.KindEqualsEqualsEqualsToken, ast.KindExclamationEqualsEqualsToken:
 		return true
 	}
 	return false
@@ -13710,6 +13836,16 @@ func (c *Checker) checkBinaryLikeExpression(left *ast.Node, operatorToken *ast.N
 	}
 	leftType := c.checkExpressionEx(left, checkMode)
 	rightType := c.checkExpressionEx(right, checkMode)
+	kvsDomainLeftType := leftType
+	kvsDomainRightType := rightType
+	if isKvsDomainBinaryOperator(operator) {
+		_, conflict := c.getKvsOperationDomain(leftType, rightType)
+		if conflict {
+			c.error(operatorToken, diagnostics.KVS_operation_cannot_combine_competing_domains_over_the_same_underlying_type)
+		}
+		leftType = getKvsDomainUnderlyingOrSelf(leftType)
+		rightType = getKvsDomainUnderlyingOrSelf(rightType)
+	}
 	leftNullable := isKvsNullableType(leftType)
 	rightNullable := isKvsNullableType(rightType)
 	kvsLifted := isKvsLiftedBinaryOperator(operator) && (leftNullable || rightNullable)
@@ -13737,6 +13873,10 @@ func (c *Checker) checkBinaryLikeExpression(left *ast.Node, operatorToken *ast.N
 			return c.getNullableType(t, TypeFlagsNull)
 		}
 		return t
+	}
+	applyKvsDomain := func(t *Type) *Type {
+		domain, _ := c.getKvsOperationDomainForResult(t, kvsDomainLeftType, kvsDomainRightType)
+		return c.recordKvsDomainExpressionType(errorNode, c.applyKvsDistinctResult(t, domain))
 	}
 	if ast.IsLogicalOrCoalescingBinaryOperator(operator) {
 		parent := left.Parent.Parent
@@ -13808,7 +13948,7 @@ func (c *Checker) checkBinaryLikeExpression(left *ast.Node, operatorToken *ast.N
 				}
 			}
 		}
-		return withKvsNullability(resultType)
+		return withKvsNullability(applyKvsDomain(resultType))
 	case ast.KindPlusToken, ast.KindPlusEqualsToken:
 		if leftType == c.silentNeverType || rightType == c.silentNeverType {
 			return c.silentNeverType
@@ -13847,7 +13987,7 @@ func (c *Checker) checkBinaryLikeExpression(left *ast.Node, operatorToken *ast.N
 		}
 		// Symbols are not allowed at all in arithmetic expressions
 		if resultType != nil && !c.checkForDisallowedESSymbolOperand(left, right, leftType, rightType, operator) {
-			return withKvsNullability(resultType)
+			return withKvsNullability(applyKvsDomain(resultType))
 		}
 		if resultType == nil {
 			// Types that have a reasonably good chance of being a valid operand type.
@@ -13863,7 +14003,7 @@ func (c *Checker) checkBinaryLikeExpression(left *ast.Node, operatorToken *ast.N
 		if operator == ast.KindPlusEqualsToken {
 			c.checkAssignmentOperator(left, operator, right, leftType, resultType)
 		}
-		return withKvsNullability(resultType)
+		return withKvsNullability(applyKvsDomain(resultType))
 	case ast.KindLessThanToken, ast.KindGreaterThanToken, ast.KindLessThanEqualsToken, ast.KindGreaterThanEqualsToken:
 		if c.checkForDisallowedESSymbolOperand(left, right, leftType, rightType, operator) {
 			leftType = c.getBaseTypeOfLiteralTypeForComparison(c.checkNonNullType(leftType, left))
@@ -19563,9 +19703,14 @@ func (c *Checker) checkKvsYieldExpression(expression *ast.Node) *Type {
 func (c *Checker) checkKvsRangeExpression(node *ast.KvsRangeExpression, checkMode CheckMode) *Type {
 	lowerType := c.checkExpressionEx(node.Lower, checkMode)
 	upperType := c.checkExpressionEx(node.Upper, checkMode)
-	c.checkTypeAssignableTo(lowerType, c.numberType, node.Lower, nil)
-	c.checkTypeAssignableTo(upperType, c.numberType, node.Upper, nil)
-	return c.createIterableType(c.numberType)
+	domain, conflict := c.getKvsOperationDomain(lowerType, upperType)
+	if conflict {
+		c.error(node.AsNode(), diagnostics.KVS_operation_cannot_combine_competing_domains_over_the_same_underlying_type)
+	}
+	c.checkTypeAssignableTo(getKvsDomainUnderlyingOrSelf(lowerType), c.numberType, node.Lower, nil)
+	c.checkTypeAssignableTo(getKvsDomainUnderlyingOrSelf(upperType), c.numberType, node.Upper, nil)
+	elementType := c.applyKvsDistinctResult(c.numberType, domain)
+	return c.createIterableType(elementType)
 }
 
 func (c *Checker) checkKvsPipelineExpression(node *ast.KvsPipelineExpression, checkMode CheckMode) *Type {
@@ -20572,6 +20717,9 @@ func (c *Checker) getWidenedType(t *Type) *Type {
 }
 
 func (c *Checker) getWidenedTypeWithContext(t *Type, context *WideningContext) *Type {
+	if isKvsDomainType(t) {
+		return t
+	}
 	if t.objectFlags&ObjectFlagsRequiresWidening != 0 {
 		if context == nil {
 			if cached := c.cachedTypes[CachedTypeKey{kind: CachedTypeKindWidened, typeId: t.id}]; cached != nil {
@@ -25112,6 +25260,8 @@ func (c *Checker) getTypeFromTypeNodeWorker(node *ast.Node) *Type {
 		return c.getNullableType(c.getTypeFromTypeNode(node.Type()), TypeFlagsNullable)
 	case ast.KindKvsExtantType:
 		return c.GetNonNullableType(c.getTypeFromTypeNode(node.Type()))
+	case ast.KindKvsDistinctType, ast.KindKvsBrandedType:
+		return c.getTypeFromKvsDomainTypeNode(node)
 	case ast.KindUnionType:
 		return c.getTypeFromUnionTypeNode(node)
 	case ast.KindIntersectionType:
@@ -25141,6 +25291,105 @@ func (c *Checker) getTypeFromTypeNodeWorker(node *ast.Node) *Type {
 	default:
 		return c.errorType
 	}
+}
+
+func getKvsDomainInfo(t *Type) *KvsDomainInfo {
+	if t == nil || t.flags&TypeFlagsIntersection == 0 {
+		return nil
+	}
+	return t.AsIntersectionType().kvsDomain
+}
+
+func isKvsDomainType(t *Type) bool {
+	return getKvsDomainInfo(t) != nil
+}
+
+func isKvsDistinctType(t *Type) bool {
+	info := getKvsDomainInfo(t)
+	return info != nil && info.mode == KvsDomainModeDistinct
+}
+
+func getKvsDomainUnderlyingOrSelf(t *Type) *Type {
+	if info := getKvsDomainInfo(t); info != nil {
+		return info.underlying
+	}
+	return t
+}
+
+func (c *Checker) getKvsOperationDomain(types ...*Type) (*Type, bool) {
+	var selected *Type
+	var selectedInfo *KvsDomainInfo
+	for _, t := range types {
+		info := getKvsDomainInfo(t)
+		if info == nil {
+			continue
+		}
+		if selectedInfo != nil && selectedInfo.symbol != info.symbol && c.isTypeIdenticalTo(selectedInfo.underlying, info.underlying) {
+			return nil, true
+		}
+		if selectedInfo == nil {
+			selected = t
+			selectedInfo = info
+		}
+	}
+	if selectedInfo == nil || selectedInfo.mode != KvsDomainModeDistinct {
+		return nil, false
+	}
+	return selected, false
+}
+
+func (c *Checker) getKvsOperationDomainForResult(result *Type, types ...*Type) (*Type, bool) {
+	matching := make([]*Type, 0, len(types))
+	for _, t := range types {
+		if info := getKvsDomainInfo(t); info != nil && c.isTypeIdenticalTo(result, info.underlying) {
+			matching = append(matching, t)
+		}
+	}
+	return c.getKvsOperationDomain(matching...)
+}
+
+func (c *Checker) applyKvsDistinctResult(result *Type, domain *Type) *Type {
+	if domain == nil || result == c.errorType || result == c.silentNeverType {
+		return result
+	}
+	info := getKvsDomainInfo(domain)
+	if info != nil && (result == info.underlying || c.isTypeAssignableTo(result, info.underlying) && c.isTypeAssignableTo(info.underlying, result)) {
+		return domain
+	}
+	return result
+}
+
+func (c *Checker) getTypeFromKvsDomainTypeNode(node *ast.Node) *Type {
+	links := c.typeNodeLinks.Get(node)
+	if links.resolvedType != nil {
+		return links.resolvedType
+	}
+	declaration := node.Parent
+	if declaration == nil || !ast.IsTypeAliasDeclaration(declaration) {
+		links.resolvedType = c.errorType
+		return links.resolvedType
+	}
+	if len(declaration.TypeParameters()) != 0 {
+		c.error(node, diagnostics.KVS_domain_aliases_cannot_declare_type_parameters)
+		links.resolvedType = c.errorType
+		return links.resolvedType
+	}
+	underlying := c.getTypeFromTypeNode(node.Type())
+	if underlying.flags&(TypeFlagsAny|TypeFlagsUnknown|TypeFlagsNever) != 0 || isKvsDomainType(underlying) {
+		c.error(node.Type(), diagnostics.A_KVS_domain_requires_a_concrete_non_domain_underlying_type)
+		links.resolvedType = c.errorType
+		return links.resolvedType
+	}
+	symbol := c.getSymbolOfDeclaration(declaration)
+	result := c.newIntersectionType(ObjectFlagsNone, []*Type{underlying})
+	result.AsIntersectionType().kvsDomain = &KvsDomainInfo{
+		symbol:     symbol,
+		underlying: underlying,
+		mode:       core.IfElse(node.Kind == ast.KindKvsDistinctType, KvsDomainModeDistinct, KvsDomainModeBranded),
+	}
+	result.alias = &TypeAlias{symbol: symbol}
+	links.resolvedType = result
+	return result
 }
 
 func (c *Checker) getTypeFromThisTypeNode(node *ast.Node) *Type {
@@ -26501,7 +26750,29 @@ func (c *Checker) getTypeFromUnionTypeNode(node *ast.Node) *Type {
 	links := c.typeNodeLinks.Get(node)
 	if links.resolvedType == nil {
 		alias := c.getAliasForTypeNode(node)
-		links.resolvedType = c.getUnionTypeEx(core.Map(node.AsUnionTypeNode().Types.Nodes, c.getTypeFromTypeNode), UnionReductionLiteral, alias, nil /*origin*/)
+		typeNodes := node.AsUnionTypeNode().Types.Nodes
+		types := core.Map(typeNodes, c.getTypeFromTypeNode)
+		type domainBase struct {
+			base   *Type
+			domain *KvsDomainInfo
+		}
+		var seen []domainBase
+		for i, t := range types {
+			info := getKvsDomainInfo(t)
+			base := t
+			if info != nil {
+				base = info.underlying
+			}
+			for _, previous := range seen {
+				if info == nil && previous.domain == nil || info != nil && previous.domain != nil && info.symbol == previous.domain.symbol || !c.isTypeIdenticalTo(base, previous.base) {
+					continue
+				}
+				c.error(typeNodes[i], diagnostics.A_union_cannot_contain_multiple_KVS_domain_constituents_with_the_same_underlying_type)
+				break
+			}
+			seen = append(seen, domainBase{base: base, domain: info})
+		}
+		links.resolvedType = c.getUnionTypeEx(types, UnionReductionLiteral, alias, nil /*origin*/)
 	}
 	return links.resolvedType
 }
@@ -31075,7 +31346,7 @@ func (c *Checker) getEntityNameForDecoratorMetadata(node *ast.Node) *ast.Node {
 		return c.getEntityNameForDecoratorMetadataFromTypeList([]*ast.Node{node.AsConditionalTypeNode().TrueType, node.AsConditionalTypeNode().FalseType})
 	case ast.KindParenthesizedType:
 		return c.getEntityNameForDecoratorMetadata(node.AsParenthesizedTypeNode().Type)
-	case ast.KindKvsNullableType, ast.KindKvsExtantType:
+	case ast.KindKvsNullableType, ast.KindKvsExtantType, ast.KindKvsDistinctType, ast.KindKvsBrandedType:
 		return c.getEntityNameForDecoratorMetadata(node.Type())
 	case ast.KindNamedTupleMember:
 		return c.getEntityNameForDecoratorMetadata(node.AsNamedTupleMember().Type)

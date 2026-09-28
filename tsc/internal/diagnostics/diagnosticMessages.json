@@ -9023,5 +9023,21 @@
     "A bindingless context statement is redundant when a context frame is already available.": {
         "category": "Warning",
         "code": 100102
+    },
+    "KVS domain aliases cannot declare type parameters.": {
+        "category": "Error",
+        "code": 100103
+    },
+    "A KVS domain requires a concrete non-domain underlying type.": {
+        "category": "Error",
+        "code": 100104
+    },
+    "A union cannot contain multiple KVS domain constituents with the same underlying type.": {
+        "category": "Error",
+        "code": 100105
+    },
+    "KVS operation cannot combine competing domains over the same underlying type.": {
+        "category": "Error",
+        "code": 100106
     }
 }

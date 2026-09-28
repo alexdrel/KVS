@@ -47,15 +47,15 @@ context function delayedLog(messages: string[]) {
     };
 }
 
-type ContextLogger = context (message: string) => void;
+export type ContextLogger = context (message: string) => void;
 >ContextLogger : Symbol(ContextLogger, Decl(kvsContext.ts, 17, 1))
->message : Symbol(message, Decl(kvsContext.ts, 19, 30))
+>message : Symbol(message, Decl(kvsContext.ts, 19, 37))
 
-class Logger {
->Logger : Symbol(Logger, Decl(kvsContext.ts, 19, 55))
+export class Logger {
+>Logger : Symbol(Logger, Decl(kvsContext.ts, 19, 62))
 
     context write(message: string) {
->write : Symbol(Logger.write, Decl(kvsContext.ts, 21, 14))
+>write : Symbol(Logger.write, Decl(kvsContext.ts, 21, 21))
 >message : Symbol(message, Decl(kvsContext.ts, 22, 18))
 
         log(message);
@@ -70,7 +70,7 @@ class Logger {
 context function useCallableAndMethod(logger: Logger, messages: string[]) {
 >useCallableAndMethod : Symbol(useCallableAndMethod, Decl(kvsContext.ts, 26, 1))
 >logger : Symbol(logger, Decl(kvsContext.ts, 28, 38))
->Logger : Symbol(Logger, Decl(kvsContext.ts, 19, 55))
+>Logger : Symbol(Logger, Decl(kvsContext.ts, 19, 62))
 >messages : Symbol(messages, Decl(kvsContext.ts, 28, 53))
 
     const write: ContextLogger = log;
@@ -83,9 +83,9 @@ context function useCallableAndMethod(logger: Logger, messages: string[]) {
 
     const methodResult: string = logger.write("method");
 >methodResult : Symbol(methodResult, Decl(kvsContext.ts, 31, 9))
->logger.write : Symbol(Logger.write, Decl(kvsContext.ts, 21, 14))
+>logger.write : Symbol(Logger.write, Decl(kvsContext.ts, 21, 21))
 >logger : Symbol(logger, Decl(kvsContext.ts, 28, 38))
->write : Symbol(Logger.write, Decl(kvsContext.ts, 21, 14))
+>write : Symbol(Logger.write, Decl(kvsContext.ts, 21, 21))
 
     return { messages, methodResult };
 >messages : Symbol(messages, Decl(kvsContext.ts, 32, 12))

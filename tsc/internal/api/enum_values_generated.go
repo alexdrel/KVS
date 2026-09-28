@@ -527,6 +527,8 @@ func main() {
 			"OptionalType":                                 toInt32(ast.KindOptionalType),
 			"KvsNullableType":                              toInt32(ast.KindKvsNullableType),
 			"KvsExtantType":                                toInt32(ast.KindKvsExtantType),
+			"KvsDistinctType":                              toInt32(ast.KindKvsDistinctType),
+			"KvsBrandedType":                               toInt32(ast.KindKvsBrandedType),
 			"RestType":                                     toInt32(ast.KindRestType),
 			"UnionType":                                    toInt32(ast.KindUnionType),
 			"IntersectionType":                             toInt32(ast.KindIntersectionType),

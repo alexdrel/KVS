@@ -994,7 +994,7 @@ func getExplicitKvsTypeNode(declaration *ast.Node) *ast.Node {
 	found := false
 	var visit func(*ast.Node) bool
 	visit = func(node *ast.Node) bool {
-		if node.Kind == ast.KindKvsNullableType || node.Kind == ast.KindKvsExtantType || ast.IsIndexSignatureDeclaration(node) && node.AsIndexSignatureDeclaration().AsteriskToken != nil {
+		if node.Kind == ast.KindKvsNullableType || node.Kind == ast.KindKvsExtantType || node.Kind == ast.KindKvsDistinctType || node.Kind == ast.KindKvsBrandedType || ast.IsIndexSignatureDeclaration(node) && node.AsIndexSignatureDeclaration().AsteriskToken != nil {
 			found = true
 			return true
 		}

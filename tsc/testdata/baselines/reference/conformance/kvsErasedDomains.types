@@ -1,0 +1,377 @@
+//// [tests/cases/conformance/kvs/kvsErasedDomains.ts] ////
+
+=== kvsErasedDomains.ts ===
+interface User {
+    name: string;
+>name : string
+
+    rename(name: string): User;
+>rename : (name: string) => User
+>name : string
+}
+
+declare function rename(user: User, name: string): User;
+>rename : (user: User, name: string) => User
+>user : User
+>name : string
+
+declare function choose(left: User, right: User): User;
+>choose : (left: User, right: User) => User
+>left : User
+>right : User
+
+declare function score(user: User, offset: number): number;
+>score : (user: User, offset: number) => number
+>user : User
+>offset : number
+
+declare function identity<T>(value: T): T;
+>identity : <T>(value: T) => T
+>value : T
+
+type Student = distinct User;
+>Student : Student
+
+type Teacher = distinct User;
+>Teacher : Teacher
+
+type UserId = branded string;
+>UserId : UserId
+
+type OrderId = branded string;
+>OrderId : OrderId
+
+type Pixel = distinct number;
+>Pixel : Pixel
+
+type Cell = distinct number;
+>Cell : Cell
+
+type Slug = distinct string;
+>Slug : Slug
+
+type Kelvin = distinct number;
+>Kelvin : Kelvin
+
+type Celsius = distinct number;
+>Celsius : Celsius
+
+type StudentAlias = Student;
+>StudentAlias : Student
+
+declare const user: User;
+>user : User
+
+declare const student: Student;
+>student : Student
+
+declare const teacher: Teacher;
+>teacher : Teacher
+
+declare const text: string;
+>text : string
+
+declare const userId: UserId;
+>userId : UserId
+
+declare const orderId: OrderId;
+>orderId : OrderId
+
+declare const pixel: Pixel;
+>pixel : Pixel
+
+declare const pixel2: Pixel;
+>pixel2 : Pixel
+
+declare const cell: Cell;
+>cell : Cell
+
+declare const slug: Slug;
+>slug : Slug
+
+declare const kelvin: Kelvin;
+>kelvin : Kelvin
+
+declare const celsius: Celsius;
+>celsius : Celsius
+
+declare function celsiusToKelvin(value: Celsius): Kelvin;
+>celsiusToKelvin : (value: Celsius) => Kelvin
+>value : Celsius
+
+const studentFromUser: Student = user;
+>studentFromUser : Student
+>user : User
+
+const studentFromStudent: Student = student;
+>studentFromStudent : Student
+>student : Student
+
+const userFromStudent: User = student;
+>userFromStudent : User
+>student : Student
+
+const studentAlias: StudentAlias = student;
+>studentAlias : Student
+>student : Student
+
+const rejectedTeacher: Student = teacher;
+>rejectedTeacher : Student
+>teacher : Teacher
+
+const rejectedText: UserId = text;
+>rejectedText : UserId
+>text : string
+
+const acceptedUserId: UserId = userId;
+>acceptedUserId : UserId
+>userId : UserId
+
+const stringFromUserId: string = userId;
+>stringFromUserId : string
+>userId : UserId
+
+const rejectedOrderId: UserId = orderId;
+>rejectedOrderId : UserId
+>orderId : OrderId
+
+const studentName = student.name;
+>studentName : string
+>student.name : string
+>student : Student
+>name : string
+
+const userIdLength = userId.length;
+>userIdLength : number
+>userId.length : number
+>userId : UserId
+>length : number
+
+const reconstructed = { ...student };
+>reconstructed : { name: string; rename(name: string): User; }
+>{ ...student } : { name: string; rename(name: string): User; }
+>student : Student
+
+const renamedStudent = rename(student, "Ada");
+>renamedStudent : Student
+>rename(student, "Ada") : Student
+>rename : (user: User, name: string) => User
+>student : Student
+>"Ada" : "Ada"
+
+const methodRenamedStudent = student.rename("Ada");
+>methodRenamedStudent : Student
+>student.rename("Ada") : Student
+>student.rename : (name: string) => User
+>student : Student
+>rename : (name: string) => User
+>"Ada" : "Ada"
+
+const identityStudent = identity(student);
+>identityStudent : Student
+>identity(student) : Student
+>identity : <T>(value: T) => T
+>student : Student
+
+const conflictingUsers = choose(student, teacher);
+>conflictingUsers : User
+>choose(student, teacher) : User
+>choose : (left: User, right: User) => User
+>student : Student
+>teacher : Teacher
+
+const addedPixel = pixel + 2;
+>addedPixel : Pixel
+>pixel + 2 : Pixel
+>pixel : Pixel
+>2 : 2
+
+const averagedPixel = (pixel + pixel2) / 2;
+>averagedPixel : Pixel
+>(pixel + pixel2) / 2 : Pixel
+>(pixel + pixel2) : Pixel
+>pixel + pixel2 : Pixel
+>pixel : Pixel
+>pixel2 : Pixel
+>2 : 2
+
+const concatenatedSlug = slug + "-archive";
+>concatenatedSlug : Slug
+>slug + "-archive" : Slug
+>slug : Slug
+>"-archive" : "-archive"
+
+const slugFromMixedDomains = pixel + slug;
+>slugFromMixedDomains : Slug
+>pixel + slug : Slug
+>pixel : Pixel
+>slug : Slug
+
+const trimmedSlug = slug.trim();
+>trimmedSlug : Slug
+>slug.trim() : Slug
+>slug.trim : () => string
+>slug : Slug
+>trim : () => string
+
+const comparedPixel = pixel < 100;
+>comparedPixel : boolean
+>pixel < 100 : boolean
+>pixel : Pixel
+>100 : 100
+
+const conflictingArithmetic = pixel + cell;
+>conflictingArithmetic : number
+>pixel + cell : number
+>pixel : Pixel
+>cell : Cell
+
+const conflictingEquality = userId == orderId;
+>conflictingEquality : boolean
+>userId == orderId : boolean
+>userId : UserId
+>orderId : OrderId
+
+const unbrandedId = userId + "-archive";
+>unbrandedId : string
+>userId + "-archive" : string
+>userId : UserId
+>"-archive" : "-archive"
+
+const trimmedUserId = userId.trim();
+>trimmedUserId : string
+>userId.trim() : string
+>userId.trim : () => string
+>userId : UserId
+>trim : () => string
+
+const minimumPixel = Math.min(pixel, 0);
+>minimumPixel : Pixel
+>Math.min(pixel, 0) : Pixel
+>Math.min : (...values: number[]) => number
+>Math : Math
+>min : (...values: number[]) => number
+>pixel : Pixel
+>0 : 0
+
+const conflictingMinimum = Math.min(pixel, cell);
+>conflictingMinimum : number
+>Math.min(pixel, cell) : number
+>Math.min : (...values: number[]) => number
+>Math : Math
+>min : (...values: number[]) => number
+>pixel : Pixel
+>cell : Cell
+
+const scoredPixel = score(student, pixel);
+>scoredPixel : Pixel
+>score(student, pixel) : Pixel
+>score : (user: User, offset: number) => number
+>student : Student
+>pixel : Pixel
+
+const negatedPixel = -pixel;
+>negatedPixel : Pixel
+>-pixel : Pixel
+>pixel : Pixel
+
+let mutablePixel = pixel;
+>mutablePixel : Pixel
+>pixel : Pixel
+
+const incrementedPixel = ++mutablePixel;
+>incrementedPixel : Pixel
+>++mutablePixel : Pixel
+>mutablePixel : Pixel
+
+const pixelRange = pixel..10;
+>pixelRange : Iterable<Pixel, void, undefined>
+>pixel..10 : Iterable<Pixel, void, undefined>
+>pixel : Pixel
+>10 : 10
+
+const conflictingRange = pixel..cell;
+>conflictingRange : Iterable<number, void, undefined>
+>pixel..cell : Iterable<number, void, undefined>
+>pixel : Pixel
+>cell : Cell
+
+const convertedKelvin = kelvin + celsiusToKelvin(celsius);
+>convertedKelvin : Kelvin
+>kelvin + celsiusToKelvin(celsius) : Kelvin
+>kelvin : Kelvin
+>celsiusToKelvin(celsius) : Kelvin
+>celsiusToKelvin : (value: Celsius) => Kelvin
+>celsius : Celsius
+
+const assertedUserId = text as UserId;
+>assertedUserId : UserId
+>text as UserId : UserId
+>text : string
+
+const identityUserId = identity(userId);
+>identityUserId : UserId
+>identity(userId) : UserId
+>identity : <T>(value: T) => T
+>userId : UserId
+
+const assertedOrderId = userId as OrderId;
+>assertedOrderId : OrderId
+>userId as OrderId : OrderId
+>userId : UserId
+
+const erasedUserId = userId as string;
+>erasedUserId : string
+>userId as string : string
+>userId : UserId
+
+type Mixed = Student | number | string;
+>Mixed : Mixed
+
+type ConflictingDistinct = Student | Teacher;
+>ConflictingDistinct : ConflictingDistinct
+
+type ConflictingBrand = UserId | OrderId;
+>ConflictingBrand : ConflictingBrand
+
+type ConflictingBase = Student | User;
+>ConflictingBase : ConflictingBase
+
+type BrandedStudent = branded User;
+>BrandedStudent : BrandedStudent
+
+type BrandedTeacher = branded User;
+>BrandedTeacher : BrandedTeacher
+
+type Person =
+>Person : Person
+
+    | { kind: "student"; value: BrandedStudent }
+>kind : "student"
+>value : BrandedStudent
+
+    | { kind: "teacher"; value: BrandedTeacher };
+>kind : "teacher"
+>value : BrandedTeacher
+
+type NullableStudent = Student?;
+>NullableStudent : Student | null | undefined
+
+type RecursivePlainUnion = string | RecursivePlainUnion[];
+>RecursivePlainUnion : RecursivePlainUnion
+
+type GenericDomain<T> = distinct T;
+>GenericDomain : any
+
+type InvalidAny = distinct any;
+>InvalidAny : any
+
+type InvalidUnknown = branded unknown;
+>InvalidUnknown : any
+
+type InvalidNever = distinct never;
+>InvalidNever : any
+
+type NestedDomain = branded Student;
+>NestedDomain : any
+

@@ -238,8 +238,10 @@ dependencies and override boundaries remain explicit.
 
 ## Other practical additions
 
-The same practical approach extends to primitive `distinct` domains for catching accidental mixing
-and comparisons that express ranges and finite alternatives directly.
+The same practical approach extends to erased domains. `distinct T` prevents accidental mixing while
+remaining compatible with its base type, and `branded T` requires explicit entry through an `as`
+cast. Both work with primitive and structural types without adding runtime wrappers. Comparisons can
+also express ranges and finite alternatives directly.
 
 ## Reading guide
 
@@ -261,12 +263,14 @@ Two independent themes can be read as needed:
 
 - [Typed Context](context.md) — independent typed keys, explicit context functions, and scoped
   overrides.
-- [Lightweight Type-System Additions](types.md) — primitive domains that catch accidental mixing
-  without runtime wrappers.
+- [Lightweight Type-System Additions](types.md) — erased domains over primitive and structural types
+  that catch accidental mixing without runtime wrappers.
 
 Alongside the chapters:
 
 - [Whole Programs](examples.md) — examples combining the themes, with a TypeScript comparison.
+- [TypeScript Interoperability](interop.md) — current source, runtime, and declaration boundaries,
+  plus the unresolved shape of TypeScript-facing artifacts.
 - [Lowering, Evaluation, and JavaScript Interop](implementation.md) — implementation reference
   outside the introductory reading path.
 - [Postponed Changes](postponed.md) — accepted directions deliberately deferred because their

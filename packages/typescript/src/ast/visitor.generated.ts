@@ -105,6 +105,7 @@ import type {
     JsxOpeningElement,
     JsxSelfClosingElement,
     JsxSpreadAttribute,
+    KvsBrandedType,
     KvsCatchSplitAssignmentExpression,
     KvsCatchSplitBindingPattern,
     KvsCatchSplitExpression,
@@ -118,6 +119,7 @@ import type {
     KvsContextDeclaration,
     KvsContextStatement,
     KvsDefaultExpression,
+    KvsDistinctType,
     KvsExtantAssertionExpression,
     KvsExtantAssignmentExpression,
     KvsExtantReturnStatement,
@@ -317,6 +319,7 @@ import {
     updateJsxOpeningElement,
     updateJsxSelfClosingElement,
     updateJsxSpreadAttribute,
+    updateKvsBrandedType,
     updateKvsCatchSplitAssignmentExpression,
     updateKvsCatchSplitBindingPattern,
     updateKvsCatchSplitExpression,
@@ -330,6 +333,7 @@ import {
     updateKvsContextDeclaration,
     updateKvsContextStatement,
     updateKvsDefaultExpression,
+    updateKvsDistinctType,
     updateKvsExtantAssertionExpression,
     updateKvsExtantAssignmentExpression,
     updateKvsExtantReturnStatement,
@@ -1378,6 +1382,14 @@ const visitEachChildTable: Record<number, VisitEachChildFunction> = {
         const _type = visitNode(node.type, visitor, isTypeNode);
         const _exclamationToken = visitNode(node.exclamationToken, visitor, isExclamationToken);
         return updateKvsExtantType(node, _type, _exclamationToken);
+    },
+    [SyntaxKind.KvsDistinctType]: (node: KvsDistinctType, visitor: Visitor): KvsDistinctType => {
+        const _type = visitNode(node.type, visitor, isTypeNode);
+        return updateKvsDistinctType(node, _type);
+    },
+    [SyntaxKind.KvsBrandedType]: (node: KvsBrandedType, visitor: Visitor): KvsBrandedType => {
+        const _type = visitNode(node.type, visitor, isTypeNode);
+        return updateKvsBrandedType(node, _type);
     },
     [SyntaxKind.RestType]: (node: RestTypeNode, visitor: Visitor): RestTypeNode => {
         const _type = visitNode(node.type, visitor, isTypeNode);

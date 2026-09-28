@@ -6892,6 +6892,25 @@ describe("AST roundtrips", { concurrency }, () => {
         assert.equal(api.printer.printFile(sourceFile), "type Users = {\n    readonly *: User;\n};\n");
     });
 
+    test("KVS erased domains roundtrip", () => {
+        using api = spawnAPI({
+            "/tsconfig.json": "{}",
+            "/src/index.ts": `type Student = distinct User;\ntype UserId = branded string;\n`,
+        });
+
+        const snapshot = api.createSnapshot({ openProject: "/tsconfig.json" });
+        const project = snapshot.getConfiguredProject("/tsconfig.json")!;
+        const sourceFile = project.program.getSourceFile("/src/index.ts");
+        assert(sourceFile);
+        const distinct = (sourceFile.statements[0] as import("@typescript/typescript/unstable/ast").TypeAliasDeclaration).type as import("@typescript/typescript/unstable/ast").KvsDistinctType;
+        const branded = (sourceFile.statements[1] as import("@typescript/typescript/unstable/ast").TypeAliasDeclaration).type as import("@typescript/typescript/unstable/ast").KvsBrandedType;
+        assert.equal(distinct.kind, SyntaxKind.KvsDistinctType);
+        assert.equal(distinct.type.kind, SyntaxKind.TypeReference);
+        assert.equal(branded.kind, SyntaxKind.KvsBrandedType);
+        assert.equal(branded.type.kind, SyntaxKind.StringKeyword);
+        assert.equal(api.printer.printFile(sourceFile), sourceFile.text);
+    });
+
     test("KVS context roundtrip", () => {
         using api = spawnAPI({
             "/tsconfig.json": "{}",

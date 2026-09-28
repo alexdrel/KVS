@@ -20,9 +20,9 @@ context function delayedLog(messages: string[]) {
     };
 }
 
-type ContextLogger = context (message: string) => void;
+export type ContextLogger = context (message: string) => void;
 
-class Logger {
+export class Logger {
     context write(message: string) {
         log(message);
         return RequestId;
@@ -107,7 +107,7 @@ function delayedLog(context_3, messages) {
         }
     }(messages);
 }
-class Logger {
+export class Logger {
     write(context_4, message) {
         log(context_4, message);
         return _ctx_RequestId_1[0] in context_4 ? context_4[_ctx_RequestId_1[0]] : _ctx_RequestId_1[1];
@@ -191,4 +191,8 @@ export declare context CurrentUser: {
     name: string;
 }?;
 export declare context function log(message: string): void;
+export type ContextLogger = context (message: string) => void;
+export declare class Logger {
+    context write(message: string): string;
+}
 export declare function runWithRequest(id: string): string;

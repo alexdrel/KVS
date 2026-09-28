@@ -21,9 +21,9 @@ context function delayedLog(messages: string[]) {
     };
 }
 
-type ContextLogger = context (message: string) => void;
+export type ContextLogger = context (message: string) => void;
 
-class Logger {
+export class Logger {
     context write(message: string) {
         log(message);
         return RequestId;

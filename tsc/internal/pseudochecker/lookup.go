@@ -552,6 +552,8 @@ func typeNodeCouldReferToUndefined(node *ast.Node) bool {
 		node = node.AsParenthesizedTypeNode().Type
 	}
 	switch node.Kind {
+	case ast.KindKvsDistinctType, ast.KindKvsBrandedType:
+		return typeNodeCouldReferToUndefined(node.Type())
 	// these types require symbolic/type resolution to know if they definitely do or do not refer to `undefined`, so might (or definitely do)
 	case ast.KindTypeReference, ast.KindIndexedAccessType, ast.KindTypeQuery, ast.KindOptionalType, ast.KindKvsNullableType, ast.KindKvsExtantType, ast.KindRestType, ast.KindImportType:
 		return true

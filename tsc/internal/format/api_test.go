@@ -93,6 +93,20 @@ func TestFormatKvsRecordTypeShorthand(t *testing.T) {
 	assert.Equal(t, applyBulkEdits(text, edits), "type Users = { readonly *: User; version: number };\n")
 }
 
+func TestFormatKvsErasedDomains(t *testing.T) {
+	t.Parallel()
+
+	ctx := format.WithFormatCodeSettings(t.Context(), lsutil.GetDefaultFormatCodeSettings(), "\n")
+	text := "type Pixel=distinct   number;type UserId=branded   string;\n"
+	sourceFile := parser.ParseSourceFile(ast.SourceFileParseOptions{
+		FileName: "/domains.ts",
+		Path:     "/domains.ts",
+	}, text, core.ScriptKindTS)
+
+	edits := format.FormatDocument(ctx, sourceFile)
+	assert.Equal(t, applyBulkEdits(text, edits), "type Pixel = distinct number; type UserId = branded string;\n")
+}
+
 func TestFormatKvsAllInOne(t *testing.T) {
 	t.Parallel()
 

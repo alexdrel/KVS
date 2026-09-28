@@ -275,6 +275,11 @@ func isKvsTypedSpreadAssignmentContext(context *FormattingContext) bool {
 	return context.contextNode.Kind == ast.KindKvsTypedSpreadAssignmentExpression
 }
 
+func isKvsDomainTypeContext(context *FormattingContext) bool {
+	return context.contextNode.Kind == ast.KindKvsDistinctType ||
+		context.contextNode.Kind == ast.KindKvsBrandedType
+}
+
 func isSameLineTokenOrBeforeBlockContext(context *FormattingContext) bool {
 	return context.TokensAreOnSameLine() || isBeforeBlockContext(context)
 }

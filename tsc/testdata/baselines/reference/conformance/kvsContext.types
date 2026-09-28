@@ -55,11 +55,11 @@ context function delayedLog(messages: string[]) {
     };
 }
 
-type ContextLogger = context (message: string) => void;
+export type ContextLogger = context (message: string) => void;
 >ContextLogger : ContextLogger
 >message : string
 
-class Logger {
+export class Logger {
 >Logger : Logger
 
     context write(message: string) {

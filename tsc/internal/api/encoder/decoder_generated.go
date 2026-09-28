@@ -1041,6 +1041,10 @@ func (d *astDecoder) createChildrenNode(kind ast.Kind, data uint32, childIndices
 		typeNode := d.nodeAt(it.nextIf(mask, 0))
 		exclamationToken := d.nodeAt(it.nextIf(mask, 1))
 		return d.factory.NewKvsExtantType(typeNode, exclamationToken), nil
+	case ast.KindKvsDistinctType:
+		return d.factory.NewKvsDistinctType(d.singleChild(childIndices)), nil
+	case ast.KindKvsBrandedType:
+		return d.factory.NewKvsBrandedType(d.singleChild(childIndices)), nil
 	case ast.KindRestType:
 		return d.factory.NewRestTypeNode(d.singleChild(childIndices)), nil
 	case ast.KindParenthesizedType:

@@ -1,0 +1,71 @@
+//// [tests/cases/conformance/kvs/kvsErasedDomainsDeclarations.ts] ////
+
+=== kvsErasedDomainsDeclarations.ts ===
+export interface User {
+    name: string;
+>name : string
+}
+
+export type Student = distinct User;
+>Student : Student
+
+export type UserId = branded string;
+>UserId : UserId
+
+export type Students = distinct User[];
+>Students : Students
+
+export type Pair = distinct [number, number];
+>Pair : Pair
+
+export type Predicate = distinct ((user: User) => boolean);
+>Predicate : Predicate
+>user : User
+
+export type UserMap = distinct Map<string, User>;
+>UserMap : UserMap
+
+declare const student: Student;
+>student : Student
+
+declare const rawId: string;
+>rawId : string
+
+declare const students: User[];
+>students : User[]
+
+declare const pair: [number, number];
+>pair : [number, number]
+
+declare const predicate: (user: User) => boolean;
+>predicate : (user: User) => boolean
+>user : User
+
+declare const userMap: Map<string, User>;
+>userMap : Map<string, User>
+
+export const inferredStudent = student;
+>inferredStudent : Student
+>student : Student
+
+export const inferredUserId = rawId as UserId;
+>inferredUserId : UserId
+>rawId as UserId : UserId
+>rawId : string
+
+export const inferredStudents: Students = students;
+>inferredStudents : Students
+>students : User[]
+
+export const inferredPair: Pair = pair;
+>inferredPair : Pair
+>pair : [number, number]
+
+export const inferredPredicate: Predicate = predicate;
+>inferredPredicate : Predicate
+>predicate : (user: User) => boolean
+
+export const inferredUserMap: UserMap = userMap;
+>inferredUserMap : UserMap
+>userMap : Map<string, User>
+

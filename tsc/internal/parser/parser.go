@@ -2389,7 +2389,9 @@ func (p *Parser) parseTypeAliasDeclaration(pos int, jsdoc jsdocScannerInfo, modi
 	typeParameters := p.parseTypeParameters()
 	p.parseExpected(ast.KindEqualsToken)
 	var typeNode *ast.TypeNode
-	if p.token == ast.KindIntrinsicKeyword && p.lookAhead((*Parser).nextIsNotDot) {
+	if p.token == ast.KindIdentifier && (p.scanner.TokenValue() == "distinct" || p.scanner.TokenValue() == "branded") && p.lookAhead((*Parser).nextTokenIsStartOfType) {
+		typeNode = p.parseKvsDomainType()
+	} else if p.token == ast.KindIntrinsicKeyword && p.lookAhead((*Parser).nextIsNotDot) {
 		typeNode = p.parseKeywordTypeNode()
 	} else {
 		typeNode = p.parseType()
@@ -2399,6 +2401,22 @@ func (p *Parser) parseTypeAliasDeclaration(pos int, jsdoc jsdocScannerInfo, modi
 	p.withJSDoc(result, jsdoc)
 	p.checkJSSyntax(result)
 	return result
+}
+
+func (p *Parser) nextTokenIsStartOfType() bool {
+	p.nextToken()
+	return p.isStartOfType(false /*inStartOfParameter*/)
+}
+
+func (p *Parser) parseKvsDomainType() *ast.Node {
+	pos := p.nodePos()
+	domain := p.scanner.TokenValue()
+	p.nextToken()
+	typeNode := p.parseType()
+	if domain == "distinct" {
+		return p.finishNode(p.factory.NewKvsDistinctType(typeNode), pos)
+	}
+	return p.finishNode(p.factory.NewKvsBrandedType(typeNode), pos)
 }
 
 func (p *Parser) nextIsNotDot() bool {

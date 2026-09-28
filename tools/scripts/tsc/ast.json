@@ -247,6 +247,8 @@
             "OptionalType",
             "KvsNullableType",
             "KvsExtantType",
+            "KvsDistinctType",
+            "KvsBrandedType",
             "RestType",
             "UnionType",
             "IntersectionType",
@@ -4749,6 +4751,32 @@
                     {
                         "name": "ExclamationToken",
                         "type": "ExclamationToken"
+                    }
+                ],
+                "arena": true
+            },
+            "KvsDistinctType": {
+                "extends": [
+                    "TypeNodeBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "Type",
+                        "type": "TypeNode"
+                    }
+                ],
+                "arena": true
+            },
+            "KvsBrandedType": {
+                "extends": [
+                    "TypeNodeBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "Type",
+                        "type": "TypeNode"
                     }
                 ],
                 "arena": true

@@ -115,6 +115,7 @@ func getAllRules() []ruleSpec {
 		rule("SpaceAfterKvsSieveBinding", ast.KindEqualsToken, anyToken, []contextPredicate{isNonJsxSameLineTokenContext, isKvsSieveBindingContext}, ruleActionInsertSpace),
 		rule("SpaceBeforeKvsTypedSpreadAssignment", anyToken, ast.KindDotDotDotToken, []contextPredicate{isNonJsxSameLineTokenContext, isKvsTypedSpreadAssignmentContext}, ruleActionInsertSpace),
 		rule("SpaceAfterKvsTypedSpreadAssignment", ast.KindEqualsToken, anyToken, []contextPredicate{isNonJsxSameLineTokenContext, isKvsTypedSpreadAssignmentContext}, ruleActionInsertSpace),
+		rule("SpaceAfterKvsDomainKeyword", ast.KindIdentifier, anyToken, []contextPredicate{isNonJsxSameLineTokenContext, isKvsDomainTypeContext}, ruleActionInsertSpace),
 
 		// Leave comments alone
 		rule("IgnoreBeforeComment", anyToken, comments, anyContext, ruleActionStopProcessingSpaceActions),

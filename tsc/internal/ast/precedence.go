@@ -710,7 +710,7 @@ func GetTypeNodePrecedence(n *TypeNode) TypePrecedence {
 		return TypePrecedenceUnion
 	case KindIntersectionType:
 		return TypePrecedenceIntersection
-	case KindTypeOperator:
+	case KindTypeOperator, KindKvsDistinctType, KindKvsBrandedType:
 		return TypePrecedenceTypeOperator
 	case KindInferType:
 		if n.AsInferTypeNode().TypeParameter.AsTypeParameterDeclaration().Constraint != nil {

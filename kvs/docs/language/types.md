@@ -1,8 +1,8 @@
 # Lightweight Type-System Additions
 
 KVS adds inexpensive static information where it can remain compatible with ordinary JavaScript
-values. Record shorthand concisely names string-keyed dictionaries, while `distinct` lets a
-primitive value carry a domain without a runtime wrapper.
+values. Record shorthand concisely names string-keyed dictionaries, while erased domains distinguish
+values that share an ordinary runtime representation.
 
 Nullable type operators, expression inference, and assertions are covered in
 [Nullability, Values, and Defaults](values.md).
@@ -35,91 +35,134 @@ for (users) use(#, _); // string key, User value
 for (const [id, user] in users) use(id, user);
 ```
 
-## Distinct primitive domains
+## Erased domains
 
-Programs often use the same primitive representation for values that must not be mixed:
+Programs often use the same representation for values that must not be mixed:
 
 ```kvs
 type Pixel = distinct number;
 type Cell = distinct number;
 
+type Student = distinct User;
+type Teacher = distinct User;
+
 const screenRect: Rect<Pixel>;
 const gridRect: Rect<Cell>;
 ```
 
-KVS rejects accidentally passing cell coordinates where pixels are expected. The same distinction is
-useful for strings:
+KVS rejects accidentally passing cell coordinates where pixels are expected, or teachers where
+students are expected. Some boundaries also require proof that a value has been checked rather than
+merely keeping two domains apart:
 
 ```kvs
-type OrderId = distinct string;
-type Email = distinct string;
+type UserId = branded string;
+type VerifiedUser = branded User;
 ```
 
-Distinct domains do not validate values or model physical units.
+Both forms are static only. They add no runtime wrapper, tag, or validation.
 
 ## Declaration
 
-`distinct` creates a new domain over one primitive base type:
+`distinct` and `branded` create a new domain over an underlying type:
 
 ```kvs
 type Kelvin = distinct number;
 type Celsius = distinct number;
-type Email = distinct string;
+type Student = distinct User;
+type OrderId = distinct string;
+
+type Email = branded string;
+type VerifiedUser = branded User;
 ```
 
-The initial proposal supports `number`, `bigint`, and `string`. A normal alias of a distinct type
-retains the same domain rather than creating another one:
+A normal alias of a domain retains the same identity rather than creating another one:
 
 ```kvs
 type ScreenPixel = Pixel; // same domain as Pixel
+type AccountId = UserId;  // same domain as UserId
 ```
 
-Distinct information is erased during transpilation. A `Pixel` has the runtime representation and
-behavior of a JavaScript number.
+Domain information is erased during transpilation. A `Pixel` is a JavaScript number, a `UserId` is a
+JavaScript string, and a `Student` is an ordinary `User` at runtime.
 
-## Neutral primitive values
+The underlying type must be concrete. `any`, `unknown`, `never`, another domain, and generic domain
+factories such as `type Domain<T> = distinct T` are rejected. Closed generic types remain ordinary
+concrete bases, so declarations such as `type Students = distinct Array<User>` are valid.
 
-An ordinary primitive value is neutral. It may be used where a domain over that primitive is
-required:
+## Distinct domains
+
+An ordinary value is neutral. It may be used where a distinct domain over its type is required:
 
 ```kvs
 function moveX(distance: Pixel) { ... }
+function enroll(student: Student) { ... }
 
 moveX(20);          // valid
 moveX(config.step); // valid when step is number
+enroll(user);        // valid when user is User
 ```
 
 This permits gradual adoption: code gains protection as values acquire domains without requiring
 every input and literal to be converted first.
 
-A value from another distinct domain is not neutral:
+A value from another domain is not neutral:
 
 ```kvs
 moveX(cellWidth); // error: Cell is not Pixel
+enroll(teacher);  // error: Teacher is not Student
 ```
 
-A distinct value may be used as its primitive base. An explicit base annotation therefore forms a
+A distinct value may be used as its underlying type. An explicit base annotation therefore forms a
 domain-erasing boundary:
 
 ```kvs
 const raw: number = pixel;
+const ordinaryUser: User = student;
 ```
 
 Code can deliberately erase and later reapply a domain, so this is not an opaque-type security
 boundary. Its purpose is to catch direct accidental mixing while remaining compatible with
 JavaScript APIs.
 
-## Contagious operations
+## Branded domains
+
+A branded domain requires an explicit assertion at its entry boundary:
+
+```kvs
+function loadUser(id: UserId) { ... }
+
+loadUser(rawId);           // error when rawId is string
+loadUser(rawId as UserId); // valid
+loadUser(userId);          // valid
+```
+
+The asserted value must be compatible with the brand's underlying type. Branding performs no runtime
+validation; the assertion records that validation or another domain decision has already happened.
+
+A branded value may be used as its underlying type, but ordinary operations do not preserve the
+brand:
+
+```kvs
+const raw: string = userId; // valid
+userId.trim()               // string, not UserId
+{ ...verifiedUser }         // User, not VerifiedUser
+```
+
+This makes branded domains suitable for validated identifiers, sanitized data, authorized actions,
+and other explicit boundaries.
+
+## Distinct propagation
 
 When an operation consumes values from one distinct domain and normally returns that domain's
-primitive base, its result retains the domain:
+underlying type, its result retains the domain:
 
 ```kvs
 celsius + 2                    // Celsius
 (celsius1 + celsius2) / 2     // Celsius
 Math.min(kelvin, kelvin / 2)  // Kelvin
-email.trim()                   // Email
+orderId.trim()                 // OrderId
 orderId + "-archived"         // OrderId
+rename(student, "Ada")        // Student when rename(User, string): User
 ```
 
 Neutral operands do not introduce a competing domain:
@@ -127,10 +170,10 @@ Neutral operands do not introduce a competing domain:
 ```kvs
 2 + pixels            // Pixel
 Math.min(kelvin, 0)   // Kelvin
-email == "a@b.test"  // boolean
+orderId == "A-123"   // boolean
 ```
 
-An operation returning a different primitive or structural type retains its declared result type:
+An operation returning a different type retains its declared result type:
 
 ```kvs
 pixels < limit       // boolean
@@ -144,10 +187,17 @@ KVS does not infer dimensions or meanings within a domain. Operations such as `P
 would produce `number`. The domain says where a number belongs, not what physical quantity it
 represents.
 
+Generic identity preserves a domain through ordinary inference. Structural reconstruction is not an
+identity operation and produces its ordinary inferred type:
+
+```kvs
+identity(student) // Student when identity<T>(value: T): T
+{ ...student }    // User-shaped object, not Student
+```
+
 ## Domain conflicts
 
-One operation cannot consume two different distinct domains, even when they have the same primitive
-base:
+One operation cannot consume two different domains over the same underlying type:
 
 ```kvs
 pixels + cells              // error
@@ -156,20 +206,27 @@ email == orderId            // error
 Math.min(celsius, kelvin)   // error
 ```
 
-Bare unions of distinct domains are not supported. Their runtime representations provide no
-discriminator with which to narrow the union:
+Unions may contain domain types, but two direct constituents cannot have the same underlying base,
+including a domain and its plain base:
 
 ```kvs
-Kelvin | Celsius // error
+Student | number | Turtle // valid: three different bases
+
+Kelvin | Celsius // error: both are number
+UserId | Email   // error: both are string
+Student | User   // error: both are User
 ```
 
-When a value genuinely belongs to one of several domains, an explicitly discriminated structure
-represents that fact:
+When a value genuinely belongs to one of several domains over the same base, an explicitly
+discriminated structure represents that fact:
 
 ```kvs
-type Temperature =
-    | { kind: "kelvin", value: Kelvin }
-    | { kind: "celsius", value: Celsius };
+type BrandedStudent = branded User;
+type BrandedTeacher = branded User;
+
+type Person =
+    | { kind: "student", value: BrandedStudent }
+    | { kind: "teacher", value: BrandedTeacher };
 ```
 
 Nullability remains available because absence is independently observable:
@@ -180,8 +237,9 @@ let reading: Kelvin?;
 
 ## Function signatures
 
-A function parameter written as a primitive base accepts values from any one corresponding domain.
-If the function returns that same primitive base, the call preserves the participating domain:
+A function parameter written as an underlying type accepts values from a corresponding distinct
+domain. If the function returns that same underlying type, the call preserves the participating
+domain:
 
 ```kvs
 function clamp(value: number, low: number, high: number): number;
@@ -190,31 +248,33 @@ clamp(pixel, 0, 1000) // Pixel
 clamp(pixel, 0, cell) // error
 ```
 
-This rule lets ordinary base-typed libraries preserve domains without separate overloads. It applies
-only when a distinct argument substitutes for a parameter of its exact primitive base type. Passing
-a distinct value through `any`, `unknown`, or an unrelated generic parameter does not contaminate
-the result.
+This rule lets ordinary base-typed libraries preserve distinct domains without separate overloads.
+It applies only when a distinct argument substitutes for a parameter of its exact underlying type.
+Passing a distinct value through `any`, `unknown`, or an unrelated generic parameter does not
+contaminate the result. Branded arguments never apply this propagation rule.
 
-A signature that names a distinct domain may explicitly return its neutral base type. This is the
-domain-aware escape hatch for an operation whose meaning genuinely changes:
+A signature that names a distinct domain may explicitly return its neutral base type. This prevents
+propagation when the operation's meaning genuinely changes; branded domains already return their
+ordinary declared result:
 
 ```kvs
 function temperatureRatio(value: Kelvin): number;
-function emailDomain(value: Email): string;
 ```
 
 ## Explicit conversion
 
-TypeScript's existing `as` syntax explicitly changes or removes a domain:
+TypeScript's existing `as` syntax explicitly changes, applies, or removes a domain:
 
 ```kvs
 const kelvin = (celsius + 273) as Kelvin;
 const cells = pixels as Cell;
 const raw = pixels as number;
+const id = rawId as UserId;
 ```
 
 These conversions have no runtime effect and perform no validation. Direct conversion between
-distinct domains is permitted precisely because `as` makes the otherwise forbidden boundary visible.
+compatible domains is permitted precisely because `as` makes the otherwise forbidden boundary
+visible.
 
 ---
 

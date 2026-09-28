@@ -2658,6 +2658,33 @@ func (r *Relater) isRelatedToEx(originalSource *Type, originalTarget *Type, recu
 	if source == target {
 		return TernaryTrue
 	}
+	if sourceDomain, targetDomain := getKvsDomainInfo(source), getKvsDomainInfo(target); sourceDomain != nil || targetDomain != nil {
+		if r.relation == r.c.identityRelation {
+			if sourceDomain != nil && targetDomain != nil && sourceDomain.symbol == targetDomain.symbol {
+				return TernaryTrue
+			}
+			return TernaryFalse
+		}
+		switch {
+		case sourceDomain != nil && targetDomain != nil:
+			if sourceDomain.symbol == targetDomain.symbol {
+				return TernaryTrue
+			}
+			if reportErrors {
+				r.reportErrorResults(originalSource, originalTarget, source, target, headMessage)
+			}
+			return TernaryFalse
+		case sourceDomain != nil:
+			return r.isRelatedToEx(sourceDomain.underlying, target, recursionFlags, reportErrors, headMessage, intersectionState)
+		case targetDomain.mode == KvsDomainModeDistinct && r.relation == r.c.assignableRelation || r.relation == r.c.comparableRelation:
+			return r.isRelatedToEx(source, targetDomain.underlying, recursionFlags, reportErrors, headMessage, intersectionState)
+		default:
+			if reportErrors {
+				r.reportErrorResults(originalSource, originalTarget, source, target, headMessage)
+			}
+			return TernaryFalse
+		}
+	}
 	if r.relation == r.c.identityRelation {
 		if source.flags != target.flags {
 			return TernaryFalse

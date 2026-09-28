@@ -729,6 +729,10 @@ func (n *Node) Type() *Node {
 		return n.AsKvsNullableType().Type
 	case KindKvsExtantType:
 		return n.AsKvsExtantType().Type
+	case KindKvsDistinctType:
+		return n.AsKvsDistinctType().Type
+	case KindKvsBrandedType:
+		return n.AsKvsBrandedType().Type
 	case KindRestType:
 		return n.AsRestTypeNode().Type
 	case KindTemplateLiteralTypeSpan:
@@ -796,6 +800,10 @@ func (m *MutableNode) SetType(t *Node) {
 		n.AsKvsNullableType().Type = t
 	case KindKvsExtantType:
 		n.AsKvsExtantType().Type = t
+	case KindKvsDistinctType:
+		n.AsKvsDistinctType().Type = t
+	case KindKvsBrandedType:
+		n.AsKvsBrandedType().Type = t
 	case KindRestType:
 		n.AsRestTypeNode().Type = t
 	case KindTemplateLiteralTypeSpan:
@@ -2220,6 +2228,14 @@ func (node *KvsNullableType) computeSubtreeFacts() SubtreeFacts {
 }
 
 func (node *KvsExtantType) computeSubtreeFacts() SubtreeFacts {
+	return propagateSubtreeFacts(node.Type) | SubtreeContainsTypeScript
+}
+
+func (node *KvsDistinctType) computeSubtreeFacts() SubtreeFacts {
+	return propagateSubtreeFacts(node.Type) | SubtreeContainsTypeScript
+}
+
+func (node *KvsBrandedType) computeSubtreeFacts() SubtreeFacts {
 	return propagateSubtreeFacts(node.Type) | SubtreeContainsTypeScript
 }
 

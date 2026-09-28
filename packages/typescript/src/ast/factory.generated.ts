@@ -149,6 +149,7 @@ import type {
     KeywordExpressionSyntaxKind,
     KeywordTypeNode,
     KeywordTypeSyntaxKind,
+    KvsBrandedType,
     KvsCatchSplitAssignmentExpression,
     KvsCatchSplitBindingPattern,
     KvsCatchSplitExpression,
@@ -162,6 +163,7 @@ import type {
     KvsContextDeclaration,
     KvsContextStatement,
     KvsDefaultExpression,
+    KvsDistinctType,
     KvsExtantAssertionExpression,
     KvsExtantAssignmentExpression,
     KvsExtantReturnStatement,
@@ -1184,6 +1186,10 @@ function cloneNodeData(node: Node): any {
             return { type: n.type, questionToken: n.questionToken };
         case SyntaxKind.KvsExtantType:
             return { type: n.type, exclamationToken: n.exclamationToken };
+        case SyntaxKind.KvsDistinctType:
+            return { type: n.type };
+        case SyntaxKind.KvsBrandedType:
+            return { type: n.type };
         case SyntaxKind.RestType:
             return { type: n.type };
         case SyntaxKind.ParenthesizedType:
@@ -1809,6 +1815,8 @@ const forEachChildTable: Record<number, ForEachChildFunction> = {
     [SyntaxKind.KvsExtantType]: (data, cbNode, cbNodes) =>
         visitNode(cbNode, data.type) ||
         visitNode(cbNode, data.exclamationToken),
+    [SyntaxKind.KvsDistinctType]: (data, cbNode, cbNodes) => visitNode(cbNode, data.type),
+    [SyntaxKind.KvsBrandedType]: (data, cbNode, cbNodes) => visitNode(cbNode, data.type),
     [SyntaxKind.RestType]: (data, cbNode, cbNodes) => visitNode(cbNode, data.type),
     [SyntaxKind.ParenthesizedType]: (data, cbNode, cbNodes) => visitNode(cbNode, data.type),
     [SyntaxKind.FunctionType]: (data, cbNode, cbNodes) =>
@@ -3910,6 +3918,18 @@ const yieldEachChildTable: Record<number, YieldEachChildFunction> = {
             if (res) return res;
         }
     },
+    [SyntaxKind.KvsDistinctType]: function* (data) {
+        if (data.type) {
+            const res = yield data.type;
+            if (res) return res;
+        }
+    },
+    [SyntaxKind.KvsBrandedType]: function* (data) {
+        if (data.type) {
+            const res = yield data.type;
+            if (res) return res;
+        }
+    },
     [SyntaxKind.RestType]: function* (data) {
         if (data.type) {
             const res = yield data.type;
@@ -5934,6 +5954,18 @@ export function createKvsExtantType(type: TypeNode, exclamationToken: Exclamatio
     }) as unknown as KvsExtantType;
 }
 
+export function createKvsDistinctType(type: TypeNode): KvsDistinctType {
+    return new NodeObject(SyntaxKind.KvsDistinctType, {
+        type,
+    }) as unknown as KvsDistinctType;
+}
+
+export function createKvsBrandedType(type: TypeNode): KvsBrandedType {
+    return new NodeObject(SyntaxKind.KvsBrandedType, {
+        type,
+    }) as unknown as KvsBrandedType;
+}
+
 export function createRestTypeNode(type: TypeNode): RestTypeNode {
     return new NodeObject(SyntaxKind.RestType, {
         type,
@@ -7057,6 +7089,14 @@ export function updateKvsNullableType(node: KvsNullableType, type: TypeNode, que
 
 export function updateKvsExtantType(node: KvsExtantType, type: TypeNode, exclamationToken: ExclamationToken): KvsExtantType {
     return node.type !== type || node.exclamationToken !== exclamationToken ? createKvsExtantType(type, exclamationToken) : node;
+}
+
+export function updateKvsDistinctType(node: KvsDistinctType, type: TypeNode): KvsDistinctType {
+    return node.type !== type ? createKvsDistinctType(type) : node;
+}
+
+export function updateKvsBrandedType(node: KvsBrandedType, type: TypeNode): KvsBrandedType {
+    return node.type !== type ? createKvsBrandedType(type) : node;
 }
 
 export function updateRestTypeNode(node: RestTypeNode, type: TypeNode): RestTypeNode {

@@ -464,6 +464,12 @@ func getChildrenPropertyMask(node *ast.Node) uint8 {
 	case ast.KindKvsExtantType:
 		n := node.AsKvsExtantType()
 		return (boolToByte(n.Type != nil) << 0) | (boolToByte(n.ExclamationToken != nil) << 1)
+	case ast.KindKvsDistinctType:
+		n := node.AsKvsDistinctType()
+		return (boolToByte(n.Type != nil) << 0)
+	case ast.KindKvsBrandedType:
+		n := node.AsKvsBrandedType()
+		return (boolToByte(n.Type != nil) << 0)
 	case ast.KindRestType:
 		n := node.AsRestTypeNode()
 		return (boolToByte(n.Type != nil) << 0)

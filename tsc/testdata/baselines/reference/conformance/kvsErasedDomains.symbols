@@ -1,0 +1,392 @@
+//// [tests/cases/conformance/kvs/kvsErasedDomains.ts] ////
+
+=== kvsErasedDomains.ts ===
+interface User {
+>User : Symbol(User, Decl(kvsErasedDomains.ts, 0, 0))
+
+    name: string;
+>name : Symbol(User.name, Decl(kvsErasedDomains.ts, 0, 16))
+
+    rename(name: string): User;
+>rename : Symbol(User.rename, Decl(kvsErasedDomains.ts, 1, 17))
+>name : Symbol(name, Decl(kvsErasedDomains.ts, 2, 11))
+>User : Symbol(User, Decl(kvsErasedDomains.ts, 0, 0))
+}
+
+declare function rename(user: User, name: string): User;
+>rename : Symbol(rename, Decl(kvsErasedDomains.ts, 3, 1))
+>user : Symbol(user, Decl(kvsErasedDomains.ts, 5, 24))
+>User : Symbol(User, Decl(kvsErasedDomains.ts, 0, 0))
+>name : Symbol(name, Decl(kvsErasedDomains.ts, 5, 35))
+>User : Symbol(User, Decl(kvsErasedDomains.ts, 0, 0))
+
+declare function choose(left: User, right: User): User;
+>choose : Symbol(choose, Decl(kvsErasedDomains.ts, 5, 56))
+>left : Symbol(left, Decl(kvsErasedDomains.ts, 6, 24))
+>User : Symbol(User, Decl(kvsErasedDomains.ts, 0, 0))
+>right : Symbol(right, Decl(kvsErasedDomains.ts, 6, 35))
+>User : Symbol(User, Decl(kvsErasedDomains.ts, 0, 0))
+>User : Symbol(User, Decl(kvsErasedDomains.ts, 0, 0))
+
+declare function score(user: User, offset: number): number;
+>score : Symbol(score, Decl(kvsErasedDomains.ts, 6, 55))
+>user : Symbol(user, Decl(kvsErasedDomains.ts, 7, 23))
+>User : Symbol(User, Decl(kvsErasedDomains.ts, 0, 0))
+>offset : Symbol(offset, Decl(kvsErasedDomains.ts, 7, 34))
+
+declare function identity<T>(value: T): T;
+>identity : Symbol(identity, Decl(kvsErasedDomains.ts, 7, 59))
+>T : Symbol(T, Decl(kvsErasedDomains.ts, 8, 26))
+>value : Symbol(value, Decl(kvsErasedDomains.ts, 8, 29))
+>T : Symbol(T, Decl(kvsErasedDomains.ts, 8, 26))
+>T : Symbol(T, Decl(kvsErasedDomains.ts, 8, 26))
+
+type Student = distinct User;
+>Student : Symbol(Student, Decl(kvsErasedDomains.ts, 8, 42))
+>User : Symbol(User, Decl(kvsErasedDomains.ts, 0, 0))
+
+type Teacher = distinct User;
+>Teacher : Symbol(Teacher, Decl(kvsErasedDomains.ts, 10, 29))
+>User : Symbol(User, Decl(kvsErasedDomains.ts, 0, 0))
+
+type UserId = branded string;
+>UserId : Symbol(UserId, Decl(kvsErasedDomains.ts, 11, 29))
+
+type OrderId = branded string;
+>OrderId : Symbol(OrderId, Decl(kvsErasedDomains.ts, 12, 29))
+
+type Pixel = distinct number;
+>Pixel : Symbol(Pixel, Decl(kvsErasedDomains.ts, 13, 30))
+
+type Cell = distinct number;
+>Cell : Symbol(Cell, Decl(kvsErasedDomains.ts, 14, 29))
+
+type Slug = distinct string;
+>Slug : Symbol(Slug, Decl(kvsErasedDomains.ts, 15, 28))
+
+type Kelvin = distinct number;
+>Kelvin : Symbol(Kelvin, Decl(kvsErasedDomains.ts, 16, 28))
+
+type Celsius = distinct number;
+>Celsius : Symbol(Celsius, Decl(kvsErasedDomains.ts, 17, 30))
+
+type StudentAlias = Student;
+>StudentAlias : Symbol(StudentAlias, Decl(kvsErasedDomains.ts, 18, 31))
+>Student : Symbol(Student, Decl(kvsErasedDomains.ts, 8, 42))
+
+declare const user: User;
+>user : Symbol(user, Decl(kvsErasedDomains.ts, 22, 13))
+>User : Symbol(User, Decl(kvsErasedDomains.ts, 0, 0))
+
+declare const student: Student;
+>student : Symbol(student, Decl(kvsErasedDomains.ts, 23, 13))
+>Student : Symbol(Student, Decl(kvsErasedDomains.ts, 8, 42))
+
+declare const teacher: Teacher;
+>teacher : Symbol(teacher, Decl(kvsErasedDomains.ts, 24, 13))
+>Teacher : Symbol(Teacher, Decl(kvsErasedDomains.ts, 10, 29))
+
+declare const text: string;
+>text : Symbol(text, Decl(kvsErasedDomains.ts, 25, 13))
+
+declare const userId: UserId;
+>userId : Symbol(userId, Decl(kvsErasedDomains.ts, 26, 13))
+>UserId : Symbol(UserId, Decl(kvsErasedDomains.ts, 11, 29))
+
+declare const orderId: OrderId;
+>orderId : Symbol(orderId, Decl(kvsErasedDomains.ts, 27, 13))
+>OrderId : Symbol(OrderId, Decl(kvsErasedDomains.ts, 12, 29))
+
+declare const pixel: Pixel;
+>pixel : Symbol(pixel, Decl(kvsErasedDomains.ts, 28, 13))
+>Pixel : Symbol(Pixel, Decl(kvsErasedDomains.ts, 13, 30))
+
+declare const pixel2: Pixel;
+>pixel2 : Symbol(pixel2, Decl(kvsErasedDomains.ts, 29, 13))
+>Pixel : Symbol(Pixel, Decl(kvsErasedDomains.ts, 13, 30))
+
+declare const cell: Cell;
+>cell : Symbol(cell, Decl(kvsErasedDomains.ts, 30, 13))
+>Cell : Symbol(Cell, Decl(kvsErasedDomains.ts, 14, 29))
+
+declare const slug: Slug;
+>slug : Symbol(slug, Decl(kvsErasedDomains.ts, 31, 13))
+>Slug : Symbol(Slug, Decl(kvsErasedDomains.ts, 15, 28))
+
+declare const kelvin: Kelvin;
+>kelvin : Symbol(kelvin, Decl(kvsErasedDomains.ts, 32, 13))
+>Kelvin : Symbol(Kelvin, Decl(kvsErasedDomains.ts, 16, 28))
+
+declare const celsius: Celsius;
+>celsius : Symbol(celsius, Decl(kvsErasedDomains.ts, 33, 13))
+>Celsius : Symbol(Celsius, Decl(kvsErasedDomains.ts, 17, 30))
+
+declare function celsiusToKelvin(value: Celsius): Kelvin;
+>celsiusToKelvin : Symbol(celsiusToKelvin, Decl(kvsErasedDomains.ts, 33, 31))
+>value : Symbol(value, Decl(kvsErasedDomains.ts, 35, 33))
+>Celsius : Symbol(Celsius, Decl(kvsErasedDomains.ts, 17, 30))
+>Kelvin : Symbol(Kelvin, Decl(kvsErasedDomains.ts, 16, 28))
+
+const studentFromUser: Student = user;
+>studentFromUser : Symbol(studentFromUser, Decl(kvsErasedDomains.ts, 37, 5))
+>Student : Symbol(Student, Decl(kvsErasedDomains.ts, 8, 42))
+>user : Symbol(user, Decl(kvsErasedDomains.ts, 22, 13))
+
+const studentFromStudent: Student = student;
+>studentFromStudent : Symbol(studentFromStudent, Decl(kvsErasedDomains.ts, 38, 5))
+>Student : Symbol(Student, Decl(kvsErasedDomains.ts, 8, 42))
+>student : Symbol(student, Decl(kvsErasedDomains.ts, 23, 13))
+
+const userFromStudent: User = student;
+>userFromStudent : Symbol(userFromStudent, Decl(kvsErasedDomains.ts, 39, 5))
+>User : Symbol(User, Decl(kvsErasedDomains.ts, 0, 0))
+>student : Symbol(student, Decl(kvsErasedDomains.ts, 23, 13))
+
+const studentAlias: StudentAlias = student;
+>studentAlias : Symbol(studentAlias, Decl(kvsErasedDomains.ts, 40, 5))
+>StudentAlias : Symbol(StudentAlias, Decl(kvsErasedDomains.ts, 18, 31))
+>student : Symbol(student, Decl(kvsErasedDomains.ts, 23, 13))
+
+const rejectedTeacher: Student = teacher;
+>rejectedTeacher : Symbol(rejectedTeacher, Decl(kvsErasedDomains.ts, 42, 5))
+>Student : Symbol(Student, Decl(kvsErasedDomains.ts, 8, 42))
+>teacher : Symbol(teacher, Decl(kvsErasedDomains.ts, 24, 13))
+
+const rejectedText: UserId = text;
+>rejectedText : Symbol(rejectedText, Decl(kvsErasedDomains.ts, 43, 5))
+>UserId : Symbol(UserId, Decl(kvsErasedDomains.ts, 11, 29))
+>text : Symbol(text, Decl(kvsErasedDomains.ts, 25, 13))
+
+const acceptedUserId: UserId = userId;
+>acceptedUserId : Symbol(acceptedUserId, Decl(kvsErasedDomains.ts, 44, 5))
+>UserId : Symbol(UserId, Decl(kvsErasedDomains.ts, 11, 29))
+>userId : Symbol(userId, Decl(kvsErasedDomains.ts, 26, 13))
+
+const stringFromUserId: string = userId;
+>stringFromUserId : Symbol(stringFromUserId, Decl(kvsErasedDomains.ts, 45, 5))
+>userId : Symbol(userId, Decl(kvsErasedDomains.ts, 26, 13))
+
+const rejectedOrderId: UserId = orderId;
+>rejectedOrderId : Symbol(rejectedOrderId, Decl(kvsErasedDomains.ts, 46, 5))
+>UserId : Symbol(UserId, Decl(kvsErasedDomains.ts, 11, 29))
+>orderId : Symbol(orderId, Decl(kvsErasedDomains.ts, 27, 13))
+
+const studentName = student.name;
+>studentName : Symbol(studentName, Decl(kvsErasedDomains.ts, 48, 5))
+>student.name : Symbol(User.name, Decl(kvsErasedDomains.ts, 0, 16))
+>student : Symbol(student, Decl(kvsErasedDomains.ts, 23, 13))
+>name : Symbol(User.name, Decl(kvsErasedDomains.ts, 0, 16))
+
+const userIdLength = userId.length;
+>userIdLength : Symbol(userIdLength, Decl(kvsErasedDomains.ts, 49, 5))
+>userId.length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+>userId : Symbol(userId, Decl(kvsErasedDomains.ts, 26, 13))
+>length : Symbol(String.length, Decl(lib.es5.d.ts, --, --))
+
+const reconstructed = { ...student };
+>reconstructed : Symbol(reconstructed, Decl(kvsErasedDomains.ts, 50, 5))
+>student : Symbol(student, Decl(kvsErasedDomains.ts, 23, 13))
+
+const renamedStudent = rename(student, "Ada");
+>renamedStudent : Symbol(renamedStudent, Decl(kvsErasedDomains.ts, 51, 5))
+>rename : Symbol(rename, Decl(kvsErasedDomains.ts, 3, 1))
+>student : Symbol(student, Decl(kvsErasedDomains.ts, 23, 13))
+
+const methodRenamedStudent = student.rename("Ada");
+>methodRenamedStudent : Symbol(methodRenamedStudent, Decl(kvsErasedDomains.ts, 52, 5))
+>student.rename : Symbol(User.rename, Decl(kvsErasedDomains.ts, 1, 17))
+>student : Symbol(student, Decl(kvsErasedDomains.ts, 23, 13))
+>rename : Symbol(User.rename, Decl(kvsErasedDomains.ts, 1, 17))
+
+const identityStudent = identity(student);
+>identityStudent : Symbol(identityStudent, Decl(kvsErasedDomains.ts, 53, 5))
+>identity : Symbol(identity, Decl(kvsErasedDomains.ts, 7, 59))
+>student : Symbol(student, Decl(kvsErasedDomains.ts, 23, 13))
+
+const conflictingUsers = choose(student, teacher);
+>conflictingUsers : Symbol(conflictingUsers, Decl(kvsErasedDomains.ts, 54, 5))
+>choose : Symbol(choose, Decl(kvsErasedDomains.ts, 5, 56))
+>student : Symbol(student, Decl(kvsErasedDomains.ts, 23, 13))
+>teacher : Symbol(teacher, Decl(kvsErasedDomains.ts, 24, 13))
+
+const addedPixel = pixel + 2;
+>addedPixel : Symbol(addedPixel, Decl(kvsErasedDomains.ts, 56, 5))
+>pixel : Symbol(pixel, Decl(kvsErasedDomains.ts, 28, 13))
+
+const averagedPixel = (pixel + pixel2) / 2;
+>averagedPixel : Symbol(averagedPixel, Decl(kvsErasedDomains.ts, 57, 5))
+>pixel : Symbol(pixel, Decl(kvsErasedDomains.ts, 28, 13))
+>pixel2 : Symbol(pixel2, Decl(kvsErasedDomains.ts, 29, 13))
+
+const concatenatedSlug = slug + "-archive";
+>concatenatedSlug : Symbol(concatenatedSlug, Decl(kvsErasedDomains.ts, 58, 5))
+>slug : Symbol(slug, Decl(kvsErasedDomains.ts, 31, 13))
+
+const slugFromMixedDomains = pixel + slug;
+>slugFromMixedDomains : Symbol(slugFromMixedDomains, Decl(kvsErasedDomains.ts, 59, 5))
+>pixel : Symbol(pixel, Decl(kvsErasedDomains.ts, 28, 13))
+>slug : Symbol(slug, Decl(kvsErasedDomains.ts, 31, 13))
+
+const trimmedSlug = slug.trim();
+>trimmedSlug : Symbol(trimmedSlug, Decl(kvsErasedDomains.ts, 60, 5))
+>slug.trim : Symbol(String.trim, Decl(lib.es5.d.ts, --, --))
+>slug : Symbol(slug, Decl(kvsErasedDomains.ts, 31, 13))
+>trim : Symbol(String.trim, Decl(lib.es5.d.ts, --, --))
+
+const comparedPixel = pixel < 100;
+>comparedPixel : Symbol(comparedPixel, Decl(kvsErasedDomains.ts, 61, 5))
+>pixel : Symbol(pixel, Decl(kvsErasedDomains.ts, 28, 13))
+
+const conflictingArithmetic = pixel + cell;
+>conflictingArithmetic : Symbol(conflictingArithmetic, Decl(kvsErasedDomains.ts, 62, 5))
+>pixel : Symbol(pixel, Decl(kvsErasedDomains.ts, 28, 13))
+>cell : Symbol(cell, Decl(kvsErasedDomains.ts, 30, 13))
+
+const conflictingEquality = userId == orderId;
+>conflictingEquality : Symbol(conflictingEquality, Decl(kvsErasedDomains.ts, 63, 5))
+>userId : Symbol(userId, Decl(kvsErasedDomains.ts, 26, 13))
+>orderId : Symbol(orderId, Decl(kvsErasedDomains.ts, 27, 13))
+
+const unbrandedId = userId + "-archive";
+>unbrandedId : Symbol(unbrandedId, Decl(kvsErasedDomains.ts, 64, 5))
+>userId : Symbol(userId, Decl(kvsErasedDomains.ts, 26, 13))
+
+const trimmedUserId = userId.trim();
+>trimmedUserId : Symbol(trimmedUserId, Decl(kvsErasedDomains.ts, 65, 5))
+>userId.trim : Symbol(String.trim, Decl(lib.es5.d.ts, --, --))
+>userId : Symbol(userId, Decl(kvsErasedDomains.ts, 26, 13))
+>trim : Symbol(String.trim, Decl(lib.es5.d.ts, --, --))
+
+const minimumPixel = Math.min(pixel, 0);
+>minimumPixel : Symbol(minimumPixel, Decl(kvsErasedDomains.ts, 66, 5))
+>Math.min : Symbol(Math.min, Decl(lib.es5.d.ts, --, --))
+>Math : Symbol(Math, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --), Decl(lib.es2015.core.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --))
+>min : Symbol(Math.min, Decl(lib.es5.d.ts, --, --))
+>pixel : Symbol(pixel, Decl(kvsErasedDomains.ts, 28, 13))
+
+const conflictingMinimum = Math.min(pixel, cell);
+>conflictingMinimum : Symbol(conflictingMinimum, Decl(kvsErasedDomains.ts, 67, 5))
+>Math.min : Symbol(Math.min, Decl(lib.es5.d.ts, --, --))
+>Math : Symbol(Math, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --), Decl(lib.es2015.core.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --))
+>min : Symbol(Math.min, Decl(lib.es5.d.ts, --, --))
+>pixel : Symbol(pixel, Decl(kvsErasedDomains.ts, 28, 13))
+>cell : Symbol(cell, Decl(kvsErasedDomains.ts, 30, 13))
+
+const scoredPixel = score(student, pixel);
+>scoredPixel : Symbol(scoredPixel, Decl(kvsErasedDomains.ts, 68, 5))
+>score : Symbol(score, Decl(kvsErasedDomains.ts, 6, 55))
+>student : Symbol(student, Decl(kvsErasedDomains.ts, 23, 13))
+>pixel : Symbol(pixel, Decl(kvsErasedDomains.ts, 28, 13))
+
+const negatedPixel = -pixel;
+>negatedPixel : Symbol(negatedPixel, Decl(kvsErasedDomains.ts, 69, 5))
+>pixel : Symbol(pixel, Decl(kvsErasedDomains.ts, 28, 13))
+
+let mutablePixel = pixel;
+>mutablePixel : Symbol(mutablePixel, Decl(kvsErasedDomains.ts, 70, 3))
+>pixel : Symbol(pixel, Decl(kvsErasedDomains.ts, 28, 13))
+
+const incrementedPixel = ++mutablePixel;
+>incrementedPixel : Symbol(incrementedPixel, Decl(kvsErasedDomains.ts, 71, 5))
+>mutablePixel : Symbol(mutablePixel, Decl(kvsErasedDomains.ts, 70, 3))
+
+const pixelRange = pixel..10;
+>pixelRange : Symbol(pixelRange, Decl(kvsErasedDomains.ts, 72, 5))
+>pixel : Symbol(pixel, Decl(kvsErasedDomains.ts, 28, 13))
+
+const conflictingRange = pixel..cell;
+>conflictingRange : Symbol(conflictingRange, Decl(kvsErasedDomains.ts, 73, 5))
+>pixel : Symbol(pixel, Decl(kvsErasedDomains.ts, 28, 13))
+>cell : Symbol(cell, Decl(kvsErasedDomains.ts, 30, 13))
+
+const convertedKelvin = kelvin + celsiusToKelvin(celsius);
+>convertedKelvin : Symbol(convertedKelvin, Decl(kvsErasedDomains.ts, 74, 5))
+>kelvin : Symbol(kelvin, Decl(kvsErasedDomains.ts, 32, 13))
+>celsiusToKelvin : Symbol(celsiusToKelvin, Decl(kvsErasedDomains.ts, 33, 31))
+>celsius : Symbol(celsius, Decl(kvsErasedDomains.ts, 33, 13))
+
+const assertedUserId = text as UserId;
+>assertedUserId : Symbol(assertedUserId, Decl(kvsErasedDomains.ts, 76, 5))
+>text : Symbol(text, Decl(kvsErasedDomains.ts, 25, 13))
+>UserId : Symbol(UserId, Decl(kvsErasedDomains.ts, 11, 29))
+
+const identityUserId = identity(userId);
+>identityUserId : Symbol(identityUserId, Decl(kvsErasedDomains.ts, 77, 5))
+>identity : Symbol(identity, Decl(kvsErasedDomains.ts, 7, 59))
+>userId : Symbol(userId, Decl(kvsErasedDomains.ts, 26, 13))
+
+const assertedOrderId = userId as OrderId;
+>assertedOrderId : Symbol(assertedOrderId, Decl(kvsErasedDomains.ts, 78, 5))
+>userId : Symbol(userId, Decl(kvsErasedDomains.ts, 26, 13))
+>OrderId : Symbol(OrderId, Decl(kvsErasedDomains.ts, 12, 29))
+
+const erasedUserId = userId as string;
+>erasedUserId : Symbol(erasedUserId, Decl(kvsErasedDomains.ts, 79, 5))
+>userId : Symbol(userId, Decl(kvsErasedDomains.ts, 26, 13))
+
+type Mixed = Student | number | string;
+>Mixed : Symbol(Mixed, Decl(kvsErasedDomains.ts, 79, 38))
+>Student : Symbol(Student, Decl(kvsErasedDomains.ts, 8, 42))
+
+type ConflictingDistinct = Student | Teacher;
+>ConflictingDistinct : Symbol(ConflictingDistinct, Decl(kvsErasedDomains.ts, 81, 39))
+>Student : Symbol(Student, Decl(kvsErasedDomains.ts, 8, 42))
+>Teacher : Symbol(Teacher, Decl(kvsErasedDomains.ts, 10, 29))
+
+type ConflictingBrand = UserId | OrderId;
+>ConflictingBrand : Symbol(ConflictingBrand, Decl(kvsErasedDomains.ts, 82, 45))
+>UserId : Symbol(UserId, Decl(kvsErasedDomains.ts, 11, 29))
+>OrderId : Symbol(OrderId, Decl(kvsErasedDomains.ts, 12, 29))
+
+type ConflictingBase = Student | User;
+>ConflictingBase : Symbol(ConflictingBase, Decl(kvsErasedDomains.ts, 83, 41))
+>Student : Symbol(Student, Decl(kvsErasedDomains.ts, 8, 42))
+>User : Symbol(User, Decl(kvsErasedDomains.ts, 0, 0))
+
+type BrandedStudent = branded User;
+>BrandedStudent : Symbol(BrandedStudent, Decl(kvsErasedDomains.ts, 84, 38))
+>User : Symbol(User, Decl(kvsErasedDomains.ts, 0, 0))
+
+type BrandedTeacher = branded User;
+>BrandedTeacher : Symbol(BrandedTeacher, Decl(kvsErasedDomains.ts, 86, 35))
+>User : Symbol(User, Decl(kvsErasedDomains.ts, 0, 0))
+
+type Person =
+>Person : Symbol(Person, Decl(kvsErasedDomains.ts, 87, 35))
+
+    | { kind: "student"; value: BrandedStudent }
+>kind : Symbol(kind, Decl(kvsErasedDomains.ts, 89, 7))
+>value : Symbol(value, Decl(kvsErasedDomains.ts, 89, 24))
+>BrandedStudent : Symbol(BrandedStudent, Decl(kvsErasedDomains.ts, 84, 38))
+
+    | { kind: "teacher"; value: BrandedTeacher };
+>kind : Symbol(kind, Decl(kvsErasedDomains.ts, 90, 7))
+>value : Symbol(value, Decl(kvsErasedDomains.ts, 90, 24))
+>BrandedTeacher : Symbol(BrandedTeacher, Decl(kvsErasedDomains.ts, 86, 35))
+
+type NullableStudent = Student?;
+>NullableStudent : Symbol(NullableStudent, Decl(kvsErasedDomains.ts, 90, 49))
+>Student : Symbol(Student, Decl(kvsErasedDomains.ts, 8, 42))
+
+type RecursivePlainUnion = string | RecursivePlainUnion[];
+>RecursivePlainUnion : Symbol(RecursivePlainUnion, Decl(kvsErasedDomains.ts, 92, 32))
+>RecursivePlainUnion : Symbol(RecursivePlainUnion, Decl(kvsErasedDomains.ts, 92, 32))
+
+type GenericDomain<T> = distinct T;
+>GenericDomain : Symbol(GenericDomain, Decl(kvsErasedDomains.ts, 93, 58))
+>T : Symbol(T, Decl(kvsErasedDomains.ts, 95, 19))
+>T : Symbol(T, Decl(kvsErasedDomains.ts, 95, 19))
+
+type InvalidAny = distinct any;
+>InvalidAny : Symbol(InvalidAny, Decl(kvsErasedDomains.ts, 95, 35))
+
+type InvalidUnknown = branded unknown;
+>InvalidUnknown : Symbol(InvalidUnknown, Decl(kvsErasedDomains.ts, 96, 31))
+
+type InvalidNever = distinct never;
+>InvalidNever : Symbol(InvalidNever, Decl(kvsErasedDomains.ts, 97, 38))
+
+type NestedDomain = branded Student;
+>NestedDomain : Symbol(NestedDomain, Decl(kvsErasedDomains.ts, 98, 35))
+>Student : Symbol(Student, Decl(kvsErasedDomains.ts, 8, 42))
+

@@ -277,9 +277,28 @@ Keeping the existing declaration node avoids a parallel declaration hierarchy an
 TypeScript's existing definite-assignment form `let value!: Type`. The KVS `!` form is distinguished
 by its inferred type and required initializer.
 
+Declaration emit retains the inferred nullable or extant type but removes the initializer-dependent
+binding suffix, producing an ordinary ambient variable declaration rather than an unusable suffix
+without an initializer.
+
 This reuses a source form that TypeScript previously rejected: `let value! = initializer`. No valid
 TypeScript declaration changes meaning; typed `let value!: Type` remains the TypeScript
 definite-assignment assertion.
+
+## Declaration emit targets KVS
+
+Status: accepted.
+
+KVS declaration emit describes the authored public contract for consumption by the KVS compiler. It
+therefore preserves contract-bearing KVS syntax, including nullable and extant types, context
+declarations and signatures, record shorthand, and erased domains. Syntax that only computes a value
+is omitted in favor of its resulting type; inferred declaration suffixes likewise become ordinary
+ambient declarations.
+
+The compiler continues to use `.d.ts` so module discovery and package layout remain aligned with
+TypeScript. This does not promise stock-TypeScript compatibility. A TypeScript-facing facade may
+later expose lowered details such as the context frame parameter or generate adapters, but that is
+an explicit interop artifact rather than a lossy form of the native KVS declaration.
 
 ## First nulling-operator slice
 
@@ -747,3 +766,34 @@ The shorthand is accepted in type literals and interfaces, including `readonly *
 arbitrary-key variant; `Map<K, V>` remains the general keyed container. Because the resulting type
 has an ordinary string index signature, existing keyed-iteration classification automatically treats
 it as a record with `string` coordinates and `Value` elements.
+
+## Erased domains
+
+Status: implemented for concrete underlying types.
+
+`type Name = distinct T` and `type Name = branded T` create declaration-identified static domains
+over `T`. Both are erased from JavaScript output and remain authored syntax in declaration emit.
+Primitive, object, collection, tuple, callable, and closed generic bases are supported. `any`,
+`unknown`, `never`, nested domains, and generic domain factories are rejected; an ordinary alias of
+an existing domain retains its identity.
+
+The checker represents a domain as a privately marked single-constituent intersection. This reuses
+the underlying type's properties, signatures, inference, containers, and narrowing without exposing
+a structural brand property or changing runtime shape. The private marker owns the declaring alias,
+underlying type, and domain mode. Widening and language-service quick-type paths preserve or
+recompute that marker explicitly; ordinary structural reconstruction does not.
+
+A neutral value assignable to `T` may enter `distinct T`, while a value from another domain may not.
+`branded T` requires an explicit compatible `as` conversion. Either domain may erase to its base.
+Generic identity preserves both modes through ordinary inference.
+
+For `distinct`, an operation propagates a participating domain only when it consumes that exact
+underlying type and its ordinary result is exactly the same type. This covers arithmetic, string
+operations, numeric ranges, methods, and base-typed calls. Neutral operands do not erase the domain.
+A signature that explicitly consumes the domain and returns its base is therefore an intentional
+erasing boundary. Branded operations retain their ordinary unbranded result.
+
+Two different domains over the same underlying type cannot participate in one operation. Direct
+union constituents likewise cannot repeat an underlying base, including a domain beside its plain
+base. Domains with different bases may coexist, and otherwise-conflicting domains remain valid when
+nested in separately discriminated object variants.

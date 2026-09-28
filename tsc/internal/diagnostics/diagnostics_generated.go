@@ -4496,6 +4496,14 @@ var A_KVS_context_function_can_only_be_called_from_a_context_function_or_context
 
 var A_bindingless_context_statement_is_redundant_when_a_context_frame_is_already_available = &Message{code: 100102, category: CategoryWarning, key: "A_bindingless_context_statement_is_redundant_when_a_context_frame_is_already_available_100102", text: "A bindingless context statement is redundant when a context frame is already available."}
 
+var KVS_domain_aliases_cannot_declare_type_parameters = &Message{code: 100103, category: CategoryError, key: "KVS_domain_aliases_cannot_declare_type_parameters_100103", text: "KVS domain aliases cannot declare type parameters."}
+
+var A_KVS_domain_requires_a_concrete_non_domain_underlying_type = &Message{code: 100104, category: CategoryError, key: "A_KVS_domain_requires_a_concrete_non_domain_underlying_type_100104", text: "A KVS domain requires a concrete non-domain underlying type."}
+
+var A_union_cannot_contain_multiple_KVS_domain_constituents_with_the_same_underlying_type = &Message{code: 100105, category: CategoryError, key: "A_union_cannot_contain_multiple_KVS_domain_constituents_with_the_same_underlying_type_100105", text: "A union cannot contain multiple KVS domain constituents with the same underlying type."}
+
+var KVS_operation_cannot_combine_competing_domains_over_the_same_underlying_type = &Message{code: 100106, category: CategoryError, key: "KVS_operation_cannot_combine_competing_domains_over_the_same_underlying_type_100106", text: "KVS operation cannot combine competing domains over the same underlying type."}
+
 var allMessages = [...]**Message{
 	&Unterminated_string_literal,
 	&Identifier_expected,
@@ -6744,4 +6752,8 @@ var allMessages = [...]**Message{
 	&A_KVS_context_value_is_only_available_in_a_context_function_or_context_block,
 	&A_KVS_context_function_can_only_be_called_from_a_context_function_or_context_block,
 	&A_bindingless_context_statement_is_redundant_when_a_context_frame_is_already_available,
+	&KVS_domain_aliases_cannot_declare_type_parameters,
+	&A_KVS_domain_requires_a_concrete_non_domain_underlying_type,
+	&A_union_cannot_contain_multiple_KVS_domain_constituents_with_the_same_underlying_type,
+	&KVS_operation_cannot_combine_competing_domains_over_the_same_underlying_type,
 }

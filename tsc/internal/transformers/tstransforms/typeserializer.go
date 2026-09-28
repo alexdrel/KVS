@@ -230,7 +230,7 @@ func (s *metadataSerializer) serializeTypeNode(node *ast.Node) *ast.Node {
 	// handle JSDoc types from an invalid parse
 	case ast.KindJSDocAllType, ast.KindJSDocVariadicType:
 		// no meaningful serialization for these invalid-parse JSDoc types
-	case ast.KindJSDocNullableType, ast.KindJSDocNonNullableType, ast.KindJSDocOptionalType, ast.KindKvsNullableType, ast.KindKvsExtantType:
+	case ast.KindJSDocNullableType, ast.KindJSDocNonNullableType, ast.KindJSDocOptionalType, ast.KindKvsNullableType, ast.KindKvsExtantType, ast.KindKvsDistinctType, ast.KindKvsBrandedType:
 		return s.serializeTypeNode(node.Type())
 	default:
 		debug.FailBadSyntaxKind(node)

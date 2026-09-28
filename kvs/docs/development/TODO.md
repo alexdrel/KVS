@@ -3,7 +3,7 @@
 This is a working implementation aid, not a language specification or feature order. The language
 documents remain authoritative for accepted semantics.
 
-Progress: **376 of 397 items complete (94.7%)**; **21 remain open**.
+Progress: **404 of 416 items complete (97.1%)**; **12 remain open**.
 
 - `[x]` means implemented with focused compiler evidence.
 - `[ ]` means unimplemented, incomplete, or not yet deliberately validated.
@@ -67,6 +67,9 @@ Implemented vertical slices:
 - Standalone VS Code syntax-highlighting supplementation for KVS punctuation and producer forms.
 - Record type shorthand: `{ *: Value }` as a source-preserving string index signature, including
   readonly forms and keyed-record iteration.
+- Erased domains: generalized `distinct T` and `branded T`, including static separation, explicit
+  brand entry, distinct propagation through matching operations, same-base conflict detection, and
+  runtime erasure.
 
 Known semantic debts:
 
@@ -116,6 +119,8 @@ Focused conformance inputs:
 - `tsc/testdata/tests/cases/conformance/kvs/kvsRange.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsKeyedIteration.ts`
 - `tsc/testdata/tests/cases/conformance/kvs/kvsRecordTypeShorthand.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsErasedDomains.ts`
+- `tsc/testdata/tests/cases/conformance/kvs/kvsErasedDomainsDeclarations.ts`
 
 Focused language-service inputs:
 
@@ -127,6 +132,7 @@ Focused language-service inputs:
 - `tsc/internal/fourslash/tests/kvsPipelineLanguageService_test.go`
 - `tsc/internal/fourslash/tests/kvsTypedSpreadLanguageService_test.go`
 - `tsc/internal/fourslash/tests/kvsRecordTypeShorthandLanguageService_test.go`
+- `tsc/internal/fourslash/tests/kvsErasedDomainsLanguageService_test.go`
 
 Run all implemented KVS slices together:
 
@@ -146,7 +152,7 @@ example `.js` files are intentionally ignored.
 - [x] Add KVS -> ordinary TS/JS lowering phase
 - [x] Establish initial KVS diagnostics convention
 - [ ] Preserve source maps through KVS lowering
-- [ ] Handle declaration emit for KVS syntax
+- [x] Handle declaration emit for KVS syntax
 - [x] Add `conformance/kvs/` test subtree
 - [x] Add runtime/evaluation-order test mechanism
 - [x] Add language-service/Fourslash coverage
@@ -610,24 +616,35 @@ example `.js` files are intentionally ignored.
 - [x] Arbitrary key types remain the responsibility of `Map<K, V>`
 - [x] Shorthand identifies the static record category for keyed iteration
 
-### `distinct`
+### Erased domains
 
-- [ ] `distinct number`
-- [ ] `distinct bigint`
-- [ ] `distinct string`
-- [ ] Alias preserves domain
-- [ ] Runtime erasure
-- [ ] Neutral primitive accepted into domain
-- [ ] Distinct domain usable as primitive base
-- [ ] Cross-domain operation rejected
-- [ ] Domain-preserving primitive operations
-- [ ] Numeric ranges accept a shared distinct domain and yield that domain
-- [ ] Neutral operands do not erase domain
-- [ ] Base-typed function signatures preserve participating domain
-- [ ] Domain-aware return may erase domain
-- [ ] Explicit `as` conversion
-- [ ] Reject bare union of indistinguishable distinct domains
-- [ ] Nullability composes with `distinct`
+- [x] `distinct T`
+- [x] `branded T`
+- [x] Primitive underlying types
+- [x] Object, collection, tuple, and callable underlying types
+- [x] Declaration identity defines a domain
+- [x] Ordinary aliases preserve domain identity
+- [x] Runtime erasure
+- [x] Neutral base value accepted into a distinct domain
+- [x] Branded-domain entry requires explicit compatible `as`
+- [x] Domain value usable as its underlying type
+- [x] Cross-domain assignment and operation rejected
+- [x] Distinct operations returning the exact underlying type preserve the participating domain
+- [x] Branded operations return their ordinary unbranded result
+- [x] Neutral operands do not erase a distinct domain
+- [x] Multiple participants from one distinct domain preserve that domain
+- [x] Competing domains over one base are rejected
+- [x] Primitive arithmetic and string operations preserve a distinct domain
+- [x] Numeric ranges accept a shared distinct domain and yield that domain
+- [x] Base-typed function signatures preserve a participating distinct domain
+- [x] Generic identity preserves either domain through ordinary inference
+- [x] Domain-aware return may erase a domain
+- [x] Structural reconstruction does not implicitly preserve a domain
+- [x] Explicit `as` conversion between, into, and out of domains
+- [x] Unions allow domain constituents with different underlying bases
+- [x] Unions reject direct constituents with the same underlying base
+- [x] Discriminated structures may contain otherwise conflicting domains
+- [x] Nullability composes with erased domains
 
 ## 8. Typed context
 
@@ -678,3 +695,18 @@ example `.js` files are intentionally ignored.
 - [x] Lazy iterator retains frame
 - [x] Explicit JavaScript callback adapter
 - [x] Explicit JavaScript export adapter
+
+## 9. TypeScript interoperability
+
+- [ ] Emit stock-TypeScript-compatible declarations for contracts with faithful representations
+- [ ] Define diagnostics or an explicit approximation policy for contracts such as `distinct` that
+      TypeScript cannot model faithfully
+- [ ] Choose between exposing the lowered `$context` first parameter and generating ordinary-call
+      adapters for context functions
+- [ ] Add an explicit compiler flag controlling whether `.ts` files are interpreted as KVS or
+      ordinary TypeScript
+- [ ] Choose and support a dedicated KVS source-file extension
+- [ ] Define module resolution and imports across KVS and ordinary TypeScript sources
+- [ ] Define package layout and discovery for native KVS declarations alongside TypeScript-facing
+      artifacts
+- [ ] Add end-to-end consumption tests for both KVS and stock TypeScript projects

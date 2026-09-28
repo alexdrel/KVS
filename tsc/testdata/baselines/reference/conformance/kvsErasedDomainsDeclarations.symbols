@@ -1,0 +1,87 @@
+//// [tests/cases/conformance/kvs/kvsErasedDomainsDeclarations.ts] ////
+
+=== kvsErasedDomainsDeclarations.ts ===
+export interface User {
+>User : Symbol(User, Decl(kvsErasedDomainsDeclarations.ts, 0, 0))
+
+    name: string;
+>name : Symbol(User.name, Decl(kvsErasedDomainsDeclarations.ts, 0, 23))
+}
+
+export type Student = distinct User;
+>Student : Symbol(Student, Decl(kvsErasedDomainsDeclarations.ts, 2, 1))
+>User : Symbol(User, Decl(kvsErasedDomainsDeclarations.ts, 0, 0))
+
+export type UserId = branded string;
+>UserId : Symbol(UserId, Decl(kvsErasedDomainsDeclarations.ts, 4, 36))
+
+export type Students = distinct User[];
+>Students : Symbol(Students, Decl(kvsErasedDomainsDeclarations.ts, 5, 36))
+>User : Symbol(User, Decl(kvsErasedDomainsDeclarations.ts, 0, 0))
+
+export type Pair = distinct [number, number];
+>Pair : Symbol(Pair, Decl(kvsErasedDomainsDeclarations.ts, 6, 39))
+
+export type Predicate = distinct ((user: User) => boolean);
+>Predicate : Symbol(Predicate, Decl(kvsErasedDomainsDeclarations.ts, 7, 45))
+>user : Symbol(user, Decl(kvsErasedDomainsDeclarations.ts, 8, 35))
+>User : Symbol(User, Decl(kvsErasedDomainsDeclarations.ts, 0, 0))
+
+export type UserMap = distinct Map<string, User>;
+>UserMap : Symbol(UserMap, Decl(kvsErasedDomainsDeclarations.ts, 8, 59))
+>Map : Symbol(Map, Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.iterable.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --))
+>User : Symbol(User, Decl(kvsErasedDomainsDeclarations.ts, 0, 0))
+
+declare const student: Student;
+>student : Symbol(student, Decl(kvsErasedDomainsDeclarations.ts, 11, 13))
+>Student : Symbol(Student, Decl(kvsErasedDomainsDeclarations.ts, 2, 1))
+
+declare const rawId: string;
+>rawId : Symbol(rawId, Decl(kvsErasedDomainsDeclarations.ts, 12, 13))
+
+declare const students: User[];
+>students : Symbol(students, Decl(kvsErasedDomainsDeclarations.ts, 13, 13))
+>User : Symbol(User, Decl(kvsErasedDomainsDeclarations.ts, 0, 0))
+
+declare const pair: [number, number];
+>pair : Symbol(pair, Decl(kvsErasedDomainsDeclarations.ts, 14, 13))
+
+declare const predicate: (user: User) => boolean;
+>predicate : Symbol(predicate, Decl(kvsErasedDomainsDeclarations.ts, 15, 13))
+>user : Symbol(user, Decl(kvsErasedDomainsDeclarations.ts, 15, 26))
+>User : Symbol(User, Decl(kvsErasedDomainsDeclarations.ts, 0, 0))
+
+declare const userMap: Map<string, User>;
+>userMap : Symbol(userMap, Decl(kvsErasedDomainsDeclarations.ts, 16, 13))
+>Map : Symbol(Map, Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.iterable.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --))
+>User : Symbol(User, Decl(kvsErasedDomainsDeclarations.ts, 0, 0))
+
+export const inferredStudent = student;
+>inferredStudent : Symbol(inferredStudent, Decl(kvsErasedDomainsDeclarations.ts, 18, 12))
+>student : Symbol(student, Decl(kvsErasedDomainsDeclarations.ts, 11, 13))
+
+export const inferredUserId = rawId as UserId;
+>inferredUserId : Symbol(inferredUserId, Decl(kvsErasedDomainsDeclarations.ts, 19, 12))
+>rawId : Symbol(rawId, Decl(kvsErasedDomainsDeclarations.ts, 12, 13))
+>UserId : Symbol(UserId, Decl(kvsErasedDomainsDeclarations.ts, 4, 36))
+
+export const inferredStudents: Students = students;
+>inferredStudents : Symbol(inferredStudents, Decl(kvsErasedDomainsDeclarations.ts, 20, 12))
+>Students : Symbol(Students, Decl(kvsErasedDomainsDeclarations.ts, 5, 36))
+>students : Symbol(students, Decl(kvsErasedDomainsDeclarations.ts, 13, 13))
+
+export const inferredPair: Pair = pair;
+>inferredPair : Symbol(inferredPair, Decl(kvsErasedDomainsDeclarations.ts, 21, 12))
+>Pair : Symbol(Pair, Decl(kvsErasedDomainsDeclarations.ts, 6, 39))
+>pair : Symbol(pair, Decl(kvsErasedDomainsDeclarations.ts, 14, 13))
+
+export const inferredPredicate: Predicate = predicate;
+>inferredPredicate : Symbol(inferredPredicate, Decl(kvsErasedDomainsDeclarations.ts, 22, 12))
+>Predicate : Symbol(Predicate, Decl(kvsErasedDomainsDeclarations.ts, 7, 45))
+>predicate : Symbol(predicate, Decl(kvsErasedDomainsDeclarations.ts, 15, 13))
+
+export const inferredUserMap: UserMap = userMap;
+>inferredUserMap : Symbol(inferredUserMap, Decl(kvsErasedDomainsDeclarations.ts, 23, 12))
+>UserMap : Symbol(UserMap, Decl(kvsErasedDomainsDeclarations.ts, 8, 59))
+>userMap : Symbol(userMap, Decl(kvsErasedDomainsDeclarations.ts, 16, 13))
+

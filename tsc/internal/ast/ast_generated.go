@@ -43,6 +43,7 @@ type NodeFactory struct {
 	jsdocUnknownTagArena                     core.Arena[JSDocUnknownTag]
 	keywordExpressionArena                   core.Arena[KeywordExpression]
 	keywordTypeNodeArena                     core.Arena[KeywordTypeNode]
+	kvsBrandedTypeArena                      core.Arena[KvsBrandedType]
 	kvsCatchSplitAssignmentExpressionArena   core.Arena[KvsCatchSplitAssignmentExpression]
 	kvsCatchSplitExpressionArena             core.Arena[KvsCatchSplitExpression]
 	kvsCollectExpressionArena                core.Arena[KvsCollectExpression]
@@ -52,6 +53,7 @@ type NodeFactory struct {
 	kvsContextDeclarationArena               core.Arena[KvsContextDeclaration]
 	kvsContextStatementArena                 core.Arena[KvsContextStatement]
 	kvsDefaultExpressionArena                core.Arena[KvsDefaultExpression]
+	kvsDistinctTypeArena                     core.Arena[KvsDistinctType]
 	kvsExtantAssertionExpressionArena        core.Arena[KvsExtantAssertionExpression]
 	kvsExtantAssignmentExpressionArena       core.Arena[KvsExtantAssignmentExpression]
 	kvsExtantReturnStatementArena            core.Arena[KvsExtantReturnStatement]
@@ -444,6 +446,8 @@ type (
 	OptionalTypeNodeNode                    = Node
 	KvsNullableTypeNode                     = Node
 	KvsExtantTypeNode                       = Node
+	KvsDistinctTypeNode                     = Node
+	KvsBrandedTypeNode                      = Node
 	RestTypeNodeNode                        = Node
 	ParenthesizedTypeNodeNode               = Node
 	FunctionTypeNodeNode                    = Node
@@ -7865,6 +7869,84 @@ func IsKvsExtantType(node *Node) bool {
 }
 
 // ──────────────────────────────────────────────────────────────────────
+// KvsDistinctType
+// ──────────────────────────────────────────────────────────────────────
+
+type KvsDistinctType struct {
+	TypeNodeBase
+	CompositeBase
+	Type *TypeNode
+}
+
+func (f *NodeFactory) NewKvsDistinctType(typeNode *TypeNode) *Node {
+	data := f.kvsDistinctTypeArena.New()
+	data.Type = typeNode
+	return f.newNode(KindKvsDistinctType, data)
+}
+
+func (f *NodeFactory) UpdateKvsDistinctType(node *KvsDistinctType, typeNode *TypeNode) *Node {
+	if typeNode != node.Type {
+		return updateNode(f.NewKvsDistinctType(typeNode), node.AsNode(), f.hooks)
+	}
+	return node.AsNode()
+}
+
+func (node *KvsDistinctType) ForEachChild(v Visitor) bool {
+	return visit(v, node.Type)
+}
+
+func (node *KvsDistinctType) VisitEachChild(v *NodeVisitor) *Node {
+	return v.Factory.UpdateKvsDistinctType(node, v.visitNode(node.Type))
+}
+
+func (node *KvsDistinctType) Clone(f NodeFactoryCoercible) *Node {
+	return cloneNode(f.AsNodeFactory().NewKvsDistinctType(node.Type), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func IsKvsDistinctType(node *Node) bool {
+	return node.Kind == KindKvsDistinctType
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// KvsBrandedType
+// ──────────────────────────────────────────────────────────────────────
+
+type KvsBrandedType struct {
+	TypeNodeBase
+	CompositeBase
+	Type *TypeNode
+}
+
+func (f *NodeFactory) NewKvsBrandedType(typeNode *TypeNode) *Node {
+	data := f.kvsBrandedTypeArena.New()
+	data.Type = typeNode
+	return f.newNode(KindKvsBrandedType, data)
+}
+
+func (f *NodeFactory) UpdateKvsBrandedType(node *KvsBrandedType, typeNode *TypeNode) *Node {
+	if typeNode != node.Type {
+		return updateNode(f.NewKvsBrandedType(typeNode), node.AsNode(), f.hooks)
+	}
+	return node.AsNode()
+}
+
+func (node *KvsBrandedType) ForEachChild(v Visitor) bool {
+	return visit(v, node.Type)
+}
+
+func (node *KvsBrandedType) VisitEachChild(v *NodeVisitor) *Node {
+	return v.Factory.UpdateKvsBrandedType(node, v.visitNode(node.Type))
+}
+
+func (node *KvsBrandedType) Clone(f NodeFactoryCoercible) *Node {
+	return cloneNode(f.AsNodeFactory().NewKvsBrandedType(node.Type), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func IsKvsBrandedType(node *Node) bool {
+	return node.Kind == KindKvsBrandedType
+}
+
+// ──────────────────────────────────────────────────────────────────────
 // RestTypeNode
 // ──────────────────────────────────────────────────────────────────────
 
@@ -10904,6 +10986,10 @@ func (n *Node) ForEachChild(v Visitor) bool {
 		return n.data.(*KvsNullableType).ForEachChild(v)
 	case KindKvsExtantType:
 		return n.data.(*KvsExtantType).ForEachChild(v)
+	case KindKvsDistinctType:
+		return n.data.(*KvsDistinctType).ForEachChild(v)
+	case KindKvsBrandedType:
+		return n.data.(*KvsBrandedType).ForEachChild(v)
 	case KindRestType:
 		return n.data.(*RestTypeNode).ForEachChild(v)
 	case KindParenthesizedType:
@@ -11677,6 +11763,14 @@ func (n *Node) AsKvsNullableType() *KvsNullableType {
 
 func (n *Node) AsKvsExtantType() *KvsExtantType {
 	return n.data.(*KvsExtantType)
+}
+
+func (n *Node) AsKvsDistinctType() *KvsDistinctType {
+	return n.data.(*KvsDistinctType)
+}
+
+func (n *Node) AsKvsBrandedType() *KvsBrandedType {
+	return n.data.(*KvsBrandedType)
 }
 
 func (n *Node) AsRestTypeNode() *RestTypeNode {

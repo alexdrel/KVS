@@ -3340,7 +3340,7 @@ func GetTypeAnnotationNode(node *Node) *TypeNode {
 	case KindVariableDeclaration, KindParameter, KindPropertySignature, KindPropertyDeclaration,
 		KindTypePredicate, KindParenthesizedType, KindTypeOperator, KindMappedType, KindTypeAssertionExpression,
 		KindAsExpression, KindSatisfiesExpression, KindTypeAliasDeclaration, KindJSTypeAliasDeclaration,
-		KindNamedTupleMember, KindOptionalType, KindKvsNullableType, KindKvsExtantType, KindRestType, KindTemplateLiteralTypeSpan, KindJSDocTypeExpression,
+		KindNamedTupleMember, KindOptionalType, KindKvsNullableType, KindKvsExtantType, KindKvsDistinctType, KindKvsBrandedType, KindRestType, KindTemplateLiteralTypeSpan, KindJSDocTypeExpression,
 		KindJSDocPropertyTag, KindJSDocNullableType, KindJSDocNonNullableType, KindJSDocOptionalType:
 		return node.Type()
 	default:

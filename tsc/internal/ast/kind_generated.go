@@ -221,6 +221,8 @@ const (
 	KindOptionalType
 	KindKvsNullableType
 	KindKvsExtantType
+	KindKvsDistinctType
+	KindKvsBrandedType
 	KindRestType
 	KindUnionType
 	KindIntersectionType

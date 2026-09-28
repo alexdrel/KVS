@@ -1278,6 +1278,14 @@ export interface KvsExtantType extends TypeNodeBase {
     readonly type: TypeNode;
     readonly exclamationToken: ExclamationToken;
 }
+export interface KvsDistinctType extends TypeNodeBase {
+    readonly kind: SyntaxKind.KvsDistinctType;
+    readonly type: TypeNode;
+}
+export interface KvsBrandedType extends TypeNodeBase {
+    readonly kind: SyntaxKind.KvsBrandedType;
+    readonly type: TypeNode;
+}
 export interface RestTypeNode extends TypeNodeBase {
     readonly kind: SyntaxKind.RestType;
     readonly type: TypeNode;

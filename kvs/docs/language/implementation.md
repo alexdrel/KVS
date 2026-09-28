@@ -99,6 +99,18 @@ remove top-level nullability without inserting evaluation, checks, or defaults; 
 The inferred binding suffixes on `let value?`, `const value!`, and `let value!` are likewise erased
 and insert no runtime operation.
 
+### Declaration output
+
+Declaration emit targets the KVS compiler. Public KVS contract syntax such as nullable and extant
+types, context declarations and callable signatures, record shorthand, and erased domains remains in
+`.d.ts` output. Computation-only syntax is removed: its declaration exposes the resulting type, and
+inferred binding suffixes are replaced by ordinary ambient declarations with their inferred types.
+
+The `.d.ts` extension is reused for compatibility with TypeScript's existing module discovery and
+package layout, but it does not promise that stock TypeScript can parse or faithfully model every
+exported KVS contract. A stock-TypeScript declaration facade, including the lowered context calling
+convention or generated adapters, is a separate interop concern.
+
 Variable destructuring keeps the authored JavaScript pattern. A nullable object root is defaulted
 with `?? {}` and a nullable array root with `?? []`. Only a nullable value feeding a nested pattern
 is selected into a temporary and destructured separately:

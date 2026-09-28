@@ -383,6 +383,7 @@ type NodeLinks struct {
 	flags                                NodeCheckFlags // Set of flags specific to Node
 	kvsPlaceholderType                   *Type
 	kvsPipelinePlaceholderType           *Type
+	kvsDomainExpressionType              *Type
 	kvsTypedObjectType                   *Type
 	kvsTypedObjectDefaults               []kvsTypedObjectDefault
 	kvsTypedSpreadProperties             []string
@@ -1218,6 +1219,20 @@ type IntersectionType struct {
 	UnionOrIntersectionType
 	resolvedApparentType             *Type
 	uniqueLiteralFilledInstantiation *Type // Instantiation with type parameters mapped to never type
+	kvsDomain                        *KvsDomainInfo
+}
+
+type KvsDomainMode uint8
+
+const (
+	KvsDomainModeDistinct KvsDomainMode = iota
+	KvsDomainModeBranded
+)
+
+type KvsDomainInfo struct {
+	symbol     *ast.Symbol
+	underlying *Type
+	mode       KvsDomainMode
 }
 
 // TypeParameter

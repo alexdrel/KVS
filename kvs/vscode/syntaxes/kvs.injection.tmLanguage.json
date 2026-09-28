@@ -4,6 +4,14 @@
     "injectionSelector": "L:source.ts -comment -string, L:source.tsx -comment -string",
     "patterns": [
         {
+            "match": "(\\btype\\s+[_$[:alpha:]][_$[:alnum:]]*\\s*=\\s*)(distinct|branded)\\b",
+            "captures": {
+                "2": {
+                    "name": "storage.type.kvs.domain.ts"
+                }
+            }
+        },
+        {
             "match": "\\b(collect|select)(\\*)?",
             "captures": {
                 "1": {

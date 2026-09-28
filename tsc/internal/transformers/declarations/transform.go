@@ -850,13 +850,15 @@ func (tx *DeclarationTransformer) transformVariableDeclaration(input *ast.Variab
 	}
 	// Variable declaration types also suppress new diagnostic contexts, provided the contexts wouldn't be made for binding pattern types
 	tx.suppressNewDiagnosticContexts = true
-	return tx.Factory().UpdateVariableDeclaration(
+	result := tx.Factory().UpdateVariableDeclaration(
 		input,
 		tx.bindingNameVisitor.VisitNode(input.Name()),
 		nil,
 		tx.ensureType(input.AsNode(), false),
 		tx.ensureNoInitializer(input.AsNode()),
 	)
+	result.Flags &^= ast.NodeFlagsKvsNullableBinding | ast.NodeFlagsKvsExtantBinding
+	return result
 }
 
 func hasAnyBindingInitializers(bindingPattern *ast.BindingPattern) bool {
