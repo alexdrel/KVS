@@ -62,9 +62,22 @@ inferred nullable types use the ordinary expanded union representation.
 ### Binding-suffix token retention
 
 The static-nullability prototype stores the `let value?` binding suffix as a flag on the ordinary
-variable declaration rather than retaining a question-token child. This is sufficient for checking
-and JavaScript emission. Precise source maps and language-service behavior for that suffix still
-need deliberate coverage and may require retaining its source token later.
+variable declaration rather than retaining a question-token child. This is sufficient for checking,
+JavaScript and declaration emission, and current language-service behavior. The suffix has no
+runtime operation and therefore does not need its own JavaScript source-map entry.
+
+### KVS source-map policy
+
+Source maps follow authored evaluation and meaningful KVS operation boundaries, not every node in
+the lowered JavaScript. Preserved operands keep their own source ranges. A generated producer loop
+maps to its producer expression, a generated production maps to its `yield` or `yield?`, and a
+pipeline maps its outer operation while retaining mappings for each stage and placeholder body.
+
+Compiler-generated storage, temporaries, helper calls, labels, and bookkeeping remain unmapped when
+they have no useful authored stopping point. This avoids making a debugger revisit one source
+construct for several invisible implementation steps. The decoded `.sourcemap.txt` conformance
+baseline is the review surface for this policy; emitting a `.map` file alone is not sufficient
+evidence.
 
 ### Statement-kind range constraint
 

@@ -74,7 +74,9 @@ func (tx *transformer) transformContextKeyRead(node *ast.Node) *ast.Node {
 	hasOverride := factory.NewBinaryExpression(nil, slot, nil, factory.NewToken(ast.KindInKeyword), tx.contextFrame)
 	override := factory.NewElementAccessExpression(tx.contextFrame, nil, tx.contextKeySlot(tx.contextKeyReference(node)), ast.NodeFlagsNone)
 	defaultValue := factory.NewElementAccessExpression(tx.contextKeyReference(node), nil, factory.NewNumericLiteral("1", ast.TokenFlagsNone), ast.NodeFlagsNone)
-	return factory.NewConditionalExpression(hasOverride, factory.NewToken(ast.KindQuestionToken), override, factory.NewToken(ast.KindColonToken), defaultValue)
+	result := factory.NewConditionalExpression(hasOverride, factory.NewToken(ast.KindQuestionToken), override, factory.NewToken(ast.KindColonToken), defaultValue)
+	tx.EmitContext().SetSourceMapRange(result, node.Loc)
+	return result
 }
 
 func (tx *transformer) transformContextCall(node *ast.CallExpression) *ast.Node {
@@ -159,6 +161,7 @@ func (tx *transformer) transformContextDeclaration(node *ast.KvsContextDeclarati
 		}
 	}
 	statement := factory.NewVariableStatement(modifiers, list)
+	tx.EmitContext().SetSourceMapRange(statement, node.Loc)
 	if node.ModifierFlags()&ast.ModifierFlagsExport == 0 {
 		return statement
 	}
@@ -198,6 +201,7 @@ func (tx *transformer) transformContextStatement(node *ast.KvsContextStatement) 
 		}
 		target := factory.NewElementAccessExpression(frame, nil, tx.contextKeySlot(tx.contextKeyReference(binding.Name())), ast.NodeFlagsNone)
 		assignStatement := factory.NewExpressionStatement(factory.NewAssignmentExpression(target, value))
+		tx.EmitContext().SetSourceMapRange(assignStatement, binding.Loc)
 		if binding.QuestionToken != nil {
 			present := factory.NewBinaryExpression(nil, value, nil, factory.NewToken(ast.KindExclamationEqualsToken), factory.NewKeywordExpression(ast.KindNullKeyword))
 			statements = append(statements, factory.NewIfStatement(present, assignStatement, nil))
@@ -212,7 +216,9 @@ func (tx *transformer) transformContextStatement(node *ast.KvsContextStatement) 
 	} else {
 		statements = append(statements, body)
 	}
-	return factory.NewBlock(factory.NewNodeList(statements), true)
+	result := factory.NewBlock(factory.NewNodeList(statements), true)
+	tx.EmitContext().SetSourceMapRange(result, node.Loc)
+	return result
 }
 
 func (tx *transformer) visit(node *ast.Node) *ast.Node {
@@ -325,18 +331,18 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 		}
 	case ast.KindKvsYieldStatement:
 		if result := tx.lowerHeadEffects(node.Expression(), func(expression *ast.Expression) *ast.Node {
-			return tx.transformYieldValue(expression, false)
+			return tx.transformYieldValue(expression, false, node)
 		}); result != nil {
 			return result
 		}
-		return tx.transformYield(node.Expression(), false)
+		return tx.transformYield(node.Expression(), false, node)
 	case ast.KindKvsExtantYieldStatement:
 		if result := tx.lowerHeadEffects(node.Expression(), func(expression *ast.Expression) *ast.Node {
-			return tx.transformYieldValue(expression, true)
+			return tx.transformYieldValue(expression, true, node)
 		}); result != nil {
 			return result
 		}
-		return tx.transformYield(node.Expression(), true)
+		return tx.transformYield(node.Expression(), true, node)
 	case ast.KindKvsExtantAssignmentExpression:
 		return tx.transformExtantAssignment(node.AsKvsExtantAssignmentExpression())
 	case ast.KindKvsDefaultExpression:
@@ -886,16 +892,20 @@ func (tx *transformer) transformPipelineExpression(node *ast.KvsPipelineExpressi
 	}
 
 	if len(node.Elements.Nodes) == 0 {
+		tx.EmitContext().SetSourceMapRange(initial, node.Loc)
 		return initial
 	}
 	firstOperator := node.Elements.Nodes[0]
+	var result *ast.Node
 	switch firstOperator.Kind {
 	case ast.KindBarQuestionGreaterThanToken:
 		present := factory.NewBinaryExpression(nil, initial, nil, factory.NewToken(ast.KindExclamationEqualsToken), factory.NewKeywordExpression(ast.KindNullKeyword))
-		return factory.NewConditionalExpression(present, factory.NewToken(ast.KindQuestionToken), lowerStage(0, current), factory.NewToken(ast.KindColonToken), factory.NewKeywordExpression(ast.KindNullKeyword))
+		result = factory.NewConditionalExpression(present, factory.NewToken(ast.KindQuestionToken), lowerStage(0, current), factory.NewToken(ast.KindColonToken), factory.NewKeywordExpression(ast.KindNullKeyword))
 	default:
-		return factory.NewCommaExpression(initial, lowerStage(0, current))
+		result = factory.NewCommaExpression(initial, lowerStage(0, current))
 	}
+	tx.EmitContext().SetSourceMapRange(result, node.Loc)
+	return result
 }
 
 func (tx *transformer) transformLazyCollectExpression(node *ast.KvsLazyCollectExpression) *ast.Node {
@@ -952,9 +962,12 @@ func (tx *transformer) transformLazyCollectExpression(node *ast.KvsLazyCollectEx
 		}
 	}
 	loop := factory.NewForInOrOfStatement(ast.KindForOfStatement, nil, initializer, source, body)
+	tx.EmitContext().SetSourceMapRange(loop, node.Loc)
 	statements = append(statements, loop)
 	function := factory.NewFunctionExpression(nil, factory.NewToken(ast.KindAsteriskToken), nil, nil, factory.NewNodeList([]*ast.Node{parameter}), nil, nil, factory.NewBlock(factory.NewNodeList(statements), true))
-	return factory.NewCallExpression(function, nil, nil, factory.NewNodeList([]*ast.Node{tx.Visitor().VisitNode(node.Expression)}), ast.NodeFlagsNone)
+	result := factory.NewCallExpression(function, nil, nil, factory.NewNodeList([]*ast.Node{tx.Visitor().VisitNode(node.Expression)}), ast.NodeFlagsNone)
+	tx.EmitContext().SetSourceMapRange(result, node.Loc)
+	return result
 }
 
 func collectLazyLabels(statement *ast.Node) map[string]bool {
@@ -1998,6 +2011,7 @@ func (tx *transformer) lowerProducer(producer *ast.Node, continuation func(*ast.
 		}
 	}
 	loop := factory.NewForInOrOfStatement(ast.KindForOfStatement, nil, visitedInitializer, visitedSource, body)
+	tx.EmitContext().SetSourceMapRange(loop, producer.Loc)
 	if label != nil {
 		loop = factory.NewLabeledStatement(label, loop)
 	}
@@ -2028,7 +2042,9 @@ func (tx *transformer) lowerProducer(producer *ast.Node, continuation func(*ast.
 	} else {
 		statements = append(statements, loop)
 	}
-	continued := continuation(result)
+	resultReference := result.Clone(factory)
+	tx.EmitContext().SetSourceMapRange(resultReference, producer.Loc)
+	continued := continuation(resultReference)
 	if continued.Kind == ast.KindSyntaxList {
 		statements = append(statements, continued.AsSyntaxList().Children...)
 	} else {
@@ -2064,12 +2080,14 @@ func (tx *transformer) lowerKvsSwitch(node *ast.KvsSwitchExpression, continuatio
 	armStatements := func(clause *ast.Node, needsCompletionBreak bool) []*ast.Node {
 		statements := clause.Statements()
 		if len(statements) == 1 && statements[0].Kind == ast.KindExpressionStatement {
+			source := statements[0]
 			expression := statements[0].Expression()
 			produce := func(value *ast.Expression) *ast.Node {
 				produced := factory.NewExpressionStatement(value)
 				if !discarded {
 					produced = factory.NewExpressionStatement(factory.NewAssignmentExpression(result, value))
 				}
+				tx.EmitContext().SetSourceMapRange(produced, source.Loc)
 				if !needsCompletionBreak {
 					return produced
 				}
@@ -2152,6 +2170,7 @@ func (tx *transformer) lowerKvsSwitch(node *ast.KvsSwitchExpression, continuatio
 	if labelUsed {
 		lowered = factory.NewLabeledStatement(label, lowered)
 	}
+	tx.EmitContext().SetSourceMapRange(lowered, node.Loc)
 	temporaries := tx.producerTemporaries
 	tx.producerResult = savedResult
 	tx.producerTemporaries = savedTemporaries
@@ -2178,7 +2197,9 @@ func (tx *transformer) lowerKvsSwitch(node *ast.KvsSwitchExpression, continuatio
 	}
 	statements = append(statements, lowered)
 	if !discarded {
-		continued := continuation(result)
+		resultReference := result.Clone(factory)
+		tx.EmitContext().SetSourceMapRange(resultReference, node.Loc)
+		continued := continuation(resultReference)
 		if continued.Kind == ast.KindSyntaxList {
 			statements = append(statements, continued.AsSyntaxList().Children...)
 		} else {
@@ -2298,6 +2319,7 @@ func (tx *transformer) lowerKvsFor(producer *ast.KvsForExpression, continuation 
 			body,
 		)
 	}
+	tx.EmitContext().SetSourceMapRange(loop, producer.Loc)
 	blockStatements = append(blockStatements, loop)
 
 	declarations := producer.Result.AsVariableDeclarationList().Declarations.Nodes
@@ -2321,7 +2343,9 @@ func (tx *transformer) lowerKvsFor(producer *ast.KvsForExpression, continuation 
 	blockStatements = append(blockStatements, factory.NewExpressionStatement(factory.NewAssignmentExpression(carrier, value)))
 	block := factory.NewBlock(factory.NewNodeList(blockStatements), true)
 
-	continued := continuation(carrier)
+	carrierReference := carrier.Clone(factory)
+	tx.EmitContext().SetSourceMapRange(carrierReference, producer.Loc)
+	continued := continuation(carrierReference)
 	statements := []*ast.Node{carrierStatement, block}
 	if continued.Kind == ast.KindSyntaxList {
 		statements = append(statements, continued.AsSyntaxList().Children...)
@@ -2363,11 +2387,11 @@ func selectNeedsLabel(statement *ast.Node) bool {
 	return visit(statement, false)
 }
 
-func (tx *transformer) transformYield(expression *ast.Expression, extant bool) *ast.Node {
-	return tx.transformYieldValue(tx.Visitor().VisitNode(expression), extant)
+func (tx *transformer) transformYield(expression *ast.Expression, extant bool, source *ast.Node) *ast.Node {
+	return tx.transformYieldValue(tx.Visitor().VisitNode(expression), extant, source)
 }
 
-func (tx *transformer) transformYieldValue(value *ast.Expression, extant bool) *ast.Node {
+func (tx *transformer) transformYieldValue(value *ast.Expression, extant bool, source *ast.Node) *ast.Node {
 	// In collect, yield appends to the result array. In select, it assigns the
 	// result and exits the producer loop. The extant form first captures its
 	// value and performs the shared KVS presence test (`value != null`), so the
@@ -2375,7 +2399,9 @@ func (tx *transformer) transformYieldValue(value *ast.Expression, extant bool) *
 	factory := tx.Factory()
 	if tx.lazyProducer {
 		yieldValue := func(value *ast.Expression) *ast.Node {
-			return factory.NewExpressionStatement(factory.NewYieldExpression(nil, value))
+			statement := factory.NewExpressionStatement(factory.NewYieldExpression(nil, value))
+			tx.EmitContext().SetSourceMapRange(statement, source.Loc)
+			return statement
 		}
 		if !extant {
 			return yieldValue(value)
@@ -2391,6 +2417,7 @@ func (tx *transformer) transformYieldValue(value *ast.Expression, extant bool) *
 			if tx.producerResult != nil {
 				production = factory.NewExpressionStatement(factory.NewAssignmentExpression(tx.producerResult, value))
 			}
+			tx.EmitContext().SetSourceMapRange(production, source.Loc)
 			return factory.NewSyntaxList([]*ast.Node{production, factory.NewBreakStatement(tx.selectLabel)})
 		}
 		if !extant {
@@ -2402,13 +2429,15 @@ func (tx *transformer) transformYieldValue(value *ast.Expression, extant bool) *
 		return factory.NewIfStatement(condition, selectValue(temp), nil)
 	}
 	push := func(value *ast.Expression) *ast.Node {
-		return factory.NewExpressionStatement(factory.NewCallExpression(
+		statement := factory.NewExpressionStatement(factory.NewCallExpression(
 			factory.NewPropertyAccessExpression(tx.producerResult, nil, factory.NewIdentifier("push"), ast.NodeFlagsNone),
 			nil,
 			nil,
 			factory.NewNodeList([]*ast.Node{value}),
 			ast.NodeFlagsNone,
 		))
+		tx.EmitContext().SetSourceMapRange(statement, source.Loc)
+		return statement
 	}
 	if !extant {
 		return push(value)

@@ -3,7 +3,7 @@
 This is a working implementation aid, not a language specification or feature order. The language
 documents remain authoritative for accepted semantics.
 
-Progress: **404 of 416 items complete (97.1%)**; **12 remain open**.
+Progress: **412 of 423 items complete (97.4%)**; **11 remain open**.
 
 - `[x]` means implemented with focused compiler evidence.
 - `[ ]` means unimplemented, incomplete, or not yet deliberately validated.
@@ -151,7 +151,6 @@ example `.js` files are intentionally ignored.
 - [x] Add KVS formatter support
 - [x] Add KVS -> ordinary TS/JS lowering phase
 - [x] Establish initial KVS diagnostics convention
-- [ ] Preserve source maps through KVS lowering
 - [x] Handle declaration emit for KVS syntax
 - [x] Add `conformance/kvs/` test subtree
 - [x] Add runtime/evaluation-order test mechanism
@@ -162,6 +161,20 @@ example `.js` files are intentionally ignored.
 - [x] Preserve explicit KVS nullable type spelling in symbol hover
 - [x] Document highlights for synthetic KVS binding forms
 - [x] Source navigation tolerates synthetic nodes and contextual producer keywords
+
+### Source maps
+
+- [x] Add a representative KVS source-map record baseline and document the mapping policy
+- [x] Preserve useful mappings through producer lowering: `collect`, `collect*`, `select`, `for`,
+      procedural `switch`, production statements, and lifted producer heads
+- [x] Preserve mappings through pipelines and placeholder lambdas
+- [x] Preserve mappings through conditional array/object placement and compact literals
+- [x] Preserve mappings through KVS assignment forms, writable-path materialization, and typed
+      in-place projection
+- [x] Preserve mappings through remaining expression lowerings: absence/default operations,
+      comparisons and ranges, failures, and typed construction/projection
+- [x] Preserve mappings through context declarations, reads, calls, and scoped frames
+- [x] Verify KVS mappings compose with downstream TypeScript transforms and representative targets
 
 ## 1. Absence and extant values
 

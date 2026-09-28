@@ -1,0 +1,1671 @@
+===================================================================
+JsFile: kvsSourceMaps.js
+mapUrl: kvsSourceMaps.js.map
+sourceRoot: 
+sources: kvsSourceMaps.ts
+===================================================================
+-------------------------------------------------------------------
+emittedFile:kvsSourceMaps.js
+sourceFile:kvsSourceMaps.ts
+-------------------------------------------------------------------
+>>>"use strict";
+>>>var __kvsProject = (this && this.__kvsProject) || function (target, source, fields) {
+>>>    if (source != null) for (var i = 0; i < fields.length; i++) {
+>>>        var field = fields[i], value = source[field];
+>>>        if (value !== void 0) target[field] = value;
+>>>    }
+>>>    return target;
+>>>};
+>>>var __kvsRange = (this && this.__kvsRange) || function (lower, upper, inclusive) {
+>>>    var range = {};
+>>>    range[Symbol.iterator] = function () {
+>>>        var value = lower;
+>>>        return { next: function () {
+>>>            if (inclusive ? value <= upper : value < upper) return { value: value++, done: false };
+>>>            return { value: void 0, done: true };
+>>>        } };
+>>>    };
+>>>    return range;
+>>>};
+>>>var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+>>>function double(value) {
+1 >
+2 >^^^^^^^^^
+3 >         ^^^^^^
+4 >               ^
+5 >                ^^^^^
+6 >                     ^->
+1 >declare const maybeNumber: number?;
+  >
+  >
+2 >function 
+3 >         double
+4 >               (
+5 >                value: number
+1 >Emitted(21, 1) Source(3, 1) + SourceIndex(0)
+2 >Emitted(21, 10) Source(3, 10) + SourceIndex(0)
+3 >Emitted(21, 16) Source(3, 16) + SourceIndex(0)
+4 >Emitted(21, 17) Source(3, 17) + SourceIndex(0)
+5 >Emitted(21, 22) Source(3, 30) + SourceIndex(0)
+---
+>>>    return value * 2;
+1->^^^^
+2 >    ^^^^^^^
+3 >           ^^^^^
+4 >                ^^^
+5 >                   ^
+6 >                    ^
+1->) {
+  >    
+2 >    return 
+3 >           value
+4 >                 * 
+5 >                   2
+6 >                    ;
+1->Emitted(22, 5) Source(4, 5) + SourceIndex(0)
+2 >Emitted(22, 12) Source(4, 12) + SourceIndex(0)
+3 >Emitted(22, 17) Source(4, 17) + SourceIndex(0)
+4 >Emitted(22, 20) Source(4, 20) + SourceIndex(0)
+5 >Emitted(22, 21) Source(4, 21) + SourceIndex(0)
+6 >Emitted(22, 22) Source(4, 22) + SourceIndex(0)
+---
+>>>}
+1 >
+2 >^
+3 > ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^->
+1 >
+  >
+2 >}
+1 >Emitted(23, 1) Source(5, 1) + SourceIndex(0)
+2 >Emitted(23, 2) Source(5, 2) + SourceIndex(0)
+---
+>>>const piped = (_a = 2, _a = double(_a), _a + 1);
+1->
+2 >^^^^^^
+3 >      ^^^^^
+4 >           ^^^^
+5 >               ^^^^^
+6 >                    ^
+7 >                     ^^^^^^^
+8 >                            ^^^^^^
+9 >                                  ^^^^
+10>                                      ^^
+11>                                        ^^^^^
+12>                                             ^
+13>                                              ^
+14>                                               ^
+15>                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^->
+1->
+  >
+  >
+2 >const 
+3 >      piped
+4 >            = 
+5 >               
+6 >                    2
+7 >                      |>
+  >                         
+8 >                            double
+9 >                                  (%)
+10>                                       |>
+  >                                          
+11>                                        % + 
+12>                                             1
+13>                                              
+14>                                               ;
+1->Emitted(24, 1) Source(7, 1) + SourceIndex(0)
+2 >Emitted(24, 7) Source(7, 7) + SourceIndex(0)
+3 >Emitted(24, 12) Source(7, 12) + SourceIndex(0)
+4 >Emitted(24, 16) Source(7, 15) + SourceIndex(0)
+5 >Emitted(24, 21) Source(7, 15) + SourceIndex(0)
+6 >Emitted(24, 22) Source(7, 16) + SourceIndex(0)
+7 >Emitted(24, 29) Source(8, 5) + SourceIndex(0)
+8 >Emitted(24, 35) Source(8, 11) + SourceIndex(0)
+9 >Emitted(24, 39) Source(8, 14) + SourceIndex(0)
+10>Emitted(24, 41) Source(9, 5) + SourceIndex(0)
+11>Emitted(24, 46) Source(9, 9) + SourceIndex(0)
+12>Emitted(24, 47) Source(9, 10) + SourceIndex(0)
+13>Emitted(24, 48) Source(9, 10) + SourceIndex(0)
+14>Emitted(24, 49) Source(9, 11) + SourceIndex(0)
+---
+>>>const pipedWhenPresent = (_b = maybeNumber) != null ? (_b = double(_b), _b + 1) : null;
+1->
+2 >^^^^^^
+3 >      ^^^^^^^^^^^^^^^^
+4 >                      ^^^
+5 >                         ^^^^^^
+6 >                               ^^^^^^^^^^^
+7 >                                          ^^^^^^^^^^^^^^^^^^
+8 >                                                            ^^^^^^
+9 >                                                                  ^^^^^^
+10>                                                                        ^^^^^
+11>                                                                             ^
+12>                                                                              ^^^^^^^^
+13>                                                                                      ^
+1->
+  >
+  >
+2 >const 
+3 >      pipedWhenPresent
+4 >                       = 
+5 >                         
+6 >                               maybeNumber
+7 >                                           |?>
+  >                                              
+8 >                                                            double
+9 >                                                                   |>
+  >                                                                      
+10>                                                                        % + 
+11>                                                                             1
+12>                                                                              
+13>                                                                                      ;
+1->Emitted(25, 1) Source(11, 1) + SourceIndex(0)
+2 >Emitted(25, 7) Source(11, 7) + SourceIndex(0)
+3 >Emitted(25, 23) Source(11, 23) + SourceIndex(0)
+4 >Emitted(25, 26) Source(11, 26) + SourceIndex(0)
+5 >Emitted(25, 32) Source(11, 26) + SourceIndex(0)
+6 >Emitted(25, 43) Source(11, 37) + SourceIndex(0)
+7 >Emitted(25, 61) Source(12, 5) + SourceIndex(0)
+8 >Emitted(25, 67) Source(12, 11) + SourceIndex(0)
+9 >Emitted(25, 73) Source(13, 5) + SourceIndex(0)
+10>Emitted(25, 78) Source(13, 9) + SourceIndex(0)
+11>Emitted(25, 79) Source(13, 10) + SourceIndex(0)
+12>Emitted(25, 87) Source(13, 10) + SourceIndex(0)
+13>Emitted(25, 88) Source(13, 11) + SourceIndex(0)
+---
+>>>const observed = [];
+1 >
+2 >^^^^^^
+3 >      ^^^^^^^^
+4 >              ^^^
+5 >                 ^^
+6 >                   ^
+7 >                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^->
+1 >
+  >
+  >
+2 >const 
+3 >      observed
+4 >              : number[] = 
+5 >                 []
+6 >                   ;
+1 >Emitted(26, 1) Source(15, 1) + SourceIndex(0)
+2 >Emitted(26, 7) Source(15, 7) + SourceIndex(0)
+3 >Emitted(26, 15) Source(15, 15) + SourceIndex(0)
+4 >Emitted(26, 18) Source(15, 28) + SourceIndex(0)
+5 >Emitted(26, 20) Source(15, 30) + SourceIndex(0)
+6 >Emitted(26, 21) Source(15, 31) + SourceIndex(0)
+---
+>>>const tapped = (_c = 2, observed.push(_c), double(_c));
+1->
+2 >^^^^^^
+3 >      ^^^^^^
+4 >            ^^^^
+5 >                ^^^^^
+6 >                     ^
+7 >                      ^^
+8 >                        ^^^^^^^^
+9 >                                ^
+10>                                 ^^^^
+11>                                     ^^^^^^
+12>                                           ^^^^^^
+13>                                                 ^^^^
+14>                                                     ^
+15>                                                      ^
+1->
+  >
+2 >const 
+3 >      tapped
+4 >             = 
+5 >                
+6 >                     2
+7 >                       |>
+  >                          
+8 >                        observed
+9 >                                .
+10>                                 push
+11>                                      |%>
+  >                                         
+12>                                           double
+13>                                                 
+14>                                                     
+15>                                                      ;
+1->Emitted(27, 1) Source(16, 1) + SourceIndex(0)
+2 >Emitted(27, 7) Source(16, 7) + SourceIndex(0)
+3 >Emitted(27, 13) Source(16, 13) + SourceIndex(0)
+4 >Emitted(27, 17) Source(16, 16) + SourceIndex(0)
+5 >Emitted(27, 22) Source(16, 16) + SourceIndex(0)
+6 >Emitted(27, 23) Source(16, 17) + SourceIndex(0)
+7 >Emitted(27, 25) Source(17, 5) + SourceIndex(0)
+8 >Emitted(27, 33) Source(17, 13) + SourceIndex(0)
+9 >Emitted(27, 34) Source(17, 14) + SourceIndex(0)
+10>Emitted(27, 38) Source(17, 18) + SourceIndex(0)
+11>Emitted(27, 44) Source(18, 5) + SourceIndex(0)
+12>Emitted(27, 50) Source(18, 11) + SourceIndex(0)
+13>Emitted(27, 54) Source(18, 11) + SourceIndex(0)
+14>Emitted(27, 55) Source(18, 11) + SourceIndex(0)
+15>Emitted(27, 56) Source(18, 12) + SourceIndex(0)
+---
+>>>const mapped = [1, 2, 3].map(_arg_1 => _arg_1 * 2);
+1 >
+2 >^^^^^^
+3 >      ^^^^^^
+4 >            ^^^
+5 >               ^
+6 >                ^
+7 >                 ^^
+8 >                   ^
+9 >                    ^^
+10>                      ^
+11>                       ^
+12>                        ^
+13>                         ^^^
+14>                            ^
+15>                             ^^^^^^
+16>                                   ^
+17>                                    ^^
+18>                                      ^
+19>                                       ^^^^^^^^^
+20>                                                ^
+21>                                                 ^
+22>                                                  ^
+1 >
+  >
+  >
+2 >const 
+3 >      mapped
+4 >             = 
+5 >               [
+6 >                1
+7 >                 , 
+8 >                   2
+9 >                    , 
+10>                      3
+11>                       ]
+12>                        .
+13>                         map
+14>                            (
+15>                             %
+16>                                   
+17>                                    %
+18>                                      
+19>                                       % * 
+20>                                                2
+21>                                                 )
+22>                                                  ;
+1 >Emitted(28, 1) Source(20, 1) + SourceIndex(0)
+2 >Emitted(28, 7) Source(20, 7) + SourceIndex(0)
+3 >Emitted(28, 13) Source(20, 13) + SourceIndex(0)
+4 >Emitted(28, 16) Source(20, 16) + SourceIndex(0)
+5 >Emitted(28, 17) Source(20, 17) + SourceIndex(0)
+6 >Emitted(28, 18) Source(20, 18) + SourceIndex(0)
+7 >Emitted(28, 20) Source(20, 20) + SourceIndex(0)
+8 >Emitted(28, 21) Source(20, 21) + SourceIndex(0)
+9 >Emitted(28, 23) Source(20, 23) + SourceIndex(0)
+10>Emitted(28, 24) Source(20, 24) + SourceIndex(0)
+11>Emitted(28, 25) Source(20, 25) + SourceIndex(0)
+12>Emitted(28, 26) Source(20, 26) + SourceIndex(0)
+13>Emitted(28, 29) Source(20, 29) + SourceIndex(0)
+14>Emitted(28, 30) Source(20, 30) + SourceIndex(0)
+15>Emitted(28, 36) Source(20, 31) + SourceIndex(0)
+16>Emitted(28, 37) Source(20, 30) + SourceIndex(0)
+17>Emitted(28, 39) Source(20, 31) + SourceIndex(0)
+18>Emitted(28, 40) Source(20, 30) + SourceIndex(0)
+19>Emitted(28, 49) Source(20, 34) + SourceIndex(0)
+20>Emitted(28, 50) Source(20, 35) + SourceIndex(0)
+21>Emitted(28, 51) Source(20, 36) + SourceIndex(0)
+22>Emitted(28, 52) Source(20, 37) + SourceIndex(0)
+---
+>>>var _k = [];
+>>>var _l;
+>>>for (const _ of [1, 2, 3]) {
+1 >
+2 >^^^^^^^^^^^^^^^^
+3 >                ^
+4 >                 ^
+5 >                  ^^
+6 >                    ^
+7 >                     ^^
+8 >                       ^
+9 >                        ^
+10>                         ^^
+11>                           ^
+1 >
+  >
+  >const produced = 
+2 >collect (
+3 >                [
+4 >                 1
+5 >                  , 
+6 >                    2
+7 >                     , 
+8 >                       3
+9 >                        ]
+10>                         ) 
+11>                           {
+1 >Emitted(31, 1) Source(22, 18) + SourceIndex(0)
+2 >Emitted(31, 17) Source(22, 27) + SourceIndex(0)
+3 >Emitted(31, 18) Source(22, 28) + SourceIndex(0)
+4 >Emitted(31, 19) Source(22, 29) + SourceIndex(0)
+5 >Emitted(31, 21) Source(22, 31) + SourceIndex(0)
+6 >Emitted(31, 22) Source(22, 32) + SourceIndex(0)
+7 >Emitted(31, 24) Source(22, 34) + SourceIndex(0)
+8 >Emitted(31, 25) Source(22, 35) + SourceIndex(0)
+9 >Emitted(31, 26) Source(22, 36) + SourceIndex(0)
+10>Emitted(31, 28) Source(22, 38) + SourceIndex(0)
+11>Emitted(31, 29) Source(22, 39) + SourceIndex(0)
+---
+>>>    if (_ == 2)
+1 >^^^^
+2 >    ^^^^
+3 >        ^
+4 >         ^^^^
+5 >             ^
+6 >              ^^^^->
+1 >
+  >    
+2 >    if (
+3 >        _
+4 >          == 
+5 >             2
+1 >Emitted(32, 5) Source(23, 5) + SourceIndex(0)
+2 >Emitted(32, 9) Source(23, 9) + SourceIndex(0)
+3 >Emitted(32, 10) Source(23, 10) + SourceIndex(0)
+4 >Emitted(32, 14) Source(23, 14) + SourceIndex(0)
+5 >Emitted(32, 15) Source(23, 15) + SourceIndex(0)
+---
+>>>        continue;
+1->^^^^^^^^
+2 >        ^^^^^^^^^
+3 >                 ^^^^->
+1->) 
+2 >        continue;
+1->Emitted(33, 9) Source(23, 17) + SourceIndex(0)
+2 >Emitted(33, 18) Source(23, 26) + SourceIndex(0)
+---
+>>>    _k.push(_ * 10);
+1->^^^^
+2 >    ^^^^^^^^
+3 >            ^
+4 >             ^^^
+5 >                ^^
+6 >                  ^^
+7 >                    ^^^^^^^^^^^^^^^^->
+1->
+  >    
+2 >    yield 
+3 >            _
+4 >              * 
+5 >                10
+6 >                  ;
+1->Emitted(34, 5) Source(24, 5) + SourceIndex(0)
+2 >Emitted(34, 13) Source(24, 11) + SourceIndex(0)
+3 >Emitted(34, 14) Source(24, 12) + SourceIndex(0)
+4 >Emitted(34, 17) Source(24, 15) + SourceIndex(0)
+5 >Emitted(34, 19) Source(24, 17) + SourceIndex(0)
+6 >Emitted(34, 21) Source(24, 18) + SourceIndex(0)
+---
+>>>    if ((_l = maybeNumber) != null)
+1->^^^^^^^^^^^^^^
+2 >              ^^^^^^^^^^^
+1->
+  >    yield? 
+2 >              maybeNumber
+1->Emitted(35, 15) Source(25, 12) + SourceIndex(0)
+2 >Emitted(35, 26) Source(25, 23) + SourceIndex(0)
+---
+>>>        _k.push(_l);
+1 >^^^^^^^^
+2 >        ^^^^^^^^^^^^
+1 >
+2 >        yield? maybeNumber;
+1 >Emitted(36, 9) Source(25, 5) + SourceIndex(0)
+2 >Emitted(36, 21) Source(25, 24) + SourceIndex(0)
+---
+>>>}
+1 >
+2 >^
+3 > ^^^^^^^^^^^^^^^^^^^^->
+1 >
+  >
+2 >}
+1 >Emitted(37, 1) Source(26, 1) + SourceIndex(0)
+2 >Emitted(37, 2) Source(26, 2) + SourceIndex(0)
+---
+>>>const produced = _k;
+1->
+2 >^^^^^^
+3 >      ^^^^^^^^
+4 >              ^^^
+5 >                 ^^
+6 >                   ^
+1->
+2 >const 
+3 >      produced
+4 >               = 
+5 >                 collect ([1, 2, 3]) {
+  >                     if (_ == 2) continue;
+  >                     yield _ * 10;
+  >                     yield? maybeNumber;
+  >                 }
+6 >                   ;
+1->Emitted(38, 1) Source(22, 1) + SourceIndex(0)
+2 >Emitted(38, 7) Source(22, 7) + SourceIndex(0)
+3 >Emitted(38, 15) Source(22, 15) + SourceIndex(0)
+4 >Emitted(38, 18) Source(22, 18) + SourceIndex(0)
+5 >Emitted(38, 20) Source(26, 2) + SourceIndex(0)
+6 >Emitted(38, 21) Source(26, 3) + SourceIndex(0)
+---
+>>>var _m = null;
+>>>var _o;
+>>>for (const _ of [1, 2, 3]) {
+1 >
+2 >^^^^^^^^^^^^^^^^
+3 >                ^
+4 >                 ^
+5 >                  ^^
+6 >                    ^
+7 >                     ^^
+8 >                       ^
+9 >                        ^
+10>                         ^^
+11>                           ^
+12>                            ^^^^^^^^^^->
+1 >
+  >
+  >const selected = 
+2 >select (
+3 >                [
+4 >                 1
+5 >                  , 
+6 >                    2
+7 >                     , 
+8 >                       3
+9 >                        ]
+10>                         ) 
+11>                           {
+1 >Emitted(41, 1) Source(28, 18) + SourceIndex(0)
+2 >Emitted(41, 17) Source(28, 26) + SourceIndex(0)
+3 >Emitted(41, 18) Source(28, 27) + SourceIndex(0)
+4 >Emitted(41, 19) Source(28, 28) + SourceIndex(0)
+5 >Emitted(41, 21) Source(28, 30) + SourceIndex(0)
+6 >Emitted(41, 22) Source(28, 31) + SourceIndex(0)
+7 >Emitted(41, 24) Source(28, 33) + SourceIndex(0)
+8 >Emitted(41, 25) Source(28, 34) + SourceIndex(0)
+9 >Emitted(41, 26) Source(28, 35) + SourceIndex(0)
+10>Emitted(41, 28) Source(28, 37) + SourceIndex(0)
+11>Emitted(41, 29) Source(28, 38) + SourceIndex(0)
+---
+>>>    if ((_o = maybeNumber) != null) {
+1->^^^^^^^^^^^^^^
+2 >              ^^^^^^^^^^^
+1->
+  >    yield? 
+2 >              maybeNumber
+1->Emitted(42, 15) Source(29, 12) + SourceIndex(0)
+2 >Emitted(42, 26) Source(29, 23) + SourceIndex(0)
+---
+>>>        _m = _o;
+1 >^^^^^^^^
+2 >        ^^^^^^^^
+1 >
+2 >        yield? maybeNumber;
+1 >Emitted(43, 9) Source(29, 5) + SourceIndex(0)
+2 >Emitted(43, 17) Source(29, 24) + SourceIndex(0)
+---
+>>>        break;
+>>>    }
+>>>    _m = _ * 10;
+1 >^^^^
+2 >    ^^^^^
+3 >         ^
+4 >          ^^^
+5 >             ^^
+6 >               ^
+1 >
+  >    
+2 >    yield 
+3 >         _
+4 >           * 
+5 >             10
+6 >               ;
+1 >Emitted(46, 5) Source(30, 5) + SourceIndex(0)
+2 >Emitted(46, 10) Source(30, 11) + SourceIndex(0)
+3 >Emitted(46, 11) Source(30, 12) + SourceIndex(0)
+4 >Emitted(46, 14) Source(30, 15) + SourceIndex(0)
+5 >Emitted(46, 16) Source(30, 17) + SourceIndex(0)
+6 >Emitted(46, 17) Source(30, 18) + SourceIndex(0)
+---
+>>>    break;
+>>>}
+1 >
+2 >^
+3 > ^^^^^^^^^^^^^^^^^^^^->
+1 >
+  >
+2 >}
+1 >Emitted(48, 1) Source(31, 1) + SourceIndex(0)
+2 >Emitted(48, 2) Source(31, 2) + SourceIndex(0)
+---
+>>>const selected = _m;
+1->
+2 >^^^^^^
+3 >      ^^^^^^^^
+4 >              ^^^
+5 >                 ^^
+6 >                   ^
+7 >                    ^^^^^^^^^^^^^^^^->
+1->
+2 >const 
+3 >      selected
+4 >               = 
+5 >                 select ([1, 2, 3]) {
+  >                     yield? maybeNumber;
+  >                     yield _ * 10;
+  >                 }
+6 >                   ;
+1->Emitted(49, 1) Source(28, 1) + SourceIndex(0)
+2 >Emitted(49, 7) Source(28, 7) + SourceIndex(0)
+3 >Emitted(49, 15) Source(28, 15) + SourceIndex(0)
+4 >Emitted(49, 18) Source(28, 18) + SourceIndex(0)
+5 >Emitted(49, 20) Source(31, 2) + SourceIndex(0)
+6 >Emitted(49, 21) Source(31, 3) + SourceIndex(0)
+---
+>>>const lazy = function* (source_1) {
+1->
+2 >^^^^^^
+3 >      ^^^^
+4 >          ^^^
+5 >             ^^^^^^^^^^^^^^^^^^^^^^^^^->
+1->
+  >
+  >
+2 >const 
+3 >      lazy
+4 >           = 
+1->Emitted(50, 1) Source(33, 1) + SourceIndex(0)
+2 >Emitted(50, 7) Source(33, 7) + SourceIndex(0)
+3 >Emitted(50, 11) Source(33, 11) + SourceIndex(0)
+4 >Emitted(50, 14) Source(33, 14) + SourceIndex(0)
+---
+>>>    for (const _ of source_1 ?? []) {
+1->^^^^
+2 >    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+3 >                                    ^
+1->
+2 >    collect* ([1, 2, 3]) 
+3 >                                    {
+1->Emitted(51, 5) Source(33, 14) + SourceIndex(0)
+2 >Emitted(51, 37) Source(33, 35) + SourceIndex(0)
+3 >Emitted(51, 38) Source(33, 36) + SourceIndex(0)
+---
+>>>        yield _ * 10;
+1 >^^^^^^^^
+2 >        ^^^^^^
+3 >              ^
+4 >               ^^^
+5 >                  ^^
+6 >                    ^
+1 >
+  >    
+2 >        yield 
+3 >              _
+4 >                * 
+5 >                  10
+6 >                    ;
+1 >Emitted(52, 9) Source(34, 5) + SourceIndex(0)
+2 >Emitted(52, 15) Source(34, 11) + SourceIndex(0)
+3 >Emitted(52, 16) Source(34, 12) + SourceIndex(0)
+4 >Emitted(52, 19) Source(34, 15) + SourceIndex(0)
+5 >Emitted(52, 21) Source(34, 17) + SourceIndex(0)
+6 >Emitted(52, 22) Source(34, 18) + SourceIndex(0)
+---
+>>>    }
+1 >^^^^
+2 >    ^
+3 >     ^^^^^^^^^->
+1 >
+  >
+2 >    }
+1 >Emitted(53, 5) Source(35, 1) + SourceIndex(0)
+2 >Emitted(53, 6) Source(35, 2) + SourceIndex(0)
+---
+>>>}([1, 2, 3]);
+1->^^
+2 >  ^
+3 >   ^
+4 >    ^^
+5 >      ^
+6 >       ^^
+7 >         ^
+8 >          ^
+9 >           ^
+10>            ^
+1->
+2 >  [
+3 >   1
+4 >    , 
+5 >      2
+6 >       , 
+7 >         3
+8 >          ]
+9 >           ) {
+  >               yield _ * 10;
+  >           }
+10>            ;
+1->Emitted(54, 3) Source(33, 24) + SourceIndex(0)
+2 >Emitted(54, 4) Source(33, 25) + SourceIndex(0)
+3 >Emitted(54, 5) Source(33, 26) + SourceIndex(0)
+4 >Emitted(54, 7) Source(33, 28) + SourceIndex(0)
+5 >Emitted(54, 8) Source(33, 29) + SourceIndex(0)
+6 >Emitted(54, 10) Source(33, 31) + SourceIndex(0)
+7 >Emitted(54, 11) Source(33, 32) + SourceIndex(0)
+8 >Emitted(54, 12) Source(33, 33) + SourceIndex(0)
+9 >Emitted(54, 13) Source(35, 2) + SourceIndex(0)
+10>Emitted(54, 14) Source(35, 3) + SourceIndex(0)
+---
+>>>var _p;
+>>>{
+>>>    let total = 0;
+1 >^^^^
+2 >    ^^^^
+3 >        ^^^^^
+4 >             ^^^
+5 >                ^
+6 >                 ^^^^^^^^^^^^^^^^->
+1 >
+  >
+  >const accumulated = for ([1, 2, 3]; total = 0
+2 >    
+3 >        total
+4 >              = 
+5 >                0
+1 >Emitted(57, 5) Source(37, 46) + SourceIndex(0)
+2 >Emitted(57, 9) Source(37, 37) + SourceIndex(0)
+3 >Emitted(57, 14) Source(37, 42) + SourceIndex(0)
+4 >Emitted(57, 17) Source(37, 45) + SourceIndex(0)
+5 >Emitted(57, 18) Source(37, 46) + SourceIndex(0)
+---
+>>>    for (const _ of [1, 2, 3]) {
+1->^^^^
+2 >    ^^^^^^^^^^^^^^^^
+3 >                    ^
+4 >                     ^
+5 >                      ^^
+6 >                        ^
+7 >                         ^^
+8 >                           ^
+9 >                            ^
+10>                             ^^
+11>                               ^
+1->
+2 >    for (
+3 >                    [
+4 >                     1
+5 >                      , 
+6 >                        2
+7 >                         , 
+8 >                           3
+9 >                            ]
+10>                             ; total = 0) 
+11>                               {
+1->Emitted(58, 5) Source(37, 21) + SourceIndex(0)
+2 >Emitted(58, 21) Source(37, 26) + SourceIndex(0)
+3 >Emitted(58, 22) Source(37, 27) + SourceIndex(0)
+4 >Emitted(58, 23) Source(37, 28) + SourceIndex(0)
+5 >Emitted(58, 25) Source(37, 30) + SourceIndex(0)
+6 >Emitted(58, 26) Source(37, 31) + SourceIndex(0)
+7 >Emitted(58, 28) Source(37, 33) + SourceIndex(0)
+8 >Emitted(58, 29) Source(37, 34) + SourceIndex(0)
+9 >Emitted(58, 30) Source(37, 35) + SourceIndex(0)
+10>Emitted(58, 32) Source(37, 48) + SourceIndex(0)
+11>Emitted(58, 33) Source(37, 49) + SourceIndex(0)
+---
+>>>        total += _;
+1 >^^^^^^^^
+2 >        ^^^^^
+3 >             ^^^^
+4 >                 ^
+5 >                  ^
+1 >
+  >    
+2 >        total
+3 >              += 
+4 >                 _
+5 >                  ;
+1 >Emitted(59, 9) Source(38, 5) + SourceIndex(0)
+2 >Emitted(59, 14) Source(38, 10) + SourceIndex(0)
+3 >Emitted(59, 18) Source(38, 14) + SourceIndex(0)
+4 >Emitted(59, 19) Source(38, 15) + SourceIndex(0)
+5 >Emitted(59, 20) Source(38, 16) + SourceIndex(0)
+---
+>>>    }
+1 >^^^^
+2 >    ^
+3 >     ^^^^^^^^^^^->
+1 >
+  >
+2 >    }
+1 >Emitted(60, 5) Source(39, 1) + SourceIndex(0)
+2 >Emitted(60, 6) Source(39, 2) + SourceIndex(0)
+---
+>>>    _p = total;
+>>>}
+>>>const accumulated = _p;
+1->
+2 >^^^^^^
+3 >      ^^^^^^^^^^^
+4 >                 ^^^
+5 >                    ^^
+6 >                      ^
+1->
+2 >const 
+3 >      accumulated
+4 >                  = 
+5 >                    for ([1, 2, 3]; total = 0) {
+  >                        total += _;
+  >                    }
+6 >                      ;
+1->Emitted(63, 1) Source(37, 1) + SourceIndex(0)
+2 >Emitted(63, 7) Source(37, 7) + SourceIndex(0)
+3 >Emitted(63, 18) Source(37, 18) + SourceIndex(0)
+4 >Emitted(63, 21) Source(37, 21) + SourceIndex(0)
+5 >Emitted(63, 23) Source(39, 2) + SourceIndex(0)
+6 >Emitted(63, 24) Source(39, 3) + SourceIndex(0)
+---
+>>>var _q = null;
+>>>switch (maybeNumber) {
+1 >
+2 >^^^^^^^^
+3 >        ^^^^^^^^^^^
+1 >
+  >
+  >const switched = 
+2 >switch (
+3 >        maybeNumber
+1 >Emitted(65, 1) Source(41, 18) + SourceIndex(0)
+2 >Emitted(65, 9) Source(41, 26) + SourceIndex(0)
+3 >Emitted(65, 20) Source(41, 37) + SourceIndex(0)
+---
+>>>    case 0:
+1 >^^^^^^^^^
+2 >         ^
+3 >          ^^^^^^^^^^^->
+1 >) {
+  >    case 
+2 >         0
+1 >Emitted(66, 10) Source(42, 10) + SourceIndex(0)
+2 >Emitted(66, 11) Source(42, 11) + SourceIndex(0)
+---
+>>>        _q = "zero";
+1->^^^^^^^^
+2 >        ^^^^^
+3 >             ^^^^^^
+4 >                   ^
+1->: 
+2 >        
+3 >             "zero"
+4 >                   ;
+1->Emitted(67, 9) Source(42, 13) + SourceIndex(0)
+2 >Emitted(67, 14) Source(42, 13) + SourceIndex(0)
+3 >Emitted(67, 20) Source(42, 19) + SourceIndex(0)
+4 >Emitted(67, 21) Source(42, 20) + SourceIndex(0)
+---
+>>>        break;
+>>>    default: _q = "other";
+1 >^^^^^^^^^^^^^
+2 >             ^^^^^
+3 >                  ^^^^^^^
+4 >                         ^
+1 >
+  >    default: 
+2 >             
+3 >                  "other"
+4 >                         ;
+1 >Emitted(69, 14) Source(43, 14) + SourceIndex(0)
+2 >Emitted(69, 19) Source(43, 14) + SourceIndex(0)
+3 >Emitted(69, 26) Source(43, 21) + SourceIndex(0)
+4 >Emitted(69, 27) Source(43, 22) + SourceIndex(0)
+---
+>>>}
+1 >^
+2 > ^^^^^^^^^^^^^^^^^^^^->
+1 >
+  >}
+1 >Emitted(70, 2) Source(44, 2) + SourceIndex(0)
+---
+>>>const switched = _q;
+1->
+2 >^^^^^^
+3 >      ^^^^^^^^
+4 >              ^^^
+5 >                 ^^
+6 >                   ^
+7 >                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^->
+1->
+2 >const 
+3 >      switched
+4 >               = 
+5 >                 switch (maybeNumber) {
+  >                     case 0: "zero";
+  >                     default: "other";
+  >                 }
+6 >                   ;
+1->Emitted(71, 1) Source(41, 1) + SourceIndex(0)
+2 >Emitted(71, 7) Source(41, 7) + SourceIndex(0)
+3 >Emitted(71, 15) Source(41, 15) + SourceIndex(0)
+4 >Emitted(71, 18) Source(41, 18) + SourceIndex(0)
+5 >Emitted(71, 20) Source(44, 2) + SourceIndex(0)
+6 >Emitted(71, 21) Source(44, 3) + SourceIndex(0)
+---
+>>>const compactArray = [...(_d = maybeNumber) != null ? [_d] : [], produced.length];
+1->
+2 >^^^^^^
+3 >      ^^^^^^^^^^^^
+4 >                  ^^^^^^^^^^^^^
+5 >                               ^^^^^^^^^^^
+6 >                                          ^^^^^^^^^^^^^^^^^^^^^^^
+7 >                                                                 ^^^^^^^^
+8 >                                                                         ^
+9 >                                                                          ^^^^^^
+10>                                                                                ^
+11>                                                                                 ^
+12>                                                                                  ^^^^^^->
+1->
+  >
+  >
+2 >const 
+3 >      compactArray
+4 >                   = [?: 
+5 >                               maybeNumber
+6 >                                          , 
+7 >                                                                 produced
+8 >                                                                         .
+9 >                                                                          length
+10>                                                                                ]
+11>                                                                                 ;
+1->Emitted(72, 1) Source(46, 1) + SourceIndex(0)
+2 >Emitted(72, 7) Source(46, 7) + SourceIndex(0)
+3 >Emitted(72, 19) Source(46, 19) + SourceIndex(0)
+4 >Emitted(72, 32) Source(46, 26) + SourceIndex(0)
+5 >Emitted(72, 43) Source(46, 37) + SourceIndex(0)
+6 >Emitted(72, 66) Source(46, 39) + SourceIndex(0)
+7 >Emitted(72, 74) Source(46, 47) + SourceIndex(0)
+8 >Emitted(72, 75) Source(46, 48) + SourceIndex(0)
+9 >Emitted(72, 81) Source(46, 54) + SourceIndex(0)
+10>Emitted(72, 82) Source(46, 55) + SourceIndex(0)
+11>Emitted(72, 83) Source(46, 56) + SourceIndex(0)
+---
+>>>const compactObject = { ...(_e = maybeNumber) != null ? { value: _e } : {}, produced };
+1->
+2 >^^^^^^
+3 >      ^^^^^^^^^^^^^
+4 >                   ^^^^^^^^^^^^^^
+5 >                                 ^^^^^^^^^^^
+6 >                                            ^^^^^^^^^^^^^^
+7 >                                                          ^^^^^
+8 >                                                               ^^^^^^^^^^^^^
+9 >                                                                            ^^^^^^^^
+10>                                                                                    ^^
+11>                                                                                      ^
+1->
+  >
+2 >const 
+3 >      compactObject
+4 >                    = { value?: 
+5 >                                 maybeNumber
+6 >                                            
+7 >                                                          value
+8 >                                                               ?: maybeNumber, 
+9 >                                                                            produced
+10>                                                                                     }
+11>                                                                                      ;
+1->Emitted(73, 1) Source(47, 1) + SourceIndex(0)
+2 >Emitted(73, 7) Source(47, 7) + SourceIndex(0)
+3 >Emitted(73, 20) Source(47, 20) + SourceIndex(0)
+4 >Emitted(73, 34) Source(47, 33) + SourceIndex(0)
+5 >Emitted(73, 45) Source(47, 44) + SourceIndex(0)
+6 >Emitted(73, 59) Source(47, 25) + SourceIndex(0)
+7 >Emitted(73, 64) Source(47, 30) + SourceIndex(0)
+8 >Emitted(73, 77) Source(47, 46) + SourceIndex(0)
+9 >Emitted(73, 85) Source(47, 54) + SourceIndex(0)
+10>Emitted(73, 87) Source(47, 56) + SourceIndex(0)
+11>Emitted(73, 88) Source(47, 57) + SourceIndex(0)
+---
+>>>let assigned = 0;
+1 >
+2 >^^^^
+3 >    ^^^^^^^^
+4 >            ^^^
+5 >               ^
+6 >                ^
+7 >                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^->
+1 >
+  >
+  >
+2 >let 
+3 >    assigned
+4 >             = 
+5 >               0
+6 >                ;
+1 >Emitted(74, 1) Source(49, 1) + SourceIndex(0)
+2 >Emitted(74, 5) Source(49, 5) + SourceIndex(0)
+3 >Emitted(74, 13) Source(49, 13) + SourceIndex(0)
+4 >Emitted(74, 16) Source(49, 16) + SourceIndex(0)
+5 >Emitted(74, 17) Source(49, 17) + SourceIndex(0)
+6 >Emitted(74, 18) Source(49, 18) + SourceIndex(0)
+---
+>>>(_f = maybeNumber) != null ? assigned = _f : _f;
+1->
+2 >^^^^^^
+3 >      ^^^^^^^^^^^
+4 >                 ^^^^^^^^^^^^
+5 >                             ^^^^^^^^
+6 >                                     ^^^^^^^^^^^
+1->
+  >
+2 >assigned ?= 
+3 >      maybeNumber
+4 >                 
+5 >                             assigned
+6 >                                      ?= maybeNumber;
+1->Emitted(75, 1) Source(50, 1) + SourceIndex(0)
+2 >Emitted(75, 7) Source(50, 13) + SourceIndex(0)
+3 >Emitted(75, 18) Source(50, 24) + SourceIndex(0)
+4 >Emitted(75, 30) Source(50, 1) + SourceIndex(0)
+5 >Emitted(75, 38) Source(50, 9) + SourceIndex(0)
+6 >Emitted(75, 49) Source(50, 25) + SourceIndex(0)
+---
+>>>let filtered = null;
+1 >
+2 >^^^^
+3 >    ^^^^^^^^
+4 >            ^^^
+5 >               ^^^^
+6 >                   ^
+7 >                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^->
+1 >
+  >
+  >
+2 >let 
+3 >    filtered
+4 >            : number? = 
+5 >               null
+6 >                   ;
+1 >Emitted(76, 1) Source(52, 1) + SourceIndex(0)
+2 >Emitted(76, 5) Source(52, 5) + SourceIndex(0)
+3 >Emitted(76, 13) Source(52, 13) + SourceIndex(0)
+4 >Emitted(76, 16) Source(52, 25) + SourceIndex(0)
+5 >Emitted(76, 20) Source(52, 29) + SourceIndex(0)
+6 >Emitted(76, 21) Source(52, 30) + SourceIndex(0)
+---
+>>>filtered = (_g = maybeNumber) != null && _g === _g ? _g : null;
+1->
+2 >^^^^^^^^
+3 >        ^^^^^^^^^
+4 >                 ^^^^^^^^^^^
+5 >                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+1->
+  >
+2 >filtered
+3 >         ~= 
+4 >                 maybeNumber
+5 >                            ;
+1->Emitted(77, 1) Source(53, 1) + SourceIndex(0)
+2 >Emitted(77, 9) Source(53, 9) + SourceIndex(0)
+3 >Emitted(77, 18) Source(53, 13) + SourceIndex(0)
+4 >Emitted(77, 29) Source(53, 24) + SourceIndex(0)
+5 >Emitted(77, 64) Source(53, 25) + SourceIndex(0)
+---
+>>>let outcome = null;
+1 >
+2 >^^^^
+3 >    ^^^^^^^
+4 >           ^^^
+5 >              ^^^^
+6 >                  ^
+1 >
+  >
+  >declare function risky(): number;
+  >
+2 >let 
+3 >    outcome
+4 >           : number? = 
+5 >              null
+6 >                  ;
+1 >Emitted(78, 1) Source(56, 1) + SourceIndex(0)
+2 >Emitted(78, 5) Source(56, 5) + SourceIndex(0)
+3 >Emitted(78, 12) Source(56, 12) + SourceIndex(0)
+4 >Emitted(78, 15) Source(56, 24) + SourceIndex(0)
+5 >Emitted(78, 19) Source(56, 28) + SourceIndex(0)
+6 >Emitted(78, 20) Source(56, 29) + SourceIndex(0)
+---
+>>>let failure;
+1 >
+2 >^^^^
+3 >    ^^^^^^^
+4 >           ^
+5 >            ^^^^^^^^^^^^^^^^^^->
+1 >
+  >
+2 >let 
+3 >    failure: unknown
+4 >           ;
+1 >Emitted(79, 1) Source(57, 1) + SourceIndex(0)
+2 >Emitted(79, 5) Source(57, 5) + SourceIndex(0)
+3 >Emitted(79, 12) Source(57, 21) + SourceIndex(0)
+4 >Emitted(79, 13) Source(57, 22) + SourceIndex(0)
+---
+>>>[outcome, failure] = (() => {
+1->
+2 >^
+3 > ^^^^^^^
+4 >        ^^
+5 >          ^^^^^^^
+1->
+  >
+2 >
+3 > outcome
+4 >        ~
+5 >          failure
+1->Emitted(80, 1) Source(58, 1) + SourceIndex(0)
+2 >Emitted(80, 2) Source(58, 1) + SourceIndex(0)
+3 >Emitted(80, 9) Source(58, 8) + SourceIndex(0)
+4 >Emitted(80, 11) Source(58, 9) + SourceIndex(0)
+5 >Emitted(80, 18) Source(58, 16) + SourceIndex(0)
+---
+>>>    try {
+>>>        return [risky(), null];
+1 >^^^^^^^^^^^^^^^^
+2 >                ^^^^^
+3 >                     ^^
+1 > = 
+2 >                risky
+3 >                     ()
+1 >Emitted(82, 17) Source(58, 19) + SourceIndex(0)
+2 >Emitted(82, 22) Source(58, 24) + SourceIndex(0)
+3 >Emitted(82, 24) Source(58, 26) + SourceIndex(0)
+---
+>>>    }
+>>>    catch (_a) {
+>>>        return [null, _a];
+>>>    }
+>>>})(), outcome;
+1 >^^^^^^
+2 >      ^^^^^^^
+3 >             ^
+4 >              ^^^^^^^^^^^->
+1 >
+2 >      outcome
+3 >             ~failure = risky();
+1 >Emitted(87, 7) Source(58, 1) + SourceIndex(0)
+2 >Emitted(87, 14) Source(58, 8) + SourceIndex(0)
+3 >Emitted(87, 15) Source(58, 27) + SourceIndex(0)
+---
+>>>let maybeCounter = null;
+1->
+2 >^^^^
+3 >    ^^^^^^^^^^^^
+4 >                ^^^
+5 >                   ^^^^
+6 >                       ^
+7 >                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^->
+1->
+  >
+  >interface Counter {
+  >    count: number;
+  >}
+  >
+2 >let 
+3 >    maybeCounter
+4 >                : Counter? = 
+5 >                   null
+6 >                       ;
+1->Emitted(88, 1) Source(63, 1) + SourceIndex(0)
+2 >Emitted(88, 5) Source(63, 5) + SourceIndex(0)
+3 >Emitted(88, 17) Source(63, 17) + SourceIndex(0)
+4 >Emitted(88, 20) Source(63, 30) + SourceIndex(0)
+5 >Emitted(88, 24) Source(63, 34) + SourceIndex(0)
+6 >Emitted(88, 25) Source(63, 35) + SourceIndex(0)
+---
+>>>(_h = maybeNumber) != null ? (maybeCounter ?? (maybeCounter = { count: 0 })).count = _h : _h;
+1->
+2 >^^^^^^
+3 >      ^^^^^^^^^^^
+4 >                 ^^^^^^^^^^^^
+5 >                             ^
+6 >                              ^^^^^^^^^^^^
+7 >                                          ^^^^^
+8 >                                               ^^^^^^^^^^^^
+9 >                                                           ^^^^^^^^^^^^^^^^^^
+10>                                                                             ^^^^^
+11>                                                                                  ^^^^^^^^^^^
+1->
+  >
+2 >maybeCounter!.count ?= 
+3 >      maybeNumber
+4 >                 
+5 >                             
+6 >                              maybeCounter
+7 >                                          
+8 >                                               maybeCounter
+9 >                                                           !.
+10>                                                                             count
+11>                                                                                   ?= maybeNumber;
+1->Emitted(89, 1) Source(64, 1) + SourceIndex(0)
+2 >Emitted(89, 7) Source(64, 24) + SourceIndex(0)
+3 >Emitted(89, 18) Source(64, 35) + SourceIndex(0)
+4 >Emitted(89, 30) Source(64, 1) + SourceIndex(0)
+5 >Emitted(89, 31) Source(64, 1) + SourceIndex(0)
+6 >Emitted(89, 43) Source(64, 13) + SourceIndex(0)
+7 >Emitted(89, 48) Source(64, 1) + SourceIndex(0)
+8 >Emitted(89, 60) Source(64, 13) + SourceIndex(0)
+9 >Emitted(89, 78) Source(64, 15) + SourceIndex(0)
+10>Emitted(89, 83) Source(64, 20) + SourceIndex(0)
+11>Emitted(89, 94) Source(64, 36) + SourceIndex(0)
+---
+>>>let point = { x: 0, y: 0 };
+1 >
+2 >^^^^
+3 >    ^^^^^
+4 >         ^^^^^^^^^^^^^^^^^
+5 >                          ^
+6 >                           ^^^^^^^^^^^^^^^^^->
+1 >
+  >
+  >interface Point {
+  >    x: number;
+  >    y: number;
+  >}
+  >
+2 >let 
+3 >    point
+4 >          = Point{}
+5 >                          ;
+1 >Emitted(90, 1) Source(70, 1) + SourceIndex(0)
+2 >Emitted(90, 5) Source(70, 5) + SourceIndex(0)
+3 >Emitted(90, 10) Source(70, 10) + SourceIndex(0)
+4 >Emitted(90, 27) Source(70, 20) + SourceIndex(0)
+5 >Emitted(90, 28) Source(70, 21) + SourceIndex(0)
+---
+>>>const rectangle = { x: 1, y: 2, width: 3 };
+1->
+2 >^^^^^^
+3 >      ^^^^^^^^^
+4 >               ^^^
+5 >                  ^^
+6 >                    ^
+7 >                     ^^
+8 >                       ^
+9 >                        ^^
+10>                          ^
+11>                           ^^
+12>                             ^
+13>                              ^^
+14>                                ^^^^^
+15>                                     ^^
+16>                                       ^
+17>                                        ^^
+18>                                          ^
+19>                                           ^->
+1->
+  >
+2 >const 
+3 >      rectangle
+4 >                = 
+5 >                  { 
+6 >                    x
+7 >                     : 
+8 >                       1
+9 >                        , 
+10>                          y
+11>                           : 
+12>                             2
+13>                              , 
+14>                                width
+15>                                     : 
+16>                                       3
+17>                                         }
+18>                                          ;
+1->Emitted(91, 1) Source(71, 1) + SourceIndex(0)
+2 >Emitted(91, 7) Source(71, 7) + SourceIndex(0)
+3 >Emitted(91, 16) Source(71, 16) + SourceIndex(0)
+4 >Emitted(91, 19) Source(71, 19) + SourceIndex(0)
+5 >Emitted(91, 21) Source(71, 21) + SourceIndex(0)
+6 >Emitted(91, 22) Source(71, 22) + SourceIndex(0)
+7 >Emitted(91, 24) Source(71, 24) + SourceIndex(0)
+8 >Emitted(91, 25) Source(71, 25) + SourceIndex(0)
+9 >Emitted(91, 27) Source(71, 27) + SourceIndex(0)
+10>Emitted(91, 28) Source(71, 28) + SourceIndex(0)
+11>Emitted(91, 30) Source(71, 30) + SourceIndex(0)
+12>Emitted(91, 31) Source(71, 31) + SourceIndex(0)
+13>Emitted(91, 33) Source(71, 33) + SourceIndex(0)
+14>Emitted(91, 38) Source(71, 38) + SourceIndex(0)
+15>Emitted(91, 40) Source(71, 40) + SourceIndex(0)
+16>Emitted(91, 41) Source(71, 41) + SourceIndex(0)
+17>Emitted(91, 43) Source(71, 43) + SourceIndex(0)
+18>Emitted(91, 44) Source(71, 44) + SourceIndex(0)
+---
+>>>__kvsProject(point, rectangle, ["x", "y"]);
+1->
+2 >^^^^^^^^^^^^^
+3 >             ^^^^^
+4 >                  ^^
+5 >                    ^^^^^^^^^
+6 >                             ^^^^^^^^^^^^^^
+1->
+  >
+2 >
+3 >             point
+4 >                   ...= 
+5 >                    rectangle
+6 >                             ;
+1->Emitted(92, 1) Source(72, 1) + SourceIndex(0)
+2 >Emitted(92, 14) Source(72, 1) + SourceIndex(0)
+3 >Emitted(92, 19) Source(72, 6) + SourceIndex(0)
+4 >Emitted(92, 21) Source(72, 12) + SourceIndex(0)
+5 >Emitted(92, 30) Source(72, 21) + SourceIndex(0)
+6 >Emitted(92, 44) Source(72, 22) + SourceIndex(0)
+---
+>>>const defaulted = maybeNumber ?? 0;
+1 >
+2 >^^^^^^
+3 >      ^^^^^^^^^
+4 >               ^^^
+5 >                  ^^^^^^^^^^^
+6 >                             ^^^^^
+7 >                                  ^
+8 >                                   ^^^^^^^^^^^^^^^^^^^^^^^->
+1 >
+  >
+  >
+2 >const 
+3 >      defaulted
+4 >                = 
+5 >                  maybeNumber
+6 >                             !
+7 >                                  ;
+1 >Emitted(93, 1) Source(74, 1) + SourceIndex(0)
+2 >Emitted(93, 7) Source(74, 7) + SourceIndex(0)
+3 >Emitted(93, 16) Source(74, 16) + SourceIndex(0)
+4 >Emitted(93, 19) Source(74, 19) + SourceIndex(0)
+5 >Emitted(93, 30) Source(74, 30) + SourceIndex(0)
+6 >Emitted(93, 35) Source(74, 31) + SourceIndex(0)
+7 >Emitted(93, 36) Source(74, 32) + SourceIndex(0)
+---
+>>>const alternatives = (_j = assigned, _j == 0 || _j == 1);
+1->
+2 >^^^^^^
+3 >      ^^^^^^^^^^^^
+4 >                  ^^^^^^^^^
+5 >                           ^^^^^^^^
+6 >                                   ^^^^^^^^
+7 >                                           ^
+8 >                                            ^^^^^^^^^^
+9 >                                                      ^
+10>                                                       ^
+11>                                                        ^
+1->
+  >
+2 >const 
+3 >      alternatives
+4 >                   = 
+5 >                           assigned
+6 >                                    == 
+7 >                                           0
+8 >                                             | 
+9 >                                                      1
+10>                                                       
+11>                                                        ;
+1->Emitted(94, 1) Source(75, 1) + SourceIndex(0)
+2 >Emitted(94, 7) Source(75, 7) + SourceIndex(0)
+3 >Emitted(94, 19) Source(75, 19) + SourceIndex(0)
+4 >Emitted(94, 28) Source(75, 22) + SourceIndex(0)
+5 >Emitted(94, 36) Source(75, 30) + SourceIndex(0)
+6 >Emitted(94, 44) Source(75, 34) + SourceIndex(0)
+7 >Emitted(94, 45) Source(75, 35) + SourceIndex(0)
+8 >Emitted(94, 55) Source(75, 38) + SourceIndex(0)
+9 >Emitted(94, 56) Source(75, 39) + SourceIndex(0)
+10>Emitted(94, 57) Source(75, 39) + SourceIndex(0)
+11>Emitted(94, 58) Source(75, 40) + SourceIndex(0)
+---
+>>>const inclusiveRange = __kvsRange(1, 3, true);
+1 >
+2 >^^^^^^
+3 >      ^^^^^^^^^^^^^^
+4 >                    ^^^^^^^^^^^^^^
+5 >                                  ^
+6 >                                   ^^
+7 >                                     ^
+8 >                                      ^^^^^^^
+9 >                                             ^
+1 >
+  >
+2 >const 
+3 >      inclusiveRange
+4 >                     = 
+5 >                                  1
+6 >                                   ..=
+7 >                                     3
+8 >                                      
+9 >                                             ;
+1 >Emitted(95, 1) Source(76, 1) + SourceIndex(0)
+2 >Emitted(95, 7) Source(76, 7) + SourceIndex(0)
+3 >Emitted(95, 21) Source(76, 21) + SourceIndex(0)
+4 >Emitted(95, 35) Source(76, 24) + SourceIndex(0)
+5 >Emitted(95, 36) Source(76, 25) + SourceIndex(0)
+6 >Emitted(95, 38) Source(76, 28) + SourceIndex(0)
+7 >Emitted(95, 39) Source(76, 29) + SourceIndex(0)
+8 >Emitted(95, 46) Source(76, 29) + SourceIndex(0)
+9 >Emitted(95, 47) Source(76, 30) + SourceIndex(0)
+---
+>>>class ExpectedFailure extends Error {
+1 >
+2 >^^^^^^
+3 >      ^^^^^^^^^^^^^^^
+4 >                     ^^^^^^^^^
+5 >                              ^^^^^
+1 >
+  >
+  >
+2 >class 
+3 >      ExpectedFailure 
+4 >                     extends 
+5 >                              Error
+1 >Emitted(96, 1) Source(78, 1) + SourceIndex(0)
+2 >Emitted(96, 7) Source(78, 7) + SourceIndex(0)
+3 >Emitted(96, 22) Source(78, 23) + SourceIndex(0)
+4 >Emitted(96, 31) Source(78, 31) + SourceIndex(0)
+5 >Emitted(96, 36) Source(78, 36) + SourceIndex(0)
+---
+>>>}
+1 >^
+2 > ^^^^^^^^^^^^^^^^^^^^^^^^->
+1 > {}
+1 >Emitted(97, 2) Source(78, 39) + SourceIndex(0)
+---
+>>>const demoted = (() => {
+1->
+2 >^^^^^^
+3 >      ^^^^^^^
+1->
+  >declare function maybeFails(): number;
+  >
+2 >const 
+3 >      demoted
+1->Emitted(98, 1) Source(80, 1) + SourceIndex(0)
+2 >Emitted(98, 7) Source(80, 7) + SourceIndex(0)
+3 >Emitted(98, 14) Source(80, 14) + SourceIndex(0)
+---
+>>>    try {
+>>>        return maybeFails();
+1 >^^^^^^^^^^^^^^^
+2 >               ^^^^^^^^^^
+3 >                         ^^
+1 > = 
+2 >               maybeFails
+3 >                         ()
+1 >Emitted(100, 16) Source(80, 17) + SourceIndex(0)
+2 >Emitted(100, 26) Source(80, 27) + SourceIndex(0)
+3 >Emitted(100, 28) Source(80, 29) + SourceIndex(0)
+---
+>>>    }
+>>>    catch (_a) {
+>>>        if (_a instanceof ExpectedFailure)
+1 >^^^^^^^^^^^^^^^^^^^^^^^^^^
+2 >                          ^^^^^^^^^^^^^^^
+1 > ~ 
+2 >                          ExpectedFailure
+1 >Emitted(103, 27) Source(80, 32) + SourceIndex(0)
+2 >Emitted(103, 42) Source(80, 47) + SourceIndex(0)
+---
+>>>            return null;
+>>>        throw _a;
+>>>    }
+>>>})();
+1 >^^^^
+2 >    ^
+3 >     ^^^^^^^^^^^^^^^^^^^^^->
+1 >
+2 >    ;
+1 >Emitted(107, 5) Source(80, 47) + SourceIndex(0)
+2 >Emitted(107, 6) Source(80, 48) + SourceIndex(0)
+---
+>>>var _r = null, _s = null;
+>>>try {
+>>>    _r = maybeNumber;
+1->^^^^^^^^^
+2 >         ^^^^^^^^^^^
+1->
+  >const promoted = 
+2 >         maybeNumber
+1->Emitted(110, 10) Source(81, 18) + SourceIndex(0)
+2 >Emitted(110, 21) Source(81, 29) + SourceIndex(0)
+---
+>>>}
+>>>catch (_t) {
+>>>    _s = _t;
+>>>}
+>>>if (_r == null) {
+>>>    var _u = new ExpectedFailure("missing");
+1 >^^^^^^^^^^^^^
+2 >             ^^^^
+3 >                 ^^^^^^^^^^^^^^^
+4 >                                ^
+5 >                                 ^^^^^^^^^
+6 >                                          ^
+1 > ~~ 
+2 >             new 
+3 >                 ExpectedFailure
+4 >                                (
+5 >                                 "missing"
+6 >                                          )
+1 >Emitted(116, 14) Source(81, 33) + SourceIndex(0)
+2 >Emitted(116, 18) Source(81, 37) + SourceIndex(0)
+3 >Emitted(116, 33) Source(81, 52) + SourceIndex(0)
+4 >Emitted(116, 34) Source(81, 53) + SourceIndex(0)
+5 >Emitted(116, 43) Source(81, 62) + SourceIndex(0)
+6 >Emitted(116, 44) Source(81, 63) + SourceIndex(0)
+---
+>>>    if (_s != null && !("cause" in _u))
+>>>        Object.defineProperty(_u, "cause", { value: _s, writable: true, configurable: true });
+>>>    throw _u;
+>>>}
+>>>const promoted = _r;
+1 >
+2 >^^^^^^
+3 >      ^^^^^^^^
+4 >              ^^^^^
+5 >                   ^
+6 >                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^->
+1 >
+2 >const 
+3 >      promoted
+4 >               = maybeNumber ~~ new ExpectedFailure("missing")
+5 >                   ;
+1 >Emitted(121, 1) Source(81, 1) + SourceIndex(0)
+2 >Emitted(121, 7) Source(81, 7) + SourceIndex(0)
+3 >Emitted(121, 15) Source(81, 15) + SourceIndex(0)
+4 >Emitted(121, 20) Source(81, 63) + SourceIndex(0)
+5 >Emitted(121, 21) Source(81, 64) + SourceIndex(0)
+---
+>>>const projected = { x: 0, y: 0, ...__kvsProject({}, rectangle, ["x", "y"]) };
+1->
+2 >^^^^^^
+3 >      ^^^^^^^^^
+4 >               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+5 >                                                    ^^^^^^^^^
+6 >                                                             ^^^^^^^^^^^^^^^
+7 >                                                                            ^
+1->
+  >
+2 >const 
+3 >      projected
+4 >                = Point{ ...
+5 >                                                    rectangle
+6 >                                                              }
+7 >                                                                            ;
+1->Emitted(122, 1) Source(82, 1) + SourceIndex(0)
+2 >Emitted(122, 7) Source(82, 7) + SourceIndex(0)
+3 >Emitted(122, 16) Source(82, 16) + SourceIndex(0)
+4 >Emitted(122, 53) Source(82, 29) + SourceIndex(0)
+5 >Emitted(122, 62) Source(82, 38) + SourceIndex(0)
+6 >Emitted(122, 77) Source(82, 40) + SourceIndex(0)
+7 >Emitted(122, 78) Source(82, 41) + SourceIndex(0)
+---
+>>>const _ctx_RequestId = Object.freeze([Symbol("RequestId"), "NO_REQUEST"]);
+1 >
+2 >^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+3 >                                                           ^^^^^^^^^^^^
+4 >                                                                       ^^^
+1 >
+  >
+  >
+2 >context RequestId: string = 
+3 >                                                           "NO_REQUEST"
+4 >                                                                       ;
+1 >Emitted(123, 1) Source(84, 1) + SourceIndex(0)
+2 >Emitted(123, 60) Source(84, 29) + SourceIndex(0)
+3 >Emitted(123, 72) Source(84, 41) + SourceIndex(0)
+4 >Emitted(123, 75) Source(84, 42) + SourceIndex(0)
+---
+>>>function trace(context_1, message) {
+1 >
+2 >^^^^^^^^^
+3 >         ^^^^^
+4 >              ^^^^^^^^^^^^
+5 >                          ^^^^^^^
+6 >                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^->
+1 >
+  >
+  >
+2 >context function 
+3 >         trace
+4 >              (
+5 >                          message: string
+1 >Emitted(124, 1) Source(86, 1) + SourceIndex(0)
+2 >Emitted(124, 10) Source(86, 18) + SourceIndex(0)
+3 >Emitted(124, 15) Source(86, 23) + SourceIndex(0)
+4 >Emitted(124, 27) Source(86, 24) + SourceIndex(0)
+5 >Emitted(124, 34) Source(86, 39) + SourceIndex(0)
+---
+>>>    return `[${_ctx_RequestId[0] in context_1 ? context_1[_ctx_RequestId[0]] : _ctx_RequestId[1]}] ${message}`;
+1->^^^^
+2 >    ^^^^^^^
+3 >           ^^^^
+4 >               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+5 >                                                                                                ^^^^^
+6 >                                                                                                     ^^^^^^^
+7 >                                                                                                            ^^
+8 >                                                                                                              ^
+1->) {
+  >    
+2 >    return 
+3 >           `[${
+4 >               RequestId
+5 >                                                                                                }] ${
+6 >                                                                                                     message
+7 >                                                                                                            }`
+8 >                                                                                                              ;
+1->Emitted(125, 5) Source(87, 5) + SourceIndex(0)
+2 >Emitted(125, 12) Source(87, 12) + SourceIndex(0)
+3 >Emitted(125, 16) Source(87, 16) + SourceIndex(0)
+4 >Emitted(125, 97) Source(87, 25) + SourceIndex(0)
+5 >Emitted(125, 102) Source(87, 30) + SourceIndex(0)
+6 >Emitted(125, 109) Source(87, 37) + SourceIndex(0)
+7 >Emitted(125, 111) Source(87, 39) + SourceIndex(0)
+8 >Emitted(125, 112) Source(87, 40) + SourceIndex(0)
+---
+>>>}
+1 >
+2 >^
+3 > ^^^^^^^^^^^^^^^^^^^^^->
+1 >
+  >
+2 >}
+1 >Emitted(126, 1) Source(88, 1) + SourceIndex(0)
+2 >Emitted(126, 2) Source(88, 2) + SourceIndex(0)
+---
+>>>function traced(id) {
+1->
+2 >^^^^^^^^^
+3 >         ^^^^^^
+4 >               ^
+5 >                ^^
+1->
+  >
+  >
+2 >function 
+3 >         traced
+4 >               (
+5 >                id: string
+1->Emitted(127, 1) Source(90, 1) + SourceIndex(0)
+2 >Emitted(127, 10) Source(90, 10) + SourceIndex(0)
+3 >Emitted(127, 16) Source(90, 16) + SourceIndex(0)
+4 >Emitted(127, 17) Source(90, 17) + SourceIndex(0)
+5 >Emitted(127, 19) Source(90, 27) + SourceIndex(0)
+---
+>>>    {
+1 >^^^^
+2 >    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^->
+1 >) {
+  >    
+1 >Emitted(128, 5) Source(91, 5) + SourceIndex(0)
+---
+>>>        const context_2 = Object.create(null);
+>>>        context_2[_ctx_RequestId[0]] = id;
+1->^^^^^^^^
+2 >        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+3 >                                       ^^
+4 >                                         ^
+5 >                                          ^->
+1->context (
+2 >        RequestId = 
+3 >                                       id
+4 >                                         
+1->Emitted(130, 9) Source(91, 14) + SourceIndex(0)
+2 >Emitted(130, 40) Source(91, 26) + SourceIndex(0)
+3 >Emitted(130, 42) Source(91, 28) + SourceIndex(0)
+4 >Emitted(130, 43) Source(91, 28) + SourceIndex(0)
+---
+>>>        return trace(context_2, "mapped");
+1->^^^^^^^^
+2 >        ^^^^^^^
+3 >               ^^^^^
+4 >                    ^^^^^^^^^^^^
+5 >                                ^^^^^^^^
+6 >                                        ^
+7 >                                         ^
+1->) {
+  >        
+2 >        return 
+3 >               trace
+4 >                    (
+5 >                                "mapped"
+6 >                                        )
+7 >                                         ;
+1->Emitted(131, 9) Source(92, 9) + SourceIndex(0)
+2 >Emitted(131, 16) Source(92, 16) + SourceIndex(0)
+3 >Emitted(131, 21) Source(92, 21) + SourceIndex(0)
+4 >Emitted(131, 33) Source(92, 22) + SourceIndex(0)
+5 >Emitted(131, 41) Source(92, 30) + SourceIndex(0)
+6 >Emitted(131, 42) Source(92, 31) + SourceIndex(0)
+7 >Emitted(131, 43) Source(92, 32) + SourceIndex(0)
+---
+>>>    }
+1 >^^^^^
+1 >
+  >    }
+1 >Emitted(132, 6) Source(93, 6) + SourceIndex(0)
+---
+>>>}
+1 >
+2 >^
+3 > ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^->
+1 >
+  >
+2 >}
+1 >Emitted(133, 1) Source(94, 1) + SourceIndex(0)
+2 >Emitted(133, 2) Source(94, 2) + SourceIndex(0)
+---
+>>>//# sourceMappingURL=kvsSourceMaps.js.map

@@ -1,0 +1,241 @@
+//// [tests/cases/conformance/kvs/kvsSourceMaps.ts] ////
+
+=== kvsSourceMaps.ts ===
+declare const maybeNumber: number?;
+>maybeNumber : Symbol(maybeNumber, Decl(kvsSourceMaps.ts, 0, 13))
+
+function double(value: number) {
+>double : Symbol(double, Decl(kvsSourceMaps.ts, 0, 35))
+>value : Symbol(value, Decl(kvsSourceMaps.ts, 2, 16))
+
+    return value * 2;
+>value : Symbol(value, Decl(kvsSourceMaps.ts, 2, 16))
+}
+
+const piped = 2 |>
+>piped : Symbol(piped, Decl(kvsSourceMaps.ts, 6, 5))
+
+    double(%) |>
+>double : Symbol(double, Decl(kvsSourceMaps.ts, 0, 35))
+>% : Symbol(%, Decl(kvsSourceMaps.ts, 7, 11))
+
+    % + 1;
+>% : Symbol(%, Decl(kvsSourceMaps.ts, 7, 16))
+
+const pipedWhenPresent = maybeNumber |?>
+>pipedWhenPresent : Symbol(pipedWhenPresent, Decl(kvsSourceMaps.ts, 10, 5))
+>maybeNumber : Symbol(maybeNumber, Decl(kvsSourceMaps.ts, 0, 13))
+
+    double |>
+>double : Symbol(double, Decl(kvsSourceMaps.ts, 0, 35))
+
+    % + 1;
+>% : Symbol(%, Decl(kvsSourceMaps.ts, 11, 13))
+
+const observed: number[] = [];
+>observed : Symbol(observed, Decl(kvsSourceMaps.ts, 14, 5))
+
+const tapped = 2 |>
+>tapped : Symbol(tapped, Decl(kvsSourceMaps.ts, 15, 5))
+
+    observed.push |%>
+>observed.push : Symbol(Array.push, Decl(lib.es5.d.ts, --, --))
+>observed : Symbol(observed, Decl(kvsSourceMaps.ts, 14, 5))
+>push : Symbol(Array.push, Decl(lib.es5.d.ts, --, --))
+
+    double;
+>double : Symbol(double, Decl(kvsSourceMaps.ts, 0, 35))
+
+const mapped = [1, 2, 3].map(% * 2);
+>mapped : Symbol(mapped, Decl(kvsSourceMaps.ts, 19, 5))
+>[1, 2, 3].map : Symbol(Array.map, Decl(lib.es5.d.ts, --, --))
+>map : Symbol(Array.map, Decl(lib.es5.d.ts, --, --))
+>% : Symbol(%, Decl(kvsSourceMaps.ts, 19, 29))
+
+const produced = collect ([1, 2, 3]) {
+>produced : Symbol(produced, Decl(kvsSourceMaps.ts, 21, 5))
+
+    if (_ == 2) continue;
+>_ : Symbol(_, Decl(kvsSourceMaps.ts, 22, 8))
+
+    yield _ * 10;
+>_ : Symbol(_, Decl(kvsSourceMaps.ts, 22, 8))
+
+    yield? maybeNumber;
+>maybeNumber : Symbol(maybeNumber, Decl(kvsSourceMaps.ts, 0, 13))
+
+};
+
+const selected = select ([1, 2, 3]) {
+>selected : Symbol(selected, Decl(kvsSourceMaps.ts, 27, 5))
+
+    yield? maybeNumber;
+>maybeNumber : Symbol(maybeNumber, Decl(kvsSourceMaps.ts, 0, 13))
+
+    yield _ * 10;
+>_ : Symbol(_, Decl(kvsSourceMaps.ts, 29, 9))
+
+};
+
+const lazy = collect* ([1, 2, 3]) {
+>lazy : Symbol(lazy, Decl(kvsSourceMaps.ts, 32, 5))
+
+    yield _ * 10;
+>_ : Symbol(_, Decl(kvsSourceMaps.ts, 33, 9))
+
+};
+
+const accumulated = for ([1, 2, 3]; total = 0) {
+>accumulated : Symbol(accumulated, Decl(kvsSourceMaps.ts, 36, 5))
+>total : Symbol(total, Decl(kvsSourceMaps.ts, 36, 35))
+
+    total += _;
+>total : Symbol(total, Decl(kvsSourceMaps.ts, 36, 35))
+>_ : Symbol(_, Decl(kvsSourceMaps.ts, 37, 12))
+
+};
+
+const switched = switch (maybeNumber) {
+>switched : Symbol(switched, Decl(kvsSourceMaps.ts, 40, 5))
+>maybeNumber : Symbol(maybeNumber, Decl(kvsSourceMaps.ts, 0, 13))
+
+    case 0: "zero";
+    default: "other";
+};
+
+const compactArray = [?: maybeNumber, produced.length];
+>compactArray : Symbol(compactArray, Decl(kvsSourceMaps.ts, 45, 5))
+>maybeNumber : Symbol(maybeNumber, Decl(kvsSourceMaps.ts, 0, 13))
+>produced.length : Symbol(Array.length, Decl(lib.es5.d.ts, --, --))
+>produced : Symbol(produced, Decl(kvsSourceMaps.ts, 21, 5))
+>length : Symbol(Array.length, Decl(lib.es5.d.ts, --, --))
+
+const compactObject = { value?: maybeNumber, produced };
+>compactObject : Symbol(compactObject, Decl(kvsSourceMaps.ts, 46, 5))
+>value : Symbol(value, Decl(kvsSourceMaps.ts, 46, 23))
+>maybeNumber : Symbol(maybeNumber, Decl(kvsSourceMaps.ts, 0, 13))
+>produced : Symbol(produced, Decl(kvsSourceMaps.ts, 46, 44))
+
+let assigned = 0;
+>assigned : Symbol(assigned, Decl(kvsSourceMaps.ts, 48, 3))
+
+assigned ?= maybeNumber;
+>assigned : Symbol(assigned, Decl(kvsSourceMaps.ts, 48, 3))
+>maybeNumber : Symbol(maybeNumber, Decl(kvsSourceMaps.ts, 0, 13))
+
+let filtered: number? = null;
+>filtered : Symbol(filtered, Decl(kvsSourceMaps.ts, 51, 3))
+
+filtered ~= maybeNumber;
+>filtered : Symbol(filtered, Decl(kvsSourceMaps.ts, 51, 3))
+>maybeNumber : Symbol(maybeNumber, Decl(kvsSourceMaps.ts, 0, 13))
+
+declare function risky(): number;
+>risky : Symbol(risky, Decl(kvsSourceMaps.ts, 52, 24))
+
+let outcome: number? = null;
+>outcome : Symbol(outcome, Decl(kvsSourceMaps.ts, 55, 3))
+
+let failure: unknown;
+>failure : Symbol(failure, Decl(kvsSourceMaps.ts, 56, 3))
+
+outcome~failure = risky();
+>outcome : Symbol(outcome, Decl(kvsSourceMaps.ts, 55, 3))
+>failure : Symbol(failure, Decl(kvsSourceMaps.ts, 56, 3))
+>risky : Symbol(risky, Decl(kvsSourceMaps.ts, 52, 24))
+
+interface Counter {
+>Counter : Symbol(Counter, Decl(kvsSourceMaps.ts, 57, 26))
+
+    count: number;
+>count : Symbol(Counter.count, Decl(kvsSourceMaps.ts, 59, 19))
+}
+let maybeCounter: Counter? = null;
+>maybeCounter : Symbol(maybeCounter, Decl(kvsSourceMaps.ts, 62, 3))
+>Counter : Symbol(Counter, Decl(kvsSourceMaps.ts, 57, 26))
+
+maybeCounter!.count ?= maybeNumber;
+>maybeCounter!.count : Symbol(Counter.count, Decl(kvsSourceMaps.ts, 59, 19))
+>maybeCounter : Symbol(maybeCounter, Decl(kvsSourceMaps.ts, 62, 3))
+>count : Symbol(Counter.count, Decl(kvsSourceMaps.ts, 59, 19))
+>maybeNumber : Symbol(maybeNumber, Decl(kvsSourceMaps.ts, 0, 13))
+
+interface Point {
+>Point : Symbol(Point, Decl(kvsSourceMaps.ts, 63, 35))
+
+    x: number;
+>x : Symbol(Point.x, Decl(kvsSourceMaps.ts, 65, 17))
+
+    y: number;
+>y : Symbol(Point.y, Decl(kvsSourceMaps.ts, 66, 14))
+}
+let point = Point{};
+>point : Symbol(point, Decl(kvsSourceMaps.ts, 69, 3))
+>Point : Symbol(Point, Decl(kvsSourceMaps.ts, 63, 35))
+
+const rectangle = { x: 1, y: 2, width: 3 };
+>rectangle : Symbol(rectangle, Decl(kvsSourceMaps.ts, 70, 5))
+>x : Symbol(x, Decl(kvsSourceMaps.ts, 70, 19))
+>y : Symbol(y, Decl(kvsSourceMaps.ts, 70, 25))
+>width : Symbol(width, Decl(kvsSourceMaps.ts, 70, 31))
+
+point ...= rectangle;
+>point : Symbol(point, Decl(kvsSourceMaps.ts, 69, 3))
+>rectangle : Symbol(rectangle, Decl(kvsSourceMaps.ts, 70, 5))
+
+const defaulted = maybeNumber!;
+>defaulted : Symbol(defaulted, Decl(kvsSourceMaps.ts, 73, 5))
+>maybeNumber : Symbol(maybeNumber, Decl(kvsSourceMaps.ts, 0, 13))
+
+const alternatives = assigned == 0 | 1;
+>alternatives : Symbol(alternatives, Decl(kvsSourceMaps.ts, 74, 5))
+
+const inclusiveRange = 1..=3;
+>inclusiveRange : Symbol(inclusiveRange, Decl(kvsSourceMaps.ts, 75, 5))
+
+class ExpectedFailure extends Error {}
+>ExpectedFailure : Symbol(ExpectedFailure, Decl(kvsSourceMaps.ts, 75, 29))
+>Error : Symbol(Error, Decl(lib.es5.d.ts, --, --), Decl(lib.es5.d.ts, --, --))
+
+declare function maybeFails(): number;
+>maybeFails : Symbol(maybeFails, Decl(kvsSourceMaps.ts, 77, 38))
+
+const demoted = maybeFails() ~ ExpectedFailure;
+>demoted : Symbol(demoted, Decl(kvsSourceMaps.ts, 79, 5))
+>maybeFails : Symbol(maybeFails, Decl(kvsSourceMaps.ts, 77, 38))
+>ExpectedFailure : Symbol(ExpectedFailure, Decl(kvsSourceMaps.ts, 75, 29))
+
+const promoted = maybeNumber ~~ new ExpectedFailure("missing");
+>promoted : Symbol(promoted, Decl(kvsSourceMaps.ts, 80, 5))
+>maybeNumber : Symbol(maybeNumber, Decl(kvsSourceMaps.ts, 0, 13))
+>ExpectedFailure : Symbol(ExpectedFailure, Decl(kvsSourceMaps.ts, 75, 29))
+
+const projected = Point{ ...rectangle };
+>projected : Symbol(projected, Decl(kvsSourceMaps.ts, 81, 5))
+>Point : Symbol(Point, Decl(kvsSourceMaps.ts, 63, 35))
+>rectangle : Symbol(rectangle, Decl(kvsSourceMaps.ts, 70, 5))
+
+context RequestId: string = "NO_REQUEST";
+>RequestId : Symbol(RequestId, Decl(kvsSourceMaps.ts, 81, 40))
+
+context function trace(message: string) {
+>trace : Symbol(trace, Decl(kvsSourceMaps.ts, 83, 41))
+>message : Symbol(message, Decl(kvsSourceMaps.ts, 85, 23))
+
+    return `[${RequestId}] ${message}`;
+>RequestId : Symbol(RequestId, Decl(kvsSourceMaps.ts, 81, 40))
+>message : Symbol(message, Decl(kvsSourceMaps.ts, 85, 23))
+}
+
+function traced(id: string) {
+>traced : Symbol(traced, Decl(kvsSourceMaps.ts, 87, 1))
+>id : Symbol(id, Decl(kvsSourceMaps.ts, 89, 16))
+
+    context (RequestId = id) {
+>RequestId : Symbol(RequestId, Decl(kvsSourceMaps.ts, 81, 40))
+
+        return trace("mapped");
+>trace : Symbol(trace, Decl(kvsSourceMaps.ts, 83, 41))
+    }
+}
+
