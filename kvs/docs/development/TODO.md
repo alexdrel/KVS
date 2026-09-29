@@ -3,7 +3,7 @@
 This is a working implementation aid, not a language specification or feature order. The language
 documents remain authoritative for accepted semantics.
 
-Progress: **412 of 423 items complete (97.4%)**; **11 remain open**.
+Progress: **413 of 423 items complete (97.6%)**; **10 remain open**.
 
 - `[x]` means implemented with focused compiler evidence.
 - `[ ]` means unimplemented, incomplete, or not yet deliberately validated.
@@ -76,7 +76,6 @@ Known semantic debts:
 - Producer assignment RHSs currently run before their assignment targets.
 - Object-field producers are lifted before the whole containing initializer; earlier property
   values, computed names, and spreads may therefore run late.
-- Extant assignment is currently RHS-first and skips target evaluation when the RHS is absent.
 
 Focused conformance inputs:
 
@@ -442,7 +441,7 @@ example `.js` files are intentionally ignored.
 - [x] Assignment expression result remains RHS
 - [x] Ordinary writable-target checking
 - [x] Materialized target interaction
-- [ ] Preserve defined evaluation-order semantics (prototype is RHS-first)
+- [x] RHS-first evaluation skips target evaluation when the value is absent
 - [x] No extant compound-assignment family
 
 ### Optional/extant invocation

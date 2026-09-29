@@ -350,7 +350,7 @@ go -C ./tsc test -run='TestLocal/kvsKeyedIteration' ./internal/testrunner
 `kvsExtantAssignment.ts` checks nullable expression typing, assignment of falsy present values,
 ordinary target validation, and rejection of a spaced `? =`. A materialized nullable target verifies
 writeback only when an extant right-hand value commits the assignment. Its JavaScript baseline
-records the prototype's deliberate RHS-first lowering and exactly-once temporary.
+records the defined RHS-first semantics and exactly-once temporary.
 
 Run it with:
 

@@ -1726,9 +1726,8 @@ func (tx *transformer) transformExtantAssignment(node *ast.KvsExtantAssignmentEx
 	//     (_a = right) != null ? left = _a : _a
 	//
 	// The temporary evaluates the candidate once and makes the whole expression
-	// produce that candidate whether or not assignment occurs. This prototype
-	// deliberately evaluates the RHS before a nontrivial assignment target; the
-	// target-spilling needed to preserve JavaScript evaluation order is pending.
+	// produce that candidate whether or not assignment occurs. RHS-first
+	// evaluation is deliberate: an absent candidate does not evaluate the target.
 	factory := tx.Factory()
 	temp := factory.NewTempVariable()
 	tx.declareTemp(temp)

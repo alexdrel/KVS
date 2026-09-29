@@ -319,8 +319,9 @@ profile.nickname ?= patch.nickname;
     : $nickname;
 ```
 
-This is separate from JavaScript `??=`, which tests the current left-hand value. There is no
-conditional compound-assignment family. The current target-order limitation is recorded below.
+The candidate is deliberately evaluated before the assignment target. An absent candidate therefore
+does not evaluate the target at all. This is separate from JavaScript `??=`, which tests the current
+left-hand value. There is no conditional compound-assignment family.
 
 ### Numeric ranges
 
@@ -590,9 +591,6 @@ applies these same assignments.
 
 ## Known lowering limitations
 
-- Extant assignment currently captures its right-hand value before evaluating a nontrivial
-  assignment target. Target spilling is still needed to preserve the final target-before-value order
-  and to stage intermediate `!` write-backs.
 - Eager producers do not yet spill evaluation outside their value position. An assignment target
   therefore runs after the producer; producers lifted from object fields can also run before earlier
   property values, computed names, and spreads.

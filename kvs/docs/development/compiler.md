@@ -99,10 +99,10 @@ or emission. Its reused source operand retains its original source-tree parent.
 
 Extant assignment reuses this presence condition but remains a dedicated
 `KvsExtantAssignmentExpression`; it does not extend TypeScript's scanner token or binary-operator
-ranges. The binder models the prototype's current RHS-first behavior: it binds the right operand,
-branches on presence, and binds and mutates the target only on the present path. The checker
-separately treats the left expression as an assignment target and checks the non-nullable part of
-the right type against it.
+ranges. The binder models the defined RHS-first behavior: it binds the right operand, branches on
+presence, and binds and mutates the target only on the present path. The checker separately treats
+the left expression as an assignment target and checks the non-nullable part of the right type
+against it.
 
 Sieve assignment likewise remains a dedicated `KvsSieveAssignmentExpression`. Unlike extant
 assignment, it always writes, so its lowering can preserve ordinary JavaScript assignment order

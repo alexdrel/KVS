@@ -596,8 +596,8 @@ The condition uses ordinary JavaScript/TypeScript truthiness.
 ### Extant assignment
 
 Alongside optional calls, `return?`, `yield?`, and conditional placement, `target ?= value` keeps a
-presence decision at the operation it controls. It evaluates like an ordinary assignment expression,
-but writes only when the right-hand value is present:
+presence decision at the operation it controls. It evaluates the right-hand value first and writes
+only when that value is present:
 
 ```kvs
 profile.nickname ?= patch.nickname;
@@ -611,9 +611,9 @@ if (patch.nickname != null) {
 }
 ```
 
-The expression value is still the right-hand value. Null and undefined leave the target unchanged;
-`false`, `0`, `""`, and empty collections are assigned. Target-path evaluation proceeds normally,
-but any `!` materialization is staged and committed only when the right-hand value is present.
+The expression value is still the right-hand value. Null and undefined leave the target unchanged
+without evaluating its path; `false`, `0`, `""`, and empty collections evaluate the target and are
+assigned. Any `!` materialization is staged and committed only on that present path.
 
 Extant assignment is distinct from JavaScript's nullish assignment:
 
