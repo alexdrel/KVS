@@ -346,6 +346,74 @@ const shadowed = for (const entry of [] as Entry[]; total = 0) {
 >value : number
 
 };
+
+for ([1, 2, 3]; discarded = 0) {
+>for ([1, 2, 3]; discarded = 0) {    discarded += _;} : number
+>[1, 2, 3] : number[]
+>1 : 1
+>2 : 2
+>3 : 3
+>discarded : number
+>0 : 0
+
+    discarded += _;
+>discarded += _ : number
+>discarded : number
+>_ : number
+}
+
+for (let i = 0; i < 3; i++; discarded = 0) {
+>for (let i = 0; i < 3; i++; discarded = 0) {    discarded += i;} : number
+>i : number
+>0 : 0
+>i < 3 : boolean
+>i : number
+>3 : 3
+>i++ : number
+>i : number
+>discarded : number
+>0 : 0
+
+    discarded += i;
+>discarded += i : number
+>discarded : number
+>i : number
+}
+
+for ([1, 2, 3]; piped = "") {
+>for ([1, 2, 3]; piped = "") {    piped += _;} |> console.log(%) : void
+>for ([1, 2, 3]; piped = "") {    piped += _;} : string
+>[1, 2, 3] : number[]
+>1 : 1
+>2 : 2
+>3 : 3
+>piped : string
+>"" : ""
+
+    piped += _;
+>piped += _ : string
+>piped : string
+>_ : number
+
+} |> console.log(%);
+>console.log(%) : (__kvsPlaceholder: any) => void
+>console.log(%) : void
+>console.log : (...data: any[]) => void
+>console : Console
+>log : (...data: any[]) => void
+>% : (__kvsPlaceholder: any) => string
+>% : string
+
+for ([1, 2, 3];) {
+>for ([1, 2, 3];) {} : any
+>[1, 2, 3] : number[]
+>1 : 1
+>2 : 2
+>3 : 3
+> : any
+> : any
+}
+
 total;
 >total : 100
 

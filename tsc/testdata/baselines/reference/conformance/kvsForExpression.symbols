@@ -297,6 +297,43 @@ const shadowed = for (const entry of [] as Entry[]; total = 0) {
 >value : Symbol(Entry.value, Decl(kvsForExpression.ts, 0, 17))
 
 };
+
+for ([1, 2, 3]; discarded = 0) {
+>discarded : Symbol(discarded, Decl(kvsForExpression.ts, 92, 15))
+
+    discarded += _;
+>discarded : Symbol(discarded, Decl(kvsForExpression.ts, 92, 15))
+>_ : Symbol(_, Decl(kvsForExpression.ts, 93, 16))
+}
+
+for (let i = 0; i < 3; i++; discarded = 0) {
+>i : Symbol(i, Decl(kvsForExpression.ts, 96, 8))
+>i : Symbol(i, Decl(kvsForExpression.ts, 96, 8))
+>i : Symbol(i, Decl(kvsForExpression.ts, 96, 8))
+>discarded : Symbol(discarded, Decl(kvsForExpression.ts, 96, 27))
+
+    discarded += i;
+>discarded : Symbol(discarded, Decl(kvsForExpression.ts, 96, 27))
+>i : Symbol(i, Decl(kvsForExpression.ts, 96, 8))
+}
+
+for ([1, 2, 3]; piped = "") {
+>piped : Symbol(piped, Decl(kvsForExpression.ts, 100, 15))
+
+    piped += _;
+>piped : Symbol(piped, Decl(kvsForExpression.ts, 100, 15))
+>_ : Symbol(_, Decl(kvsForExpression.ts, 101, 12))
+
+} |> console.log(%);
+>console.log : Symbol(Console.log, Decl(lib.dom.d.ts, --, --))
+>console : Symbol(console, Decl(lib.dom.d.ts, --, --))
+>log : Symbol(Console.log, Decl(lib.dom.d.ts, --, --))
+>% : Symbol(%, Decl(kvsForExpression.ts, 102, 17))
+
+for ([1, 2, 3];) {
+> : Symbol((Missing), Decl(kvsForExpression.ts, 104, 15))
+}
+
 total;
 >total : Symbol(total, Decl(kvsForExpression.ts, 87, 5))
 

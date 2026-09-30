@@ -145,8 +145,24 @@ const byId = collect* (items) {
     new Map(%);
 ```
 
-The producer's own [head-path placement rule](flow.md#producing-loops-in-expression-position)
-remains unchanged. A pipeline introduces no new exception or block boundary.
+A pipeline stage may itself be a producer when the whole pipeline occupies a supported
+[statement-head value position](flow.md#producing-loops-in-expression-position):
+
+```kvs
+const uniqueNames = users |>
+    collect (%) {
+        yield _.name;
+    } |>
+    new Set(%);
+```
+
+Earlier stages finish before the producer begins, and later stages receive its result. `|?>` can
+skip a producer stage, while `|%>` after one discards its result and retains the value that entered
+it. Multiple producer stages may occur in one pipeline.
+
+The pipeline owns the statement-lowering boundary in this form. Putting that pipeline in an
+unsupported call argument, operand, array element, or conditional branch remains an error. A
+pipeline introduces no exception or function boundary.
 
 ## Placeholder lambdas
 

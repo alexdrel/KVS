@@ -319,8 +319,8 @@ const invalid = #;
 ># : any
 
 const invalidKeyedProducer = collect (const key in users) yield key;
->invalidKeyedProducer : never[]
->collect (const key in users) yield key; : never[]
+>invalidKeyedProducer : [string, { active: boolean; }][]
+>collect (const key in users) yield key; : [string, { active: boolean; }][]
 >key : [string, { active: boolean; }]
 >users : Record<string, { active: boolean; }>
 >key : [string, { active: boolean; }]

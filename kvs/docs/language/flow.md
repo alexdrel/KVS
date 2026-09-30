@@ -345,6 +345,19 @@ return select (records) {
 } ~~ OwnerNotFound();
 ```
 
+A producing loop may also stand alone as an expression statement. Its body still executes and its
+produced value is discarded:
+
+```kvs
+for (items; total = 0) {
+    total += _.price;
+}
+```
+
+The KVS `for (source; result)` header is structurally distinct from JavaScript's three-slot `for
+(initializer; condition; incrementor)` header, so it retains this meaning even when no later
+operation consumes the result.
+
 For eager producers, failure demotion or promotion protects the whole production step: failures
 raised while evaluating the source or running the body are handled by the following `~` or `~~`. For
 `collect*`, only iterator creation happens at that point; failures raised later while consuming the
@@ -360,6 +373,21 @@ const result = {
     }.filter(%.enabled),
 };
 ```
+
+A producer may also begin an individual pipeline stage when the complete pipeline is itself at one
+of these value-position boundaries:
+
+```kvs
+const uniqueNames = users |>
+    collect (%) {
+        yield _.name;
+    } |>
+    new Set(%);
+```
+
+The preceding pipeline input is evaluated before production begins. The pipeline then resumes from
+the produced value. This does not make producers valid inside a pipeline whose complete value is in
+an unsupported argument, operand, array element, or conditional branch.
 
 The rule is structural rather than based on expression depth. Property access, calls, chaining, and
 operators may form an arbitrarily long tail when the producer remains the first-evaluated operation

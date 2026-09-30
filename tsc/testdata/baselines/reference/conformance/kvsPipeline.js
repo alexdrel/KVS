@@ -83,6 +83,62 @@ const produced = collect ([1, 2, 3]) {
 } |>
     new Set(%);
 
+const stageProduced = [1, 2, 3] |>
+    collect (%) {
+        yield _ * 2;
+    } |>
+    new Set(%);
+
+const stageSelected = [1, 2, 3] |>
+    select (%) {
+        if (_ > 1) yield _;
+    } |>
+    % ?? 0;
+
+const stageAccumulated = [1, 2, 3] |>
+    for (%; total = 0) {
+        total += _;
+    } |>
+    double;
+
+const stageSwitched = 2 |>
+    switch (%) {
+        case 2: "two";
+        default: "other";
+    } |>
+    %.toUpperCase();
+
+const guardedStage = maybe(0) |?>
+    collect ([%]) {
+        yield _;
+    } |>
+    %.length;
+
+const preservedStageInput = [1, 2, 3] |>
+    collect (%) {
+        yield _ * 2;
+    } |%>
+    %.length;
+
+const multipleStageProducers = [1, 2, 3] |>
+    collect (%) {
+        yield _ * 2;
+    } |>
+    collect (%) {
+        yield _ + 1;
+    };
+
+const unbracedStageProducer = ["https://example.com"] |>
+    collect (%) yield new URL(_).hostname;
+
+const unbracedLazyProducer = collect* ([1, 2, 3]) yield _ * 2;
+
+const invalidProducerStagePlacement = 1 + ([1, 2, 3] |>
+    collect (%) {
+        yield _;
+    } |>
+    %.length);
+
 const nonCallable = 2 |>
     3;
 
@@ -95,7 +151,7 @@ const danglingPreserve = 2 |>
 
 //// [kvsPipeline.js]
 "use strict";
-var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u;
+var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2, _3;
 function double(value) {
     return value * 2;
 }
@@ -130,11 +186,96 @@ const acceptsNullable = (_l = null, ((value) => value)(_l));
 const callbackBoundary = (_m = [1, 2], add(_m.length, _m.map(_arg_1 => _arg_1 + 1)[0]));
 const nestedPipeline = (_o = 2, add(_o, (_p = 3, _p = double(_p), add(_p, 1))));
 const explicitGeneric = (_q = [1, 2], identity(_q));
-var _v = [];
+var _4 = [];
 for (const _ of [1, 2, 3]) {
-    _v.push(_);
+    _4.push(_);
 }
-const produced = (_r = _v, new Set(_r));
-const nonCallable = (_s = 2, 3(_s));
-const invalidPreserve = (_t = 2, double(_t));
-const danglingPreserve = (_u = 2, double(_u), (_u));
+const produced = (_r = _4, new Set(_r));
+_s = [1, 2, 3];
+var _5 = [];
+for (const _ of _s) {
+    _5.push(_ * 2);
+}
+_s = _5;
+_s = new Set(_s);
+const stageProduced = _s;
+_t = [1, 2, 3];
+var _6 = null;
+for (const _ of _t) {
+    if (_ > 1) {
+        _6 = _;
+        break;
+    }
+}
+_t = _6;
+_t = _t ?? 0;
+const stageSelected = _t;
+_u = [1, 2, 3];
+var _7;
+{
+    let total = 0;
+    for (const _ of _u) {
+        total += _;
+    }
+    _7 = total;
+}
+_u = _7;
+_u = double(_u);
+const stageAccumulated = _u;
+_v = 2;
+var _8 = null;
+switch (_v) {
+    case 2:
+        _8 = "two";
+        break;
+    default: _8 = "other";
+}
+_v = _8;
+_v = _v.toUpperCase();
+const stageSwitched = _v;
+_w = maybe(0);
+if (_w != null) {
+    var _9 = [];
+    for (const _ of [_w]) {
+        _9.push(_);
+    }
+    _w = _9;
+    _w = _w.length;
+}
+else
+    _w = null;
+const guardedStage = _w;
+_x = [1, 2, 3];
+var _10 = [];
+for (const _ of _x) {
+    _10.push(_ * 2);
+}
+_10;
+_x = _x.length;
+const preservedStageInput = _x;
+_y = [1, 2, 3];
+var _11 = [];
+for (const _ of _y) {
+    _11.push(_ * 2);
+}
+_y = _11;
+var _12 = [];
+for (const _ of _y) {
+    _12.push(_ + 1);
+}
+_y = _12;
+const multipleStageProducers = _y;
+_z = ["https://example.com"];
+var _13 = [];
+for (const _ of _z)
+    _13.push(new URL(_).hostname);
+_z = _13;
+const unbracedStageProducer = _z;
+const unbracedLazyProducer = function* (source_1) {
+    for (const _ of source_1 ?? [])
+        yield _ * 2;
+}([1, 2, 3]);
+const invalidProducerStagePlacement = 1 + (_0 = [1, 2, 3], _0 = [], _0.length);
+const nonCallable = (_1 = 2, 3(_1));
+const invalidPreserve = (_2 = 2, double(_2));
+const danglingPreserve = (_3 = 2, double(_3), (_3));

@@ -219,19 +219,154 @@ const produced = collect ([1, 2, 3]) {
 >Set : Symbol(Set, Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.iterable.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --))
 >% : Symbol(%, Decl(kvsPipeline.ts, 80, 12))
 
+const stageProduced = [1, 2, 3] |>
+>stageProduced : Symbol(stageProduced, Decl(kvsPipeline.ts, 82, 5))
+
+    collect (%) {
+>% : Symbol(%, Decl(kvsPipeline.ts, 83, 13))
+
+        yield _ * 2;
+>_ : Symbol(_, Decl(kvsPipeline.ts, 84, 13))
+
+    } |>
+    new Set(%);
+>Set : Symbol(Set, Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.collection.d.ts, --, --), Decl(lib.es2015.iterable.d.ts, --, --), Decl(lib.es2015.symbol.wellknown.d.ts, --, --))
+>% : Symbol(%, Decl(kvsPipeline.ts, 86, 12))
+
+const stageSelected = [1, 2, 3] |>
+>stageSelected : Symbol(stageSelected, Decl(kvsPipeline.ts, 88, 5))
+
+    select (%) {
+>% : Symbol(%, Decl(kvsPipeline.ts, 89, 12))
+
+        if (_ > 1) yield _;
+>_ : Symbol(_, Decl(kvsPipeline.ts, 90, 12))
+>_ : Symbol(_, Decl(kvsPipeline.ts, 90, 12))
+
+    } |>
+    % ?? 0;
+>% : Symbol(%, Decl(kvsPipeline.ts, 91, 8))
+
+const stageAccumulated = [1, 2, 3] |>
+>stageAccumulated : Symbol(stageAccumulated, Decl(kvsPipeline.ts, 94, 5))
+
+    for (%; total = 0) {
+>% : Symbol(%, Decl(kvsPipeline.ts, 95, 9))
+>total : Symbol(total, Decl(kvsPipeline.ts, 95, 11))
+
+        total += _;
+>total : Symbol(total, Decl(kvsPipeline.ts, 95, 11))
+>_ : Symbol(_, Decl(kvsPipeline.ts, 96, 16))
+
+    } |>
+    double;
+>double : Symbol(double, Decl(kvsPipeline.ts, 0, 0))
+
+const stageSwitched = 2 |>
+>stageSwitched : Symbol(stageSwitched, Decl(kvsPipeline.ts, 100, 5))
+
+    switch (%) {
+>% : Symbol(%, Decl(kvsPipeline.ts, 101, 12))
+
+        case 2: "two";
+        default: "other";
+    } |>
+    %.toUpperCase();
+>%.toUpperCase : Symbol(String.toUpperCase, Decl(lib.es5.d.ts, --, --))
+>% : Symbol(%, Decl(kvsPipeline.ts, 104, 8))
+>toUpperCase : Symbol(String.toUpperCase, Decl(lib.es5.d.ts, --, --))
+
+const guardedStage = maybe(0) |?>
+>guardedStage : Symbol(guardedStage, Decl(kvsPipeline.ts, 107, 5))
+>maybe : Symbol(maybe, Decl(kvsPipeline.ts, 10, 1))
+
+    collect ([%]) {
+>% : Symbol(%, Decl(kvsPipeline.ts, 108, 14))
+
+        yield _;
+>_ : Symbol(_, Decl(kvsPipeline.ts, 109, 13))
+
+    } |>
+    %.length;
+>%.length : Symbol(Array.length, Decl(lib.es5.d.ts, --, --))
+>% : Symbol(%, Decl(kvsPipeline.ts, 110, 8))
+>length : Symbol(Array.length, Decl(lib.es5.d.ts, --, --))
+
+const preservedStageInput = [1, 2, 3] |>
+>preservedStageInput : Symbol(preservedStageInput, Decl(kvsPipeline.ts, 113, 5))
+
+    collect (%) {
+>% : Symbol(%, Decl(kvsPipeline.ts, 114, 13))
+
+        yield _ * 2;
+>_ : Symbol(_, Decl(kvsPipeline.ts, 115, 13))
+
+    } |%>
+    %.length;
+>%.length : Symbol(Array.length, Decl(lib.es5.d.ts, --, --))
+>% : Symbol(%, Decl(kvsPipeline.ts, 116, 9))
+>length : Symbol(Array.length, Decl(lib.es5.d.ts, --, --))
+
+const multipleStageProducers = [1, 2, 3] |>
+>multipleStageProducers : Symbol(multipleStageProducers, Decl(kvsPipeline.ts, 119, 5))
+
+    collect (%) {
+>% : Symbol(%, Decl(kvsPipeline.ts, 120, 13))
+
+        yield _ * 2;
+>_ : Symbol(_, Decl(kvsPipeline.ts, 121, 13))
+
+    } |>
+    collect (%) {
+>% : Symbol(%, Decl(kvsPipeline.ts, 123, 13))
+
+        yield _ + 1;
+>_ : Symbol(_, Decl(kvsPipeline.ts, 124, 13))
+
+    };
+
+const unbracedStageProducer = ["https://example.com"] |>
+>unbracedStageProducer : Symbol(unbracedStageProducer, Decl(kvsPipeline.ts, 127, 5))
+
+    collect (%) yield new URL(_).hostname;
+>% : Symbol(%, Decl(kvsPipeline.ts, 128, 13))
+>new URL(_).hostname : Symbol(URL.hostname, Decl(lib.dom.d.ts, --, --))
+>URL : Symbol(URL, Decl(lib.dom.d.ts, --, --), Decl(lib.dom.d.ts, --, --))
+>_ : Symbol(_, Decl(kvsPipeline.ts, 128, 30))
+>hostname : Symbol(URL.hostname, Decl(lib.dom.d.ts, --, --))
+
+const unbracedLazyProducer = collect* ([1, 2, 3]) yield _ * 2;
+>unbracedLazyProducer : Symbol(unbracedLazyProducer, Decl(kvsPipeline.ts, 130, 5))
+>_ : Symbol(_, Decl(kvsPipeline.ts, 130, 55))
+
+const invalidProducerStagePlacement = 1 + ([1, 2, 3] |>
+>invalidProducerStagePlacement : Symbol(invalidProducerStagePlacement, Decl(kvsPipeline.ts, 132, 5))
+
+    collect (%) {
+>% : Symbol(%, Decl(kvsPipeline.ts, 133, 13))
+
+        yield _;
+>_ : Symbol(_, Decl(kvsPipeline.ts, 134, 13))
+
+    } |>
+    %.length);
+>%.length : Symbol(Array.length, Decl(lib.es5.d.ts, --, --))
+>% : Symbol(%, Decl(kvsPipeline.ts, 135, 8))
+>length : Symbol(Array.length, Decl(lib.es5.d.ts, --, --))
+
 const nonCallable = 2 |>
->nonCallable : Symbol(nonCallable, Decl(kvsPipeline.ts, 82, 5))
+>nonCallable : Symbol(nonCallable, Decl(kvsPipeline.ts, 138, 5))
 
     3;
 
 const invalidPreserve = 2 |%>
->invalidPreserve : Symbol(invalidPreserve, Decl(kvsPipeline.ts, 85, 5))
+>invalidPreserve : Symbol(invalidPreserve, Decl(kvsPipeline.ts, 141, 5))
 
     double;
 >double : Symbol(double, Decl(kvsPipeline.ts, 0, 0))
 
 const danglingPreserve = 2 |>
->danglingPreserve : Symbol(danglingPreserve, Decl(kvsPipeline.ts, 88, 5))
+>danglingPreserve : Symbol(danglingPreserve, Decl(kvsPipeline.ts, 144, 5))
 
     double |%>;
 >double : Symbol(double, Decl(kvsPipeline.ts, 0, 0))

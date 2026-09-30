@@ -83,6 +83,62 @@ const produced = collect ([1, 2, 3]) {
 } |>
     new Set(%);
 
+const stageProduced = [1, 2, 3] |>
+    collect (%) {
+        yield _ * 2;
+    } |>
+    new Set(%);
+
+const stageSelected = [1, 2, 3] |>
+    select (%) {
+        if (_ > 1) yield _;
+    } |>
+    % ?? 0;
+
+const stageAccumulated = [1, 2, 3] |>
+    for (%; total = 0) {
+        total += _;
+    } |>
+    double;
+
+const stageSwitched = 2 |>
+    switch (%) {
+        case 2: "two";
+        default: "other";
+    } |>
+    %.toUpperCase();
+
+const guardedStage = maybe(0) |?>
+    collect ([%]) {
+        yield _;
+    } |>
+    %.length;
+
+const preservedStageInput = [1, 2, 3] |>
+    collect (%) {
+        yield _ * 2;
+    } |%>
+    %.length;
+
+const multipleStageProducers = [1, 2, 3] |>
+    collect (%) {
+        yield _ * 2;
+    } |>
+    collect (%) {
+        yield _ + 1;
+    };
+
+const unbracedStageProducer = ["https://example.com"] |>
+    collect (%) yield new URL(_).hostname;
+
+const unbracedLazyProducer = collect* ([1, 2, 3]) yield _ * 2;
+
+const invalidProducerStagePlacement = 1 + ([1, 2, 3] |>
+    collect (%) {
+        yield _;
+    } |>
+    %.length);
+
 const nonCallable = 2 |>
     3;
 

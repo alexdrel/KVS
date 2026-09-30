@@ -77,6 +77,31 @@ const mapped = [1, 2, 3].map(% * 2);
 >% : number
 >2 : 2
 
+const pipedProduction = [1, 2, 3] |>
+>pipedProduction : number
+>[1, 2, 3] |>    collect (%) {        yield _ * 2;    } |>    %.length : number
+>[1, 2, 3] : number[]
+>1 : 1
+>2 : 2
+>3 : 3
+
+    collect (%) {
+>collect (%) {        yield _ * 2;    } : (__kvsPlaceholder: any) => number[]
+>collect (%) {        yield _ * 2;    } : number[]
+>% : number[]
+
+        yield _ * 2;
+>_ * 2 : number
+>_ : number
+>2 : 2
+
+    } |>
+    %.length;
+>%.length : (__kvsPlaceholder: any) => number
+>%.length : number
+>% : number[]
+>length : number
+
 const produced = collect ([1, 2, 3]) {
 >produced : number[]
 >collect ([1, 2, 3]) {    if (_ == 2) continue;    yield _ * 10;    yield? maybeNumber;} : number[]

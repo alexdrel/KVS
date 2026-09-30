@@ -50,6 +50,16 @@ function selectFirstValueWithDefault(groups: Group[]) {
     }!;
 }
 
+function selectUnbraced(values: number[]) {
+    return select (values) yield _;
+}
+
+function selectFromUnbracedIf(values: number[]) {
+    return select (values) {
+        if (_ > 0) yield _;
+    };
+}
+
 function rejectNestedPosition(groups: Group[]) {
     console.log(select (const group of groups) {
         yield group.value;

@@ -53,8 +53,10 @@ for (const _ of exclusive) {
 const collected = _a;
 var _b = null;
 for (const _ of inclusive) {
-    _b = _;
-    break;
+    {
+        _b = _;
+        break;
+    }
 }
 const selected = _b;
 const invalidString = __kvsRange("a", "z");

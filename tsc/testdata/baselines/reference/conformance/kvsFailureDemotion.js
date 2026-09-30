@@ -129,8 +129,10 @@ function demoteSelectedSentinel(values) {
     var _a;
     var _b = null;
     for (const value of values) {
-        _b = value;
-        break;
+        {
+            _b = value;
+            break;
+        }
     }
     return Object.is(_a = _b, -1) ? null : _a;
 }

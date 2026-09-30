@@ -131,21 +131,44 @@ function selectFirstValueWithDefault(groups: Group[]) {
     }!;
 }
 
+function selectUnbraced(values: number[]) {
+>selectUnbraced : Symbol(selectUnbraced, Decl(kvsSelect.ts, 48, 1))
+>values : Symbol(values, Decl(kvsSelect.ts, 50, 24))
+
+    return select (values) yield _;
+>values : Symbol(values, Decl(kvsSelect.ts, 50, 24))
+>_ : Symbol(_, Decl(kvsSelect.ts, 51, 32))
+}
+
+function selectFromUnbracedIf(values: number[]) {
+>selectFromUnbracedIf : Symbol(selectFromUnbracedIf, Decl(kvsSelect.ts, 52, 1))
+>values : Symbol(values, Decl(kvsSelect.ts, 54, 30))
+
+    return select (values) {
+>values : Symbol(values, Decl(kvsSelect.ts, 54, 30))
+
+        if (_ > 0) yield _;
+>_ : Symbol(_, Decl(kvsSelect.ts, 56, 12))
+>_ : Symbol(_, Decl(kvsSelect.ts, 56, 12))
+
+    };
+}
+
 function rejectNestedPosition(groups: Group[]) {
->rejectNestedPosition : Symbol(rejectNestedPosition, Decl(kvsSelect.ts, 48, 1))
->groups : Symbol(groups, Decl(kvsSelect.ts, 50, 30))
+>rejectNestedPosition : Symbol(rejectNestedPosition, Decl(kvsSelect.ts, 58, 1))
+>groups : Symbol(groups, Decl(kvsSelect.ts, 60, 30))
 >Group : Symbol(Group, Decl(kvsSelect.ts, 0, 0))
 
     console.log(select (const group of groups) {
 >console.log : Symbol(Console.log, Decl(lib.dom.d.ts, --, --))
 >console : Symbol(console, Decl(lib.dom.d.ts, --, --))
 >log : Symbol(Console.log, Decl(lib.dom.d.ts, --, --))
->group : Symbol(group, Decl(kvsSelect.ts, 51, 29))
->groups : Symbol(groups, Decl(kvsSelect.ts, 50, 30))
+>group : Symbol(group, Decl(kvsSelect.ts, 61, 29))
+>groups : Symbol(groups, Decl(kvsSelect.ts, 60, 30))
 
         yield group.value;
 >group.value : Symbol(Group.value, Decl(kvsSelect.ts, 0, 17))
->group : Symbol(group, Decl(kvsSelect.ts, 51, 29))
+>group : Symbol(group, Decl(kvsSelect.ts, 61, 29))
 >value : Symbol(Group.value, Decl(kvsSelect.ts, 0, 17))
 
     });

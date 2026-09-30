@@ -168,13 +168,16 @@ go -C ./tsc test -run='TestLocal/kvsPlaceholderLambda' ./internal/testrunner
 `kvsPipeline.ts` checks bare callable and receiver-preserving member stages, explicitly positioned
 and repeated `%`, nested pipelines, callback shadowing, generic inference, ordinary and compound
 assignment stages, extant continuation and narrowing, `|%>` input retention, and a producer tail.
-Its diagnostic cases reject a non-callable bare stage plus leading and dangling `|%>`.
+Producer-stage cases cover eager collection, selection, accumulation, value switches, guarded and
+input-retaining continuation, and multiple producers in source order. Its diagnostic cases reject a
+non-callable bare stage plus leading and dangling `|%>`.
 
 `TestKvsPipelineLanguageService` checks hover types for a pipeline `%`, a nearer callback `%`, and a
 later pipeline stage. The API roundtrip test guards the ordered pipeline AST and structural printing
 of `%` after transport. The runnable `pipeline.ts` example resolves an optional path alias, encodes
 it, observes it through a void-producing `console.log` stage, and retains it with `|%>` to build a
-link.
+link. The runnable `showcase/links.ts` story uses a producer stage to normalize candidates before a
+`Set` removes duplicate hrefs in the same pipeline.
 
 Run the focused compiler and language-service cases with:
 

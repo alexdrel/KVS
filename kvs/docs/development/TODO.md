@@ -3,7 +3,7 @@
 This is a working implementation aid, not a language specification or feature order. The language
 documents remain authoritative for accepted semantics.
 
-Progress: **413 of 423 items complete (97.6%)**; **10 remain open**.
+Progress: **414 of 424 items complete (97.6%)**; **10 remain open**.
 
 - `[x]` means implemented with focused compiler evidence.
 - `[ ]` means unimplemented, incomplete, or not yet deliberately validated.
@@ -567,6 +567,7 @@ example `.js` files are intentionally ignored.
 - [x] Pipeline input and stages evaluate once in source order
 - [x] Pipelines are ordinary expressions
 - [x] Pipeline tail after a KVS producer
+- [x] Producer stages when the whole pipeline has a statement-head lowering boundary
 - [x] Reject non-callable bare stages
 - [x] Reject leading or dangling `|%>`
 

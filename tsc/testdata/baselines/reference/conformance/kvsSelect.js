@@ -51,6 +51,16 @@ function selectFirstValueWithDefault(groups: Group[]) {
     }!;
 }
 
+function selectUnbraced(values: number[]) {
+    return select (values) yield _;
+}
+
+function selectFromUnbracedIf(values: number[]) {
+    return select (values) {
+        if (_ > 0) yield _;
+    };
+}
+
 function rejectNestedPosition(groups: Group[]) {
     console.log(select (const group of groups) {
         yield group.value;
@@ -78,8 +88,10 @@ function selectFirstPresent(groups) {
 function selectFirstValue(groups) {
     var _a = null;
     for (const group of groups) {
-        _a = group.candidates[0];
-        break;
+        {
+            _a = group.candidates[0];
+            break;
+        }
     }
     return _a;
 }
@@ -125,10 +137,30 @@ function selectFromOptionalGroups() {
 function selectFirstValueWithDefault(groups) {
     var _a = null;
     for (const group of groups) {
-        _a = group.value;
-        break;
+        {
+            _a = group.value;
+            break;
+        }
     }
     return _a ?? "";
+}
+function selectUnbraced(values) {
+    var _a = null;
+    for (const _ of values) {
+        _a = _;
+        break;
+    }
+    return _a;
+}
+function selectFromUnbracedIf(values) {
+    var _a = null;
+    for (const _ of values) {
+        if (_ > 0) {
+            _a = _;
+            break;
+        }
+    }
+    return _a;
 }
 function rejectNestedPosition(groups) {
     console.log(null);

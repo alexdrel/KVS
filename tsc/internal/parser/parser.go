@@ -1111,6 +1111,9 @@ func (p *Parser) parseStatement() *ast.Statement {
 	case ast.KindWhileKeyword:
 		return p.parseWhileStatement()
 	case ast.KindForKeyword:
+		if p.lookAhead((*Parser).isKvsForExpressionStatement) {
+			return p.parseExpressionOrLabeledStatement()
+		}
 		return p.parseForOrForInOrForOfStatement()
 	case ast.KindContinueKeyword:
 		return p.parseContinueStatement()
@@ -1139,6 +1142,39 @@ func (p *Parser) parseStatement() *ast.Statement {
 		}
 	}
 	return p.parseExpressionOrLabeledStatement()
+}
+
+func (p *Parser) isKvsForExpressionStatement() bool {
+	if p.nextToken() != ast.KindOpenParenToken {
+		return false
+	}
+	parenDepth := 1
+	bracketDepth := 0
+	braceDepth := 0
+	semicolons := 0
+	for parenDepth != 0 {
+		switch p.nextToken() {
+		case ast.KindEndOfFile:
+			return false
+		case ast.KindOpenParenToken:
+			parenDepth++
+		case ast.KindCloseParenToken:
+			parenDepth--
+		case ast.KindOpenBracketToken:
+			bracketDepth++
+		case ast.KindCloseBracketToken:
+			bracketDepth--
+		case ast.KindOpenBraceToken:
+			braceDepth++
+		case ast.KindCloseBraceToken:
+			braceDepth--
+		case ast.KindSemicolonToken:
+			if parenDepth == 1 && bracketDepth == 0 && braceDepth == 0 {
+				semicolons++
+			}
+		}
+	}
+	return semicolons == 1 || semicolons == 3
 }
 
 func (p *Parser) nextTokenStartsKvsContextDeclaration() bool {
@@ -6542,10 +6578,12 @@ func (p *Parser) parseKvsForResultDeclaration() *ast.Node {
 func (p *Parser) kvsForResultFromExpression(expression *ast.Expression) (*ast.Node, bool, bool) {
 	pos := p.nodePos()
 	var declarations []*ast.Node
-	tupleResult := ast.IsArrayLiteralExpression(expression)
-	objectResult := ast.IsObjectLiteralExpression(expression)
+	tupleResult := expression != nil && ast.IsArrayLiteralExpression(expression)
+	objectResult := expression != nil && ast.IsObjectLiteralExpression(expression)
 	var assignments []*ast.Node
-	if tupleResult {
+	if expression == nil {
+		declarations = append(declarations, p.parseKvsForResultDeclaration())
+	} else if tupleResult {
 		assignments = expression.AsArrayLiteralExpression().Elements.Nodes
 	} else if objectResult {
 		assignments = expression.AsObjectLiteralExpression().Properties.Nodes

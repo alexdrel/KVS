@@ -215,6 +215,12 @@ expression tail. An IIFE remains unacceptable because it changes return and lexi
 Unsupported placements receive a diagnostic; error-recovery emit substitutes an empty array only to
 keep later compiler stages valid. That substitute is not language semantics.
 
+A producer may likewise head a pipeline stage when the complete pipeline owns one of these
+statement-level value positions. The transformer evaluates the preceding pipeline stages, lowers the
+producer inline, and resumes the remaining stages through the producer result. The pipeline itself
+remains subject to the placement rule; this does not admit a producer-bearing pipeline into an
+arbitrary call argument or later operand.
+
 Any assignment target is accepted in this prototype. The collector currently runs before the
 left-hand target is evaluated. This is an explicit shortcut: side-effecting property and element
 targets therefore do not yet preserve JavaScript's left-before-right evaluation order. Correct

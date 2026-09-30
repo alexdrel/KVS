@@ -22,6 +22,12 @@ const tapped = 2 |>
 
 const mapped = [1, 2, 3].map(% * 2);
 
+const pipedProduction = [1, 2, 3] |>
+    collect (%) {
+        yield _ * 2;
+    } |>
+    %.length;
+
 const produced = collect ([1, 2, 3]) {
     if (_ == 2) continue;
     yield _ * 10;
@@ -117,7 +123,7 @@ var __kvsRange = (this && this.__kvsRange) || function (lower, upper, inclusive)
     };
     return range;
 };
-var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
 function double(value) {
     return value * 2;
 }
@@ -126,55 +132,65 @@ const pipedWhenPresent = (_b = maybeNumber) != null ? (_b = double(_b), _b + 1) 
 const observed = [];
 const tapped = (_c = 2, observed.push(_c), double(_c));
 const mapped = [1, 2, 3].map(_arg_1 => _arg_1 * 2);
-var _k = [];
-var _l;
+_d = [1, 2, 3];
+var _l = [];
+for (const _ of _d) {
+    _l.push(_ * 2);
+}
+_d = _l;
+_d = _d.length;
+const pipedProduction = _d;
+var _m = [];
+var _o;
 for (const _ of [1, 2, 3]) {
     if (_ == 2)
         continue;
-    _k.push(_ * 10);
-    if ((_l = maybeNumber) != null)
-        _k.push(_l);
+    _m.push(_ * 10);
+    if ((_o = maybeNumber) != null)
+        _m.push(_o);
 }
-const produced = _k;
-var _m = null;
-var _o;
+const produced = _m;
+var _p = null;
+var _q;
 for (const _ of [1, 2, 3]) {
-    if ((_o = maybeNumber) != null) {
-        _m = _o;
+    if ((_q = maybeNumber) != null) {
+        _p = _q;
         break;
     }
-    _m = _ * 10;
-    break;
+    {
+        _p = _ * 10;
+        break;
+    }
 }
-const selected = _m;
+const selected = _p;
 const lazy = function* (source_1) {
     for (const _ of source_1 !== null && source_1 !== void 0 ? source_1 : []) {
         yield _ * 10;
     }
 }([1, 2, 3]);
-var _p;
+var _r;
 {
     let total = 0;
     for (const _ of [1, 2, 3]) {
         total += _;
     }
-    _p = total;
+    _r = total;
 }
-const accumulated = _p;
-var _q = null;
+const accumulated = _r;
+var _s = null;
 switch (maybeNumber) {
     case 0:
-        _q = "zero";
+        _s = "zero";
         break;
-    default: _q = "other";
+    default: _s = "other";
 }
-const switched = _q;
-const compactArray = [...(_d = maybeNumber) != null ? [_d] : [], produced.length];
-const compactObject = Object.assign(Object.assign({}, (_e = maybeNumber) != null ? { value: _e } : {}), { produced });
+const switched = _s;
+const compactArray = [...(_e = maybeNumber) != null ? [_e] : [], produced.length];
+const compactObject = Object.assign(Object.assign({}, (_f = maybeNumber) != null ? { value: _f } : {}), { produced });
 let assigned = 0;
-(_f = maybeNumber) != null ? assigned = _f : _f;
+(_g = maybeNumber) != null ? assigned = _g : _g;
 let filtered = null;
-filtered = (_g = maybeNumber) != null && _g === _g ? _g : null;
+filtered = (_h = maybeNumber) != null && _h === _h ? _h : null;
 let outcome = null;
 let failure;
 [outcome, failure] = (() => {
@@ -186,12 +202,12 @@ let failure;
     }
 })(), outcome;
 let maybeCounter = null;
-(_h = maybeNumber) != null ? (maybeCounter !== null && maybeCounter !== void 0 ? maybeCounter : (maybeCounter = { count: 0 })).count = _h : _h;
+(_j = maybeNumber) != null ? (maybeCounter !== null && maybeCounter !== void 0 ? maybeCounter : (maybeCounter = { count: 0 })).count = _j : _j;
 let point = { x: 0, y: 0 };
 const rectangle = { x: 1, y: 2, width: 3 };
 __kvsProject(point, rectangle, ["x", "y"]);
 const defaulted = maybeNumber !== null && maybeNumber !== void 0 ? maybeNumber : 0;
-const alternatives = (_j = assigned, _j == 0 || _j == 1);
+const alternatives = (_k = assigned, _k == 0 || _k == 1);
 const inclusiveRange = __kvsRange(1, 3, true);
 class ExpectedFailure extends Error {
 }
@@ -205,20 +221,20 @@ const demoted = (() => {
         throw _a;
     }
 })();
-var _r = null, _s = null;
+var _t = null, _u = null;
 try {
-    _r = maybeNumber;
+    _t = maybeNumber;
 }
-catch (_t) {
-    _s = _t;
+catch (_v) {
+    _u = _v;
 }
-if (_r == null) {
-    var _u = new ExpectedFailure("missing");
-    if (_s != null && !("cause" in _u))
-        Object.defineProperty(_u, "cause", { value: _s, writable: true, configurable: true });
-    throw _u;
+if (_t == null) {
+    var _w = new ExpectedFailure("missing");
+    if (_u != null && !("cause" in _w))
+        Object.defineProperty(_w, "cause", { value: _u, writable: true, configurable: true });
+    throw _w;
 }
-const promoted = _r;
+const promoted = _t;
 const projected = Object.assign({ x: 0, y: 0 }, __kvsProject({}, rectangle, ["x", "y"]));
 const _ctx_RequestId = Object.freeze([Symbol("RequestId"), "NO_REQUEST"]);
 function trace(context_1, message) {

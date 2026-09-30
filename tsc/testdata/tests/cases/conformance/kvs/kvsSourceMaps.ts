@@ -23,6 +23,12 @@ const tapped = 2 |>
 
 const mapped = [1, 2, 3].map(% * 2);
 
+const pipedProduction = [1, 2, 3] |>
+    collect (%) {
+        yield _ * 2;
+    } |>
+    %.length;
+
 const produced = collect ([1, 2, 3]) {
     if (_ == 2) continue;
     yield _ * 10;

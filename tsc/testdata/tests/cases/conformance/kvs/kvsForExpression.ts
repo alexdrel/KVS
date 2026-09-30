@@ -92,5 +92,21 @@ const total = 100;
 const shadowed = for (const entry of [] as Entry[]; total = 0) {
     total += entry.value;
 };
+
+for ([1, 2, 3]; discarded = 0) {
+    discarded += _;
+}
+
+for (let i = 0; i < 3; i++; discarded = 0) {
+    discarded += i;
+}
+
+for ([1, 2, 3]; piped = "") {
+    piped += _;
+} |> console.log(%);
+
+for ([1, 2, 3];) {
+}
+
 total;
 shadowed;

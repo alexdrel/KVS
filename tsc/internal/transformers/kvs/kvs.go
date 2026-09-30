@@ -1821,8 +1821,16 @@ func (tx *transformer) lowerHeadEffects(root *ast.Expression, continuation func(
 		if node.Kind == ast.KindKvsFailureDemotionExpression && tx.resolver.IsKvsFailureDemotionErrorPattern(node.AsKvsFailureDemotionExpression().Pattern) {
 			return false
 		}
+		if node.Kind == ast.KindKvsPipelineExpression && containsKvsEagerPipelineStage(node.AsKvsPipelineExpression()) {
+			effects = append(effects, node)
+			return false
+		}
 		if isKvsProducer(node) || node.Kind == ast.KindKvsFailurePromotionExpression {
-			if ast.IsKvsStatementHeadPosition(node) {
+			validPosition := ast.IsKvsStatementHeadPosition(node)
+			if isKvsProducer(node) {
+				validPosition = ast.IsKvsProducerHeadPosition(node)
+			}
+			if validPosition {
 				effects = append(effects, node)
 			}
 			return false
@@ -1844,7 +1852,9 @@ func (tx *transformer) lowerHeadEffects(root *ast.Expression, continuation func(
 		}
 		effect := effects[index]
 		lowerEffect := tx.lowerProducer
-		if effect.Kind == ast.KindKvsFailurePromotionExpression {
+		if effect.Kind == ast.KindKvsPipelineExpression {
+			lowerEffect = tx.lowerPipelineWithProducers
+		} else if effect.Kind == ast.KindKvsFailurePromotionExpression {
 			lowerEffect = tx.lowerFailurePromotion
 		}
 		return lowerEffect(effect, func(result *ast.Expression) *ast.Node {
@@ -1853,6 +1863,126 @@ func (tx *transformer) lowerHeadEffects(root *ast.Expression, continuation func(
 		})
 	}
 	return lower(0)
+}
+
+func containsKvsEagerPipelineStage(node *ast.KvsPipelineExpression) bool {
+	found := false
+	var visit func(*ast.Node) bool
+	visit = func(current *ast.Node) bool {
+		if found || ast.IsFunctionLike(current) {
+			return found
+		}
+		if current.Kind == ast.KindKvsLazyCollectExpression {
+			return false
+		}
+		if isKvsProducer(current) {
+			found = ast.IsKvsProducerHeadPosition(current)
+			return found
+		}
+		current.ForEachChild(visit)
+		return found
+	}
+	for index := 1; index < len(node.Elements.Nodes); index += 2 {
+		stage := node.Elements.Nodes[index]
+		if stage.Kind == ast.KindKvsPlaceholderLambdaExpression {
+			stage = stage.AsKvsPlaceholderLambdaExpression().Arrow.AsArrowFunction().Body
+		}
+		visit(stage)
+	}
+	return found
+}
+
+func (tx *transformer) lowerPipelineWithProducers(effect *ast.Node, continuation func(*ast.Expression) *ast.Node) *ast.Node {
+	node := effect.AsKvsPipelineExpression()
+	factory := tx.Factory()
+	current := factory.NewTempVariable()
+	tx.declareTemp(current)
+
+	sequence := func(first *ast.Node, rest *ast.Node) *ast.Node {
+		statements := kvsStatementNodes(first)
+		statements = append(statements, kvsStatementNodes(rest)...)
+		return factory.NewSyntaxList(statements)
+	}
+	assignCurrent := func(value *ast.Expression, source *ast.Node, rest *ast.Node) *ast.Node {
+		statement := factory.NewExpressionStatement(factory.NewAssignmentExpression(current, value))
+		tx.EmitContext().SetSourceMapRange(statement, source.Loc)
+		return sequence(statement, rest)
+	}
+	present := func(rest *ast.Node, source *ast.Node) *ast.Node {
+		condition := factory.NewBinaryExpression(nil, current, nil, factory.NewToken(ast.KindExclamationEqualsToken), factory.NewKeywordExpression(ast.KindNullKeyword))
+		whenPresent := factory.NewBlock(factory.NewNodeList(kvsStatementNodes(rest)), true)
+		whenAbsent := factory.NewExpressionStatement(factory.NewAssignmentExpression(current, factory.NewKeywordExpression(ast.KindNullKeyword)))
+		statement := factory.NewIfStatement(condition, whenPresent, whenAbsent)
+		tx.EmitContext().SetSourceMapRange(statement, source.Loc)
+		return statement
+	}
+
+	var lowerStage func(int) *ast.Node
+	lowerStage = func(index int) *ast.Node {
+		stage := node.Elements.Nodes[index*2+1]
+		stageExpression := stage
+		if stage.Kind == ast.KindKvsPlaceholderLambdaExpression {
+			stageExpression = stage.AsKvsPlaceholderLambdaExpression().Arrow.AsArrowFunction().Body
+		}
+		last := index == len(node.Elements.Nodes)/2-1
+		finish := func(result *ast.Expression) *ast.Node {
+			if last {
+				statement := factory.NewExpressionStatement(factory.NewAssignmentExpression(current, result))
+				tx.EmitContext().SetSourceMapRange(statement, stage.Loc)
+				return statement
+			}
+			next := lowerStage(index + 1)
+			operator := node.Elements.Nodes[(index+1)*2]
+			switch operator.Kind {
+			case ast.KindBarPercentGreaterThanToken:
+				statement := factory.NewExpressionStatement(result)
+				tx.EmitContext().SetSourceMapRange(statement, stage.Loc)
+				return sequence(statement, next)
+			case ast.KindBarQuestionGreaterThanToken:
+				return assignCurrent(result, stage, present(next, operator))
+			default:
+				return assignCurrent(result, stage, next)
+			}
+		}
+
+		bare := tx.resolver.IsKvsPipelineBareStage(stage)
+		if !bare {
+			tx.placeholderNames = append(tx.placeholderNames, current)
+		}
+		lowered := tx.lowerHeadEffects(stageExpression, func(result *ast.Expression) *ast.Node {
+			if bare {
+				result = factory.NewCallExpression(result, nil, nil, factory.NewNodeList([]*ast.Node{current}), ast.NodeFlagsNone)
+			}
+			return finish(result)
+		})
+		if lowered == nil {
+			result := tx.Visitor().VisitNode(stageExpression)
+			if bare {
+				result = factory.NewCallExpression(result, nil, nil, factory.NewNodeList([]*ast.Node{current}), ast.NodeFlagsNone)
+			}
+			lowered = finish(result)
+		}
+		if !bare {
+			tx.placeholderNames = tx.placeholderNames[:len(tx.placeholderNames)-1]
+		}
+		return lowered
+	}
+
+	afterHead := func(result *ast.Expression) *ast.Node {
+		stages := lowerStage(0)
+		firstOperator := node.Elements.Nodes[0]
+		if firstOperator.Kind == ast.KindBarQuestionGreaterThanToken {
+			stages = present(stages, firstOperator)
+		}
+		return assignCurrent(result, node.Head, stages)
+	}
+	lowered := tx.lowerHeadEffects(node.Head, afterHead)
+	if lowered == nil {
+		lowered = afterHead(tx.Visitor().VisitNode(node.Head))
+	}
+	result := current.Clone(factory)
+	tx.EmitContext().SetSourceMapRange(result, node.Loc)
+	return sequence(lowered, continuation(result))
 }
 
 func (tx *transformer) lowerFailurePromotion(effect *ast.Node, continuation func(*ast.Expression) *ast.Node) *ast.Node {
@@ -2417,7 +2547,8 @@ func (tx *transformer) transformYieldValue(value *ast.Expression, extant bool, s
 				production = factory.NewExpressionStatement(factory.NewAssignmentExpression(tx.producerResult, value))
 			}
 			tx.EmitContext().SetSourceMapRange(production, source.Loc)
-			return factory.NewSyntaxList([]*ast.Node{production, factory.NewBreakStatement(tx.selectLabel)})
+			statements := []*ast.Node{production, factory.NewBreakStatement(tx.selectLabel)}
+			return factory.NewBlock(factory.NewNodeList(statements), true)
 		}
 		if !extant {
 			return selectValue(value)

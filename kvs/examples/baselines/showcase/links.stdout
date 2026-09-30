@@ -1,0 +1,4 @@
+{"href":"https://example.org/guide","hostname":"example.org"}
+{"href":"https://example.org/reference","hostname":"example.org"}
+{"href":"https://other.example/guide","hostname":"other.example"}
+[ 'other.example' ]

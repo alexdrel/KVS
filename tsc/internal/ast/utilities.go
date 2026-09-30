@@ -2178,10 +2178,14 @@ func IsKvsConditionalObjectProperty(node *Node) bool {
 }
 
 func IsKvsProducerHeadPosition(node *Node) bool {
-	return IsKvsStatementHeadPosition(node)
+	return isKvsStatementHeadPosition(node, true)
 }
 
 func IsKvsStatementHeadPosition(node *Node) bool {
+	return isKvsStatementHeadPosition(node, false)
+}
+
+func isKvsStatementHeadPosition(node *Node, allowPipelineStage bool) bool {
 	current := node
 	for current.Parent != nil {
 		parent := current.Parent
@@ -2209,9 +2213,29 @@ func IsKvsStatementHeadPosition(node *Node) bool {
 			if parent.Expression() != current {
 				return false
 			}
+		case KindArrowFunction:
+			if !allowPipelineStage || parent.AsArrowFunction().Body != current || parent.Parent == nil || parent.Parent.Kind != KindKvsPlaceholderLambdaExpression {
+				return false
+			}
+		case KindKvsPlaceholderLambdaExpression:
+			if !allowPipelineStage || parent.AsKvsPlaceholderLambdaExpression().Arrow != current {
+				return false
+			}
 		case KindKvsPipelineExpression:
 			if parent.AsKvsPipelineExpression().Head != current {
-				return false
+				if !allowPipelineStage {
+					return false
+				}
+				stage := false
+				for index := 1; index < len(parent.AsKvsPipelineExpression().Elements.Nodes); index += 2 {
+					if parent.AsKvsPipelineExpression().Elements.Nodes[index] == current {
+						stage = true
+						break
+					}
+				}
+				if !stage {
+					return false
+				}
 			}
 		case KindKvsFailureDemotionExpression:
 			if parent.AsKvsFailureDemotionExpression().Expression != current {

@@ -147,6 +147,33 @@ function selectFirstValueWithDefault(groups: Group[]) {
     }!;
 }
 
+function selectUnbraced(values: number[]) {
+>selectUnbraced : (values: number[]) => number | null
+>values : number[]
+
+    return select (values) yield _;
+>select (values) yield _; : number | null
+>values : number[]
+>_ : number
+}
+
+function selectFromUnbracedIf(values: number[]) {
+>selectFromUnbracedIf : (values: number[]) => number | null
+>values : number[]
+
+    return select (values) {
+>select (values) {        if (_ > 0) yield _;    } : number | null
+>values : number[]
+
+        if (_ > 0) yield _;
+>_ > 0 : boolean
+>_ : number
+>0 : 0
+>_ : number
+
+    };
+}
+
 function rejectNestedPosition(groups: Group[]) {
 >rejectNestedPosition : (groups: Group[]) => void
 >groups : Group[]

@@ -80,8 +80,10 @@ const lazyPairsExpected = lazyPairs;
 const pairMap = toMap(lazyPairs);
 var _b = null;
 for (const _ of keys) {
-    _b = [_, _.length];
-    break;
+    {
+        _b = [_, _.length];
+        break;
+    }
 }
 const selectedPair = _b;
 const selectedPairExpected = selectedPair;
@@ -115,8 +117,10 @@ for (const _ of keys) {
         _f = [_, _.length];
         break;
     }
-    _f = [_.length, _];
-    break;
+    {
+        _f = [_.length, _];
+        break;
+    }
 }
 const selectedTupleUnion = _f;
 const selectedTupleUnionExpected = selectedTupleUnion;

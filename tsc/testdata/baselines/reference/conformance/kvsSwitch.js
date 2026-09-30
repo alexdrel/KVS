@@ -213,8 +213,10 @@ switch ("cache") {
                 break;
             }
             audit("miss");
-            _d = "fallback";
-            break;
+            {
+                _d = "fallback";
+                break;
+            }
         }
         break;
     default: _d = "fallback";
@@ -223,8 +225,10 @@ const cached = _d;
 var _f = null;
 switch_1: if (count > 0) {
     {
-        _f = "positive";
-        break switch_1;
+        {
+            _f = "positive";
+            break switch_1;
+        }
         audit("unreachable");
     }
 }
@@ -237,11 +241,15 @@ switch_2: switch (count) {
     case 1:
         {
             for (const value of ["one"]) {
-                _g = value;
+                {
+                    _g = value;
+                    break switch_2;
+                }
+            }
+            {
+                _g = "fallback";
                 break switch_2;
             }
-            _g = "fallback";
-            break switch_2;
         }
         break;
     default: _g = "other";
@@ -252,12 +260,16 @@ switch (count) {
     case 1:
         {
             if (choice) {
-                _h = "chosen";
-                break;
+                {
+                    _h = "chosen";
+                    break;
+                }
             }
             else {
-                _h = "other";
-                break;
+                {
+                    _h = "other";
+                    break;
+                }
             }
         }
         break;
@@ -270,8 +282,10 @@ var _j = null;
 switch_3: if (choice) {
     {
         if (count > 0) {
-            _j = "positive";
-            break switch_3;
+            {
+                _j = "positive";
+                break switch_3;
+            }
         }
     }
 }

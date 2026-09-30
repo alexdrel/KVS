@@ -92,12 +92,29 @@ const total = 100;
 const shadowed = for (const entry of [] as Entry[]; total = 0) {
     total += entry.value;
 };
+
+for ([1, 2, 3]; discarded = 0) {
+    discarded += _;
+}
+
+for (let i = 0; i < 3; i++; discarded = 0) {
+    discarded += i;
+}
+
+for ([1, 2, 3]; piped = "") {
+    piped += _;
+} |> console.log(%);
+
+for ([1, 2, 3];) {
+}
+
 total;
 shadowed;
 
 
 //// [kvsForExpression.js]
 "use strict";
+var _a;
 function explicitScalar(entries) {
     var _a;
     {
@@ -213,15 +230,15 @@ function enumerate(input) {
     }
     return _a;
 }
-var _a;
+var _b;
 {
     let total = 0;
     for (const _ of nullableEntries ?? []) {
         total += _.value;
     }
-    _a = total;
+    _b = total;
 }
-const nullableSourceTotal = _a;
+const nullableSourceTotal = _b;
 function explicitNullableSource(entries) {
     var _a;
     {
@@ -245,14 +262,49 @@ async function awaitedBody(entries) {
     return _a;
 }
 const total = 100;
-var _b;
+var _c;
 {
     let total = 0;
     for (const entry of []) {
         total += entry.value;
     }
-    _b = total;
+    _c = total;
 }
-const shadowed = _b;
+const shadowed = _c;
+var _d;
+{
+    let discarded = 0;
+    for (const _ of [1, 2, 3]) {
+        discarded += _;
+    }
+    _d = discarded;
+}
+_d;
+var _e;
+{
+    let discarded = 0;
+    for (let i = 0; i < 3; i++) {
+        discarded += i;
+    }
+    _e = discarded;
+}
+_e;
+var _f;
+{
+    let piped = "";
+    for (const _ of [1, 2, 3]) {
+        piped += _;
+    }
+    _f = piped;
+}
+_a = _f, console.log(_a);
+var _g;
+{
+    let  = ;
+    for (const _ of [1, 2, 3]) {
+    }
+    _g = ;
+}
+_g;
 total;
 shadowed;

@@ -19683,7 +19683,7 @@ func (c *Checker) checkKvsProducerElementType(node *ast.Node, initializer *ast.F
 		current.ForEachChild(visit)
 		return false
 	}
-	statement.ForEachChild(visit)
+	visit(statement)
 	if node.Locals() != nil {
 		c.registerForUnusedIdentifiersCheck(node)
 	}
@@ -20011,7 +20011,7 @@ func (c *Checker) checkKvsProducerExpression(node *ast.Node, initializer *ast.Fo
 		current.ForEachChild(visit)
 		return false
 	}
-	statement.ForEachChild(visit)
+	visit(statement)
 	elementType := c.neverType
 	if len(yieldTypes) != 0 {
 		elementType = c.getUnionType(yieldTypes)

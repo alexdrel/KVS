@@ -375,6 +375,11 @@ record loops still use their keyed view so `_` remains the mapped or property va
 `for...in` header lowers to the same ordinary pair iteration; single-binding `for...in` is
 untouched.
 
+At statement start, a `for` header with one top-level semicolon is parsed as the iterable/result KVS
+form, and one with three is parsed as the C-style/result KVS form. JavaScript's ordinary C-style
+statement has two. This header distinction applies before considering whether the produced value is
+discarded, continued through a pipeline, or consumed by another supported tail.
+
 ### Value-producing switch
 
 A consumed KVS switch lowers inline to a null-initialized result temporary. When its value is
@@ -496,6 +501,12 @@ remaining stage and makes the whole pipeline produce `null`; on presence the che
 value supplied to the next stage. Ordinary `|>` performs no such test or narrowing. Lowering may
 share branches and temporaries, but it must preserve once-only evaluation and must not evaluate a
 skipped stage or assignment.
+
+An eager producer in a pipeline stage uses the containing pipeline's statement-head boundary. The
+lowering evaluates and captures the preceding value, emits the producer inline, and resumes later
+stages from its result. This continuation-based lowering also preserves input retention across
+`|%>`, absence guards across `|?>`, and source order across multiple producer stages. It does not
+use an IIFE, so producer-body control flow and lexical state keep their ordinary meaning.
 
 Pipelines do not synthesize members, change reflection, alter function values, or add fallback
 dispatch. Accessibility, overload, nullable-call, and JavaScript `this` rules remain ordinary KVS

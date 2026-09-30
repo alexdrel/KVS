@@ -16,10 +16,20 @@ declare function combine(items: Item[], id: number): number;
 
 const result = items |?>
     combine(/*pipeOuter*/%, [1].map(/*callbackInner*/% + 1)[0]) |>
-    /*pipeRepeated*/% + 1;`
+    /*pipeRepeated*/% + 1;
+
+const produced = items |?>
+    collect (/*producerInput*/%) {
+        yield _.id;
+    };
+
+const /*unbracedResult*/hostnames = ["https://example.com"] |>
+    collect (%) yield new URL(_).hostname;`
 	f, done := fourslash.NewFourslash(t, nil /*capabilities*/, content)
 	defer done()
 	f.VerifyQuickInfoAt(t, "pipeOuter", "(parameter) %: Item[]", "")
 	f.VerifyQuickInfoAt(t, "callbackInner", "(parameter) %: number", "")
 	f.VerifyQuickInfoAt(t, "pipeRepeated", "(parameter) %: number", "")
+	f.VerifyQuickInfoAt(t, "producerInput", "(parameter) %: Item[]", "")
+	f.VerifyQuickInfoAt(t, "unbracedResult", "const hostnames: string[]", "")
 }
