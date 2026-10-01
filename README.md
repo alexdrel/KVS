@@ -1,15 +1,13 @@
 # KVS
 
-KVS is an experimental [TypeScript](https://www.typescriptlang.org/) dialect that gives application
-logic itself a more prominent place in the code. It builds on TypeScript’s static type system and is
-designed to transpile into ordinary JavaScript.
+KVS is a working, experimental TypeScript dialect for application code. It compiles to ordinary JavaScript and uses type information to handle missing values, shape data, and produce results from familiar control flow. Its implemented features work through the compiler, language service, and formatter today.
 
-> [!IMPORTANT]
-> This repository contains a working implementation of every major part of the language described
-> here. KVS remains experimental, but its core features can be compiled, run, explored through the
-> language service, and formatted today. See the [working examples](kvs/examples/README.md),
-> [implementation checklist](kvs/docs/development/TODO.md), and
-> [development notes](kvs/docs/development/README.md) for details and remaining work.
+Explore the [working showcase](kvs/examples/showcase/README.md), the
+[whole-program examples](kvs/examples/whole-programs/README.md), or the
+[example catalog](kvs/examples/README.md). The [programs guide](kvs/docs/language/examples.md)
+explains how these examples use KVS.
+
+A square root outside the real numbers is absent. Arithmetic carries that absence through the calculation, and the compact array keeps only roots that exist:
 
 ```kvs
 function realSqrt(x: number): number? {
@@ -24,305 +22,126 @@ function realRoots(a: number, b: number, c: number) {
         d! > 0 ?: (-b + d) / (2 * a),
     ];
 }
+
+console.log(JSON.stringify(realRoots(1, -3, 2))); // [1,2]
+console.log(JSON.stringify(realRoots(1, -2, 1))); // [1]
+console.log(JSON.stringify(realRoots(1,  0, 1))); // []
 ```
 
----
+`number?` includes `null` and `undefined`. `condition ?: value` produces the value only when the condition holds. Numeric arithmetic returns `null` when a required operand is absent. Postfix `!` gives an absent number its type's default, zero; here it makes the discriminant comparison explicit. `?[...]` omits absent elements. This is the runnable [quadratic example](kvs/examples/showcase/quadratic.ts).
 
-TypeScript made an extremely successful choice to preserve JavaScript’s runtime semantics while
-using types primarily for checking and tooling. That choice was especially natural when TypeScript
-also had plenty of work to do as a JavaScript compatibility compiler: classes, async/await,
-generators, optional chaining, and other newer JavaScript constructs still needed lowering for the
-runtimes of the day. As JavaScript and its runtimes matured, much of that
-compatibility-transpilation role diminished. TypeScript has nevertheless continued to keep type
-information out of runtime semantics, so its evolution is now naturally concentrated in inference,
-checking, diagnostics, and tooling.
+## Work with missing data
 
-KVS starts from the observation that this is a boundary TypeScript has chosen, not a technical
-inevitability. A compiler that already knows whether a value may be absent, what fields a structural
-type contains, or whether a parameter accepts absence can also use that information when lowering
-the program. This opens a class of application-language conveniences outside TypeScript’s current
-scope: implicit propagation of absence, type-directed materialization and projection, presence-aware
-calls, and similar constructs.
-
-KVS largely accepts TypeScript’s type system as given. Its interest is not in making types
-substantially more expressive, but in making more use of the information they already provide when
-compiling ordinary application code.
-
-The implementation now covers the language’s major themes: nullable values and defaults, procedural
-production and decision constructs, pipelines and placeholder lambdas, typed data construction and
-projection, local failure policy, typed context, and erased `distinct` and `branded` domains. These
-work through the compiler, compiler API, language service, and formatter rather than existing only
-as isolated syntax experiments.
-
-KVS explores that design space while trying to remain recognizably JavaScript: preserving its
-values, libraries, and ecosystem, but also the way programs are written and reasoned about—ordinary
-expressions, statements, functions, objects, mutation, exceptions, and explicit control flow. It
-does not try to replace JavaScript’s general programming model. Its scope is narrower: the recurring
-mechanics around absence, failure, data transformation, and control flow that often obscure the
-application logic they exist to support.
-
-Application code should make its actual computation easy to see. Too often it does the opposite. A
-simple transformation becomes surrounded by null checks, guard clauses, temporary variables,
-defensive branching, and `try`/`catch` scaffolding. None of these concerns are imaginary, but in
-many programs the mechanics of handling absence and failure become more prominent than the operation
-they exist to protect. The code ends up describing how to keep the computation safe more loudly than
-it describes the computation itself.
-
-KVS treats that as a language problem rather than an unavoidable cost of writing robust application
-code. The compiler can perform the necessary presence checks while the source code expresses the
-computation directly, instead of forcing the developer to spell out those checks at every
-intermediate step. A recurring principle is to let absence and ordinary outcomes propagate
-naturally, while requiring explicit syntax where the program has a genuine policy decision to make.
-A call may depend on its inputs being present; a missing value may be replaced or materialized; a
-selected failure may become absence rather than escape as an exception. The aim is for ordinary
-robust code to get reasonable behavior by default, while making the decisions that actually matter
-explicit and local.
-
-## Functional ideas in procedural code
-
-Functional style offers useful ways to express transformations: mapping and filtering collections,
-accumulating a result, or searching for the first successful value. KVS brings those capabilities
-into procedural code built from ordinary conditions, loops, and early exits.
-
-A loop can build its result as it runs:
+KVS keeps JavaScript's values and ordinary truthiness. Empty arrays are truthy; zero and false remain useful values. Its absence-aware operations treat `null` and `undefined` as missing:
 
 ```kvs
-const results = collect (items) {
-    if (!_.enabled) continue;
+const city = user.profile.address.city; // stop at an absent receiver
+const area = photo.width * photo.height; // absent input gives an absent result
 
-    yield transform(_);
+send?(address, message);                 // call when required inputs are present
+return? cached;                          // return when present
+nickname ?= suggestion;                  // assign when present
+const nonempty = ~~items;                 // sieve unusable values
+```
 
-    if (_.includeFallback)
-        yield? _.fallback;
+An optional call checks its callable and required arguments before invocation. `return?`, `yield?`, and `?=` make the same presence choice at a return, production, or assignment. Prefix `~~` explicitly filters absence, `NaN`, empty strings, and empty collections to `null`, while retaining zero and false. Postfix value `!` supplies a type-directed default; `as!` is a static assertion and does not alter the value.
+
+## Produce results with familiar control flow
+
+Loops can return a final accumulator, collect every produced value, or stop at the first one. Their bodies use ordinary conditions, `continue`, and local variables:
+
+```kvs
+const capacity = new Map([["studio", 8], ["gallery", 20]]);
+const booked = new Map([["studio", 8], ["gallery", 13]]);
+
+const available = for (capacity; total = 0) {
+    total += _ - booked.get(#)!;
 };
-```
+console.log(available); // 7
 
-`collect` gathers every value produced by the body, `select` returns the first, and `for` can return
-its final accumulator state. They provide collection transformations and folds without moving
-conditions or intermediate calculations out of the procedural body.
-
-## Keep local decisions local
-
-A calculation often needs temporary state that the surrounding code has no reason to manage. For
-example, summing paid orders usually means declaring a mutable total before the loop, updating it
-inside, and using it afterward. KVS lets the accumulator belong to the loop:
-
-```kvs
-const total = for (orders; total = 0) {
-    if (_.paid) total += _.amount;
+const openRooms = collect (capacity) {
+    const seats = _ - booked.get(#)!;
+    if (seats > 0) yield #;
 };
+console.log(JSON.stringify(openRooms)); // ["gallery"]
 ```
 
-The result binding belongs to the loop; the surrounding code receives its final value. The same
-locality applies to `return? lookup()`, sieve bindings such as `if (const items ~= getItems())`,
-extant assignment such as `profile.nickname ?= patch.nickname`, and conditional fields in literals,
-without adding setup to a wider scope.
+Here `_` is the current map value and `#` is its key. For arrays, `#` is the index; for records, the property name. `collect` produces an array eagerly, `collect*` produces values lazily, and `select` returns the first production. Numeric ranges and value-producing `switch` support other decisions.
 
-## Keep the familiar programming model
+## Build and update typed data
 
-KVS should feel familiar to someone who writes TypeScript. Functions, objects, loops, and mutations
-still explain the program in the same way; the added constructs express common operations without
-replacing that structure.
-
-They can also reduce the amount of type annotation needed. `collect` infers its result collection
-from the values produced, and a binding in an `if` condition is inferred and narrowed where it is
-used. The operation itself provides information that would otherwise require a separate declaration
-or assertion.
-
-That familiarity is a practical constraint for KVS, not merely a syntactic preference.
-
-## Let absence flow
-
-KVS writes the nullable form of `T` as `T?`. Application data is frequently incomplete, so absence
-flows through member access and value computation:
+Structural objects can be initialized from their field types. Typed spread copies only fields in the target shape:
 
 ```kvs
-const city = user.profile.address.city;
-const area = photo.metadata.width * photo.metadata.height;
+interface Point { x: number; y: number }
+interface Rect extends Point { width: number; height: number }
+
+const frame = Rect{ x: 12, y: 8, width: 120, height: 60 };
+const position = Point{ ...frame }; // { x: 12, y: 8 }
+console.log(JSON.stringify(position)); // {"x":12,"y":8}
+
+frame ...= { x: 20, color: "blue" }; // update the existing Rect
+console.log(JSON.stringify(frame)); // {"x":20,"y":8,"width":120,"height":60}
 ```
 
-When a required input is absent, the result is absent too. The programmer chooses what happens where
-that value is used:
+The `Point` construction selects `x` and `y`; the in-place spread changes `frame` without replacing it. Typed construction supplies defaults for omitted fields. `?{...}` and `?[...]` omit absent fields or elements. Writable nullable paths can materialize a missing object with `!` or skip a write with `?`.
+
+## Compose with pipelines
+
+Pipelines make a sequence of transformations read in execution order. They pass a value to ordinary functions without inventing methods or changing member lookup. A bare callable stage receives that value as its argument; `%` places it elsewhere in a stage:
 
 ```kvs
-normalize?(name)        // call when the value is present
-return? cached          // return when present
-yield? candidate        // produce when present
-nickname ?= suggestion  // assign when present
-const usable = ~~value  // preserve a usable value, otherwise null
+const aliases = new Map([["docs", "/guide/getting started"]]);
+
+const link = "docs" |>
+    aliases.get(%) |?>
+    encodeURI |>
+    console.log |%> // /guide/getting%20started
+    `<a href="${%}">Open</a>`;
+
+console.log(link); // <a href="/guide/getting%20started">Open</a>
 ```
 
-Test presence explicitly with `value != null`. Ordinary conditions and boolean operators retain
-JavaScript/TypeScript truthiness, so empty collections remain truthy. Prefix `~~value` explicitly
-sieves absence, `NaN`, empty strings, and empty collections to null when that distinction is wanted.
-Zero and false pass.
-
-When flow analysis needs an explicit escape hatch, `as!` asserts that one expression is present. It
-is static only; runtime `!` instead resolves absence using the type's default value.
-
-## Build data where it belongs
-
-Optional fields can be included directly in an object literal:
-
-```kvs
-const options = ?{
-    title,
-    query: form.query || null,
-    tags: selectedTags,
-};
-```
-
-The compact literal keeps present values and omits absent ones. The decision stays beside the data
-it shapes.
-
-TypeScript inference can also make an initial value narrower than the data it is meant to represent.
-`as?` keeps the widening at the construction site:
-
-```kvs
-const state = { current: initialItem as? };
-state.current = null;
-```
-
-Structural PODs have a predictable initial state derived from their field types. Typed construction
-starts there and applies the supplied fields:
-
-```kvs
-const profile = Profile{ ...source };
-const updated = Profile{ ...profile, ...patch };
-profile ...= patch;
-```
-
-Typed spread selects fields using the target shape. Construction creates a new object; typed
-in-place spread updates the existing one.
-
-The same initial state supports defaulting and building missing paths:
-
-```kvs
-const profile = maybeProfile!; // use the default state when absent
-user.profile!.theme = dark;   // materialize profile and write
-user.profile?.theme = dark;   // write when profile is present
-```
-
-The programmer chooses when to initialize, default, or materialize. The language supplies the
-structural values.
+The lookup returns a nullable value. `|?>` stops the remaining stages if it is absent; otherwise `encodeURI` receives the present path. `console.log` observes the encoded path, and `|%>` keeps that path flowing instead of passing along `console.log`'s result. Ordinary `|>` passes the previous result to the next stage. `%` also creates concise callbacks in a contextually typed argument, such as `items.map(%.price)`.
 
 ## Choose failure policy locally
 
-KVS uses ordinary JavaScript exceptions and provides concise operations for choosing how to handle
-them:
+KVS uses JavaScript exceptions. Syntax beside a call says whether a selected failure becomes absence, is exposed for handling, or is promoted to an application error:
 
 ```kvs
-parse(text) ~ SyntaxError          // selected failure becomes absence
-const value~error = operation();   // expose an exception for local handling
-operation() ~~ PublicError(...)    // require a value at this boundary
+const url = new URL(input) ~ TypeError;       // selected exception becomes null
+const value~error = load();                    // capture value or thrown error
+const user = findUser(id) ~~ UserNotFound(id); // require a value here
 ```
 
-A computation can recover from a selected failure, inspect an error, or raise an application-level
-exception with the underlying cause preserved. Each decision lives beside the operation it concerns.
+## The implemented language
 
-## Compose in execution order
+| Area | What is available |
+| --- | --- |
+| [Values](kvs/docs/language/values.md) | Nullable `T?` and present `T!` types; nullable access and numeric arithmetic; defaults and path materialization; optional calls; explicit sieving and filtered bindings; comparison chains and alternatives |
+| [Flow](kvs/docs/language/flow.md) | Result-producing `for`, `collect`, lazy `collect*`, `select`, and `switch`; implicit `_` and keyed `#` iteration; ranges; conditional return, yield, assignment, and literal placement |
+| [Data](kvs/docs/language/data.md) | Presence-aware literals, structural defaults, typed construction and projection, and in-place typed spread |
+| [Pipelines](kvs/docs/language/pipelines.md) | `|>`, presence-aware `|?>`, input-retaining `|%>`, and `%` placeholder callbacks |
+| [Failure](kvs/docs/language/errors.md) | Catch-and-split bindings, selected failure demotion with `~`, and promotion with `~~` |
+| [Types](kvs/docs/language/types.md) | Record shorthand `{ *: Value }` and runtime-erased `distinct` and `branded` domains |
+| [Context](kvs/docs/language/context.md) | Typed context keys, context functions, scoped overrides, and explicit JavaScript boundaries |
 
-Pipelines compose ordinary functions explicitly, keep argument placement visible, and can stop when
-an intermediate value is absent:
+These features compile and run now. KVS also provides language-service diagnostics, hover and navigation, formatting, and a VS Code syntax-highlighting extension. The [working examples](kvs/examples/README.md) and [whole programs](kvs/docs/language/examples.md) show more combinations; the [language guide](kvs/docs/language/README.md) gives the detailed rules.
 
-```kvs
-const encoded = maybeDocument |?>
-    normalize |>
-    % + "\n" |>
-    compress(%, "LZ", compressionLevel) |>
-    toBase64;
-```
+## Experimental boundaries
 
-Use a pipeline for successive transformations and a producing loop for branching work. Both keep the
-steps in the order they happen.
+KVS currently reads `.ts` files with KVS semantics and emits ordinary JavaScript. It can consume JavaScript libraries and TypeScript declarations, but its native declarations may contain KVS syntax that stock TypeScript cannot read. A dedicated source extension, a mode for ordinary TypeScript sources, and stock-TypeScript-facing package declarations remain open work. See [TypeScript interoperability](kvs/docs/language/interop.md) and the [implementation checklist](kvs/docs/development/TODO.md) for the exact boundary.
 
-## Typed context
+## Development
 
-Request identifiers, locales, and similar values may be needed several calls below the code that
-establishes them. KVS provides typed context keys, requires participating functions to declare
-`context`, and lets callers override values for a scoped operation:
-
-```kvs
-context RequestId: string = "NO_REQUEST";
-
-context function processOrder(order: Order) {
-    Audit.record(RequestId, order.id);
-}
-
-function handleRequest(request: Request) {
-    context (RequestId = request.id) {
-        processOrder(request.order);
-    }
-}
-```
-
-Intermediate functions need not carry parameters they do not otherwise use, while contextual
-dependencies and override boundaries remain explicit.
-
-## Other practical additions
-
-The same practical approach extends to erased domains. `distinct T` prevents accidental mixing while
-remaining compatible with its base type, and `branded T` requires explicit entry through an `as`
-cast. Both work with primitive and structural types without adding runtime wrappers. Comparisons can
-also express ranges and finite alternatives directly.
-
-## Reading guide
-
-Read the core chapters in order, or start with [whole programs](kvs/docs/language/examples.md) to
-see the ideas together.
-
-1. [Nullability, Values, and Defaults](kvs/docs/language/values.md) — nullable types, optional
-   invocation, and explicit policies for missing data.
-2. [Structured Production and Decisions](kvs/docs/language/flow.md) — final state, every result,
-   first result, and selected results using familiar control flow.
-3. [Constructing and Shaping Data](kvs/docs/language/data.md) — presence-aware literals, POD
-   construction, writable paths, and typed spread.
-4. [Pipelines and Placeholder Lambdas](kvs/docs/language/pipelines.md) — staged composition and
-   concise callbacks around `%`.
-5. [Failure Policy](kvs/docs/language/errors.md) — expose failure, demote it to absence, or raise an
-   exception at a boundary.
-
-Two independent themes can be read as needed:
-
-- [Typed Context](kvs/docs/language/context.md) — independent typed keys, explicit context
-  functions, and scoped overrides.
-- [Lightweight Type-System Additions](kvs/docs/language/types.md) — erased domains over primitive
-  and structural types that catch accidental mixing without runtime wrappers.
-
-Alongside the chapters:
-
-- [Whole Programs](kvs/docs/language/examples.md) — examples combining the themes, with a TypeScript
-  comparison.
-- [TypeScript Interoperability](kvs/docs/language/interop.md) — current source, runtime, and
-  declaration boundaries, plus the unresolved shape of TypeScript-facing artifacts.
-- [Lowering, Evaluation, and JavaScript Interop](kvs/docs/language/implementation.md) —
-  implementation reference outside the introductory reading path.
-
-## Scope
-
-KVS is centered on application data and control flow.
-
-Structured concurrency, signature/type unification, ownership, packages, and metaprogramming remain
-outside the current proposals.
+From the repository root, install dependencies with `npm ci`, build the KVS compiler with `npx hereby tsc:build`, and run the working examples with `npx hereby test:smoke`. The smoke task compiles and runs the normal and showcase examples, checking their output against tracked baselines. The [development documents](kvs/docs/development/README.md) cover the compiler, decisions, and testing workflow; the [implementation checklist](kvs/docs/development/TODO.md) tracks remaining work.
 
 ## VS Code
 
-VS Code can use the local KVS compiler for language features such as diagnostics, hover, document
-highlights, and formatting:
+Install the **TypeScript (Native Preview)** extension, build the local compiler with `npx hereby tsc:build`, and copy `.vscode/settings.template.json` to `.vscode/settings.json` (or merge it into your existing settings). Reload the VS Code window after setup and after rebuilding the compiler. The settings point the native language service at `./built/local` for KVS diagnostics, hover, navigation, and formatting.
 
-1. Install the recommended **TypeScript (Native Preview)** extension.
-2. Build the local compiler with `npx hereby tsc:build`.
-3. Copy `.vscode/settings.template.json` to `.vscode/settings.json`, or merge its settings into your
-   existing workspace settings.
-4. Reload the VS Code window. Reload it again after rebuilding the compiler.
-
-The template enables the native TypeScript language service and points it to `./built/local`. The
-resulting `.vscode/settings.json` remains ignored so personal workspace settings are not committed.
-
-The companion [KVS syntax-highlighting extension](kvs/vscode/README.md) teaches VS Code's TypeScript
-grammar about KVS constructs. It is kept separate from the compiler-backed language features above.
+The companion [KVS syntax-highlighting extension](kvs/vscode/README.md) adds grammar support for KVS punctuation and producer forms. It supplements the compiler-backed language features.
 
 ## Upstream
 
-KVS is built as a fork of [Microsoft TypeScript](https://github.com/microsoft/TypeScript) and
-retains its Apache-2.0 license.
+KVS is built as a fork of [Microsoft TypeScript](https://github.com/microsoft/TypeScript) and retains its Apache-2.0 license.

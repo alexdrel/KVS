@@ -1,7 +1,7 @@
 class Trie {
     end = false;
     children: Trie?[] = [];
-    
+
     ndx = (c: string) => c.charCodeAt(0) - 'a'.charCodeAt(0);
     add(word: string, i = 0) {
         if (i === word.length) {

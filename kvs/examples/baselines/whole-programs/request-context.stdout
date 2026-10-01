@@ -1,0 +1,5 @@
+req-1: greeting-created
+Bonjour, Ada
+req-2: greeting-created
+Hello, Ada
+true

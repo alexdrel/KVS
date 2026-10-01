@@ -1187,7 +1187,7 @@ export const validate = task({
 async function runSmokeTest() {
     const examplesDir = path.resolve("kvs/examples");
     const baselinesDir = path.join(examplesDir, "baselines");
-    const groups = ["", "showcase"];
+    const groups = ["", "showcase", "whole-programs"];
     const examples = groups.flatMap(group =>
         fs.readdirSync(path.join(examplesDir, group), { withFileTypes: true })
             .filter(entry => entry.isFile() && entry.name.endsWith(".ts"))
@@ -1203,6 +1203,27 @@ async function runSmokeTest() {
             : [];
     });
     assert.deepStrictEqual(actualBaselines.sort(), [...expectedBaselines].sort(), "KVS example output baselines must match runnable examples");
+
+    const documentedPaths = [
+        "whole-programs/invoice.ts",
+        "whole-programs/photo-cards.ts",
+        "whole-programs/request-context.ts",
+        "whole-programs/document-export.ts",
+        "showcase/quadratic.ts",
+        "showcase/primes.ts",
+        "showcase/histogram.ts",
+        "showcase/queens.ts",
+        "showcase/links.ts",
+        "showcase/trie.ts",
+        "showcase/versions.ts",
+    ];
+    const documentedExamples = fs.readFileSync("kvs/docs/language/examples.md", "utf8");
+    const documentedBlocks = [...documentedExamples.matchAll(/```kvs\r?\n([\s\S]*?)\r?\n```/g)].map(match => match[1].replaceAll("\r\n", "\n").trimEnd());
+    assert.strictEqual(documentedBlocks.length, documentedPaths.length, "Documented examples must match tracked sources");
+    for (const [index, example] of documentedPaths.entries()) {
+        const source = fs.readFileSync(path.join(examplesDir, example), "utf8").replaceAll("\r\n", "\n").trimEnd();
+        assert.strictEqual(documentedBlocks[index], source, `${example} differs from its language-guide example`);
+    }
 
     const outputDir = fs.mkdtempSync(path.join(os.tmpdir(), "kvs-examples-"));
     try {

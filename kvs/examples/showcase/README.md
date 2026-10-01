@@ -8,3 +8,7 @@ here when all syntax it uses is implemented.
 - [Histogram spikes](histogram.ts)
 - [Eight queens](queens.ts)
 - [URL normalization](links.ts)
+- [Trie](trie.ts)
+
+[Version checking](versions.ts) is a directory-scanning CLI. It compiles with the KVS compiler but
+is excluded from the smoke test because its output and exit status depend on the scanned directory.
