@@ -240,8 +240,11 @@ func isKvsQuestionPrefixContext(context *FormattingContext) bool {
 }
 
 func isKvsOptionalDeclarationContext(context *FormattingContext) bool {
-	return context.contextNode.Kind == ast.KindVariableDeclaration &&
-		context.currentTokenSpan.Kind != ast.KindEqualsToken
+	if context.contextNode.Kind != ast.KindVariableDeclaration || context.currentTokenSpan.Kind == ast.KindEqualsToken {
+		return false
+	}
+	initializer := context.contextNode.AsVariableDeclaration().Initializer
+	return initializer == nil || initializer.Kind != ast.KindKvsExtantBindingInitializer
 }
 
 func isKvsQuestionSuffixContext(context *FormattingContext) bool {
@@ -261,7 +264,22 @@ func isBeforeKvsCompactLiteral(context *FormattingContext) bool {
 
 func isKvsExtantAssignmentContext(context *FormattingContext) bool {
 	return context.contextNode.Kind == ast.KindKvsContextBinding ||
-		context.contextNode.Kind == ast.KindKvsExtantAssignmentExpression
+		context.contextNode.Kind == ast.KindKvsExtantAssignmentExpression ||
+		context.contextNode.Kind == ast.KindKvsExtantBindingInitializer ||
+		context.currentTokenParent.Kind == ast.KindKvsExtantBindingInitializer ||
+		context.nextTokenParent.Kind == ast.KindKvsExtantBindingInitializer
+}
+
+func isKvsExtantBindingContext(context *FormattingContext) bool {
+	if context.contextNode.Kind == ast.KindVariableDeclaration {
+		initializer := context.contextNode.AsVariableDeclaration().Initializer
+		if initializer != nil && initializer.Kind == ast.KindKvsExtantBindingInitializer {
+			return true
+		}
+	}
+	return context.contextNode.Kind == ast.KindKvsExtantBindingInitializer ||
+		context.currentTokenParent.Kind == ast.KindKvsExtantBindingInitializer ||
+		context.nextTokenParent.Kind == ast.KindKvsExtantBindingInitializer
 }
 
 func isKvsSieveBindingContext(context *FormattingContext) bool {

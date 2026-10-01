@@ -3,7 +3,7 @@
 This is a working implementation aid, not a language specification or feature order. The language
 documents remain authoritative for accepted semantics.
 
-Progress: **414 of 424 items complete (97.6%)**; **10 remain open**.
+Progress: **415 of 425 items complete (97.6%)**; **10 remain open**.
 
 - `[x]` means implemented with focused compiler evidence.
 - `[ ]` means unimplemented, incomplete, or not yet deliberately validated.
@@ -27,7 +27,8 @@ Implemented vertical slices:
   source-order argument effects and staging writable receiver materialization until invocation.
 - Nulling operator: `condition ?: expression`.
 - Nullability type operators: `T?` and `T!`.
-- Successful-branch binding: `if (const value = expression)`.
+- Successful-branch bindings: truthy `if (const value = expression)` and presence-based `if (const
+  value ?= expression)`.
 - Type-directed defaults and materialization for primitive, collection, constructor-backed, and
   concrete structural types: postfix `value!`, including writable named and indexed paths and staged
   optional writes.
@@ -264,6 +265,7 @@ example `.js` files are intentionally ignored.
 ### Binding in an `if` condition
 
 - [x] `if (const value = expression)`
+- [x] `if (const value ?= expression)` presence binding
 - [x] Initializer evaluated once
 - [x] Binding scoped only to the successful branch
 - [x] Successful branch narrows the binding to its truthy type

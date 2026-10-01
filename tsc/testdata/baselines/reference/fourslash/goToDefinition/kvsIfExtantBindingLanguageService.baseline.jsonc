@@ -1,0 +1,17 @@
+// === goToDefinition ===
+// === /kvsIfExtantBindingLanguageService.ts ===
+// declare function read(): { value: number }?;
+// 
+// if (const <|[|item|] ?= read()|>) {
+//     console.log(/*GOTO DEF*/item.value);
+// }
+
+
+
+// === goToDefinition ===
+// === /kvsIfExtantBindingLanguageService.ts ===
+// declare function read(): { value: number }?;
+// 
+// if (const /*GOTO DEF*/<|[|item|] ?= read()|>) {
+//     console.log(item.value);
+// }

@@ -44,8 +44,9 @@ comparison chains, and explicit diagnostics for ambiguous nullable equality.
 their accumulator state, eager `collect`, lazy `collect*`, first-result `select`, and
 value-producing `switch`. The iteration subject `_` and its coordinate `#` work with arrays, maps,
 records, and general iterables; an explicit destructuring `in` header names both values. Numeric
-ranges provide lazy iteration. Conditional bindings in `if`, conditional return and yield, and
-conditional placement keep local decisions beside the operation they affect.
+ranges provide lazy iteration. Conditional bindings in `if` test truthiness (`=`), presence (`?=`),
+or a sieved value (`~=`). Conditional return, yield, and placement keep local decisions beside the
+operation they affect.
 
 For example, a record's values and keys are available directly in a producing loop:
 

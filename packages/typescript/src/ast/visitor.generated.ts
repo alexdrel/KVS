@@ -122,6 +122,7 @@ import type {
     KvsDistinctType,
     KvsExtantAssertionExpression,
     KvsExtantAssignmentExpression,
+    KvsExtantBindingInitializer,
     KvsExtantReturnStatement,
     KvsExtantType,
     KvsExtantYieldStatement,
@@ -336,6 +337,7 @@ import {
     updateKvsDistinctType,
     updateKvsExtantAssertionExpression,
     updateKvsExtantAssignmentExpression,
+    updateKvsExtantBindingInitializer,
     updateKvsExtantReturnStatement,
     updateKvsExtantType,
     updateKvsExtantYieldStatement,
@@ -752,6 +754,12 @@ const visitEachChildTable: Record<number, VisitEachChildFunction> = {
     [SyntaxKind.KvsPlaceholderLambdaExpression]: (node: KvsPlaceholderLambdaExpression, visitor: Visitor): KvsPlaceholderLambdaExpression => {
         const _arrow = visitNode(node.arrow, visitor, isArrowFunction);
         return updateKvsPlaceholderLambdaExpression(node, _arrow);
+    },
+    [SyntaxKind.KvsExtantBindingInitializer]: (node: KvsExtantBindingInitializer, visitor: Visitor): KvsExtantBindingInitializer => {
+        const _questionToken = visitNode(node.questionToken, visitor, isQuestionToken);
+        const _equalsToken = visitNode(node.equalsToken, visitor, isEqualsToken);
+        const _expression = visitNode(node.expression, visitor, isExpression);
+        return updateKvsExtantBindingInitializer(node, _questionToken, _equalsToken, _expression);
     },
     [SyntaxKind.KvsSieveBindingInitializer]: (node: KvsSieveBindingInitializer, visitor: Visitor): KvsSieveBindingInitializer => {
         const _tildeToken = visitNode(node.tildeToken, visitor, isTildeToken);

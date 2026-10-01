@@ -166,6 +166,7 @@ import type {
     KvsDistinctType,
     KvsExtantAssertionExpression,
     KvsExtantAssignmentExpression,
+    KvsExtantBindingInitializer,
     KvsExtantReturnStatement,
     KvsExtantType,
     KvsExtantYieldStatement,
@@ -956,6 +957,8 @@ function cloneNodeData(node: Node): any {
             return { firstTildeToken: n.firstTildeToken, secondTildeToken: n.secondTildeToken, expression: n.expression };
         case SyntaxKind.KvsPlaceholderLambdaExpression:
             return { arrow: n.arrow };
+        case SyntaxKind.KvsExtantBindingInitializer:
+            return { questionToken: n.questionToken, equalsToken: n.equalsToken, expression: n.expression };
         case SyntaxKind.KvsSieveBindingInitializer:
             return { tildeToken: n.tildeToken, equalsToken: n.equalsToken, expression: n.expression };
         case SyntaxKind.KvsSieveAssignmentExpression:
@@ -1428,6 +1431,10 @@ const forEachChildTable: Record<number, ForEachChildFunction> = {
         visitNode(cbNode, data.secondTildeToken) ||
         visitNode(cbNode, data.expression),
     [SyntaxKind.KvsPlaceholderLambdaExpression]: (data, cbNode, cbNodes) => visitNode(cbNode, data.arrow),
+    [SyntaxKind.KvsExtantBindingInitializer]: (data, cbNode, cbNodes) =>
+        visitNode(cbNode, data.questionToken) ||
+        visitNode(cbNode, data.equalsToken) ||
+        visitNode(cbNode, data.expression),
     [SyntaxKind.KvsSieveBindingInitializer]: (data, cbNode, cbNodes) =>
         visitNode(cbNode, data.tildeToken) ||
         visitNode(cbNode, data.equalsToken) ||
@@ -2341,6 +2348,20 @@ const yieldEachChildTable: Record<number, YieldEachChildFunction> = {
     [SyntaxKind.KvsPlaceholderLambdaExpression]: function* (data) {
         if (data.arrow) {
             const res = yield data.arrow;
+            if (res) return res;
+        }
+    },
+    [SyntaxKind.KvsExtantBindingInitializer]: function* (data) {
+        if (data.questionToken) {
+            const res = yield data.questionToken;
+            if (res) return res;
+        }
+        if (data.equalsToken) {
+            const res = yield data.equalsToken;
+            if (res) return res;
+        }
+        if (data.expression) {
+            const res = yield data.expression;
             if (res) return res;
         }
     },
@@ -5010,6 +5031,14 @@ export function createKvsIterationCoordinateExpression(): KvsIterationCoordinate
     return new NodeObject(SyntaxKind.KvsIterationCoordinateExpression, undefined) as unknown as KvsIterationCoordinateExpression;
 }
 
+export function createKvsExtantBindingInitializer(questionToken: QuestionToken, equalsToken: EqualsToken, expression: Expression): KvsExtantBindingInitializer {
+    return new NodeObject(SyntaxKind.KvsExtantBindingInitializer, {
+        questionToken,
+        equalsToken,
+        expression,
+    }) as unknown as KvsExtantBindingInitializer;
+}
+
 export function createKvsSieveBindingInitializer(tildeToken: TildeToken, equalsToken: EqualsToken, expression: Expression): KvsSieveBindingInitializer {
     return new NodeObject(SyntaxKind.KvsSieveBindingInitializer, {
         tildeToken,
@@ -6653,6 +6682,10 @@ export function updateKvsSieveExpression(node: KvsSieveExpression, firstTildeTok
 
 export function updateKvsPlaceholderLambdaExpression(node: KvsPlaceholderLambdaExpression, arrow: ArrowFunction): KvsPlaceholderLambdaExpression {
     return node.arrow !== arrow ? createKvsPlaceholderLambdaExpression(arrow) : node;
+}
+
+export function updateKvsExtantBindingInitializer(node: KvsExtantBindingInitializer, questionToken: QuestionToken, equalsToken: EqualsToken, expression: Expression): KvsExtantBindingInitializer {
+    return node.questionToken !== questionToken || node.equalsToken !== equalsToken || node.expression !== expression ? createKvsExtantBindingInitializer(questionToken, equalsToken, expression) : node;
 }
 
 export function updateKvsSieveBindingInitializer(node: KvsSieveBindingInitializer, tildeToken: TildeToken, equalsToken: EqualsToken, expression: Expression): KvsSieveBindingInitializer {

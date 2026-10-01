@@ -1,0 +1,7 @@
+// === documentHighlights ===
+// === /kvsIfExtantBindingLanguageService.ts ===
+// declare function [|read|](): { value: number }?;
+// 
+// if (const item ?= /*HIGHLIGHTS*/[|read|]()) {
+//     console.log(item.value);
+// }

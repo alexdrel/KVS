@@ -357,6 +357,8 @@ func (tx *transformer) visit(node *ast.Node) *ast.Node {
 		return tx.Visitor().VisitNode(placeholder.Arrow.AsArrowFunction().Body)
 	case ast.KindKvsSieveBindingInitializer:
 		return tx.transformSieve(node.AsKvsSieveBindingInitializer().Expression)
+	case ast.KindKvsExtantBindingInitializer:
+		return tx.Visitor().VisitNode(node.AsKvsExtantBindingInitializer().Expression)
 	case ast.KindKvsSieveAssignmentExpression:
 		return tx.transformSieveAssignment(node.AsKvsSieveAssignmentExpression())
 	case ast.KindKvsTypedSpreadAssignmentExpression:
@@ -1679,12 +1681,12 @@ func (tx *transformer) transformIfBindingStatement(node *ast.KvsIfBindingStateme
 	//
 	// The temporary evaluates the initializer once. Keeping the source binding
 	// inside the successful block preserves its intentionally one-sided scope.
-	// Ordinary bindings use JavaScript truthiness. Sieve bindings instead test
-	// the sieved result for presence, so accepted zero and false values succeed.
+	// Ordinary bindings use JavaScript truthiness. Sieve and extant bindings
+	// test presence, so accepted zero and false values succeed.
 	factory := tx.Factory()
 	clause := node.Clause.AsKvsIfBindingClause()
 	declaration := clause.DeclarationList.AsVariableDeclarationList().Declarations.Nodes[0].AsVariableDeclaration()
-	sieveBinding := declaration.Initializer != nil && declaration.Initializer.Kind == ast.KindKvsSieveBindingInitializer
+	presenceBinding := declaration.Initializer != nil && (declaration.Initializer.Kind == ast.KindKvsSieveBindingInitializer || declaration.Initializer.Kind == ast.KindKvsExtantBindingInitializer)
 	var temp *ast.IdentifierNode
 	if tx.lazyProducer {
 		// The iterator body owns its hoisted expression temporaries. Keep this
@@ -1713,7 +1715,7 @@ func (tx *transformer) transformIfBindingStatement(node *ast.KvsIfBindingStateme
 	}
 	thenBlock := factory.NewBlock(factory.NewNodeList(statements), true)
 	condition := temp.AsNode()
-	if sieveBinding {
+	if presenceBinding {
 		condition = factory.NewBinaryExpression(nil, temp, nil, factory.NewToken(ast.KindExclamationEqualsToken), factory.NewKeywordExpression(ast.KindNullKeyword))
 	}
 	ifStatement := factory.NewIfStatement(condition, thenBlock, tx.Visitor().VisitNode(node.ElseStatement))

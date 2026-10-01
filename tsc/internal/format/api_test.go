@@ -120,6 +120,19 @@ func TestFormatKvsIfBinding(t *testing.T) {
 	assert.Equal(t, applyBulkEdits(text, edits), "if (const files ~= find(root)) {\n    console.log(files);\n} else {\n    console.error(\"none\");\n}\n")
 }
 
+func TestFormatKvsIfExtantBinding(t *testing.T) {
+	t.Parallel()
+
+	ctx := format.WithFormatCodeSettings(t.Context(), lsutil.GetDefaultFormatCodeSettings(), "\n")
+	text := "if(const count?=read()){\nconsole.log(count);\n}\n"
+	sourceFile := parser.ParseSourceFile(ast.SourceFileParseOptions{
+		FileName: "/if-extant-binding.ts",
+		Path:     "/if-extant-binding.ts",
+	}, text, core.ScriptKindTS)
+	edits := format.FormatDocument(ctx, sourceFile)
+	assert.Equal(t, applyBulkEdits(text, edits), "if (const count ?= read()) {\n    console.log(count);\n}\n")
+}
+
 func TestFormatKvsAllInOne(t *testing.T) {
 	t.Parallel()
 

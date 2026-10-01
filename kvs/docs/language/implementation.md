@@ -242,8 +242,22 @@ if ($value) {
 }
 ```
 
-A sieve binding first applies `~~` and tests the filtered result with `$value != null`, allowing
-accepted zero and false values into the branch.
+A presence binding keeps the original initializer value and tests `$value != null`:
+
+```kvs
+if (const count ?= readCount()) use(count);
+```
+
+```ts
+const $value = readCount();
+if ($value != null) {
+    const count = $value;
+    use(count);
+}
+```
+
+A sieve binding first applies `~~` and then uses the same presence test. Both forms admit zero and
+false, but only the sieve rejects empty strings, empty collections, and `NaN`.
 
 `return?` lowers to the same presence test around a return:
 

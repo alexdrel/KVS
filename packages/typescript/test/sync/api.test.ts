@@ -6848,6 +6848,24 @@ describe("AST roundtrips", { concurrency }, () => {
         assert.equal(api.printer.printFile(sourceFile), sourceFile.text);
     });
 
+    test("KVS presence if binding roundtrip", () => {
+        using api = spawnAPI({
+            "/tsconfig.json": "{}",
+            "/src/index.ts": `if (const count ?= readCount()) {\n    use(count);\n}\n`,
+        });
+
+        const snapshot = api.createSnapshot({ openProject: "/tsconfig.json" });
+        const project = snapshot.getConfiguredProject("/tsconfig.json")!;
+        const sourceFile = project.program.getSourceFile("/src/index.ts");
+        assert(sourceFile);
+        const stmt = sourceFile.statements[0] as import("@typescript/typescript/unstable/ast").KvsIfBindingStatement;
+        assert.equal(stmt.kind, SyntaxKind.KvsIfBindingStatement);
+        const initializer = stmt.clause.declarationList.declarations[0].initializer as import("@typescript/typescript/unstable/ast").KvsExtantBindingInitializer;
+        assert.equal(initializer.kind, SyntaxKind.KvsExtantBindingInitializer);
+        assert.equal(initializer.expression.kind, SyntaxKind.CallExpression);
+        assert.equal(api.printer.printFile(sourceFile), sourceFile.text);
+    });
+
     test("KVS pipeline roundtrip", () => {
         using api = spawnAPI({
             "/tsconfig.json": "{}",

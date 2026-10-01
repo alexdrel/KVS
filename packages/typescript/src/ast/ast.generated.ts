@@ -678,6 +678,12 @@ export interface KvsPlaceholderLambdaExpression extends ExpressionBase {
 export interface KvsIterationCoordinateExpression extends ExpressionBase {
     readonly kind: SyntaxKind.KvsIterationCoordinateExpression;
 }
+export interface KvsExtantBindingInitializer extends ExpressionBase {
+    readonly kind: SyntaxKind.KvsExtantBindingInitializer;
+    readonly questionToken: QuestionToken;
+    readonly equalsToken: EqualsToken;
+    readonly expression: Expression;
+}
 export interface KvsSieveBindingInitializer extends ExpressionBase {
     readonly kind: SyntaxKind.KvsSieveBindingInitializer;
     readonly tildeToken: TildeToken;

@@ -578,6 +578,21 @@ condition narrows the binding's type:** although the lookup can produce absence,
 The binding exists only in the successful branch, where it is narrowed to its truthy type. It is not
 in scope in `else` or after the `if` statement.
 
+A **presence binding** tests only for absence:
+
+```kvs
+if (const count ?= readCount()) {
+    // count is present here, including when it is zero.
+    report(count);
+}
+```
+
+`if (const value ?= expression)` evaluates the expression once, binds its original value, and enters
+the successful branch when that value is neither `null` nor `undefined`. The binding is narrowed to
+its present type in that branch and has the same one-sided scope as an ordinary `if` binding. False,
+zero, empty strings, and empty collections all pass. This declaration form is available in an `if`
+condition; outside one, `?=` remains an assignment to an existing target.
+
 A **sieve binding** applies the sieve to the initializer before binding it:
 
 ```kvs
@@ -592,7 +607,8 @@ producing either the original value or null.
 
 In an `if`, the condition succeeds when that sieved result is extant rather than when it is
 JavaScript-truthy. Accepted values such as zero and false therefore bind and enter the successful
-branch.
+branch. Unlike `?=`, `~=` first turns `NaN`, empty strings, and empty collections into absence, so
+those values skip the branch.
 
 The same spelling is available as assignment:
 

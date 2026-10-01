@@ -20,3 +20,18 @@ if (const roots ~= realRoots(eq.a, eq.b, eq/*property*/.c)) {
 	defer done()
 	f.VerifyBaselineDocumentHighlights(t, nil /*preferences*/, "property")
 }
+
+func TestKvsIfExtantBindingLanguageService(t *testing.T) {
+	t.Parallel()
+	defer testutil.RecoverAndFail(t, "Panic on fourslash test")
+	const content = `declare function read(): { value: number }?;
+
+if (const /*binding*/item ?= /*call*/read()) {
+    console.log(/*use*/item.value);
+}`
+	f, done := fourslash.NewFourslash(t, nil /*capabilities*/, content)
+	defer done()
+	f.VerifyQuickInfoAt(t, "use", "const item: {\n    value: number;\n}", "")
+	f.VerifyBaselineGoToDefinition(t, true, "use", "binding")
+	f.VerifyBaselineDocumentHighlights(t, nil /*preferences*/, "call")
+}

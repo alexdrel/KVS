@@ -134,6 +134,9 @@ func getChildrenPropertyMask(node *ast.Node) uint8 {
 	case ast.KindKvsPlaceholderLambdaExpression:
 		n := node.AsKvsPlaceholderLambdaExpression()
 		return (boolToByte(n.Arrow != nil) << 0)
+	case ast.KindKvsExtantBindingInitializer:
+		n := node.AsKvsExtantBindingInitializer()
+		return (boolToByte(n.QuestionToken != nil) << 0) | (boolToByte(n.EqualsToken != nil) << 1) | (boolToByte(n.Expression != nil) << 2)
 	case ast.KindKvsSieveBindingInitializer:
 		n := node.AsKvsSieveBindingInitializer()
 		return (boolToByte(n.TildeToken != nil) << 0) | (boolToByte(n.EqualsToken != nil) << 1) | (boolToByte(n.Expression != nil) << 2)

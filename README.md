@@ -143,15 +143,22 @@ const user = findUser(id) ~~ UserNotFound(id); // require a value here
 
 ## The implemented language
 
-| Area                                        | What is available                                                                                                                                                                                           |
-| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Values](kvs/docs/language/values.md)       | Nullable `T?` and present `T!` types; nullable access and numeric arithmetic; defaults and path materialization; optional calls; explicit sieving and filtered bindings; comparison chains and alternatives |
-| [Flow](kvs/docs/language/flow.md)           | Result-producing `for`, `collect`, lazy `collect*`, `select`, and `switch`; implicit `_` and keyed `#` iteration; ranges; conditional return, yield, assignment, and literal placement                      |
-| [Data](kvs/docs/language/data.md)           | Presence-aware literals, structural defaults, typed construction and projection, and in-place typed spread                                                                                                  |
-| [Pipelines](kvs/docs/language/pipelines.md) | `                                                                                                                                                                                                           | >`, presence-aware ` | ?>`, input-retaining ` | %>``, and ``%` placeholder callbacks |
-| [Failure](kvs/docs/language/errors.md)      | Catch-and-split bindings, selected failure demotion with `~`, and promotion with `~~`                                                                                                                       |
-| [Types](kvs/docs/language/types.md)         | Record shorthand `{ *: Value }` and runtime-erased `distinct` and `branded` domains                                                                                                                         |
-| [Context](kvs/docs/language/context.md)     | Typed context keys, context functions, scoped overrides, and explicit JavaScript boundaries                                                                                                                 |
+- [Values](kvs/docs/language/values.md): nullable `T?` and present `T!` types; nullable access and
+  numeric arithmetic; defaults and path materialization; optional calls; explicit sieving and
+  filtered bindings; comparison chains and alternatives.
+- [Flow](kvs/docs/language/flow.md): result-producing `for`, `collect`, lazy `collect*`, `select`,
+  and `switch`; implicit `_` and keyed `#` iteration; ranges; truthy, present, and sieved `if`
+  bindings; conditional return, yield, assignment, and literal placement.
+- [Data](kvs/docs/language/data.md): presence-aware literals, structural defaults, typed
+  construction and projection, and in-place typed spread.
+- [Pipelines](kvs/docs/language/pipelines.md): `|>`, presence-aware `|?>`, input-retaining `|%>`,
+  and `%` placeholder callbacks.
+- [Failure](kvs/docs/language/errors.md): catch-and-split bindings, selected failure demotion with
+  `~`, and promotion with `~~`.
+- [Types](kvs/docs/language/types.md): record shorthand `{ *: Value }` and runtime-erased `distinct`
+  and `branded` domains.
+- [Context](kvs/docs/language/context.md): typed context keys, context functions, scoped overrides,
+  and explicit JavaScript boundaries.
 
 These features compile and run now. KVS also provides language-service diagnostics, hover and
 navigation, formatting, and a VS Code syntax-highlighting extension. The

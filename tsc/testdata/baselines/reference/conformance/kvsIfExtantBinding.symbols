@@ -1,0 +1,50 @@
+//// [tests/cases/conformance/kvs/kvsIfExtantBinding.ts] ////
+
+=== kvsIfExtantBinding.ts ===
+declare function candidate(): number | false | "" | null | undefined;
+>candidate : Symbol(candidate, Decl(kvsIfExtantBinding.ts, 0, 0))
+
+if (const value ?= candidate()) {
+>value : Symbol(value, Decl(kvsIfExtantBinding.ts, 2, 9))
+>candidate : Symbol(candidate, Decl(kvsIfExtantBinding.ts, 0, 0))
+
+    const present: number | false | "" = value;
+>present : Symbol(present, Decl(kvsIfExtantBinding.ts, 3, 9))
+>value : Symbol(value, Decl(kvsIfExtantBinding.ts, 2, 9))
+
+    console.log(present);
+>console.log : Symbol(Console.log, Decl(lib.dom.d.ts, --, --))
+>console : Symbol(console, Decl(lib.dom.d.ts, --, --))
+>log : Symbol(Console.log, Decl(lib.dom.d.ts, --, --))
+>present : Symbol(present, Decl(kvsIfExtantBinding.ts, 3, 9))
+
+} else {
+    value; // Error: the binding is only in the successful branch.
+}
+
+value; // Error: the binding does not escape the if statement.
+
+function readOnce() {
+>readOnce : Symbol(readOnce, Decl(kvsIfExtantBinding.ts, 9, 6))
+
+    console.log("read");
+>console.log : Symbol(Console.log, Decl(lib.dom.d.ts, --, --))
+>console : Symbol(console, Decl(lib.dom.d.ts, --, --))
+>log : Symbol(Console.log, Decl(lib.dom.d.ts, --, --))
+
+    return 0 as number?;
+}
+
+if (const zero ?= readOnce()) {
+>zero : Symbol(zero, Decl(kvsIfExtantBinding.ts, 16, 9))
+>readOnce : Symbol(readOnce, Decl(kvsIfExtantBinding.ts, 9, 6))
+
+    console.log(zero.toFixed(1));
+>console.log : Symbol(Console.log, Decl(lib.dom.d.ts, --, --))
+>console : Symbol(console, Decl(lib.dom.d.ts, --, --))
+>log : Symbol(Console.log, Decl(lib.dom.d.ts, --, --))
+>zero.toFixed : Symbol(Number.toFixed, Decl(lib.es5.d.ts, --, --))
+>zero : Symbol(zero, Decl(kvsIfExtantBinding.ts, 16, 9))
+>toFixed : Symbol(Number.toFixed, Decl(lib.es5.d.ts, --, --))
+}
+

@@ -1385,7 +1385,7 @@ func (p *Parser) parseIfStatement() *ast.Node {
 	openParenParsed := p.parseExpected(ast.KindOpenParenToken)
 	if p.token == ast.KindConstKeyword {
 		p.nextToken()
-		declaration := p.parseVariableDeclaration()
+		declaration := p.parseIfBindingDeclaration()
 		declarations := p.newNodeList(core.NewTextRange(declaration.Pos(), declaration.End()), []*ast.Node{declaration})
 		declarationList := p.finishNode(
 			p.factory.NewVariableDeclarationList(declarations, ast.NodeFlagsConst),
@@ -1823,19 +1823,23 @@ func (p *Parser) nextTokenIsIdentifier() bool {
 }
 
 func (p *Parser) parseVariableDeclaration() *ast.Node {
-	return p.parseVariableDeclarationWorker(false /*allowExclamation*/)
+	return p.parseVariableDeclarationWorker(false /*allowExclamation*/, false /*allowExtantBinding*/)
 }
 
 func (p *Parser) parseVariableDeclarationAllowExclamation() *ast.Node {
-	return p.parseVariableDeclarationWorker(true /*allowExclamation*/)
+	return p.parseVariableDeclarationWorker(true /*allowExclamation*/, false /*allowExtantBinding*/)
 }
 
-func (p *Parser) parseVariableDeclarationWorker(allowExclamation bool) *ast.Node {
+func (p *Parser) parseIfBindingDeclaration() *ast.Node {
+	return p.parseVariableDeclarationWorker(false /*allowExclamation*/, true /*allowExtantBinding*/)
+}
+
+func (p *Parser) parseVariableDeclarationWorker(allowExclamation bool, allowExtantBinding bool) *ast.Node {
 	pos := p.nodePos()
 	jsdoc := p.jsdocScannerInfo()
 	nameEnd := p.scanner.TokenEnd()
 	name := p.parseIdentifierOrPatternWithDiagnostic(diagnostics.Private_identifiers_are_not_allowed_in_variable_declarations)
-	var filteredInitializer *ast.Node
+	var kvsInitializer *ast.Node
 	if name.Kind == ast.KindIdentifier && p.isKvsCatchSplit(nameEnd) {
 		valueElement := p.finishNode(p.factory.NewBindingElement(nil, nil, name, nil), name.Pos())
 		tildeToken := p.parseTokenNode()
@@ -1849,12 +1853,17 @@ func (p *Parser) parseVariableDeclarationWorker(allowExclamation bool) *ast.Node
 		), pos)
 		p.parseExpected(ast.KindEqualsToken)
 		expression := p.parseAssignmentExpressionOrHigher()
-		filteredInitializer = p.finishNode(p.factory.NewKvsCatchSplitExpression(expression), tildeToken.Pos())
+		kvsInitializer = p.finishNode(p.factory.NewKvsCatchSplitExpression(expression), tildeToken.Pos())
+	} else if allowExtantBinding && name.Kind == ast.KindIdentifier && p.isKvsExtantBindingInitializer() {
+		questionToken := p.parseTokenNode()
+		equalsToken := p.parseTokenNode()
+		expression := p.parseAssignmentExpressionOrHigher()
+		kvsInitializer = p.finishNode(p.factory.NewKvsExtantBindingInitializer(questionToken, equalsToken, expression), questionToken.Pos())
 	} else if name.Kind == ast.KindIdentifier && p.isKvsSieveBindingInitializer() {
 		tildeToken := p.parseTokenNode()
 		equalsToken := p.parseTokenNode()
 		expression := p.parseAssignmentExpressionOrHigher()
-		filteredInitializer = p.finishNode(p.factory.NewKvsSieveBindingInitializer(tildeToken, equalsToken, expression), tildeToken.Pos())
+		kvsInitializer = p.finishNode(p.factory.NewKvsSieveBindingInitializer(tildeToken, equalsToken, expression), tildeToken.Pos())
 	}
 	var kvsBindingFlags ast.NodeFlags
 	var exclamationToken *ast.Node
@@ -1870,8 +1879,8 @@ func (p *Parser) parseVariableDeclarationWorker(allowExclamation bool) *ast.Node
 	}
 	typeNode := p.parseTypeAnnotation()
 	var initializer *ast.Expression
-	if filteredInitializer != nil {
-		initializer = filteredInitializer
+	if kvsInitializer != nil {
+		initializer = kvsInitializer
 	} else if p.token != ast.KindInKeyword && p.token != ast.KindOfKeyword {
 		initializer = p.parseInitializer()
 	}
@@ -1892,6 +1901,16 @@ func (p *Parser) isKvsSieveBindingInitializer() bool {
 	tildeEnd := p.scanner.TokenEnd()
 	return p.lookAhead(func(p *Parser) bool {
 		return p.nextToken() == ast.KindEqualsToken && p.scanner.TokenStart() == tildeEnd
+	})
+}
+
+func (p *Parser) isKvsExtantBindingInitializer() bool {
+	if p.token != ast.KindQuestionToken {
+		return false
+	}
+	questionEnd := p.scanner.TokenEnd()
+	return p.lookAhead(func(p *Parser) bool {
+		return p.nextToken() == ast.KindEqualsToken && p.scanner.TokenStart() == questionEnd
 	})
 }
 

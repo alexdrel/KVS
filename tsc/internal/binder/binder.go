@@ -2169,7 +2169,7 @@ func (b *Binder) bindKvsIfBindingStatement(node *ast.Node) {
 	condition.Parent = clause.AsNode()
 	var conditionExpression *ast.Node = condition
 	declaration := clause.DeclarationList.AsVariableDeclarationList().Declarations.Nodes[0].AsVariableDeclaration()
-	if declaration.Initializer != nil && declaration.Initializer.Kind == ast.KindKvsSieveBindingInitializer {
+	if declaration.Initializer != nil && (declaration.Initializer.Kind == ast.KindKvsSieveBindingInitializer || declaration.Initializer.Kind == ast.KindKvsExtantBindingInitializer) {
 		conditionExpression = b.flowFactory.NewBinaryExpression(nil, condition, nil, b.flowFactory.NewToken(ast.KindExclamationEqualsToken), b.flowFactory.NewKeywordExpression(ast.KindNullKeyword))
 		conditionExpression.Flags |= ast.NodeFlagsSynthesized
 		conditionExpression.Parent = clause.AsNode()

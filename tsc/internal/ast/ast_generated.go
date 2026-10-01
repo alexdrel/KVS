@@ -56,6 +56,7 @@ type NodeFactory struct {
 	kvsDistinctTypeArena                     core.Arena[KvsDistinctType]
 	kvsExtantAssertionExpressionArena        core.Arena[KvsExtantAssertionExpression]
 	kvsExtantAssignmentExpressionArena       core.Arena[KvsExtantAssignmentExpression]
+	kvsExtantBindingInitializerArena         core.Arena[KvsExtantBindingInitializer]
 	kvsExtantReturnStatementArena            core.Arena[KvsExtantReturnStatement]
 	kvsExtantTypeArena                       core.Arena[KvsExtantType]
 	kvsExtantYieldStatementArena             core.Arena[KvsExtantYieldStatement]
@@ -324,6 +325,7 @@ type (
 	KvsSieveExpressionNode                  = Node
 	KvsPlaceholderLambdaExpressionNode      = Node
 	KvsIterationCoordinateExpressionNode    = Node
+	KvsExtantBindingInitializerNode         = Node
 	KvsSieveBindingInitializerNode          = Node
 	KvsSieveAssignmentExpressionNode        = Node
 	KvsFailureDemotionExpressionNode        = Node
@@ -2333,6 +2335,55 @@ func (node *KvsIterationCoordinateExpression) computeSubtreeFacts() SubtreeFacts
 
 func IsKvsIterationCoordinateExpression(node *Node) bool {
 	return node.Kind == KindKvsIterationCoordinateExpression
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// KvsExtantBindingInitializer
+// ──────────────────────────────────────────────────────────────────────
+
+type KvsExtantBindingInitializer struct {
+	ExpressionBase
+	CompositeBase
+	QuestionToken *QuestionToken
+	EqualsToken   *EqualsToken
+	Expression    *Expression
+}
+
+func (f *NodeFactory) NewKvsExtantBindingInitializer(questionToken *QuestionToken, equalsToken *EqualsToken, expression *Expression) *Node {
+	data := f.kvsExtantBindingInitializerArena.New()
+	data.QuestionToken = questionToken
+	data.EqualsToken = equalsToken
+	data.Expression = expression
+	return f.newNode(KindKvsExtantBindingInitializer, data)
+}
+
+func (f *NodeFactory) UpdateKvsExtantBindingInitializer(node *KvsExtantBindingInitializer, questionToken *QuestionToken, equalsToken *EqualsToken, expression *Expression) *Node {
+	if questionToken != node.QuestionToken || equalsToken != node.EqualsToken || expression != node.Expression {
+		return updateNode(f.NewKvsExtantBindingInitializer(questionToken, equalsToken, expression), node.AsNode(), f.hooks)
+	}
+	return node.AsNode()
+}
+
+func (node *KvsExtantBindingInitializer) ForEachChild(v Visitor) bool {
+	return visit(v, node.QuestionToken) || visit(v, node.EqualsToken) || visit(v, node.Expression)
+}
+
+func (node *KvsExtantBindingInitializer) VisitEachChild(v *NodeVisitor) *Node {
+	return v.Factory.UpdateKvsExtantBindingInitializer(node, v.visitNode(node.QuestionToken), v.visitNode(node.EqualsToken), v.visitNode(node.Expression))
+}
+
+func (node *KvsExtantBindingInitializer) Clone(f NodeFactoryCoercible) *Node {
+	return cloneNode(f.AsNodeFactory().NewKvsExtantBindingInitializer(node.QuestionToken, node.EqualsToken, node.Expression), node.AsNode(), f.AsNodeFactory().hooks)
+}
+
+func (node *KvsExtantBindingInitializer) computeSubtreeFacts() SubtreeFacts {
+	return propagateSubtreeFacts(node.QuestionToken) |
+		propagateSubtreeFacts(node.EqualsToken) |
+		propagateSubtreeFacts(node.Expression)
+}
+
+func IsKvsExtantBindingInitializer(node *Node) bool {
+	return node.Kind == KindKvsExtantBindingInitializer
 }
 
 // ──────────────────────────────────────────────────────────────────────
@@ -10766,6 +10817,8 @@ func (n *Node) ForEachChild(v Visitor) bool {
 		return n.data.(*KvsSieveExpression).ForEachChild(v)
 	case KindKvsPlaceholderLambdaExpression:
 		return n.data.(*KvsPlaceholderLambdaExpression).ForEachChild(v)
+	case KindKvsExtantBindingInitializer:
+		return n.data.(*KvsExtantBindingInitializer).ForEachChild(v)
 	case KindKvsSieveBindingInitializer:
 		return n.data.(*KvsSieveBindingInitializer).ForEachChild(v)
 	case KindKvsSieveAssignmentExpression:
@@ -11275,6 +11328,10 @@ func (n *Node) AsKvsPlaceholderLambdaExpression() *KvsPlaceholderLambdaExpressio
 
 func (n *Node) AsKvsIterationCoordinateExpression() *KvsIterationCoordinateExpression {
 	return n.data.(*KvsIterationCoordinateExpression)
+}
+
+func (n *Node) AsKvsExtantBindingInitializer() *KvsExtantBindingInitializer {
+	return n.data.(*KvsExtantBindingInitializer)
 }
 
 func (n *Node) AsKvsSieveBindingInitializer() *KvsSieveBindingInitializer {

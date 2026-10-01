@@ -204,6 +204,7 @@ import type {
     KvsDistinctType,
     KvsExtantAssertionExpression,
     KvsExtantAssignmentExpression,
+    KvsExtantBindingInitializer,
     KvsExtantReturnStatement,
     KvsExtantType,
     KvsExtantYieldStatement,
@@ -708,6 +709,15 @@ export declare namespace isKvsIterationCoordinateExpression {
     function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsIterationCoordinateExpression>;
 }
 isKvsIterationCoordinateExpression.Handle = isKvsIterationCoordinateExpression as any;
+
+export function isKvsExtantBindingInitializer(node: Node): node is KvsExtantBindingInitializer {
+    return node.kind === SyntaxKind.KvsExtantBindingInitializer;
+}
+
+export declare namespace isKvsExtantBindingInitializer {
+    function Handle<T extends NodeHandleLike<Node>>(node: T): node is SpecializeNodeHandle<T, KvsExtantBindingInitializer>;
+}
+isKvsExtantBindingInitializer.Handle = isKvsExtantBindingInitializer as any;
 
 export function isKvsSieveBindingInitializer(node: Node): node is KvsSieveBindingInitializer {
     return node.kind === SyntaxKind.KvsSieveBindingInitializer;

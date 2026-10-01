@@ -303,6 +303,7 @@
             "KvsSieveExpression",
             "KvsPlaceholderLambdaExpression",
             "KvsIterationCoordinateExpression",
+            "KvsExtantBindingInitializer",
             "KvsSieveBindingInitializer",
             "KvsSieveAssignmentExpression",
             "KvsFailureDemotionExpression",
@@ -1957,6 +1958,28 @@
                     "CompositeBase"
                 ],
                 "members": [],
+                "arena": true
+            },
+            "KvsExtantBindingInitializer": {
+                "generateSubtreeFacts": true,
+                "extends": [
+                    "ExpressionBase",
+                    "CompositeBase"
+                ],
+                "members": [
+                    {
+                        "name": "QuestionToken",
+                        "type": "QuestionToken"
+                    },
+                    {
+                        "name": "EqualsToken",
+                        "type": "EqualsToken"
+                    },
+                    {
+                        "name": "Expression",
+                        "type": "Expression"
+                    }
+                ],
                 "arena": true
             },
             "KvsSieveBindingInitializer": {

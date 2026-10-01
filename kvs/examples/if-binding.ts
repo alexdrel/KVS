@@ -25,3 +25,21 @@ if (const matches ~= findBooks("ocean")) {
 } else {
     console.log("No matching books"); // No matching books
 }
+
+// A presence binding keeps falsy readings such as zero.
+const readings: { station: string; temperature: number? }[] = [
+    { station: "coast", temperature: 0 },
+    { station: "hill", temperature: -2 },
+    { station: "valley", temperature: null },
+];
+
+for (readings) {
+    if (const temperature ?= _.temperature) {
+        console.log(`${_.station}: ${temperature.toFixed(1)}°C`);
+    } else {
+        console.log(`${_.station}: offline`);
+    }
+}
+// coast: 0.0°C
+// hill: -2.0°C
+// valley: offline

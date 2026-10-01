@@ -1,0 +1,66 @@
+//// [tests/cases/conformance/kvs/kvsIfExtantBinding.ts] ////
+
+=== kvsIfExtantBinding.ts ===
+declare function candidate(): number | false | "" | null | undefined;
+>candidate : () => number | false | "" | null | undefined
+>false : false
+
+if (const value ?= candidate()) {
+>value : number | "" | false | null | undefined
+>?= candidate() : number | "" | false | null | undefined
+>candidate() : number | "" | false | null | undefined
+>candidate : () => number | false | "" | null | undefined
+
+    const present: number | false | "" = value;
+>present : number | "" | false
+>false : false
+>value : number | "" | false
+
+    console.log(present);
+>console.log(present) : void
+>console.log : (...data: any[]) => void
+>console : Console
+>log : (...data: any[]) => void
+>present : number | "" | false
+
+} else {
+    value; // Error: the binding is only in the successful branch.
+>value : any
+}
+
+value; // Error: the binding does not escape the if statement.
+>value : any
+
+function readOnce() {
+>readOnce : () => number?
+
+    console.log("read");
+>console.log("read") : void
+>console.log : (...data: any[]) => void
+>console : Console
+>log : (...data: any[]) => void
+>"read" : "read"
+
+    return 0 as number?;
+>0 as number? : number | null | undefined
+>0 : 0
+}
+
+if (const zero ?= readOnce()) {
+>zero : number | null | undefined
+>?= readOnce() : number | null | undefined
+>readOnce() : number | null | undefined
+>readOnce : () => number?
+
+    console.log(zero.toFixed(1));
+>console.log(zero.toFixed(1)) : void
+>console.log : (...data: any[]) => void
+>console : Console
+>log : (...data: any[]) => void
+>zero.toFixed(1) : string
+>zero.toFixed : (fractionDigits?: number) => string
+>zero : number
+>toFixed : (fractionDigits?: number) => string
+>1 : 1
+}
+

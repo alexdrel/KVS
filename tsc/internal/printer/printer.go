@@ -3452,6 +3452,8 @@ func (p *Printer) emitExpression(node *ast.Expression, precedence ast.OperatorPr
 		p.writePunctuation("#")
 	case ast.KindKvsSieveBindingInitializer:
 		p.emitKvsSieveBindingInitializer(node.AsKvsSieveBindingInitializer())
+	case ast.KindKvsExtantBindingInitializer:
+		p.emitKvsExtantBindingInitializer(node.AsKvsExtantBindingInitializer())
 	case ast.KindKvsSieveAssignmentExpression:
 		p.emitKvsSieveAssignmentExpression(node.AsKvsSieveAssignmentExpression())
 	case ast.KindKvsTypedSpreadAssignmentExpression:
@@ -3993,6 +3995,15 @@ func (p *Printer) emitKvsSieveBindingInitializer(node *ast.KvsSieveBindingInitia
 	p.exitNode(node.AsNode(), state)
 }
 
+func (p *Printer) emitKvsExtantBindingInitializer(node *ast.KvsExtantBindingInitializer) {
+	state := p.enterNode(node.AsNode())
+	p.emitPunctuationNode(node.QuestionToken)
+	p.emitPunctuationNode(node.EqualsToken)
+	p.writeSpace()
+	p.emitExpression(node.Expression, ast.OperatorPrecedenceAssignment)
+	p.exitNode(node.AsNode(), state)
+}
+
 func (p *Printer) emitKvsSieveAssignmentExpression(node *ast.KvsSieveAssignmentExpression) {
 	state := p.enterNode(node.AsNode())
 	p.emitExpression(node.Left, ast.OperatorPrecedenceLeftHandSide)
@@ -4275,6 +4286,9 @@ func (p *Printer) emitVariableDeclaration(node *ast.VariableDeclaration) {
 	if node.Initializer != nil && node.Initializer.Kind == ast.KindKvsSieveBindingInitializer {
 		p.writeSpace()
 		p.emitKvsSieveBindingInitializer(node.Initializer.AsKvsSieveBindingInitializer())
+	} else if node.Initializer != nil && node.Initializer.Kind == ast.KindKvsExtantBindingInitializer {
+		p.writeSpace()
+		p.emitKvsExtantBindingInitializer(node.Initializer.AsKvsExtantBindingInitializer())
 	} else {
 		p.emitInitializer(node.Initializer, greatestEnd(node.Name().End(), node.Type, p.emitContext.GetTypeNode(node.Name())), node.AsNode())
 	}

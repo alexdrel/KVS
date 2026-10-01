@@ -8258,6 +8258,8 @@ func (c *Checker) checkExpressionWorker(node *ast.Node, checkMode CheckMode) *Ty
 		return c.checkKvsDefaultExpression(node, checkMode)
 	case ast.KindKvsSieveExpression, ast.KindKvsSieveBindingInitializer:
 		return c.checkKvsSieveExpression(node, checkMode)
+	case ast.KindKvsExtantBindingInitializer:
+		return c.checkExpressionEx(node.AsKvsExtantBindingInitializer().Expression, checkMode)
 	case ast.KindKvsPlaceholderLambdaExpression:
 		return c.checkKvsPlaceholderLambdaExpression(node.AsKvsPlaceholderLambdaExpression(), checkMode)
 	case ast.KindKvsIterationCoordinateExpression:

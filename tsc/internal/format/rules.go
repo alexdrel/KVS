@@ -108,6 +108,7 @@ func getAllRules() []ruleSpec {
 		rule("SpaceAfterKvsFailureOperator", ast.KindTildeToken, anyToken, []contextPredicate{isNonJsxSameLineTokenContext, isKvsFailureOperatorContext}, ruleActionInsertSpace),
 		rule("NoSpaceInsideKvsFailurePromotion", ast.KindTildeToken, ast.KindTildeToken, []contextPredicate{isNonJsxSameLineTokenContext, isKvsFailureOperatorContext}, ruleActionDeleteSpace),
 		rule("SpaceBeforeKvsCompactLiteral", anyToken, ast.KindQuestionToken, []contextPredicate{isNonJsxSameLineTokenContext, isBeforeKvsCompactLiteral}, ruleActionInsertSpace),
+		rule("SpaceBeforeKvsExtantBinding", anyToken, ast.KindQuestionToken, []contextPredicate{isNonJsxSameLineTokenContext, isKvsExtantBindingContext}, ruleActionInsertSpace),
 		rule("NoSpaceInsideKvsExtantAssignment", ast.KindQuestionToken, ast.KindEqualsToken, []contextPredicate{isNonJsxSameLineTokenContext, isKvsExtantAssignmentContext}, ruleActionDeleteSpace),
 		rule("SpaceAfterKvsExtantAssignment", ast.KindEqualsToken, anyToken, []contextPredicate{isNonJsxSameLineTokenContext, isKvsExtantAssignmentContext}, ruleActionInsertSpace),
 		rule("SpaceBeforeKvsSieveBinding", anyToken, ast.KindTildeToken, []contextPredicate{isNonJsxSameLineTokenContext, isKvsSieveBindingContext}, ruleActionInsertSpace),
