@@ -1,35 +1,41 @@
-kvsTypedConstruction.ts(127,14): error TS2322: Type 'string' is not assignable to type 'number'.
-kvsTypedConstruction.ts(128,14): error TS2322: Type 'number | null' is not assignable to type 'number'.
+kvsTypedConstruction.ts(144,28): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+kvsTypedConstruction.ts(146,25): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+kvsTypedConstruction.ts(147,29): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+kvsTypedConstruction.ts(159,35): error TS2559: Type '{ width: number; }' has no properties in common with type 'Point'.
+kvsTypedConstruction.ts(165,14): error TS2322: Type 'string' is not assignable to type 'number'.
+kvsTypedConstruction.ts(166,14): error TS2322: Type 'number | null' is not assignable to type 'number'.
   Type 'null' is not assignable to type 'number'.
-kvsTypedConstruction.ts(129,1): error TS2559: Type '{ width: number; }' has no properties in common with type 'Point'.
-kvsTypedConstruction.ts(130,1): error TS2698: Spread types may only be created from object types.
-kvsTypedConstruction.ts(142,16): error TS2540: Cannot assign to 'point' because it is a read-only property.
-kvsTypedConstruction.ts(145,1): error TS2588: Cannot assign to 'constantPoint' because it is a constant.
-kvsTypedConstruction.ts(146,1): error TS2364: The left-hand side of an assignment expression must be a variable or a property access.
-kvsTypedConstruction.ts(153,20): error TS2540: Cannot assign to 'x' because it is a read-only property.
-kvsTypedConstruction.ts(156,1): error TS100082: KVS typed in-place spread requires a concrete interface or object type alias target.
-kvsTypedConstruction.ts(160,1): error TS100089: KVS '!' on a typed in-place spread target requires a writable target.
-kvsTypedConstruction.ts(162,11): error TS2322: Type 'string' is not assignable to type 'number'.
-kvsTypedConstruction.ts(163,11): error TS2322: Type 'string' is not assignable to type 'number'.
-kvsTypedConstruction.ts(164,11): error TS2322: Type 'number | null' is not assignable to type 'number'.
+kvsTypedConstruction.ts(167,1): error TS2559: Type '{ width: number; }' has no properties in common with type 'Point'.
+kvsTypedConstruction.ts(168,1): error TS2698: Spread types may only be created from object types.
+kvsTypedConstruction.ts(171,1): error TS2559: Type '{ width: number; }' has no properties in common with type 'Point'.
+kvsTypedConstruction.ts(172,14): error TS2322: Type 'string' is not assignable to type 'number'.
+kvsTypedConstruction.ts(173,1): error TS2698: Spread types may only be created from object types.
+kvsTypedConstruction.ts(196,1): error TS2364: The left-hand side of an assignment expression must be a variable or a property access.
+kvsTypedConstruction.ts(203,20): error TS2540: Cannot assign to 'x' because it is a read-only property.
+kvsTypedConstruction.ts(204,20): error TS2540: Cannot assign to 'x' because it is a read-only property.
+kvsTypedConstruction.ts(207,1): error TS100082: KVS typed in-place spread requires a concrete interface or object type alias target.
+kvsTypedConstruction.ts(211,1): error TS100089: KVS '!' on a typed in-place spread target requires a writable target.
+kvsTypedConstruction.ts(213,11): error TS2322: Type 'string' is not assignable to type 'number'.
+kvsTypedConstruction.ts(214,11): error TS2322: Type 'string' is not assignable to type 'number'.
+kvsTypedConstruction.ts(215,11): error TS2322: Type 'number | null' is not assignable to type 'number'.
   Type 'null' is not assignable to type 'number'.
-kvsTypedConstruction.ts(165,8): error TS2559: Type '{ width: number; }' has no properties in common with type 'Point'.
-kvsTypedConstruction.ts(166,8): error TS2698: Spread types may only be created from object types.
-kvsTypedConstruction.ts(168,10): error TS2322: Type 'string | null | undefined' is not assignable to type 'string'.
+kvsTypedConstruction.ts(216,8): error TS2559: Type '{ width: number; }' has no properties in common with type 'Point'.
+kvsTypedConstruction.ts(217,8): error TS2698: Spread types may only be created from object types.
+kvsTypedConstruction.ts(219,10): error TS2322: Type 'string | null | undefined' is not assignable to type 'string'.
   Type 'undefined' is not assignable to type 'string'.
-kvsTypedConstruction.ts(169,10): error TS2353: Object literal may only specify known properties, and 'unknown' does not exist in type 'Profile'.
-kvsTypedConstruction.ts(174,1): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
-kvsTypedConstruction.ts(177,1): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
-kvsTypedConstruction.ts(182,1): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
-kvsTypedConstruction.ts(187,1): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
-kvsTypedConstruction.ts(197,1): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
-kvsTypedConstruction.ts(199,1): error TS100072: KVS '!' requires a defaultable type.
-kvsTypedConstruction.ts(204,1): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
-kvsTypedConstruction.ts(207,12): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
-kvsTypedConstruction.ts(210,1): error TS2693: 'Profile' only refers to a type, but is being used as a value here.
+kvsTypedConstruction.ts(220,10): error TS2353: Object literal may only specify known properties, and 'unknown' does not exist in type 'Profile'.
+kvsTypedConstruction.ts(225,1): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+kvsTypedConstruction.ts(228,1): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+kvsTypedConstruction.ts(233,1): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+kvsTypedConstruction.ts(238,1): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+kvsTypedConstruction.ts(248,1): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+kvsTypedConstruction.ts(250,1): error TS100072: KVS '!' requires a defaultable type.
+kvsTypedConstruction.ts(255,1): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+kvsTypedConstruction.ts(258,12): error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+kvsTypedConstruction.ts(261,1): error TS2693: 'Profile' only refers to a type, but is being used as a value here.
 
 
-==== kvsTypedConstruction.ts (26 errors) ====
+==== kvsTypedConstruction.ts (32 errors) ====
     interface Entity {
         id: string;
     }
@@ -80,6 +86,28 @@ kvsTypedConstruction.ts(210,1): error TS2693: 'Profile' only refers to a type, b
         names: string[];
     }
     
+    type Path = distinct string;
+    type BrandedPath = branded string;
+    type DistinctPoint = distinct Point;
+    
+    interface VersionFile {
+        path: Path;
+        version?: string;
+    }
+    
+    interface BrandedFile {
+        path: BrandedPath;
+    }
+    
+    interface CallbackHolder {
+        run: () => void;
+        label: string;
+    }
+    
+    declare const maybeRun: (() => void)?;
+    declare let maybePath: Path?;
+    declare let maybeDistinctPoint: DistinctPoint?;
+    
     declare const entities: Entity[];
     
     declare const maybeName: string?;
@@ -115,6 +143,11 @@ kvsTypedConstruction.ts(210,1): error TS2693: 'Profile' only refers to a type, b
     declare const anySource: any;
     declare const optionalPoint: { x?: number; y?: number };
     declare const nullablePoint: { x: number?; y: number };
+    declare const disjointPatch: { x: number } | { y: number };
+    declare const nullableDisjointPatch: { x: number } | { y: number } | null;
+    declare const unrelatedBranch: { x: number } | { width: number };
+    declare const incompatibleBranch: { x: number } | { y: string };
+    declare const nonObjectBranch: { x: number } | 42;
     declare function getRectangle(): Rectangle?;
     declare function getPoint(): Point;
     
@@ -141,6 +174,21 @@ kvsTypedConstruction.ts(210,1): error TS2693: 'Profile' only refers to a type, b
             yield entity.id;
         },
     };
+    const defaultedPath = VersionFile{};
+    const suppliedPath = VersionFile{ path: "package.json" };
+    const materializedPath = maybePath!;
+    const materializedDistinctPoint = maybeDistinctPoint!;
+    const suppliedBrandedPath = BrandedFile{ path: "package.json" as BrandedPath };
+    const missingBrandedPath = BrandedFile{};
+                               ~~~~~~~~~~~
+!!! error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+    const suppliedCallback = CallbackHolder{ run: () => {}, label: "ready" };
+    const missingCallback = CallbackHolder{ label: "missing" };
+                            ~~~~~~~~~~~~~~
+!!! error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
+    const conditionalCallback = CallbackHolder{ run?: maybeRun, label: "conditional" };
+                                ~~~~~~~~~~~~~~
+!!! error TS100081: KVS typed construction requires a concrete defaultable interface or object type alias.
     
     const projected = Point{ ...rectangle };
     const projectedNullable = Point{ ...maybeRectangle };
@@ -151,6 +199,10 @@ kvsTypedConstruction.ts(210,1): error TS2693: 'Profile' only refers to a type, b
     const projectedOnce = Point{ ...getRectangle() };
     const projectedOptional = Point{ ...optionalPoint };
     const projectedNull = NullablePoint{ ...nullablePoint };
+    const projectedDisjoint = Point{ ...disjointPatch };
+    const projectedUnrelated = Point{ ...unrelatedBranch };
+                                      ~~~~~~~~~~~~~~~~~~
+!!! error TS2559: Type '{ width: number; }' has no properties in common with type 'Point'.
     
     let updated = Point{};
     const updatedAlias = updated;
@@ -169,6 +221,17 @@ kvsTypedConstruction.ts(210,1): error TS2693: 'Profile' only refers to a type, b
     updated ...= unknownSource;
     ~~~~~~~~~~~~~~~~~~~~~~~~~~
 !!! error TS2698: Spread types may only be created from object types.
+    updated ...= disjointPatch;
+    updated ...= nullableDisjointPatch;
+    updated ...= unrelatedBranch;
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+!!! error TS2559: Type '{ width: number; }' has no properties in common with type 'Point'.
+    updated ...= incompatibleBranch;
+                 ~~~~~~~~~~~~~~~~~~
+!!! error TS2322: Type 'string' is not assignable to type 'number'.
+    updated ...= nonObjectBranch;
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+!!! error TS2698: Spread types may only be created from object types.
     
     interface PointHolder {
         point: Point;
@@ -181,13 +244,16 @@ kvsTypedConstruction.ts(210,1): error TS2693: 'Profile' only refers to a type, b
     }
     let readonlyHolder = ReadonlyPointHolder{};
     readonlyHolder.point ...= rectangle;
-                   ~~~~~
-!!! error TS2540: Cannot assign to 'point' because it is a read-only property.
     
     const constantPoint = Point{};
     constantPoint ...= rectangle;
-    ~~~~~~~~~~~~~
-!!! error TS2588: Cannot assign to 'constantPoint' because it is a constant.
+    
+    const switchedPoint = Point{};
+    switchedPoint ...= switch (true) {
+        case true: ({ x: 1, y: 2 });
+        default: ({ x: 3, y: 4 });
+    };
+    
     getPoint() ...= rectangle;
     ~~~~~~~~~~
 !!! error TS2364: The left-hand side of an assignment expression must be a variable or a property access.
@@ -199,6 +265,9 @@ kvsTypedConstruction.ts(210,1): error TS2693: 'Profile' only refers to a type, b
     let readonlyPoint = ReadonlyPoint{};
     readonlyPoint ...= rectangle;
                        ~~~~~~~~~
+!!! error TS2540: Cannot assign to 'x' because it is a read-only property.
+    readonlyPoint ...= disjointPatch;
+                       ~~~~~~~~~~~~~
 !!! error TS2540: Cannot assign to 'x' because it is a read-only property.
     
     let maybePoint: Point?;

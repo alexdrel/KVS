@@ -20,13 +20,21 @@ const result = items |?>
 
 const produced = items |?>
     collect (/*producerInput*/%) {
-        yield _.id;
+        yield /*producerElement*/_.id;
+    };
+
+const later = items |?>
+    %.filter(%.id > 0) |>
+    collect (%) {
+        yield /*laterElement*/_.id;
     };
 
 const /*unbracedResult*/hostnames = ["https://example.com"] |>
     collect (%) yield new URL(_).hostname;`
 	f, done := fourslash.NewFourslash(t, nil /*capabilities*/, content)
 	defer done()
+	f.VerifyQuickInfoAt(t, "laterElement", "const _: Item", "")
+	f.VerifyQuickInfoAt(t, "producerElement", "const _: Item", "")
 	f.VerifyQuickInfoAt(t, "pipeOuter", "(parameter) %: Item[]", "")
 	f.VerifyQuickInfoAt(t, "callbackInner", "(parameter) %: number", "")
 	f.VerifyQuickInfoAt(t, "pipeRepeated", "(parameter) %: number", "")

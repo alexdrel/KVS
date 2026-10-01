@@ -149,8 +149,10 @@ Profile{ id: userId }
 
 Horizontal whitespace may separate the type and `{`; a line break may not.
 
-Choosing `Profile{...}` chooses a construction policy: create the POD from the default values of its
-fields, then apply the supplied fields.
+Choosing `Profile{...}` chooses a construction policy: default fields not definitely supplied by the
+object body, then apply the supplied fields. An unconditional named field needs no default;
+conditional fields and spreads may contribute nothing, so their target fields still need defaults.
+Distinct domains use their underlying type's default, just as they use its runtime representation.
 
 Required fields are initialized from their types' defaults; nullable fields remain absent. Thus a
 required `id: string` initially contains `""`, while `tags: string[]` initially contains `[]`. This
@@ -200,6 +202,10 @@ receive generated POD defaults:
 
 A POD is defaultable if and only if every required field type is itself defaultable. Nullable fields
 require no value and therefore do not block defaultability.
+
+Typed construction may still create a POD with a non-defaultable field when that field is supplied
+unconditionally in the object body. This does not make the POD defaultable for `T{}` or `value!`;
+fields supplied conditionally or through spread must still have defaults.
 
 For example, this POD is not defaultable:
 
@@ -299,6 +305,20 @@ type controls the operation:
 A source with no statically projectable fields is an error. A matching field whose type remains
 incompatible after removing `undefined` is also an error; it is not silently filtered out. A wider
 structural source is valid when its shared fields satisfy these rules.
+
+For a union source, check each present object branch independently. Every branch must contribute at
+least one target field, and every matching field in that branch must have a compatible type. The
+projected field list is the union of those matches: at runtime a branch without a particular field
+contributes `undefined`, which leaves that target field unchanged. `null` and `undefined` branches
+remain explicit no-ops; an unrelated object branch is an error rather than an implicit no-op.
+
+```kvs
+const patch = switch {
+    case changeName: ({ name: nextName });
+    default: ({ theme: nextTheme });
+};
+profile ...= patch; // each branch updates only its own field
+```
 
 This gives typed spread update semantics rather than object-enumeration semantics. A missing field
 or a field whose value is `undefined` contributes nothing, so the target field retains its current

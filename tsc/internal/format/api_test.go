@@ -107,6 +107,19 @@ func TestFormatKvsErasedDomains(t *testing.T) {
 	assert.Equal(t, applyBulkEdits(text, edits), "type Pixel = distinct number; type UserId = branded string;\n")
 }
 
+func TestFormatKvsIfBinding(t *testing.T) {
+	t.Parallel()
+
+	ctx := format.WithFormatCodeSettings(t.Context(), lsutil.GetDefaultFormatCodeSettings(), "\n")
+	text := "if( const files~=find(root)){\nconsole.log(files);\n}else{\nconsole.error(\"none\");\n}\n"
+	sourceFile := parser.ParseSourceFile(ast.SourceFileParseOptions{
+		FileName: "/if-binding.ts",
+		Path:     "/if-binding.ts",
+	}, text, core.ScriptKindTS)
+	edits := format.FormatDocument(ctx, sourceFile)
+	assert.Equal(t, applyBulkEdits(text, edits), "if (const files ~= find(root)) {\n    console.log(files);\n} else {\n    console.error(\"none\");\n}\n")
+}
+
 func TestFormatKvsAllInOne(t *testing.T) {
 	t.Parallel()
 

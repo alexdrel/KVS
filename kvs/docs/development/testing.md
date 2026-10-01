@@ -16,15 +16,16 @@ npx hereby test:api
 # Go benchmarks, including parse and formatter/printer paths
 go -C ./tsc test -run=- -bench=. -benchtime=1x ./...
 
-# Compile and run every normal and showcase KVS example, checking stdout
+# Compile and run stdout-baselined normal and showcase KVS examples
 npx hereby test:smoke
 ```
 
-`test:smoke` builds the compiler, discovers every `.ts` file directly under `kvs/examples/` and
+`test:smoke` builds the compiler, discovers `.ts` files directly under `kvs/examples/` and
 `kvs/examples/showcase/`, compiles each independently, and checks its stdout against the
-corresponding file under `kvs/examples/baselines/`. Baseline changes are reviewed and accepted
-manually. Goalposts are deliberately outside this runnable set. These checks complement the normal
-compiler baseline suite; they do not replace it.
+corresponding file under `kvs/examples/baselines/`. The `showcase/versions.ts` CLI is excluded: its
+no-argument run scans the host checkout, so its output is not a stable smoke baseline. Baseline
+changes are reviewed and accepted manually. Goalposts are deliberately outside this runnable set.
+These checks complement the normal compiler baseline suite; they do not replace it.
 
 ### Bootstrap compiler for TypeScript harnesses
 

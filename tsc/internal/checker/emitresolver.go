@@ -65,7 +65,7 @@ func (r *EmitResolver) GetKvsDefaultKind(node *ast.Node) ast.KvsDefaultKind {
 			r.checker.nodeLinks.Get(node).kvsDefaultConstructorSymbol = constructor
 			return ast.KvsDefaultKindConstructor
 		}
-		if _, ok := r.checker.getKvsTypedObjectDefaults(t, make(map[*Type]bool)); ok && r.checker.isKvsNamedStructuralObjectType(t) {
+		if _, ok := r.checker.getKvsTypedObjectDefaults(t, make(map[*Type]bool), nil); ok && r.checker.isKvsNamedStructuralObjectType(t) {
 			return ast.KvsDefaultKindObject
 		}
 	}

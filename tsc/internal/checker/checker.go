@@ -8455,7 +8455,7 @@ func (c *Checker) checkKvsDefaultExpression(node *ast.Node, checkMode CheckMode)
 			c.nodeLinks.Get(node).kvsDefaultConstructorSymbol = constructor
 			return presentType
 		}
-		defaults, ok := c.getKvsTypedObjectDefaults(presentType, make(map[*Type]bool))
+		defaults, ok := c.getKvsTypedObjectDefaults(presentType, make(map[*Type]bool), nil)
 		ok = ok && c.isKvsNamedStructuralObjectType(presentType)
 		if !ok {
 			c.error(node, diagnostics.KVS_requires_a_defaultable_type)
@@ -8559,7 +8559,13 @@ func (c *Checker) checkKvsTypedObjectExpression(node *ast.KvsTypedObjectExpressi
 	target := c.getTypeFromTypeNode(node.Type)
 	links := c.nodeLinks.Get(node.AsNode())
 	links.kvsTypedObjectType = target
-	defaults, ok := c.getKvsTypedObjectDefaults(target, make(map[*Type]bool))
+	written := make(map[string]bool)
+	for _, member := range node.Properties.Nodes {
+		if (ast.IsPropertyAssignment(member) || ast.IsShorthandPropertyAssignment(member)) && !ast.IsKvsConditionalObjectProperty(member) && member.Name() != nil && !ast.IsComputedPropertyName(member.Name()) {
+			written[member.Name().Text()] = true
+		}
+	}
+	defaults, ok := c.getKvsTypedObjectDefaults(target, make(map[*Type]bool), written)
 	if !ok {
 		c.error(node.Type, diagnostics.KVS_typed_construction_requires_a_concrete_defaultable_interface_or_object_type_alias)
 	}
@@ -8625,39 +8631,64 @@ func (c *Checker) checkKvsTypedProjection(node *ast.Node, sourceExpression *ast.
 	presentSource := c.GetNonNullableType(source)
 	targetProperties := c.getPropertiesOfType(target)
 	projected := make([]string, 0, len(targetProperties))
+	projectedFields := make(map[string]bool, len(targetProperties))
+	checkBranch := func(branch *Type) {
+		overlaps := false
+		for _, targetProperty := range targetProperties {
+			sourceProperty := c.getPropertyOfType(branch, targetProperty.Name)
+			if sourceProperty == nil {
+				continue
+			}
+			overlaps = true
+			if rejectReadonly && !projectedFields[targetProperty.Name] && c.isReadonlySymbol(targetProperty) {
+				c.error(sourceExpression, diagnostics.Cannot_assign_to_0_because_it_is_a_read_only_property, c.symbolToString(targetProperty))
+			}
+			projectedFields[targetProperty.Name] = true
+			sourcePropertyType := c.getTypeWithFacts(c.getTypeOfSymbol(sourceProperty), TypeFactsNEUndefined)
+			c.checkTypeAssignableTo(sourcePropertyType, c.getTypeOfSymbol(targetProperty), sourceExpression, nil)
+		}
+		if !overlaps {
+			c.error(node, diagnostics.Type_0_has_no_properties_in_common_with_type_1, c.TypeToString(branch), c.TypeToString(target))
+		}
+	}
 
 	if source.flags&TypeFlagsAny != 0 {
 		for _, targetProperty := range targetProperties {
-			projected = append(projected, targetProperty.Name)
+			projectedFields[targetProperty.Name] = true
 			if rejectReadonly && c.isReadonlySymbol(targetProperty) {
 				c.error(sourceExpression, diagnostics.Cannot_assign_to_0_because_it_is_a_read_only_property, c.symbolToString(targetProperty))
 			}
 		}
 	} else if source.flags&TypeFlagsUnknown != 0 {
 		c.error(node, diagnostics.Spread_types_may_only_be_created_from_object_types)
-	} else if presentSource.flags&TypeFlagsNever == 0 && c.isValidSpreadType(presentSource) {
-		for _, targetProperty := range targetProperties {
-			sourceProperty := c.getPropertyOfType(presentSource, targetProperty.Name)
-			if sourceProperty == nil {
+	} else if presentSource.flags&TypeFlagsUnion != 0 {
+		for _, branch := range presentSource.Types() {
+			if !c.isValidSpreadType(branch) {
+				c.error(node, diagnostics.Spread_types_may_only_be_created_from_object_types)
 				continue
 			}
-			projected = append(projected, targetProperty.Name)
-			if rejectReadonly && c.isReadonlySymbol(targetProperty) {
-				c.error(sourceExpression, diagnostics.Cannot_assign_to_0_because_it_is_a_read_only_property, c.symbolToString(targetProperty))
-			}
-			sourcePropertyType := c.getTypeWithFacts(c.getTypeOfSymbol(sourceProperty), TypeFactsNEUndefined)
-			c.checkTypeAssignableTo(sourcePropertyType, c.getTypeOfSymbol(targetProperty), sourceExpression, nil)
+			checkBranch(branch)
 		}
-	}
-
-	if len(projected) == 0 && presentSource.flags&TypeFlagsNever == 0 && !c.isErrorType(source) && source.flags&TypeFlagsUnknown == 0 {
+	} else if presentSource.flags&TypeFlagsNever != 0 {
+		// An absent source contributes no fields.
+	} else if c.isValidSpreadType(presentSource) {
+		checkBranch(presentSource)
+	} else if !c.isErrorType(source) {
 		c.error(node, diagnostics.Type_0_has_no_properties_in_common_with_type_1, c.TypeToString(source), c.TypeToString(target))
+	}
+	for _, targetProperty := range targetProperties {
+		if projectedFields[targetProperty.Name] {
+			projected = append(projected, targetProperty.Name)
+		}
 	}
 	c.nodeLinks.Get(node).kvsTypedSpreadProperties = projected
 }
 
-func (c *Checker) getKvsTypedObjectDefaults(t *Type, visiting map[*Type]bool) ([]kvsTypedObjectDefault, bool) {
+func (c *Checker) getKvsTypedObjectDefaults(t *Type, visiting map[*Type]bool, written map[string]bool) ([]kvsTypedObjectDefault, bool) {
 	t = c.getReducedType(t)
+	if isKvsDistinctType(t) {
+		t = getKvsDomainUnderlyingOrSelf(t)
+	}
 	if t.flags&TypeFlagsObject == 0 || t.objectFlags&ObjectFlagsClass != 0 || len(c.getIndexInfosOfType(t)) != 0 || len(c.getSignaturesOfType(t, SignatureKindCall)) != 0 || len(c.getSignaturesOfType(t, SignatureKindConstruct)) != 0 {
 		return nil, false
 	}
@@ -8671,6 +8702,9 @@ func (c *Checker) getKvsTypedObjectDefaults(t *Type, visiting map[*Type]bool) ([
 	defer delete(visiting, t)
 	defaults := make([]kvsTypedObjectDefault, 0)
 	for _, property := range c.getPropertiesOfType(t) {
+		if written[property.Name] {
+			continue
+		}
 		propertyType := c.getTypeOfSymbol(property)
 		if property.Flags&ast.SymbolFlagsOptional != 0 || isKvsNullableType(propertyType) {
 			continue
@@ -8683,7 +8717,7 @@ func (c *Checker) getKvsTypedObjectDefaults(t *Type, visiting map[*Type]bool) ([
 				defaults = append(defaults, item)
 				continue
 			}
-			children, ok := c.getKvsTypedObjectDefaults(propertyType, visiting)
+			children, ok := c.getKvsTypedObjectDefaults(propertyType, visiting, nil)
 			if !ok {
 				return nil, false
 			}
@@ -8698,6 +8732,9 @@ func (c *Checker) getKvsTypedObjectDefaults(t *Type, visiting map[*Type]bool) ([
 
 func (c *Checker) getKvsDefaultConstructorSymbol(t *Type, location *ast.Node) *ast.Symbol {
 	t = c.getReducedType(t)
+	if isKvsDistinctType(t) {
+		t = getKvsDomainUnderlyingOrSelf(t)
+	}
 	if t.flags&TypeFlagsObject == 0 || t.symbol == nil {
 		return nil
 	}
@@ -8769,6 +8806,9 @@ func (c *Checker) isKvsPrimitiveDefaultAssignable(kind ast.KvsDefaultKind, targe
 }
 
 func (c *Checker) getKvsDefaultKindForType(t *Type) ast.KvsDefaultKind {
+	if isKvsDistinctType(t) {
+		t = getKvsDomainUnderlyingOrSelf(t)
+	}
 	switch {
 	case everyType(t, func(part *Type) bool { return part.flags&TypeFlagsStringLike != 0 }):
 		return ast.KvsDefaultKindString
@@ -19543,7 +19583,19 @@ func (c *Checker) checkKvsIterationCoordinateExpression(node *ast.Node) *Type {
 }
 
 func (c *Checker) getKvsKeyedIterationInfo(source *ast.Node) (printer.KvsKeyedIterationKind, *Type, *Type) {
-	sourceType := c.GetNonNullableType(c.checkExpression(source))
+	var sourceType *Type
+	if c.kvsPipelineContext == nil {
+		if pipelineInputType := c.getKvsPipelineInputTypeForIteration(source); pipelineInputType != nil {
+			savedContext := c.kvsPipelineContext
+			c.kvsPipelineContext = &kvsPipelineContext{inputType: pipelineInputType}
+			sourceType = c.checkExpression(source)
+			c.kvsPipelineContext = savedContext
+		}
+	}
+	if sourceType == nil {
+		sourceType = c.checkExpression(source)
+	}
+	sourceType = c.GetNonNullableType(sourceType)
 	kind := printer.KvsKeyedIterationKindUnsupported
 	parts := []*Type{sourceType}
 	if sourceType.flags&TypeFlagsUnion != 0 {
@@ -19592,6 +19644,49 @@ func (c *Checker) getKvsKeyedIterationInfo(source *ast.Node) (printer.KvsKeyedIt
 		}
 	}
 	return printer.KvsKeyedIterationKindOrdinal, c.numberType, valueType
+}
+
+// Hover can resolve an implicit iteration binding before its pipeline is checked.
+// Check only preceding stages; checking the whole pipeline would revisit that binding.
+func (c *Checker) getKvsPipelineInputTypeForIteration(source *ast.Node) *Type {
+	if !containsKvsPlaceholderReference(source) {
+		return nil
+	}
+	child := source
+	for parent := source.Parent; parent != nil; child, parent = parent, parent.Parent {
+		if parent.Kind == ast.KindKvsPipelineExpression {
+			pipeline := parent.AsKvsPipelineExpression()
+			if info := c.nodeLinks.Get(parent).kvsPipeline; info != nil {
+				if inputType := info.stageInputTypes[child]; inputType != nil {
+					return inputType
+				}
+			}
+			currentType := c.checkExpression(pipeline.Head)
+			var previousInputType *Type
+			info := &kvsPipelineInfo{bareStages: make(map[*ast.Node]bool)}
+			for index := 0; index < len(pipeline.Elements.Nodes); index += 2 {
+				switch pipeline.Elements.Nodes[index].Kind {
+				case ast.KindBarQuestionGreaterThanToken:
+					currentType = c.GetNonNullableType(currentType)
+				case ast.KindBarPercentGreaterThanToken:
+					if previousInputType != nil {
+						currentType = previousInputType
+					}
+				}
+				stage := pipeline.Elements.Nodes[index+1]
+				if stage == child {
+					return currentType
+				}
+				previousInputType = currentType
+				currentType = c.checkKvsPipelineStage(stage, currentType, info, CheckModeNormal)
+			}
+			return nil
+		}
+		if ast.IsFunctionLikeDeclaration(parent) && (parent.Parent == nil || parent.Parent.Kind != ast.KindKvsPlaceholderLambdaExpression) {
+			break
+		}
+	}
+	return nil
 }
 
 func (c *Checker) isKvsMapType(t *Type) bool {

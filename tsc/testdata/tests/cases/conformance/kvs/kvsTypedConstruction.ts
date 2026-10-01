@@ -51,6 +51,28 @@ interface Report {
     names: string[];
 }
 
+type Path = distinct string;
+type BrandedPath = branded string;
+type DistinctPoint = distinct Point;
+
+interface VersionFile {
+    path: Path;
+    version?: string;
+}
+
+interface BrandedFile {
+    path: BrandedPath;
+}
+
+interface CallbackHolder {
+    run: () => void;
+    label: string;
+}
+
+declare const maybeRun: (() => void)?;
+declare let maybePath: Path?;
+declare let maybeDistinctPoint: DistinctPoint?;
+
 declare const entities: Entity[];
 
 declare const maybeName: string?;
@@ -86,6 +108,11 @@ declare const unknownSource: unknown;
 declare const anySource: any;
 declare const optionalPoint: { x?: number; y?: number };
 declare const nullablePoint: { x: number?; y: number };
+declare const disjointPatch: { x: number } | { y: number };
+declare const nullableDisjointPatch: { x: number } | { y: number } | null;
+declare const unrelatedBranch: { x: number } | { width: number };
+declare const incompatibleBranch: { x: number } | { y: string };
+declare const nonObjectBranch: { x: number } | 42;
 declare function getRectangle(): Rectangle?;
 declare function getPoint(): Point;
 
@@ -112,6 +139,15 @@ const report = Report{
         yield entity.id;
     },
 };
+const defaultedPath = VersionFile{};
+const suppliedPath = VersionFile{ path: "package.json" };
+const materializedPath = maybePath!;
+const materializedDistinctPoint = maybeDistinctPoint!;
+const suppliedBrandedPath = BrandedFile{ path: "package.json" as BrandedPath };
+const missingBrandedPath = BrandedFile{};
+const suppliedCallback = CallbackHolder{ run: () => {}, label: "ready" };
+const missingCallback = CallbackHolder{ label: "missing" };
+const conditionalCallback = CallbackHolder{ run?: maybeRun, label: "conditional" };
 
 const projected = Point{ ...rectangle };
 const projectedNullable = Point{ ...maybeRectangle };
@@ -122,6 +158,8 @@ const projectedTwice = Point{ ...rectangle, ...maybeRectangle };
 const projectedOnce = Point{ ...getRectangle() };
 const projectedOptional = Point{ ...optionalPoint };
 const projectedNull = NullablePoint{ ...nullablePoint };
+const projectedDisjoint = Point{ ...disjointPatch };
+const projectedUnrelated = Point{ ...unrelatedBranch };
 
 let updated = Point{};
 const updatedAlias = updated;
@@ -131,6 +169,11 @@ updated ...= incompatible;
 updated ...= nullablePoint;
 updated ...= unrelated;
 updated ...= unknownSource;
+updated ...= disjointPatch;
+updated ...= nullableDisjointPatch;
+updated ...= unrelatedBranch;
+updated ...= incompatibleBranch;
+updated ...= nonObjectBranch;
 
 interface PointHolder {
     point: Point;
@@ -146,6 +189,13 @@ readonlyHolder.point ...= rectangle;
 
 const constantPoint = Point{};
 constantPoint ...= rectangle;
+
+const switchedPoint = Point{};
+switchedPoint ...= switch (true) {
+    case true: ({ x: 1, y: 2 });
+    default: ({ x: 3, y: 4 });
+};
+
 getPoint() ...= rectangle;
 
 interface ReadonlyPoint {
@@ -154,6 +204,7 @@ interface ReadonlyPoint {
 }
 let readonlyPoint = ReadonlyPoint{};
 readonlyPoint ...= rectangle;
+readonlyPoint ...= disjointPatch;
 
 let maybePoint: Point?;
 maybePoint ...= rectangle;

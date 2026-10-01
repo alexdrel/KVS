@@ -98,6 +98,45 @@ interface Report {
 >names : string[]
 }
 
+type Path = distinct string;
+>Path : Path
+
+type BrandedPath = branded string;
+>BrandedPath : BrandedPath
+
+type DistinctPoint = distinct Point;
+>DistinctPoint : DistinctPoint
+
+interface VersionFile {
+    path: Path;
+>path : Path
+
+    version?: string;
+>version : string | undefined
+}
+
+interface BrandedFile {
+    path: BrandedPath;
+>path : BrandedPath
+}
+
+interface CallbackHolder {
+    run: () => void;
+>run : () => void
+
+    label: string;
+>label : string
+}
+
+declare const maybeRun: (() => void)?;
+>maybeRun : (() => void) | null | undefined
+
+declare let maybePath: Path?;
+>maybePath : Path | null | undefined
+
+declare let maybeDistinctPoint: DistinctPoint?;
+>maybeDistinctPoint : DistinctPoint | null | undefined
+
 declare const entities: Entity[];
 >entities : Entity[]
 
@@ -175,6 +214,30 @@ declare const nullablePoint: { x: number?; y: number };
 >nullablePoint : { x: number?; y: number; }
 >x : number | null | undefined
 >y : number
+
+declare const disjointPatch: { x: number } | { y: number };
+>disjointPatch : { x: number; } | { y: number; }
+>x : number
+>y : number
+
+declare const nullableDisjointPatch: { x: number } | { y: number } | null;
+>nullableDisjointPatch : { x: number; } | { y: number; } | null
+>x : number
+>y : number
+
+declare const unrelatedBranch: { x: number } | { width: number };
+>unrelatedBranch : { x: number; } | { width: number; }
+>x : number
+>width : number
+
+declare const incompatibleBranch: { x: number } | { y: string };
+>incompatibleBranch : { x: number; } | { y: string; }
+>x : number
+>y : string
+
+declare const nonObjectBranch: { x: number } | 42;
+>nonObjectBranch : 42 | { x: number; }
+>x : number
 
 declare function getRectangle(): Rectangle?;
 >getRectangle : () => Rectangle?
@@ -275,6 +338,58 @@ const report = Report{
 
     },
 };
+const defaultedPath = VersionFile{};
+>defaultedPath : VersionFile
+>VersionFile{} : VersionFile
+
+const suppliedPath = VersionFile{ path: "package.json" };
+>suppliedPath : VersionFile
+>VersionFile{ path: "package.json" } : VersionFile
+>path : string
+>"package.json" : "package.json"
+
+const materializedPath = maybePath!;
+>materializedPath : Path
+>maybePath! : Path
+>maybePath : Path | null | undefined
+
+const materializedDistinctPoint = maybeDistinctPoint!;
+>materializedDistinctPoint : DistinctPoint
+>maybeDistinctPoint! : DistinctPoint
+>maybeDistinctPoint : DistinctPoint | null | undefined
+
+const suppliedBrandedPath = BrandedFile{ path: "package.json" as BrandedPath };
+>suppliedBrandedPath : BrandedFile
+>BrandedFile{ path: "package.json" as BrandedPath } : BrandedFile
+>path : BrandedPath
+>"package.json" as BrandedPath : BrandedPath
+>"package.json" : "package.json"
+
+const missingBrandedPath = BrandedFile{};
+>missingBrandedPath : BrandedFile
+>BrandedFile{} : BrandedFile
+
+const suppliedCallback = CallbackHolder{ run: () => {}, label: "ready" };
+>suppliedCallback : CallbackHolder
+>CallbackHolder{ run: () => {}, label: "ready" } : CallbackHolder
+>run : () => void
+>() => {} : () => void
+>label : string
+>"ready" : "ready"
+
+const missingCallback = CallbackHolder{ label: "missing" };
+>missingCallback : CallbackHolder
+>CallbackHolder{ label: "missing" } : CallbackHolder
+>label : string
+>"missing" : "missing"
+
+const conditionalCallback = CallbackHolder{ run?: maybeRun, label: "conditional" };
+>conditionalCallback : CallbackHolder
+>CallbackHolder{ run?: maybeRun, label: "conditional" } : CallbackHolder
+>run : (() => void) | null | undefined
+>maybeRun : (() => void) | null | undefined
+>label : string
+>"conditional" : "conditional"
 
 const projected = Point{ ...rectangle };
 >projected : Point
@@ -326,6 +441,16 @@ const projectedNull = NullablePoint{ ...nullablePoint };
 >NullablePoint{ ...nullablePoint } : NullablePoint
 >nullablePoint : { x: number?; y: number; }
 
+const projectedDisjoint = Point{ ...disjointPatch };
+>projectedDisjoint : Point
+>Point{ ...disjointPatch } : Point
+>disjointPatch : { x: number; } | { y: number; }
+
+const projectedUnrelated = Point{ ...unrelatedBranch };
+>projectedUnrelated : Point
+>Point{ ...unrelatedBranch } : Point
+>unrelatedBranch : { x: number; } | { width: number; }
+
 let updated = Point{};
 >updated : Point
 >Point{} : Point
@@ -365,6 +490,31 @@ updated ...= unknownSource;
 >updated : Point
 >unknownSource : unknown
 
+updated ...= disjointPatch;
+>updated ...= disjointPatch : Point
+>updated : Point
+>disjointPatch : { x: number; } | { y: number; }
+
+updated ...= nullableDisjointPatch;
+>updated ...= nullableDisjointPatch : Point
+>updated : Point
+>nullableDisjointPatch : { x: number; } | { y: number; } | null
+
+updated ...= unrelatedBranch;
+>updated ...= unrelatedBranch : Point
+>updated : Point
+>unrelatedBranch : { x: number; } | { width: number; }
+
+updated ...= incompatibleBranch;
+>updated ...= incompatibleBranch : Point
+>updated : Point
+>incompatibleBranch : { x: number; } | { y: string; }
+
+updated ...= nonObjectBranch;
+>updated ...= nonObjectBranch : Point
+>updated : Point
+>nonObjectBranch : 42 | { x: number; }
+
 interface PointHolder {
     point: Point;
 >point : Point
@@ -390,9 +540,9 @@ let readonlyHolder = ReadonlyPointHolder{};
 
 readonlyHolder.point ...= rectangle;
 >readonlyHolder.point ...= rectangle : Point
->readonlyHolder.point : any
+>readonlyHolder.point : Point
 >readonlyHolder : ReadonlyPointHolder
->point : any
+>point : Point
 >rectangle : Rectangle
 
 const constantPoint = Point{};
@@ -401,8 +551,37 @@ const constantPoint = Point{};
 
 constantPoint ...= rectangle;
 >constantPoint ...= rectangle : Point
->constantPoint : any
+>constantPoint : Point
 >rectangle : Rectangle
+
+const switchedPoint = Point{};
+>switchedPoint : Point
+>Point{} : Point
+
+switchedPoint ...= switch (true) {
+>switchedPoint ...= switch (true) {    case true: ({ x: 1, y: 2 });    default: ({ x: 3, y: 4 });} : Point
+>switchedPoint : Point
+>switch (true) {    case true: ({ x: 1, y: 2 });    default: ({ x: 3, y: 4 });} : { x: number; y: number; } | { x: number; y: number; }
+>true : true
+
+    case true: ({ x: 1, y: 2 });
+>true : true
+>({ x: 1, y: 2 }) : { x: number; y: number; }
+>{ x: 1, y: 2 } : { x: number; y: number; }
+>x : number
+>1 : 1
+>y : number
+>2 : 2
+
+    default: ({ x: 3, y: 4 });
+>({ x: 3, y: 4 }) : { x: number; y: number; }
+>{ x: 3, y: 4 } : { x: number; y: number; }
+>x : number
+>3 : 3
+>y : number
+>4 : 4
+
+};
 
 getPoint() ...= rectangle;
 >getPoint() ...= rectangle : Point
@@ -425,6 +604,11 @@ readonlyPoint ...= rectangle;
 >readonlyPoint ...= rectangle : ReadonlyPoint
 >readonlyPoint : ReadonlyPoint
 >rectangle : Rectangle
+
+readonlyPoint ...= disjointPatch;
+>readonlyPoint ...= disjointPatch : ReadonlyPoint
+>readonlyPoint : ReadonlyPoint
+>disjointPatch : { x: number; } | { y: number; }
 
 let maybePoint: Point?;
 >maybePoint : Point | null | undefined

@@ -1,0 +1,20 @@
+//// [tests/cases/conformance/kvs/kvsDeclarationRuntimeStatements.ts] ////
+
+=== kvsDeclarationRuntimeStatements.ts ===
+export const maybeCount: number? = 3;
+>maybeCount : number | null | undefined
+>3 : 3
+
+if (const count ~= maybeCount) {
+>count : number | null
+>~= maybeCount : number | null
+>maybeCount : number
+
+    console.log(count);
+>console.log(count) : void
+>console.log : (...data: any[]) => void
+>console : Console
+>log : (...data: any[]) => void
+>count : number
+}
+

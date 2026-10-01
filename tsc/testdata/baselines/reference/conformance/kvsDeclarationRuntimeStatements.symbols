@@ -1,0 +1,17 @@
+//// [tests/cases/conformance/kvs/kvsDeclarationRuntimeStatements.ts] ////
+
+=== kvsDeclarationRuntimeStatements.ts ===
+export const maybeCount: number? = 3;
+>maybeCount : Symbol(maybeCount, Decl(kvsDeclarationRuntimeStatements.ts, 0, 12))
+
+if (const count ~= maybeCount) {
+>count : Symbol(count, Decl(kvsDeclarationRuntimeStatements.ts, 2, 9))
+>maybeCount : Symbol(maybeCount, Decl(kvsDeclarationRuntimeStatements.ts, 0, 12))
+
+    console.log(count);
+>console.log : Symbol(Console.log, Decl(lib.dom.d.ts, --, --))
+>console : Symbol(console, Decl(lib.dom.d.ts, --, --))
+>log : Symbol(Console.log, Decl(lib.dom.d.ts, --, --))
+>count : Symbol(count, Decl(kvsDeclarationRuntimeStatements.ts, 2, 9))
+}
+

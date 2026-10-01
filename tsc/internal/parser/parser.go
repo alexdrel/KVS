@@ -1397,11 +1397,11 @@ func (p *Parser) parseIfStatement() *ast.Node {
 		}
 		p.parseExpectedMatchingBrackets(ast.KindOpenParenToken, ast.KindCloseParenToken, openParenParsed, openParenPosition)
 		thenStatement := p.parseStatement()
+		clause := p.finishNode(p.factory.NewKvsIfBindingClause(declarationList, thenStatement), declaration.Pos())
 		var elseStatement *ast.Statement
 		if p.parseOptional(ast.KindElseKeyword) {
 			elseStatement = p.parseStatement()
 		}
-		clause := p.finishNode(p.factory.NewKvsIfBindingClause(declarationList, thenStatement), declaration.Pos())
 		result := p.finishNode(p.factory.NewKvsIfBindingStatement(clause, elseStatement), pos)
 		p.withJSDoc(result, jsdoc)
 		return result

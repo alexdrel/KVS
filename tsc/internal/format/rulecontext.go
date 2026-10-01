@@ -407,6 +407,7 @@ func isAfterCodeBlockContext(context *FormattingContext) bool {
 func isControlDeclContext(context *FormattingContext) bool {
 	switch context.contextNode.Kind {
 	case ast.KindIfStatement,
+		ast.KindKvsIfBindingStatement,
 		ast.KindSwitchStatement,
 		ast.KindForStatement,
 		ast.KindForInStatement,
@@ -598,6 +599,7 @@ func isNotStatementConditionContext(context *FormattingContext) bool {
 func isStatementConditionContext(context *FormattingContext) bool {
 	switch context.contextNode.Kind {
 	case ast.KindIfStatement,
+		ast.KindKvsIfBindingStatement,
 		ast.KindForStatement,
 		ast.KindForInStatement,
 		ast.KindForOfStatement,

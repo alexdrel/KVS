@@ -85,6 +85,8 @@ __debug_bin*
 /kvs/examples/**/*.js
 /kvs/examples/*.js.map
 /kvs/examples/**/*.js.map
+/kvs/examples/*.mjs
+/kvs/examples/**/*.mjs
 
 # Local compiler baselines and test output
 tsc/testdata/baselines/local

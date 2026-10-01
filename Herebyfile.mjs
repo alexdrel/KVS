@@ -1192,7 +1192,7 @@ async function runSmokeTest() {
         fs.readdirSync(path.join(examplesDir, group), { withFileTypes: true })
             .filter(entry => entry.isFile() && entry.name.endsWith(".ts"))
             .map(entry => path.join(group, entry.name))
-    ).sort();
+    ).filter(example => example !== path.join("showcase", "versions.ts")).sort(); // CLI output depends on the scanned directory.
     const expectedBaselines = new Set(examples.map(example => example.replace(/\.ts$/, ".stdout")));
     const actualBaselines = groups.flatMap(group => {
         const directory = path.join(baselinesDir, group);

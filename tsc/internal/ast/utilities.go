@@ -203,7 +203,7 @@ func GetAssignmentTarget(node *Node) *Node {
 			}
 			return nil
 		case KindKvsTypedSpreadAssignmentExpression:
-			if parent.AsKvsTypedSpreadAssignmentExpression().Left == node {
+			if parent.AsKvsTypedSpreadAssignmentExpression().Left == node && node.Kind == KindKvsDefaultExpression {
 				return parent
 			}
 			return nil
@@ -2206,6 +2206,8 @@ func isKvsStatementHeadPosition(node *Node, allowPipelineStage bool) bool {
 			if binary.Left != current {
 				return false
 			}
+		case KindKvsTypedSpreadAssignmentExpression:
+			return parent.AsKvsTypedSpreadAssignmentExpression().Right == current
 		case KindParenthesizedExpression, KindAsExpression, KindSatisfiesExpression, KindNonNullExpression,
 			KindTypeAssertionExpression, KindAwaitExpression, KindVoidExpression, KindTypeOfExpression, KindDeleteExpression,
 			KindPropertyAccessExpression, KindElementAccessExpression, KindCallExpression, KindNewExpression,

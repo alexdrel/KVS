@@ -51,6 +51,28 @@ interface Report {
     names: string[];
 }
 
+type Path = distinct string;
+type BrandedPath = branded string;
+type DistinctPoint = distinct Point;
+
+interface VersionFile {
+    path: Path;
+    version?: string;
+}
+
+interface BrandedFile {
+    path: BrandedPath;
+}
+
+interface CallbackHolder {
+    run: () => void;
+    label: string;
+}
+
+declare const maybeRun: (() => void)?;
+declare let maybePath: Path?;
+declare let maybeDistinctPoint: DistinctPoint?;
+
 declare const entities: Entity[];
 
 declare const maybeName: string?;
@@ -86,6 +108,11 @@ declare const unknownSource: unknown;
 declare const anySource: any;
 declare const optionalPoint: { x?: number; y?: number };
 declare const nullablePoint: { x: number?; y: number };
+declare const disjointPatch: { x: number } | { y: number };
+declare const nullableDisjointPatch: { x: number } | { y: number } | null;
+declare const unrelatedBranch: { x: number } | { width: number };
+declare const incompatibleBranch: { x: number } | { y: string };
+declare const nonObjectBranch: { x: number } | 42;
 declare function getRectangle(): Rectangle?;
 declare function getPoint(): Point;
 
@@ -112,6 +139,15 @@ const report = Report{
         yield entity.id;
     },
 };
+const defaultedPath = VersionFile{};
+const suppliedPath = VersionFile{ path: "package.json" };
+const materializedPath = maybePath!;
+const materializedDistinctPoint = maybeDistinctPoint!;
+const suppliedBrandedPath = BrandedFile{ path: "package.json" as BrandedPath };
+const missingBrandedPath = BrandedFile{};
+const suppliedCallback = CallbackHolder{ run: () => {}, label: "ready" };
+const missingCallback = CallbackHolder{ label: "missing" };
+const conditionalCallback = CallbackHolder{ run?: maybeRun, label: "conditional" };
 
 const projected = Point{ ...rectangle };
 const projectedNullable = Point{ ...maybeRectangle };
@@ -122,6 +158,8 @@ const projectedTwice = Point{ ...rectangle, ...maybeRectangle };
 const projectedOnce = Point{ ...getRectangle() };
 const projectedOptional = Point{ ...optionalPoint };
 const projectedNull = NullablePoint{ ...nullablePoint };
+const projectedDisjoint = Point{ ...disjointPatch };
+const projectedUnrelated = Point{ ...unrelatedBranch };
 
 let updated = Point{};
 const updatedAlias = updated;
@@ -131,6 +169,11 @@ updated ...= incompatible;
 updated ...= nullablePoint;
 updated ...= unrelated;
 updated ...= unknownSource;
+updated ...= disjointPatch;
+updated ...= nullableDisjointPatch;
+updated ...= unrelatedBranch;
+updated ...= incompatibleBranch;
+updated ...= nonObjectBranch;
 
 interface PointHolder {
     point: Point;
@@ -146,6 +189,13 @@ readonlyHolder.point ...= rectangle;
 
 const constantPoint = Point{};
 constantPoint ...= rectangle;
+
+const switchedPoint = Point{};
+switchedPoint ...= switch (true) {
+    case true: ({ x: 1, y: 2 });
+    default: ({ x: 3, y: 4 });
+};
+
 getPoint() ...= rectangle;
 
 interface ReadonlyPoint {
@@ -154,6 +204,7 @@ interface ReadonlyPoint {
 }
 let readonlyPoint = ReadonlyPoint{};
 readonlyPoint ...= rectangle;
+readonlyPoint ...= disjointPatch;
 
 let maybePoint: Point?;
 maybePoint ...= rectangle;
@@ -223,7 +274,7 @@ var __kvsProject = (this && this.__kvsProject) || function (target, source, fiel
     }
     return target;
 };
-var _a;
+var _a, _b;
 class Clock {
     constructor(zone = "UTC") {
         this.zone = zone;
@@ -255,13 +306,22 @@ const spacedBox = { value: "", values: [] };
 const pair = { left: 0, right: [] };
 const fresh = [{ enabled: false, tags: [], settings: { retries: 0, labels: [], aliases: new Map(), visited: new Set(), created: new Date(), clock: new Clock() }, "display-name": "", id: "" }, { enabled: false, tags: [], settings: { retries: 0, labels: [], aliases: new Map(), visited: new Set(), created: new Date(), clock: new Clock() }, "display-name": "", id: "" }];
 const link = { label: "" };
-var _b = [];
+var _c = [];
 for (const entity of entities) {
-    _b.push(entity.id);
+    _c.push(entity.id);
 }
 const report = {
-    names: _b
+    names: _c
 };
+const defaultedPath = { path: "" };
+const suppliedPath = { path: "package.json" };
+const materializedPath = maybePath ?? "";
+const materializedDistinctPoint = maybeDistinctPoint ?? { y: 0, x: 0 };
+const suppliedBrandedPath = { path: "package.json" };
+const missingBrandedPath = {};
+const suppliedCallback = { run: () => { }, label: "ready" };
+const missingCallback = { label: "missing" };
+const conditionalCallback = { ...(_b = maybeRun) != null ? { run: _b } : {}, label: "conditional" };
 const projected = { y: 0, x: 0, ...__kvsProject({}, rectangle, ["y", "x"]) };
 const projectedNullable = { y: 0, x: 0, ...__kvsProject({}, maybeRectangle, ["y", "x"]) };
 const projectedAbsent = { y: 0, x: 0, ...__kvsProject({}, null, []) };
@@ -271,6 +331,8 @@ const projectedTwice = { y: 0, x: 0, ...__kvsProject({}, rectangle, ["y", "x"]),
 const projectedOnce = { y: 0, x: 0, ...__kvsProject({}, getRectangle(), ["y", "x"]) };
 const projectedOptional = { y: 0, x: 0, ...__kvsProject({}, optionalPoint, ["y", "x"]) };
 const projectedNull = { y: 0, ...__kvsProject({}, nullablePoint, ["x", "y"]) };
+const projectedDisjoint = { y: 0, x: 0, ...__kvsProject({}, disjointPatch, ["y", "x"]) };
+const projectedUnrelated = { y: 0, x: 0, ...__kvsProject({}, unrelatedBranch, ["x"]) };
 let updated = { y: 0, x: 0 };
 const updatedAlias = updated;
 const updateResult = __kvsProject(updated, rectangle, ["y", "x"]);
@@ -279,15 +341,30 @@ __kvsProject(updated, incompatible, ["x"]);
 __kvsProject(updated, nullablePoint, ["y", "x"]);
 __kvsProject(updated, unrelated, []);
 __kvsProject(updated, unknownSource, []);
+__kvsProject(updated, disjointPatch, ["y", "x"]);
+__kvsProject(updated, nullableDisjointPatch, ["y", "x"]);
+__kvsProject(updated, unrelatedBranch, ["x"]);
+__kvsProject(updated, incompatibleBranch, ["y", "x"]);
+__kvsProject(updated, nonObjectBranch, ["x"]);
 let holder = { point: { y: 0, x: 0 } };
 __kvsProject(holder.point, rectangle, ["y", "x"]);
 let readonlyHolder = { point: { y: 0, x: 0 } };
 __kvsProject(readonlyHolder.point, rectangle, ["y", "x"]);
 const constantPoint = { y: 0, x: 0 };
 __kvsProject(constantPoint, rectangle, ["y", "x"]);
+const switchedPoint = { y: 0, x: 0 };
+var _d = null;
+switch (true) {
+    case true:
+        _d = ({ x: 1, y: 2 });
+        break;
+    default: _d = ({ x: 3, y: 4 });
+}
+__kvsProject(switchedPoint, _d, ["y", "x"]);
 __kvsProject(getPoint(), rectangle, ["y", "x"]);
 let readonlyPoint = { x: 0, y: 0 };
 __kvsProject(readonlyPoint, rectangle, ["x", "y"]);
+__kvsProject(readonlyPoint, disjointPatch, ["x", "y"]);
 let maybePoint;
 __kvsProject(maybePoint, rectangle, []);
 __kvsProject(maybePoint ?? (maybePoint = { y: 0, x: 0 }), rectangle, ["y", "x"]);
