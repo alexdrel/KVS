@@ -1,6 +1,8 @@
 # Whole Programs
 
-The four whole programs below stand alone and show checked output beside their logs. The showcase programs that follow are also printed here from their tracked sources. The linked chapters give the exact language rules.
+The four whole programs below stand alone and show checked output beside their logs. The showcase
+programs that follow are also printed here from their tracked sources. The linked chapters give the
+exact language rules.
 
 ## Preparing an invoice
 
@@ -51,9 +53,14 @@ console.log(createInvoice("o2"));      // null
 console.log(createInvoice("missing")); // null
 ```
 
-The lookup, total, and final formatting stay in one function. The optional call to `customers.get?` skips the lookup when the order is absent; `formatInvoice?` skips formatting when either the order or customer is absent. The loop returns its final total. The second order has no customer, and the third ID has no order, so both produce `null`.
+The lookup, total, and final formatting stay in one function. The optional call to `customers.get?`
+skips the lookup when the order is absent; `formatInvoice?` skips formatting when either the order
+or customer is absent. The loop returns its final total. The second order has no customer, and the
+third ID has no order, so both produce `null`.
 
-See [nullable values and optional calls](values.md), [accumulator loops](flow.md#returning-final-loop-state), and [conditional production](flow.md#local-conditional-production).
+See [nullable values and optional calls](values.md),
+[accumulator loops](flow.md#returning-final-loop-state), and
+[conditional production](flow.md#local-conditional-production).
 
 ## Local photo transformation
 
@@ -107,9 +114,14 @@ console.log(JSON.stringify(buildCards(photos)));
 console.log(JSON.stringify(buildCards(null))); // []
 ```
 
-The `Photo{ ..._ }` projection copies only the fields in `Photo`, leaving the import path behind. Nullable dimensions flow into `area`; `!` gives an absent number the default zero. The loop produces cards for large photos, and the final `!` turns an absent input collection into an empty array. The color parser's selected `InvalidColor` failure is demoted to absence before the background receives its default.
+The `Photo{ ..._ }` projection copies only the fields in `Photo`, leaving the import path behind.
+Nullable dimensions flow into `area`; `!` gives an absent number the default zero. The loop produces
+cards for large photos, and the final `!` turns an absent input collection into an empty array. The
+color parser's selected `InvalidColor` failure is demoted to absence before the background receives
+its default.
 
-See [collecting](flow.md#collect), [typed construction and spread](data.md#pod-construction), [defaults](values.md#default-values), and [failure demotion](errors.md#demoting-outcomes-to-null-).
+See [collecting](flow.md#collect), [typed construction and spread](data.md#pod-construction),
+[defaults](values.md#default-values), and [failure demotion](errors.md#demoting-outcomes-to-null-).
 
 ## Request-scoped configuration
 
@@ -172,7 +184,10 @@ main();
 // true
 ```
 
-The endpoint establishes a context frame for each request. `loadGreeting` can read the request ID and locale without passing them through every call. The unavailable-user boundary raises an error; a missing locale template falls back to English after the selected failure is demoted. Both requests run successfully, and their audit lines show which context was active.
+The endpoint establishes a context frame for each request. `loadGreeting` can read the request ID
+and locale without passing them through every call. The unavailable-user boundary raises an error; a
+missing locale template falls back to English after the selected failure is demoted. Both requests
+run successfully, and their audit lines show which context was active.
 
 See [typed context](context.md) and [failure policy](errors.md).
 
@@ -218,13 +233,17 @@ console.log(exportFirst([]));        // null
 console.log(exportFirst([{ title: "Note", body: " Café ", approved: true }])); // Q2Fmw6kK
 ```
 
-`select` returns the first approved document with a body. If it produces no document, `|?>` stops the pipeline and returns `null`. Otherwise `%` extracts the body, the bare `normalize` and `toBase64` stages receive the current value, and `% + "\n"` inserts a final newline before encoding. The encoder uses UTF-8 bytes, so it also handles non-ASCII text.
+`select` returns the first approved document with a body. If it produces no document, `|?>` stops
+the pipeline and returns `null`. Otherwise `%` extracts the body, the bare `normalize` and
+`toBase64` stages receive the current value, and `% + "\n"` inserts a final newline before encoding.
+The encoder uses UTF-8 bytes, so it also handles non-ASCII text.
 
 See [first production](flow.md#select) and [pipelines and placeholders](pipelines.md#pipelines).
 
 ## Showcase programs
 
-These are the programs in the [showcase folder](../../examples/showcase/README.md). The smoke test compiles and checks stdout for the first six. The version checker is a directory-dependent CLI.
+These are the programs in the [showcase folder](../../examples/showcase/README.md). The smoke test
+compiles and checks stdout for the first six. The version checker is a directory-dependent CLI.
 
 ### Quadratic roots
 
@@ -267,7 +286,8 @@ console.log(solved);
 // ]
 ```
 
-Nullable square roots flow through numeric arithmetic. The compact array drops missing roots, while the final `collect` keeps only equations with a nonempty result.
+Nullable square roots flow through numeric arithmetic. The compact array drops missing roots, while
+the final `collect` keeps only equations with a nonempty result.
 
 ### Prime numbers
 
@@ -291,7 +311,9 @@ const special = select (primes) {
 console.log(special);
 ```
 
-`select` finds a divisor, while lazy `collect*` produces candidates from an unbounded range. The final `select` stops iteration at the first prime whose decimal form ends in `999`; the checked result is `1999`.
+`select` finds a divisor, while lazy `collect*` produces candidates from an unbounded range. The
+final `select` stops iteration at the first prime whose decimal form ends in `999`; the checked
+result is `1999`.
 
 ### Histogram spikes
 
@@ -323,7 +345,9 @@ for (histo) {
 }
 ```
 
-The nullable histogram has a gap. Lifted division and a filtered `~=` binding skip unusable growth ratios; lazy production yields only indices whose growth passes the threshold. Keyed `#` iteration then marks those positions in the display.
+The nullable histogram has a gap. Lifted division and a filtered `~=` binding skip unusable growth
+ratios; lazy production yields only indices whose growth passes the threshold. Keyed `#` iteration
+then marks those positions in the display.
 
 ### Eight queens
 
@@ -364,7 +388,9 @@ for (allSolutions[0]; s = "") {
 // ...Q....
 ```
 
-Recursive `collect*` enumerates boards lazily. Keyed iteration supplies earlier row and column coordinates, and `select` detects the first conflict before exploring a branch. The program counts the 92 solutions for an eight-by-eight board and prints the first.
+Recursive `collect*` enumerates boards lazily. Keyed iteration supplies earlier row and column
+coordinates, and `select` detects the first conflict before exploring a branch. The program counts
+the 92 solutions for an eight-by-eight board and prints the first.
 
 ### URL normalization
 
@@ -405,7 +431,8 @@ collect(links) yield? _.hostname !== "example.org" ?: _.hostname;
     |> console.log(%); // [ 'other.example' ]
 ```
 
-Failure demotion drops malformed URLs, ordinary conditions reject unsupported schemes, and a pipeline deduplicates accepted URLs before typed projection into `Link` records.
+Failure demotion drops malformed URLs, ordinary conditions reject unsupported schemes, and a
+pipeline deduplicates accepted URLs before typed projection into `Link` records.
 
 ### Trie
 
@@ -444,7 +471,8 @@ for (["cat", "can", "dog", "dot"])
     console.log(_, words.has(_));
 ```
 
-A writable nullable path with `!` creates a missing child node during insertion. Searching uses `?.` instead, so a missing path returns `false` without changing the trie.
+A writable nullable path with `!` creates a missing child node during insertion. Searching uses `?.`
+instead, so a missing path returns `false` without changing the trie.
 
 ### Version checking CLI
 
@@ -532,6 +560,9 @@ if (const files ~= findVersionFiles(root)) {
 }
 ```
 
-This CLI recursively discovers Node and Deno manifests with `collect*`, filters out files without versions, builds typed records, and reports whether their versions agree. Run it with a directory argument. Its output and exit status depend on that directory, so it is excluded from the stdout-baselined smoke run.
+This CLI recursively discovers Node and Deno manifests with `collect*`, filters out files without
+versions, builds typed records, and reports whether their versions agree. Run it with a directory
+argument. Its output and exit status depend on that directory, so it is excluded from the
+stdout-baselined smoke run.
 
 [Back to the language guide](README.md)

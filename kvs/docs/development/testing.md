@@ -21,13 +21,13 @@ npx hereby test:smoke
 ```
 
 `test:smoke` builds the compiler, discovers `.ts` files directly under `kvs/examples/`,
-`kvs/examples/showcase/`, and `kvs/examples/whole-programs/`, compiles each independently, and checks
-its stdout against the corresponding file under `kvs/examples/baselines/`. It also checks that the
-whole-program and showcase sources match the KVS blocks in `kvs/docs/language/examples.md`. The
-`showcase/versions.ts` CLI is excluded: its
-no-argument run scans the host checkout, so its output is not a stable smoke baseline. Baseline
-changes are reviewed and accepted manually. Goalposts are deliberately outside this runnable set.
-These checks complement the normal compiler baseline suite; they do not replace it.
+`kvs/examples/showcase/`, and `kvs/examples/whole-programs/`, compiles each independently, and
+checks its stdout against the corresponding file under `kvs/examples/baselines/`. It also checks
+that the whole-program and showcase sources match the KVS blocks in `kvs/docs/language/examples.md`.
+The `showcase/versions.ts` CLI is excluded: its no-argument run scans the host checkout, so its
+output is not a stable smoke baseline. Baseline changes are reviewed and accepted manually.
+Goalposts are deliberately outside this runnable set. These checks complement the normal compiler
+baseline suite; they do not replace it.
 
 ### Bootstrap compiler for TypeScript harnesses
 

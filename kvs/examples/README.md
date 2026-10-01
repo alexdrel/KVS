@@ -9,10 +9,10 @@ and run with the current compiler. The `whole-programs/` directory contains the 
 shown in the [language guide](../docs/language/examples.md). When a goalpost is fully supported,
 move it to the showcase.
 
-`npx hereby test:smoke` compiles and runs every normal, showcase, and whole-program example. Expected
-stdout is reviewed and accepted manually under `baselines/`; every runnable `.ts` file must have a
-matching `.stdout` file. The smoke test also checks that the language-guide code blocks match their
-tracked whole-program and showcase sources.
+`npx hereby test:smoke` compiles and runs every normal, showcase, and whole-program example.
+Expected stdout is reviewed and accepted manually under `baselines/`; every runnable `.ts` file must
+have a matching `.stdout` file. The smoke test also checks that the language-guide code blocks match
+their tracked whole-program and showcase sources.
 
 - [Extant operations](extant.ts)
 - [Eager collection](collect.ts)
